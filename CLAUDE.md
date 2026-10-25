@@ -18,8 +18,8 @@ Use these skills automatically at the start of each phase, in addition to Contex
 |---|---|
 | 1 · Design system | `swiftui-liquid-glass`, `apple-design`, `animate`, `emil-design-eng`, `swiftui-pro` |
 | 2 · Data + crypto | `swiftdata-pro`, `cryptokit`, `swift-testing`, `write-swift` |
-| 3–6 · Screens | `swiftui-pro`, `swiftui-liquid-glass`, `animate`, `ios-accessibility` |
-| 7 · Onboarding + tour | `tipkit`, `swiftui-pro`, `animate` |
+| 3–6 · Screens (Calendar, Composer, To-do, Journal + Categories) | `swiftui-pro`, `swiftui-liquid-glass`, `animate`, `ios-accessibility` |
+| 7 · Onboarding + tour + Profile | `tipkit`, `swiftui-pro`, `animate` |
 | 8 · Dictation + AI | `speech-recognition`, `apple-on-device-ai` |
 | 9 · Backend | `hono`, `better-auth-best-practices`, `better-auth-security-best-practices`, `cloudflare`, `workers-best-practices`, `wrangler`, `durable-objects`, `turnstile-spin`, `VibeSec-Skill` |
 | 10 · iPhone sign-in + sync | `authentication`, `cryptokit`, `background-processing`, `VibeSec-Skill` |

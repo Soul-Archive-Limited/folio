@@ -4,7 +4,7 @@ import SwiftUI
 struct FolioApp: App {
     var body: some Scene {
         WindowGroup {
-            RootView()
+            AppRootView()
         }
     }
 }

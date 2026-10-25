@@ -13,6 +13,7 @@ Working file for App Store Connect. The full checklist is SPEC §12; this file r
 | Support URL | https://folio.devilsense.com/support |
 | Account deletion URL | https://folio.devilsense.com/delete-account |
 | Copyright | © 2026 Soul Archive Ltd |
+| Developer account | Apple Developer Program — Organization: Soul Archive Ltd (seller name on the store) |
 | Trader status (EU DSA) | Trader: Soul Archive Ltd |
 
 ## Privacy label

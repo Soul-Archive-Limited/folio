@@ -1,0 +1,31 @@
+{
+  "$comment": "Folio colour tokens (SPEC §3.2). Source of truth for iOS asset colours (scripts/generate-ios-colors.py) and, from Phase 11, the web CSS variables. Values are sRGB hex; alpha 0-1. 'contrast' = Increase Contrast variant.",
+  "colors": {
+    "bg":           { "light": "#F5F3EF", "dark": "#0A0A0C" },
+    "bgElevated":   { "light": "#FFFFFF", "dark": "#141418" },
+    "ink":          { "light": "#16161A", "dark": "#F4F4F5" },
+    "inkSecondary": { "light": "#16161A", "dark": "#F4F4F5", "alpha": { "light": 0.60, "dark": 0.62 }, "contrast": { "light": 0.78, "dark": 0.80 } },
+    "inkTertiary":  { "light": "#16161A", "dark": "#F4F4F5", "alpha": { "light": 0.34, "dark": 0.36 }, "contrast": { "light": 0.56, "dark": 0.58 } },
+    "hairline":     { "light": "#000000", "dark": "#FFFFFF", "alpha": { "light": 0.07, "dark": 0.08 }, "contrast": { "light": 0.22, "dark": 0.24 } },
+    "ember":        { "light": "#F0602A", "dark": "#FF7A45" },
+    "done":         { "light": "#2FA35A", "dark": "#7ED69B" },
+    "danger":       { "light": "#D93A3F", "dark": "#FF5A5F" },
+    "aura1":        { "light": "#FFB38F", "dark": "#FF7A45" },
+    "aura2":        { "light": "#D9B8FF", "dark": "#B65CFF" },
+    "aura3":        { "light": "#A9C6FF", "dark": "#3D7BFF" }
+  },
+  "categories": {
+    "ember":    { "light": "#F0602A", "dark": "#FF7A45" },
+    "coral":    { "light": "#E25A4A", "dark": "#FF8A73" },
+    "rose":     { "light": "#C93C70", "dark": "#F2709B" },
+    "plum":     { "light": "#9E3D8A", "dark": "#CF72BA" },
+    "violet":   { "light": "#7650D6", "dark": "#A587F2" },
+    "indigo":   { "light": "#4657D1", "dark": "#808EF2" },
+    "ocean":    { "light": "#1A72B2", "dark": "#52ABEA" },
+    "teal":     { "light": "#0C7D76", "dark": "#3FC4BA" },
+    "sage":     { "light": "#4A7650", "dark": "#8FC191" },
+    "olive":    { "light": "#86862B", "dark": "#BDBD5E" },
+    "sand":     { "light": "#B08A52", "dark": "#DBBC8E" },
+    "graphite": { "light": "#585B63", "dark": "#9C9FA8" }
+  }
+}
