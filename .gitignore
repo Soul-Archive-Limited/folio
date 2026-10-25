@@ -1,0 +1,38 @@
+# --- Secrets (SPEC §13.3–13.4) — never commit ---
+.env
+.env*
+.dev.vars
+.dev.vars*
+*.p8
+*.pem
+*.key
+*.p12
+*.mobileprovision
+*.cer
+secrets/
+
+# --- macOS ---
+.DS_Store
+
+# --- Xcode / XcodeGen (project is generated from ios/project.yml) ---
+*.xcodeproj
+*.xcworkspace
+!*.xcodeproj/project.xcworkspace
+xcuserdata/
+DerivedData/
+build/
+*.xcresult
+
+# --- Node / Wrangler / Astro ---
+node_modules/
+dist/
+.wrangler/
+.astro/
+.cache/
+npm-debug.log*
+coverage/
+
+# --- Editors ---
+.vscode/
+.idea/
+*.swp

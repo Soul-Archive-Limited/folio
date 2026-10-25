@@ -1,0 +1,11 @@
+# Secrets must never be uploaded to Cloudflare (SPEC §13.3)
+.env
+.env*
+.dev.vars
+.dev.vars*
+**/.dev.vars*
+*.p8
+*.pem
+*.key
+.git
+node_modules

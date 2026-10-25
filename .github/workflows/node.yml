@@ -1,0 +1,44 @@
+name: API & web
+
+on:
+  push:
+    paths: ["api/**", "web/**", "shared/**", ".github/workflows/node.yml"]
+  pull_request:
+    paths: ["api/**", "web/**", "shared/**", ".github/workflows/node.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [api, web]
+    defaults:
+      run:
+        working-directory: ${{ matrix.package }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check for package.json
+        id: present
+        run: |
+          if [ -f package.json ]; then echo "yes=true" >> "$GITHUB_OUTPUT"; else echo "No package.json in ${{ matrix.package }} yet — skipping."; fi
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        if: steps.present.outputs.yes == 'true'
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: ${{ matrix.package }}/package-lock.json
+      - name: Install (lockfile only, no install scripts)
+        if: steps.present.outputs.yes == 'true'
+        run: npm ci --ignore-scripts
+      - name: Audit dependencies
+        if: steps.present.outputs.yes == 'true'
+        run: npm audit --audit-level=high
+      - name: Test
+        if: steps.present.outputs.yes == 'true'
+        run: npm test --if-present

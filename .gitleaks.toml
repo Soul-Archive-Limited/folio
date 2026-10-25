@@ -1,0 +1,25 @@
+# gitleaks config — default rules plus Folio-specific ones.
+title = "Folio gitleaks config"
+
+[extend]
+useDefault = true
+
+# Apple Sign in with Apple private key files are PEM "PRIVATE KEY" blocks — covered by the default
+# private-key rule. These extra rules catch Folio's own server secrets if pasted as plain values.
+[[rules]]
+id = "resend-api-key"
+description = "Resend API key"
+regex = '''\bre_[A-Za-z0-9]{8}_[A-Za-z0-9]{20,}\b'''
+keywords = ["re_"]
+
+[[rules]]
+id = "turnstile-secret-key"
+description = "Cloudflare Turnstile secret key"
+regex = '''\b0x4AAAAAAA[A-Za-z0-9_-]{20,}\b'''
+keywords = ["0x4aaaaaaa"]
+
+[[rules]]
+id = "google-oauth-client-secret"
+description = "Google OAuth client secret"
+regex = '''\bGOCSPX-[A-Za-z0-9_-]{28}\b'''
+keywords = ["gocspx-"]

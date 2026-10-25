@@ -1,0 +1,71 @@
+# XcodeGen spec — the .xcodeproj is generated from this file and git-ignored (SPEC §0.9).
+# Regenerate after any change:  cd ios && xcodegen generate
+name: Folio
+
+options:
+  bundleIdPrefix: com.devilsense
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_APPROACHABLE_CONCURRENCY: YES
+    SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    DEAD_CODE_STRIPPING: YES
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+    # Apple Developer Team ID (10 characters, not secret). Set before running on a real
+    # device or using capabilities like Sign in with Apple — see README "Signing".
+    DEVELOPMENT_TEAM: ""
+
+targets:
+  Folio:
+    type: application
+    platform: iOS
+    sources:
+      - path: Folio
+        excludes: ["**/.gitkeep"]
+    info:
+      path: Folio/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: Folio
+        LSRequiresIPhoneOS: true
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.devilsense.folio
+        PRODUCT_NAME: Folio
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        ENABLE_PREVIEWS: YES
+    scheme:
+      testTargets:
+        - FolioTests
+
+  FolioTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: FolioTests
+    dependencies:
+      - target: Folio
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.devilsense.folio.tests
+        GENERATE_INFOPLIST_FILE: YES
