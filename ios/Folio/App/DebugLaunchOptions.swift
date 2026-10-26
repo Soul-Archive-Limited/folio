@@ -15,6 +15,8 @@ import Foundation
 /// - `-FolioFilter Travel` turns on the category filter for that category name.
 /// - `-FolioJumpSheet YES` opens the Jump sheet.
 /// - `-FolioCollapsed YES` collapses the calendar to the selected week.
+/// - `-FolioSkipGreeting YES` skips the launch greeting (UI tests).
+/// - `-FolioSeedTask "Title"` adds one task for today (UI tests).
 enum DebugLaunchOptions {
     enum Screen: String {
         case gallery, cover, greeting
@@ -22,6 +24,10 @@ enum DebugLaunchOptions {
 
     static var screen: Screen? {
         UserDefaults.standard.string(forKey: "FolioScreen").flatMap(Screen.init(rawValue:))
+    }
+
+    static var skipsGreeting: Bool {
+        UserDefaults.standard.bool(forKey: "FolioSkipGreeting")
     }
 
     static var holdsGreeting: Bool {
@@ -34,6 +40,7 @@ enum DebugLaunchOptions {
         if defaults.bool(forKey: "FolioResetData") { store.eraseAll() }
         if defaults.bool(forKey: "FolioSampleData") { PreviewData.loadIfEmpty(into: store) }
         if defaults.bool(forKey: "FolioStressData"), store.isEmpty { PreviewData.loadStressData(into: store) }
+        if let title = defaults.string(forKey: "FolioSeedTask") { _ = try? store.createTask(title: title, day: store.today) }
         if let name = defaults.string(forKey: "displayName"), store.settings().displayName != name {
             store.updateSettings { $0.displayName = name }
         }

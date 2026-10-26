@@ -12,4 +12,7 @@ enum FloatingButtonMetrics {
     /// Space a scrolling list leaves above the tab bar so the floating "+" never sits on a
     /// row: the button plus its 16 pt gap (owner review, Batch A).
     static let clearance: Double = diameter + Spacing.m
+
+    /// Toasts sit above the "+" and the To-do quick-add bar, never on top of them.
+    static let toastBottomPadding: Double = 49 + Spacing.m + diameter + Spacing.s
 }

@@ -70,6 +70,7 @@ targets:
       testTargets:
         - FolioTests
         - FolioCryptoTests
+        - FolioUITests
 
   FolioCrypto:
     type: framework
@@ -98,6 +99,20 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.devilsense.folio.crypto.tests
         GENERATE_INFOPLIST_FILE: YES
+        SWIFT_DEFAULT_ACTOR_ISOLATION: nonisolated
+
+  FolioUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: FolioUITests
+    dependencies:
+      - target: Folio
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.devilsense.folio.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: Folio
         SWIFT_DEFAULT_ACTOR_ISOLATION: nonisolated
 
   FolioTests:

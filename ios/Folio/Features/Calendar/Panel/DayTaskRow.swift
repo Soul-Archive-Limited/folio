@@ -28,5 +28,6 @@ struct DayTaskRow: View {
         .accessibilityElement(children: .combine)
         .accessibilityValue(task.isCompleted ? "Done" : "Not done")
         .accessibilityAction(named: task.isCompleted ? "Mark as not done" : "Mark as done", onToggle)
+        .accessibilityIdentifier("day-task-row")
     }
 }

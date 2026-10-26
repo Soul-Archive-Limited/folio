@@ -8,4 +8,6 @@ enum PreferenceKeys {
     static let lastBackgroundAt = "lastBackgroundAt"
     /// Profile → Writing → "Show photo tiles on calendar" (SPEC §6.9).
     static let showPhotoTiles = "showPhotoTiles"
+    /// To-do: whether the Completed section is expanded (SPEC §6.7, "state persisted").
+    static let todoCompletedExpanded = "todoCompletedExpanded"
 }

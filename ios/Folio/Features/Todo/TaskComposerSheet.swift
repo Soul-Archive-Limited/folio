@@ -1,0 +1,112 @@
+import SwiftUI
+
+/// New or edit task (SPEC §6.8): title (required), notes, optional date and time, category.
+/// Existing tasks get a Delete button at the bottom.
+struct TaskComposerSheet: View {
+    let task: TaskItem?
+
+    @Environment(DiaryStore.self) private var store
+    @Environment(\.dismiss) private var dismiss
+    @State private var title: String
+    @State private var notes: String
+    @State private var hasDate: Bool
+    @State private var day: DayKey
+    @State private var minutes: Int?
+    @State private var categoryID: UUID?
+    @State private var confirmsDelete = false
+    @State private var saveCount = 0
+    @FocusState private var titleFocused: Bool
+
+    init(task: TaskItem?, day: DayKey?, categoryID: UUID? = nil) {
+        self.task = task
+        _title = State(initialValue: task?.title ?? "")
+        _notes = State(initialValue: task?.notes ?? "")
+        _hasDate = State(initialValue: task?.dayKey != nil || day != nil)
+        _day = State(initialValue: task?.day ?? day ?? DayKey(date: AppClock.now, calendar: .current))
+        _minutes = State(initialValue: task?.minutesFromMidnight)
+        _categoryID = State(initialValue: task?.categoryID ?? categoryID)
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    TextField("Title", text: $title, axis: .vertical)
+                        .folioFont(.headline)
+                        .focused($titleFocused)
+                    TextField("Notes", text: $notes, axis: .vertical)
+                        .lineLimit(2...6)
+                }
+                Section {
+                    Toggle("Date", isOn: $hasDate.animation())
+                        .tint(.ember)
+                    if hasDate {
+                        ComposerDatePicker(day: $day, minutes: $minutes)
+                            .listRowInsets(EdgeInsets())
+                    }
+                }
+                Section("Category") {
+                    ComposerCategoryRow(selection: $categoryID)
+                        .listRowBackground(Color.clear)
+                }
+                if task != nil {
+                    Section {
+                        Button("Delete task", role: .destructive) { confirmsDelete = true }
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+            }
+            .scrollContentBackground(.hidden)
+            .navigationTitle(task == nil ? "New task" : "Edit task")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel", systemImage: "xmark") { dismiss() } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save", action: save)
+                        .buttonStyle(.glassProminent)
+                        .tint(.ember)
+                        .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
+        .presentationBackground(.thickMaterial)
+        .privacyCovered()
+        .onAppear { if task == nil { titleFocused = true } }
+        .confirmationDialog("Delete this task?", isPresented: $confirmsDelete, titleVisibility: .visible) {
+            Button("Delete", role: .destructive, action: delete)
+        }
+        .folioHaptic(.warning, trigger: confirmsDelete)
+        .folioHaptic(.success, trigger: saveCount)
+    }
+
+    private func save() {
+        let cleanNotes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
+        do {
+            if let task {
+                try store.updateTask(task, title: title, notes: cleanNotes.isEmpty ? nil : cleanNotes,
+                                     day: hasDate ? day : nil, minutesFromMidnight: minutes, categoryID: categoryID)
+            } else {
+                try store.createTask(title: title, notes: cleanNotes.isEmpty ? nil : cleanNotes,
+                                     day: hasDate ? day : nil, minutesFromMidnight: hasDate ? minutes : nil, categoryID: categoryID)
+            }
+            saveCount += 1
+            dismiss()
+        } catch {
+            // Validation is reflected in the disabled Save button; nothing else to show.
+        }
+    }
+
+    private func delete() {
+        if let task { store.delete(task) }
+        dismiss()
+    }
+}
+
+#Preview {
+    Color.bg.sheet(isPresented: .constant(true)) {
+        TaskComposerSheet(task: nil, day: DayKey(date: .now, calendar: .current))
+    }
+    .environment(PreviewData.previewStore())
+}

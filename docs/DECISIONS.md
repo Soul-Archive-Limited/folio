@@ -95,3 +95,13 @@ Every API and architecture decision, newest last. Format: date · phase · decis
 74. **Delete with Undo restores from an `EntrySnapshot`** (text, day, category and photo bytes). Never-synced entries are hard-deleted, so Undo recreates the entry with new ids. Duplicate uses the same snapshot path.
 75. **The detail carousel shows full-resolution images** decoded off-main, with the thumbnail underneath while they load. Pinch or tap opens a full-screen viewer (pinch 1–4×, double-tap, pan).
 76. **Mic and ✦ are in the keyboard toolbar but disabled**, with accessibility hints, until Phase 8. "Dictate" from the "+" menu opens the composer for now.
+
+## Phase 5 — To-do (2026-10-27)
+
+77. **A tick writes to the store immediately; only the list move waits 1.2 s.** The calendar shows the task as done at once, and a tick isn't lost if you leave the tab during the pause. Tapping again during the pause, or Undo, reverts the store.
+78. **The Undo toast appears at the tick and lasts 4 s.** It covers both the 1.2 s pause and the move, so one toast handles both cases (`TodoModel.undo`). Toasts now sit above the "+" and the quick-add bar.
+79. **Quick add reads "today" or "tomorrow" only as a whole word at the start or end** (case and trailing punctuation ignored), so "Today's paper" stays as typed. English keywords are localisable via `String(localized:)`.
+80. **Swipe actions:** leading is Done / Not done. Trailing is Delete (asks first only if the task has notes), Edit, and Date, which opens Today / Tomorrow / Next week / Pick a date… / Remove date. The same actions are in the context menu for VoiceOver and Switch Control users.
+81. **Undated tasks reorder with `List.onMove`**, which works on iOS 26 (`reorderable()` is iOS 27+). Only undated tasks have a manual order (SPEC §6.7).
+82. **UI test target `FolioUITests`** (XCTest, which UI automation requires) proves SPEC §5 end to end: ticking keeps a task on its calendar day, marked done, and only Delete removes it. Rows carry accessibility identifiers (`todo-row`, `day-task-row`) so the test can't match the hidden Calendar tab's copy.
+83. **Bug found and fixed: "Erase data on this iPhone" didn't erase.** SwiftData's `context.delete(model:)` batch delete fails on the Entry → EntryPhoto inverse ("mandatory OTO nullify inverse") and only logs it. Erase now deletes object by object, and a test covers it.

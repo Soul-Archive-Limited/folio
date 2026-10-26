@@ -330,6 +330,37 @@ final class DiaryStore {
         commit()
     }
 
+    func updateTask(_ task: TaskItem, title: String, notes: String?, day: DayKey?, minutesFromMidnight: Int?,
+                    categoryID: UUID?) throws(StoreError) {
+        let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { throw .taskTitleEmpty }
+        guard TaskItem.titleLengths.contains(trimmed.count) else { throw .titleTooLong }
+        guard (notes?.count ?? 0) <= TaskItem.maximumNotesLength else { throw .notesTooLong }
+        task.title = trimmed
+        task.notes = notes?.isEmpty == true ? nil : notes
+        task.dayKey = day?.rawValue
+        task.minutesFromMidnight = day == nil ? nil : minutesFromMidnight
+        task.categoryID = categoryID
+        task.markChanged(at: now())
+        commit()
+    }
+
+    /// Drag order for undated tasks (SPEC §6.7).
+    func reorderTasks(_ ordered: [TaskItem]) {
+        let indices = ordered.map(\.sortIndex).sorted()
+        for (task, index) in zip(ordered, indices) where task.sortIndex != index {
+            task.sortIndex = index
+            task.markChanged(at: now())
+        }
+        commit()
+    }
+
+    func task(id: UUID) -> TaskItem? {
+        var descriptor = FetchDescriptor<TaskItem>(predicate: #Predicate { $0.id == id && !$0.isTombstone })
+        descriptor.fetchLimit = 1
+        return fetch(descriptor).first
+    }
+
     func delete(_ task: TaskItem) {
         retire(task)
         commit()
@@ -410,16 +441,16 @@ final class DiaryStore {
 
     /// "Erase data on this iPhone" (SPEC §6.9): removes every local record.
     func eraseAll() {
-        do {
-            try context.delete(model: EntryPhoto.self)
-            try context.delete(model: Entry.self)
-            try context.delete(model: TaskItem.self)
-            try context.delete(model: Category.self)
-            try context.delete(model: UserSettings.self)
-        } catch {
-            logger.error("Erase failed: \(error.localizedDescription, privacy: .public)")
-        }
+        // Not `context.delete(model:)`: SwiftData's batch delete fails on the Entry → EntryPhoto
+        // inverse ("mandatory OTO nullify inverse") and silently leaves everything in place.
+        // Deleting objects lets the cascade rule remove photos with their entries.
+        for entry in fetch(FetchDescriptor<Entry>()) { context.delete(entry) }
+        for photo in fetch(FetchDescriptor<EntryPhoto>()) { context.delete(photo) }
+        for task in fetch(FetchDescriptor<TaskItem>()) { context.delete(task) }
+        for category in fetch(FetchDescriptor<Category>()) { context.delete(category) }
+        for settings in fetch(FetchDescriptor<UserSettings>()) { context.delete(settings) }
         commit()
+        ThumbnailCache.shared.removeAll()
     }
 
     // MARK: - Helpers

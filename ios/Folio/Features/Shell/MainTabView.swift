@@ -23,7 +23,7 @@ struct MainTabView: View {
                     .floatingAddButton(day: store.today, namespace: composerNamespace, onRequest: present)
             }
             Tab("To-do", systemImage: "checklist", value: .todo) {
-                PlaceholderTabView(title: "To-do", systemImage: "checkmark.seal", message: "All clear.")
+                TodoScreen()
                     .floatingAddButton(day: store.today, namespace: composerNamespace, onRequest: present)
             }
             Tab("Profile", systemImage: "person.crop.circle", value: .profile) {
@@ -33,7 +33,7 @@ struct MainTabView: View {
         .tabBarMinimizeBehavior(selection.minimisesTabBar ? .onScrollDown : .never)
         .environment(\.newItemRequest, requester)
         .environment(toasts)
-        .toastHost(toasts, bottomPadding: 96)
+        .toastHost(toasts, bottomPadding: FloatingButtonMetrics.toastBottomPadding)
         .sheet(item: $requester.pending) { request in
             ComposerRoute(request: request, calendar: selection == .calendar ? calendar : nil, namespace: composerNamespace)
                 .environment(toasts)

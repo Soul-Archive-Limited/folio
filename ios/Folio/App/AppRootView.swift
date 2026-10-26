@@ -40,6 +40,7 @@ struct AppRootView: View {
         let factory = GreetingFactory(defaults: .standard)
         #if DEBUG
         if let screen = DebugLaunchOptions.screen, screen != .greeting { return }
+        if DebugLaunchOptions.skipsGreeting { return }
         let force = DebugLaunchOptions.screen == .greeting
         #else
         let force = false

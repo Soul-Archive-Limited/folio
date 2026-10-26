@@ -11,7 +11,7 @@ Status key: ✅ done · 🟡 in progress · ⬜ not started
 | 2 | Data + crypto core | SwiftData models, `DayKey`, sync fields, `@Observable` store, `MarkdownCodec` + shared fixtures, image pipeline, `PreviewData`, `FolioCrypto` + shared vectors, recovery key, X25519 link handshake, greeting summary on real data (§5, §10.3, §10.4) | ✅ |
 | 3 | Tabs + Calendar | Native TabView shell, floating "+", Calendar tab, endless month paging, all cell states, filter, Today pill, day panel, collapse to week, Jump sheet, long-press menus, VoiceOver + rotor (§2, §6.2, §6.3, §15.1) | ✅ |
 | 4 | Composer + entry detail | Composer half sheet, rich text, photos, drafts, entry detail with zoom (§5.1, §6.4, §6.5) | ✅ |
-| 5 | To-do | To-do tab, task composer, complete/undo flow, quick-add (§6.7, §6.8) | ⬜ |
+| 5 | To-do | To-do tab, task composer, complete/undo flow, quick-add (§6.7, §6.8) | ✅ |
 | 6 | Journal + Categories | Journal tab (Timeline / Photos), categories manager (§6.6, §6.10) | ⬜ |
 | 7 | Onboarding + tour + Profile | Welcome pages, name, sync choice UI, recovery key + unlock screens, TipKit tour, Profile tab (guest mode), iPad split view (§6.1, §6.9, §6.13, §6.15, §6.16) | ⬜ |
 | 8 | Dictation + AI | SpeechAnalyzer dictation overlay, Foundation Models ✦ menu, permission explainers (§6.11, §6.12, §7, §8, §9) | ⬜ |
@@ -58,3 +58,9 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - iOS 26 rich `TextEditor` limited to SPEC §5.1 via a formatting definition; Aa popover (5 inline + 5 block styles, tick checklist item); saved through `MarkdownCodec`.
 - PhotosPicker (no permission), camera with explainer, photo strip (drag to reorder, × to remove), category chips with inline create, 2 s draft autosave + "Continue your draft?".
 - Entry detail: zoom from the card, full-res carousel + full-screen pinch, share, change date, duplicate, delete with Undo toast, "Same day in other years".
+
+### Phase 5 — To-do (2026-10-27)
+- To-do tab: overdue → dated → undated (drag order), collapsible "Completed · N" (persisted), category filter chips, "All clear." empty state.
+- Tick: fill + checkmark draw + strike-through + haptic, 1.2 s pause, then moves; tap again to cancel; 4 s Undo toast; untick in Completed is instant.
+- Swipe actions (Done, Delete with confirm for notes, Edit, Date menu), glass quick-add bar recognising today/tomorrow, task composer sheet (also from long-press "+").
+- UI test proving only Delete removes a task from the calendar; erase-all bug fixed.
