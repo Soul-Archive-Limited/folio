@@ -33,8 +33,7 @@ struct CalendarGridArea: View {
         .onChange(of: model.visibleMonthID) { _, id in
             if let id { model.monthDidChange(to: MonthKey(year: 0, month: id + 1)) }
         }
-        .folioHaptic(.selection, trigger: model.visibleMonthID)
-        .folioHaptic(.selection, trigger: model.selectedDay)
+        .folioHaptic(.selection, trigger: model.selectionHapticCount)
     }
 
     /// Jump sheet / Today: a quick fade + scale instead of scrolling through months.

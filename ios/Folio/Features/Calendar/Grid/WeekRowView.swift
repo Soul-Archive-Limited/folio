@@ -21,10 +21,10 @@ struct WeekRowView: View {
                 DayCell(
                     state: DayCellState(day: day, marker: markers[day], isToday: day == today,
                                         isSelected: day == model.selectedDay, isInMonth: true,
-                                        matchesFilter: true, showsPhotoTiles: showsPhotoTiles),
+                                        matchesFilter: model.matchesFilter(markers[day]), showsPhotoTiles: showsPhotoTiles),
                     size: layout.cellSize,
                     categoryColor: { $0.flatMap { categoryColors[$0] } ?? .inkSecondary },
-                    onTap: { model.selectedDay = day }
+                    onTap: { model.select(day, reduceMotion: reduceMotion) }
                 )
                 .contextMenu { DayContextMenu(day: day) }
             }

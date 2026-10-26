@@ -24,11 +24,13 @@ struct MonthGridView: View {
             ForEach(0..<6, id: \.self) { row in
                 HStack(spacing: CalendarLayout.gap) {
                     ForEach(days[(row * 7)..<(row * 7 + 7)], id: \.self) { day in
+                        // Out-of-month days are just a faded number: no photos, dots, rings or checks.
+                        let inMonth = day.monthKey == month
                         DayCell(
                             state: DayCellState(
-                                day: day, marker: markers[day], isToday: day == today,
-                                isSelected: day == model.selectedDay, isInMonth: day.monthKey == month,
-                                matchesFilter: matches(markers[day]), showsPhotoTiles: showsPhotoTiles
+                                day: day, marker: inMonth ? markers[day] : nil, isToday: inMonth && day == today,
+                                isSelected: day == model.selectedDay, isInMonth: inMonth,
+                                matchesFilter: model.matchesFilter(markers[day]), showsPhotoTiles: showsPhotoTiles
                             ),
                             size: layout.cellSize,
                             categoryColor: { $0.flatMap { categoryColors[$0] } ?? .inkSecondary },
@@ -45,12 +47,6 @@ struct MonthGridView: View {
         .offset(y: -Double(selectedRow) * layout.rowHeight * progress)
         .padding(CalendarLayout.panelPadding)
         .frame(width: layout.panelWidth, alignment: .top)
-    }
-
-    private func matches(_ marker: DayMarker?) -> Bool {
-        guard model.isFiltering else { return true }
-        guard let marker else { return false }
-        return !marker.categoryIDs.isDisjoint(with: model.filter)
     }
 
     private func tap(_ day: DayKey) {

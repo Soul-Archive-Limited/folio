@@ -14,7 +14,7 @@ struct PhotoTileOverlay: View {
                 .shadow(color: .black.opacity(0.55), radius: 2)
                 .padding(4)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            if let extra = state.marker?.extraPhotoCount, extra > 0 {
+            if let extra = state.marker?.extraEntryCount, extra > 0 {
                 Text("+\(extra)")
                     .folioFont(.micro)
                     .foregroundStyle(.white)

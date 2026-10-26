@@ -111,3 +111,42 @@ struct CalendarModelTests {
         #expect(label.contains("1 task done"))
     }
 }
+
+@MainActor
+@Suite("Calendar haptics (SPEC §3.7: one per gesture)")
+struct CalendarHapticTests {
+    let today = DayKey(year: 2026, month: 10, day: 27)!
+
+    @Test("Tapping a day in another month plays one selection haptic, not two")
+    func outOfMonthTapOneHaptic() {
+        let model = CalendarModel(today: today)
+        model.select(DayKey(year: 2026, month: 11, day: 2)!, reduceMotion: true)
+        model.monthDidChange(to: MonthKey(year: 2026, month: 11)) // the pager settling
+        #expect(model.selectionHapticCount == 1)
+    }
+
+    @Test("Swiping to another month plays one haptic")
+    func swipeOneHaptic() {
+        let model = CalendarModel(today: today)
+        model.monthDidChange(to: MonthKey(year: 2026, month: 11))
+        #expect(model.selectionHapticCount == 1)
+    }
+
+    @Test("Tapping a day in the visible month plays one haptic")
+    func inMonthTap() {
+        let model = CalendarModel(today: today)
+        model.select(DayKey(year: 2026, month: 10, day: 3)!, reduceMotion: true)
+        #expect(model.selectionHapticCount == 1)
+    }
+
+    @Test("Filter matching: unfiltered matches all; filtered needs a shared category")
+    func filterMatching() {
+        let model = CalendarModel(today: today)
+        let travel = UUID()
+        #expect(model.matchesFilter(nil))
+        model.toggleFilter(travel)
+        #expect(!model.matchesFilter(nil))
+        #expect(!model.matchesFilter(DayMarker(categoryIDs: [UUID()])))
+        #expect(model.matchesFilter(DayMarker(categoryIDs: [travel])))
+    }
+}

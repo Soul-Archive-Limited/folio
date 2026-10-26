@@ -71,3 +71,13 @@ Every API and architecture decision, newest last. Format: date · phase · decis
 56. **The "+" button's centre is 127 pt above the bottom edge on iPhone 17 Pro** (home indicator 34 + tab bar 49 + 16 + 28). The greeting mark travels to this point.
 57. **Synthetic Simulator taps need ~0.15 s on Liquid Glass buttons and ~0.3 s inside horizontal scroll views.** This is a tooling quirk only, recorded so screenshot scripts don't misread it as a bug.
 58. **The privacy cover only engages after the app has been active once.** A cold launch passes through `.inactive` before the first `.active`, and the cover was flashing "See you soon" over the launch greeting. A frame-by-frame look at the Batch A recording caught it.
+
+## Batch A fixes — owner review (2026-10-27)
+
+59. **Calendar is quieter.** The open-task ring is 1 pt `inkTertiary` (white at 75% on photo tiles, where `inkTertiary` would vanish). The all-done ring stays `done` green at 1 pt. Out-of-month days are only a faded number: no photo, dots, rings, checks or today dot.
+60. **The filter fades every marker on non-matching days**, rings and checks included, in both the month grid and the week strip (`CalendarModel.matchesFilter`).
+61. **The day panel ends above the floating "+"** (tab bar + button + 16 pt, `FloatingButtonMetrics.clearance`), with a 24 pt fade at its bottom edge. The last row scrolls fully clear, and the "+" can never cover a row, at rest or mid-scroll. This is stricter than a content inset alone, which still lets rows rest under the button.
+62. **"+N" on a photo tile counts extra entries that day**, not extra photos (`DayMarker.extraEntryCount`).
+63. **One selection haptic per gesture**, via a single `selectionHapticCount` trigger. A tap that also pages the month suppresses the page's haptic.
+64. **The large-text list opens on the selected day** (today by default), and re-anchors when the month changes.
+65. **First weekday follows the locale** (unchanged). All screenshots from Batch B on are taken in the en_GB region, so weeks start on Monday; `scripts/sim-shot.sh` passes `-AppleLocale en_GB -AppleLanguages (en-GB)`.

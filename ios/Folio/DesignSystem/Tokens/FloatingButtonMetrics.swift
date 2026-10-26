@@ -9,4 +9,7 @@ enum FloatingButtonMetrics {
     /// Distance from the screen's bottom edge to the button's centre: home indicator (34) +
     /// tab bar (49) + gap (16) + radius. Measured on iPhone 17 Pro: 127 pt.
     static let centerInsetBottom: Double = 34 + 49 + Spacing.m + diameter / 2
+    /// Space a scrolling list leaves above the tab bar so the floating "+" never sits on a
+    /// row: the button plus its 16 pt gap (owner review, Batch A).
+    static let clearance: Double = diameter + Spacing.m
 }

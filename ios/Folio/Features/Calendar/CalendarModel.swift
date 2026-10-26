@@ -14,6 +14,10 @@ final class CalendarModel {
     /// 0 = full month grid, 1 = collapsed to the selected week. Tracks the finger.
     var collapseProgress: Double = 0
     var showsJumpSheet = false
+    /// One selection haptic per gesture (SPEC §3.7). A tap on another month's day pages the
+    /// month too, but that page change must not add a second haptic.
+    private(set) var selectionHapticCount = 0
+    @ObservationIgnored private var suppressMonthHaptic = false
     /// Bumped when a jump should play the quick fade + scale (SPEC §6.3).
     private(set) var jumpCount = 0
     private(set) var months: [MonthKey]
@@ -39,7 +43,9 @@ final class CalendarModel {
     /// Selects a day; days outside the visible month page to their month.
     func select(_ day: DayKey, reduceMotion: Bool) {
         selectedDay = day
+        selectionHapticCount += 1
         if day.monthKey != visibleMonth {
+            suppressMonthHaptic = true
             withAnimation(FolioMotion.standard(reduceMotion: reduceMotion)) { visibleMonthID = day.monthKey.id }
         }
     }
@@ -47,6 +53,7 @@ final class CalendarModel {
     /// Called when the pager settles on a month: keep the selection inside it.
     func monthDidChange(to month: MonthKey) {
         extendIfNeeded(around: month)
+        if suppressMonthHaptic { suppressMonthHaptic = false } else { selectionHapticCount += 1 }
         guard selectedDay.monthKey != month else { return }
         let day = min(selectedDay.day, month.dayCount)
         selectedDay = DayKey(year: month.year, month: month.month, day: day) ?? month.firstDay
@@ -54,6 +61,7 @@ final class CalendarModel {
 
     /// Called when the collapsed week strip settles on a new week.
     func weekDidChange(to weekStart: DayKey) {
+        selectionHapticCount += 1
         let offset = (selectedDay.weekday - weekStart.weekday + 7) % 7
         selectedDay = weekStart.adding(days: offset)
         if selectedDay.monthKey != visibleMonth { visibleMonthID = selectedDay.monthKey.id }
@@ -73,6 +81,8 @@ final class CalendarModel {
         ensureContains(month)
         var transaction = Transaction()
         transaction.disablesAnimations = true
+        suppressMonthHaptic = month != visibleMonth
+        selectionHapticCount += 1
         withTransaction(transaction) {
             visibleMonthID = month.id
             selectedDay = day ?? (month == selectedDay.monthKey ? selectedDay : month.firstDay)
@@ -100,6 +110,13 @@ final class CalendarModel {
         if last.id - month.id < 12 {
             months.append(contentsOf: (1...Self.extendStep).map { last.adding(months: $0) })
         }
+    }
+
+    /// Whether a day's markers stay at full strength under the current filter.
+    func matchesFilter(_ marker: DayMarker?) -> Bool {
+        guard isFiltering else { return true }
+        guard let marker else { return false }
+        return !marker.categoryIDs.isDisjoint(with: filter)
     }
 
     func toggleFilter(_ categoryID: UUID) {

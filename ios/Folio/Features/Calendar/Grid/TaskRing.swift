@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// Task marker (SPEC §6.2): a thin ring for open tasks; a green ring plus a tiny check
-/// when every task that day is done. The check is the non-colour cue.
+/// Task marker (SPEC §6.2): a 1 pt ring for open tasks; a 1 pt green ring plus a tiny check
+/// when every task that day is done. The check is the non-colour cue. Kept deliberately
+/// quiet so task-heavy weeks don't overpower photos and dots (owner review, Batch A).
 struct TaskRing: View {
     let marker: DayMarker?
     let isPhoto: Bool
@@ -9,8 +10,7 @@ struct TaskRing: View {
     var body: some View {
         if let marker, marker.hasTasks {
             RoundedRectangle(cornerRadius: Radius.dayCell)
-                .strokeBorder(marker.allTasksDone ? AnyShapeStyle(.done) : AnyShapeStyle(isPhoto ? .white : .inkSecondary),
-                              lineWidth: 1.5)
+                .strokeBorder(ringStyle(marker), lineWidth: 1)
                 .overlay(alignment: .topTrailing) {
                     if marker.allTasksDone {
                         Image(systemName: "checkmark")
@@ -23,5 +23,10 @@ struct TaskRing: View {
                 }
                 .accessibilityHidden(true)
         }
+    }
+
+    private func ringStyle(_ marker: DayMarker) -> AnyShapeStyle {
+        if marker.allTasksDone { return AnyShapeStyle(.done) }
+        return isPhoto ? AnyShapeStyle(.white.opacity(0.75)) : AnyShapeStyle(.inkTertiary)
     }
 }

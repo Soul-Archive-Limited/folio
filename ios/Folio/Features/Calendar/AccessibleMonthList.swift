@@ -14,6 +14,7 @@ struct AccessibleMonthList: View {
         let firstWeekday = store.settings().firstWeekday ?? store.calendar.firstWeekday
         let markers = store.markers(for: month, firstWeekday: firstWeekday)
         let today = store.today
+        ScrollViewReader { proxy in
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.m) {
                 CalendarHeader(model: model, onTitleTap: onTitleTap)
@@ -38,11 +39,18 @@ struct AccessibleMonthList: View {
                     }
                     .buttonStyle(.pressable)
                     .padding(.horizontal, Spacing.sideMargin)
+                    .id(day)
                 }
                 DayPanel(model: model, onTitleTap: {})
                     .padding(.horizontal, Spacing.sideMargin)
-                    .padding(.bottom, 120)
+                    .padding(.bottom, Spacing.m)
             }
+        }
+        .scrollEdgeFade()
+        .padding(.bottom, FloatingButtonMetrics.clearance)
+        // Open on the selected day (today by default), not day 1 (owner review, Batch A).
+        .onAppear { proxy.scrollTo(model.selectedDay, anchor: .top) }
+        .onChange(of: model.visibleMonth) { proxy.scrollTo(model.selectedDay, anchor: .top) }
         }
     }
 

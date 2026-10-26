@@ -109,13 +109,10 @@ final class DiaryStore {
             var marker = DayMarker()
             let ordered = dayEntries.sorted(by: Self.entryOrder)
             marker.entryCount = ordered.count
-            var photoCount = 0
             for entry in ordered.reversed() {
-                let photos = entry.orderedPhotos
-                photoCount += photos.count
-                if marker.thumbnailPhotoID == nil, let first = photos.first { marker.thumbnailPhotoID = first.id }
+                if marker.thumbnailPhotoID == nil, let first = entry.orderedPhotos.first { marker.thumbnailPhotoID = first.id }
             }
-            marker.extraPhotoCount = max(photoCount - 1, 0)
+            marker.extraEntryCount = marker.thumbnailPhotoID == nil ? 0 : ordered.count - 1
             marker.dotCategoryIDs = Array(ordered.filter { $0.orderedPhotos.isEmpty }.map(\.categoryID).prefix(DayMarker.maximumDots))
             marker.categoryIDs = Set(ordered.compactMap(\.categoryID))
             markers[day] = marker

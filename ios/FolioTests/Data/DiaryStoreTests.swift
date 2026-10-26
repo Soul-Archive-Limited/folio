@@ -117,7 +117,7 @@ struct DiaryStoreTests {
         let marker = try #require(store.markers(for: today.monthKey, firstWeekday: 2)[today])
         #expect(marker.entryCount == 2)
         #expect(marker.thumbnailPhotoID == photo.id)
-        #expect(marker.extraPhotoCount == 1)
+        #expect(marker.extraEntryCount == 1, "two entries, one shown as the photo")
         #expect(marker.dotCategoryIDs == [ideas.id])
         #expect(marker.openTaskCount == 1 && !marker.allTasksDone)
         #expect(marker.categoryIDs == [ideas.id])

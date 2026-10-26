@@ -5,8 +5,8 @@ struct DayMarker: Equatable, Sendable {
     var entryCount = 0
     /// The latest entry's first photo, shown as the cell's thumbnail.
     var thumbnailPhotoID: UUID?
-    /// Photos on this day beyond the one shown ("+2").
-    var extraPhotoCount = 0
+    /// Entries on this day beyond the one whose photo is shown ("+2").
+    var extraEntryCount = 0
     /// Up to 3 category colours for entries without photos, in entry order. nil = uncategorised.
     var dotCategoryIDs: [UUID?] = []
     var openTaskCount = 0

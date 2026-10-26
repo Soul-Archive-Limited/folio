@@ -45,7 +45,7 @@ struct CalendarScreen: View {
                     DayPanel(model: model, onTitleTap: expand)
                         .padding(.horizontal, Spacing.sideMargin)
                         .padding(.top, Spacing.m)
-                        .padding(.bottom, 120)
+                        .padding(.bottom, Spacing.m)
                         // Short days still need room to collapse the grid all the way: the
                         // furthest offset is contentHeight − viewport (viewport excludes the margin).
                         .frame(maxWidth: .infinity, minHeight: viewportHeight + layout.collapseDistance, alignment: .topLeading)
@@ -62,6 +62,10 @@ struct CalendarScreen: View {
                 .onScrollGeometryChange(for: Double.self) { $0.containerSize.height } action: { _, height in
                     viewportHeight = height
                 }
+                // The panel stops above the "+" and the tab bar (tab bar + button + 16 pt), so
+                // the last row scrolls fully clear and the "+" never covers a row.
+                .scrollEdgeFade()
+                .padding(.bottom, FloatingButtonMetrics.clearance)
                 CalendarGridArea(model: model, layout: layout, firstWeekday: firstWeekday)
             }
         }
