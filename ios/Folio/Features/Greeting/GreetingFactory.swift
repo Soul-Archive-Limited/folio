@@ -6,7 +6,7 @@ struct GreetingFactory {
     let defaults: UserDefaults
     var picker = GreetingPicker()
 
-    func makeIfNeeded(now: Date, summary: GreetingSummary, force: Bool = false) -> GreetingIntroModel? {
+    func makeIfNeeded(now: Date, name: String?, summary: GreetingSummary, force: Bool = false) -> GreetingIntroModel? {
         let lastBackground = defaults.object(forKey: PreferenceKeys.lastBackgroundAt) as? Date
         guard force || GreetingLaunchPolicy.shouldShow(now: now, lastBackgroundAt: lastBackground) else {
             return nil
@@ -14,7 +14,7 @@ struct GreetingFactory {
         var generator = SystemRandomNumberGenerator()
         let choice = picker.choose(
             now: now,
-            name: defaults.string(forKey: PreferenceKeys.displayName),
+            name: name,
             lastID: defaults.string(forKey: PreferenceKeys.lastGreetingID),
             onThisDayYear: summary.onThisDayYear,
             using: &generator

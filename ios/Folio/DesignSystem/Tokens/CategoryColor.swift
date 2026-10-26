@@ -2,14 +2,14 @@ import SwiftUI
 
 /// The 12 category colours (SPEC §3.2). Stored on `Category.colorKey` by raw value, so
 /// raw values must never change once shipped.
-enum CategoryColor: String, CaseIterable, Identifiable, Sendable {
+nonisolated enum CategoryColor: String, CaseIterable, Identifiable, Sendable {
     case ember, coral, rose, plum, violet, indigo, ocean, teal, sage, olive, sand, graphite
 
     var id: Self { self }
 
-    var color: Color { Color(resource) }
+    @MainActor var color: Color { Color(resource) }
 
-    var resource: ColorResource {
+    @MainActor var resource: ColorResource {
         switch self {
         case .ember: .categoryEmber
         case .coral: .categoryCoral

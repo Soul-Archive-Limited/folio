@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// The font used for diary text (SPEC §3.3). New York by default.
-enum WritingFont: String, CaseIterable, Identifiable, Sendable {
+nonisolated enum WritingFont: String, CaseIterable, Identifiable, Sendable {
     case newYork
     case sfPro
 

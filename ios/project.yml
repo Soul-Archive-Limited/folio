@@ -30,6 +30,8 @@ targets:
     sources:
       - path: Folio
         excludes: ["**/.gitkeep"]
+    entitlements:
+      path: Folio/Resources/Folio.entitlements
     info:
       path: Folio/Resources/Info.plist
       properties:
@@ -60,15 +62,50 @@ targets:
         ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: YES
         LOCALIZATION_PREFERS_STRING_CATALOGS: YES
         SWIFT_EMIT_LOC_STRINGS: YES
+    dependencies:
+      - target: FolioCrypto
+        embed: false
     scheme:
       testTargets:
         - FolioTests
+        - FolioCryptoTests
+
+  FolioCrypto:
+    type: framework
+    platform: iOS
+    sources:
+      - path: FolioCrypto
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.devilsense.folio.crypto
+        GENERATE_INFOPLIST_FILE: YES
+        MACH_O_TYPE: staticlib
+        SKIP_INSTALL: YES
+        # Library code: callers decide where it runs (write-swift §3).
+        SWIFT_DEFAULT_ACTOR_ISOLATION: nonisolated
+
+  FolioCryptoTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: FolioCryptoTests
+      - path: ../shared/crypto-vectors.json
+        buildPhase: resources
+    dependencies:
+      - target: FolioCrypto
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.devilsense.folio.crypto.tests
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_DEFAULT_ACTOR_ISOLATION: nonisolated
 
   FolioTests:
     type: bundle.unit-test
     platform: iOS
     sources:
       - path: FolioTests
+      - path: ../shared/markdown-fixtures.json
+        buildPhase: resources
     dependencies:
       - target: Folio
     settings:

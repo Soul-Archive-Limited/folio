@@ -8,7 +8,7 @@ Status key: ✅ done · 🟡 in progress · ⬜ not started
 |---|---|---|---|
 | 0 | Setup | Repo layout, CLAUDE.md, docs, security guardrails (§13.4–13.6), XcodeGen project, empty app, LICENSE, README, first push | ✅ |
 | 1 | Design system, greeting, privacy cover | Colour tokens, category palette, type scale, spacing, glass components, `AuraBackground`, toast, motion + haptics, accessibility fallbacks, DEBUG Design Gallery, greeting intro, app-switcher cover (§3, §4) | ✅ |
-| 2 | Data + crypto core | SwiftData models, `DayKey`, sync fields, `@Observable` store, `MarkdownCodec` + shared fixtures, image pipeline, `PreviewData`, `FolioCrypto` + shared vectors, recovery key, X25519 link handshake, greeting summary on real data (§5, §10.3, §10.4) | ⬜ |
+| 2 | Data + crypto core | SwiftData models, `DayKey`, sync fields, `@Observable` store, `MarkdownCodec` + shared fixtures, image pipeline, `PreviewData`, `FolioCrypto` + shared vectors, recovery key, X25519 link handshake, greeting summary on real data (§5, §10.3, §10.4) | ✅ |
 | 3 | Tabs + Calendar | Native TabView shell, floating "+", Calendar tab, endless month paging, all cell states, filter, Today pill, day panel, collapse to week, Jump sheet, long-press menus, VoiceOver + rotor (§2, §6.2, §6.3, §15.1) | ⬜ |
 | 4 | Composer + entry detail | Composer half sheet, rich text, photos, drafts, entry detail with zoom (§5.1, §6.4, §6.5) | ⬜ |
 | 5 | To-do | To-do tab, task composer, complete/undo flow, quick-add (§6.7, §6.8) | ⬜ |
@@ -38,3 +38,10 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - Components: `FolioGlassModifier` (Reduce Transparency / Increase Contrast fallbacks), `GlassCard`, `Chip`, `GlassIconButton`, `EmptyStateView`, toasts with Undo, `AuraBackground`, `AppMark`.
 - DEBUG Design Gallery (`-FolioScreen gallery`).
 - Greeting intro (full pool, no-repeat, specials, tap-to-skip, skip on quick resume) and app-switcher privacy cover.
+
+### Phase 2 — Data + crypto core (2026-10-27)
+- SwiftData schema v1 (`Category`, `Entry`, `EntryPhoto`, `TaskItem`, `UserSettings`) with sync fields, `#Unique`/`#Index`, migration plan; store in a `NSFileProtectionComplete` directory.
+- `DayKey`/`MonthKey` floating days; `DiaryStore` (day queries, cached month markers, category CRUD + un-assign on delete, tombstones, greeting summary).
+- Folio Markdown codec + `shared/markdown-fixtures.json`; photo pipeline (all metadata stripped, ≤ 2048 HEIC, 240 px thumb, `@concurrent`).
+- `FolioCrypto`: data key, AES-256-GCM records with AAD, recovery key (Crockford base32) + HKDF envelope, X25519 device link; `shared/crypto-vectors.json` from WebCrypto.
+- DEBUG sample data (40 entries, 25 tasks, 6 categories, generated photos) and 10k stress generator. Greeting summary uses live data.

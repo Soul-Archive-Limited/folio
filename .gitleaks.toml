@@ -23,3 +23,13 @@ id = "google-oauth-client-secret"
 description = "Google OAuth client secret"
 regex = '''\bGOCSPX-[A-Za-z0-9_-]{28}\b'''
 keywords = ["gocspx-"]
+
+# Narrow allowlists — every entry must say why it's safe.
+[[allowlists]]
+description = "Published test vectors only (RFC 7748 example keys and fixed made-up test values). Never real keys."
+paths = ['''^shared/crypto-vectors\.json$''']
+
+[[allowlists]]
+description = "Swift type annotations that mention 'PrivateKey', not key material."
+regexTarget = "line"
+regexes = ['''^\s*(let|var)\s+\w+:\s*Curve25519\.KeyAgreement\.PrivateKey\s*$''']

@@ -1,0 +1,656 @@
+{
+  "$comment": "Folio Markdown round-trip fixtures (SPEC §5.1). 'canonical' cases must parse to 'document' AND serialise back to exactly 'markdown'. 'lenient' cases parse 'markdown' to 'document' and serialise to 'serialized'. Used by iOS (MarkdownCodecTests) and the web editor.",
+  "version": 1,
+  "canonical": [
+    {
+      "name": "plain text",
+      "markdown": "Hello world",
+      "document": {
+        "blocks": [
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "Hello world",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "bold",
+      "markdown": "A **bold** word",
+      "document": {
+        "blocks": [
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "A ",
+                "styles": []
+              },
+              {
+                "text": "bold",
+                "styles": [
+                  "bold"
+                ]
+              },
+              {
+                "text": " word",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "italic",
+      "markdown": "An _italic_ word",
+      "document": {
+        "blocks": [
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "An ",
+                "styles": []
+              },
+              {
+                "text": "italic",
+                "styles": [
+                  "italic"
+                ]
+              },
+              {
+                "text": " word",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "underline",
+      "markdown": "<u>under</u>line",
+      "document": {
+        "blocks": [
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "under",
+                "styles": [
+                  "underline"
+                ]
+              },
+              {
+                "text": "line",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "strikethrough",
+      "markdown": "~~gone~~",
+      "document": {
+        "blocks": [
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "gone",
+                "styles": [
+                  "strikethrough"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "highlight",
+      "markdown": "a ==bright== idea",
+      "document": {
+        "blocks": [
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "a ",
+                "styles": []
+              },
+              {
+                "text": "bright",
+                "styles": [
+                  "highlight"
+                ]
+              },
+              {
+                "text": " idea",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "bold and italic",
+      "markdown": "**_both_**",
+      "document": {
+        "blocks": [
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "both",
+                "styles": [
+                  "bold",
+                  "italic"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "overlapping styles",
+      "markdown": "**a_b_**_c_",
+      "document": {
+        "blocks": [
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "a",
+                "styles": [
+                  "bold"
+                ]
+              },
+              {
+                "text": "b",
+                "styles": [
+                  "bold",
+                  "italic"
+                ]
+              },
+              {
+                "text": "c",
+                "styles": [
+                  "italic"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "underline outside bold",
+      "markdown": "<u>**x**</u>",
+      "document": {
+        "blocks": [
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "x",
+                "styles": [
+                  "underline",
+                  "bold"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "all five styles",
+      "markdown": "<u>==~~**_all_**~~==</u>",
+      "document": {
+        "blocks": [
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "all",
+                "styles": [
+                  "underline",
+                  "highlight",
+                  "strikethrough",
+                  "bold",
+                  "italic"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "heading",
+      "markdown": "# Saturday",
+      "document": {
+        "blocks": [
+          {
+            "type": "heading",
+            "runs": [
+              {
+                "text": "Saturday",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "heading with bold",
+      "markdown": "# Big **day**",
+      "document": {
+        "blocks": [
+          {
+            "type": "heading",
+            "runs": [
+              {
+                "text": "Big ",
+                "styles": []
+              },
+              {
+                "text": "day",
+                "styles": [
+                  "bold"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "bulleted list",
+      "markdown": "- milk\n- eggs",
+      "document": {
+        "blocks": [
+          {
+            "type": "bullet",
+            "runs": [
+              {
+                "text": "milk",
+                "styles": []
+              }
+            ]
+          },
+          {
+            "type": "bullet",
+            "runs": [
+              {
+                "text": "eggs",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "numbered list",
+      "markdown": "1. one\n2. two",
+      "document": {
+        "blocks": [
+          {
+            "type": "numbered",
+            "runs": [
+              {
+                "text": "one",
+                "styles": []
+              }
+            ]
+          },
+          {
+            "type": "numbered",
+            "runs": [
+              {
+                "text": "two",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "numbering restarts after a paragraph",
+      "markdown": "1. a\nText\n1. b",
+      "document": {
+        "blocks": [
+          {
+            "type": "numbered",
+            "runs": [
+              {
+                "text": "a",
+                "styles": []
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "Text",
+                "styles": []
+              }
+            ]
+          },
+          {
+            "type": "numbered",
+            "runs": [
+              {
+                "text": "b",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "checklist",
+      "markdown": "- [ ] post the letter\n- [x] call Mum",
+      "document": {
+        "blocks": [
+          {
+            "type": "checklist",
+            "checked": false,
+            "runs": [
+              {
+                "text": "post the letter",
+                "styles": []
+              }
+            ]
+          },
+          {
+            "type": "checklist",
+            "checked": true,
+            "runs": [
+              {
+                "text": "call Mum",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "quote",
+      "markdown": "> Be kind",
+      "document": {
+        "blocks": [
+          {
+            "type": "quote",
+            "runs": [
+              {
+                "text": "Be kind",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "escaped marker characters",
+      "markdown": "2\\*3\\=6 and a\\_b \\<3 \\~ \\\\",
+      "document": {
+        "blocks": [
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "2*3=6 and a_b <3 ~ \\",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "paragraph that looks like a bullet",
+      "markdown": "\\- not a list",
+      "document": {
+        "blocks": [
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "- not a list",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "paragraph that looks like a heading",
+      "markdown": "\\# not a heading",
+      "document": {
+        "blocks": [
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "# not a heading",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "paragraph that looks like a number",
+      "markdown": "1\\. not a list",
+      "document": {
+        "blocks": [
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "1. not a list",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "blank line is an empty paragraph",
+      "markdown": "First\n\nSecond",
+      "document": {
+        "blocks": [
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "First",
+                "styles": []
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "runs": []
+          },
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "Second",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "unicode",
+      "markdown": "Café ☕️ 日本 — **naïve**",
+      "document": {
+        "blocks": [
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "Café ☕️ 日本 — ",
+                "styles": []
+              },
+              {
+                "text": "naïve",
+                "styles": [
+                  "bold"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "mixed document",
+      "markdown": "# Trip\nWe walked for **hours**.\n- [x] pack\n> Worth it",
+      "document": {
+        "blocks": [
+          {
+            "type": "heading",
+            "runs": [
+              {
+                "text": "Trip",
+                "styles": []
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "We walked for ",
+                "styles": []
+              },
+              {
+                "text": "hours",
+                "styles": [
+                  "bold"
+                ]
+              },
+              {
+                "text": ".",
+                "styles": []
+              }
+            ]
+          },
+          {
+            "type": "checklist",
+            "checked": true,
+            "runs": [
+              {
+                "text": "pack",
+                "styles": []
+              }
+            ]
+          },
+          {
+            "type": "quote",
+            "runs": [
+              {
+                "text": "Worth it",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "lenient": [
+    {
+      "name": "asterisk italic is read as italic",
+      "markdown": "an *old* style",
+      "document": {
+        "blocks": [
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "an ",
+                "styles": []
+              },
+              {
+                "text": "old",
+                "styles": [
+                  "italic"
+                ]
+              },
+              {
+                "text": " style",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      },
+      "serialized": "an _old_ style"
+    },
+    {
+      "name": "unclosed marker stays literal",
+      "markdown": "2 ** 3",
+      "document": {
+        "blocks": [
+          {
+            "type": "paragraph",
+            "runs": [
+              {
+                "text": "2 ** 3",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      },
+      "serialized": "2 \\*\\* 3"
+    },
+    {
+      "name": "capital X checklist",
+      "markdown": "- [X] done",
+      "document": {
+        "blocks": [
+          {
+            "type": "checklist",
+            "checked": true,
+            "runs": [
+              {
+                "text": "done",
+                "styles": []
+              }
+            ]
+          }
+        ]
+      },
+      "serialized": "- [x] done"
+    }
+  ]
+}

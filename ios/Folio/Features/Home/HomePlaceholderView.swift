@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Stand-in for the tab shell until Phase 3.
 struct HomePlaceholderView: View {
+    @Environment(DiaryStore.self) private var store
     #if DEBUG
     @State private var showsGallery = false
     #endif
@@ -14,6 +15,9 @@ struct HomePlaceholderView: View {
                 #if DEBUG
                 Button("Design Gallery", systemImage: "swatchpalette") { showsGallery = true }
                     .buttonStyle(.glass)
+                Button("Load sample data", systemImage: "tray.and.arrow.down", action: loadSampleData)
+                    .buttonStyle(.glass)
+                    .disabled(!store.isEmpty)
                 #endif
             }
         }
@@ -30,6 +34,15 @@ struct HomePlaceholderView: View {
     }
 }
 
+#if DEBUG
+extension HomePlaceholderView {
+    private func loadSampleData() {
+        PreviewData.loadIfEmpty(into: store)
+    }
+}
+#endif
+
 #Preview {
     HomePlaceholderView()
+        .environment(PreviewData.previewStore())
 }

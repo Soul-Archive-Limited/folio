@@ -6,11 +6,11 @@ import SwiftUI
 struct PrivacyCoverModifier: ViewModifier {
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage(PreferenceKeys.privacyCoverEnabled) private var isEnabled = true
-    @AppStorage(PreferenceKeys.displayName) private var name = ""
+    @Environment(DiaryStore.self) private var store: DiaryStore?
 
     func body(content: Content) -> some View {
         content.overlay {
-            PrivacyCoverView(name: name)
+            PrivacyCoverView(name: isCovered ? store?.settings().displayName ?? "" : "")
                 .opacity(isCovered ? 1 : 0)
                 .allowsHitTesting(isCovered)
                 .accessibilityHidden(!isCovered)

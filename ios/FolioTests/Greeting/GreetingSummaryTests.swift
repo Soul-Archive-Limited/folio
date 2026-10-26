@@ -40,11 +40,11 @@ struct GreetingSummaryTests {
         defaults.removePersistentDomain(forName: "GreetingFactoryTests")
         let factory = GreetingFactory(defaults: defaults)
         let now = Date.now
-        let model = try #require(factory.makeIfNeeded(now: now, summary: .empty))
+        let model = try #require(factory.makeIfNeeded(now: now, name: "Sam", summary: .empty))
         #expect(defaults.string(forKey: PreferenceKeys.lastGreetingID) != nil)
         #expect(!model.greeting.isEmpty)
         defaults.set(now.addingTimeInterval(-30), forKey: PreferenceKeys.lastBackgroundAt)
-        #expect(factory.makeIfNeeded(now: now, summary: .empty) == nil)
-        #expect(factory.makeIfNeeded(now: now, summary: .empty, force: true) != nil)
+        #expect(factory.makeIfNeeded(now: now, name: "Sam", summary: .empty) == nil)
+        #expect(factory.makeIfNeeded(now: now, name: "Sam", summary: .empty, force: true) != nil)
     }
 }
