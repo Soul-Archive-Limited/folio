@@ -34,6 +34,7 @@ struct ComposerPlaceholderSheet: View {
         case .entry: "New entry"
         case .task: "New task"
         case .dictation: "Dictation"
+        case .editEntry: "Edit entry"
         }
     }
 
@@ -42,6 +43,7 @@ struct ComposerPlaceholderSheet: View {
         case .entry: "square.and.pencil"
         case .task: "checklist"
         case .dictation: "mic"
+        case .editEntry: "square.and.pencil"
         }
     }
 
@@ -49,6 +51,7 @@ struct ComposerPlaceholderSheet: View {
         let day: DayKey? = switch request {
         case .entry(let day), .dictation(let day): day
         case .task(let day): day
+        case .editEntry: nil
         }
         guard let day else { return String(localized: "No date") }
         return day.utcDate.formatted(Date.FormatStyle(timeZone: .gmt).weekday(.wide).day().month(.wide))

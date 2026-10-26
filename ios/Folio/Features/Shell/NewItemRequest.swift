@@ -5,12 +5,15 @@ enum NewItemRequest: Identifiable, Hashable {
     case entry(DayKey)
     case task(DayKey?)
     case dictation(DayKey)
+    /// Edit an existing entry (opens the composer at the large detent).
+    case editEntry(UUID)
 
     var id: String {
         switch self {
         case .entry(let day): "entry-\(day.rawValue)"
         case .task(let day): "task-\(day?.rawValue ?? "undated")"
         case .dictation(let day): "dictation-\(day.rawValue)"
+        case .editEntry(let id): "edit-\(id.uuidString)"
         }
     }
 }

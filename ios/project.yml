@@ -37,6 +37,7 @@ targets:
       properties:
         CFBundleDisplayName: Folio
         LSRequiresIPhoneOS: true
+        NSCameraUsageDescription: "Folio uses the camera only when you choose to take a photo for an entry."
         UILaunchScreen:
           UIColorName: bg
           UIImageName: AppMark

@@ -231,6 +231,73 @@ final class DiaryStore {
         commit()
     }
 
+    func entry(id: UUID) -> Entry? {
+        _ = revision
+        var descriptor = FetchDescriptor<Entry>(predicate: #Predicate { $0.id == id && !$0.isTombstone })
+        descriptor.fetchLimit = 1
+        return fetch(descriptor).first
+    }
+
+    /// Entries written on the same calendar day in other years (SPEC §6.5 footer).
+    func entriesOnSameDay(as day: DayKey, excluding id: UUID) -> [Entry] {
+        _ = revision
+        let keys = (max(day.year - 120, 1)...(day.year + 10)).compactMap { year -> String? in
+            year == day.year ? nil : DayKey(year: year, month: day.month, day: day.day)?.rawValue
+        }
+        let descriptor = FetchDescriptor<Entry>(
+            predicate: #Predicate { keys.contains($0.dayKey) && !$0.isTombstone && $0.id != id },
+            sortBy: [SortDescriptor(\.dayKey, order: .reverse)]
+        )
+        return fetch(descriptor)
+    }
+
+    /// Applies the composer's photo order; ids not listed keep their relative order after.
+    func setPhotoOrder(_ entry: Entry, ids: [UUID]) {
+        let photos = entry.orderedPhotos
+        let ordered = ids.compactMap { id in photos.first { $0.id == id } } + photos.filter { !ids.contains($0.id) }
+        for (index, photo) in ordered.enumerated() where photo.sortIndex != index {
+            photo.sortIndex = index
+            photo.markChanged(at: now())
+        }
+        commit()
+    }
+
+    /// Everything needed to bring a deleted entry back (Undo, SPEC §6.14).
+    struct EntrySnapshot {
+        let title: String
+        let body: String
+        let day: DayKey
+        let minutesFromMidnight: Int?
+        let categoryID: UUID?
+        let photos: [ProcessedPhoto]
+    }
+
+    func snapshot(of entry: Entry) -> EntrySnapshot? {
+        guard let day = entry.day else { return nil }
+        return EntrySnapshot(
+            title: entry.title, body: entry.bodyMarkdown, day: day, minutesFromMidnight: entry.minutesFromMidnight,
+            categoryID: entry.categoryID,
+            photos: entry.orderedPhotos.map {
+                ProcessedPhoto(imageData: $0.imageData, thumbnailData: $0.thumbData, pixelWidth: $0.pixelWidth,
+                               pixelHeight: $0.pixelHeight, imageType: "public.heic")
+            }
+        )
+    }
+
+    @discardableResult
+    func restore(_ snapshot: EntrySnapshot) -> Entry? {
+        guard let entry = try? createEntry(title: snapshot.title, body: snapshot.body, day: snapshot.day,
+                                           minutesFromMidnight: snapshot.minutesFromMidnight,
+                                           categoryID: category(id: snapshot.categoryID)?.id) else { return nil }
+        for photo in snapshot.photos { _ = try? addPhoto(photo, to: entry) }
+        return entry
+    }
+
+    @discardableResult
+    func duplicate(_ entry: Entry) -> Entry? {
+        snapshot(of: entry).flatMap(restore)
+    }
+
     // MARK: - Tasks
 
     @discardableResult

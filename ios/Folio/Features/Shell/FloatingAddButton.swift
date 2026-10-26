@@ -4,7 +4,11 @@ import SwiftUI
 /// New entry / New task / Dictate. It sits bottom-trailing, above the tab bar.
 struct FloatingAddButton: View {
     let day: DayKey
+    let namespace: Namespace.ID
     let onRequest: (NewItemRequest) -> Void
+
+    /// The composer sheet zooms out of the button (SPEC §2: "+" morphs into the composer).
+    static let transitionID = "composer"
 
     @Namespace private var glass
 
@@ -27,6 +31,7 @@ struct FloatingAddButton: View {
             .accessibilityLabel("New entry")
             .accessibilityHint("Touch and hold for more options")
             .accessibilityInputLabels(["New entry", "Plus", "Add"])
+            .matchedTransitionSource(id: Self.transitionID, in: namespace)
         }
         .padding(.trailing, Spacing.sideMargin)
         .padding(.bottom, Spacing.m)
@@ -35,9 +40,9 @@ struct FloatingAddButton: View {
 
 extension View {
     /// Places the floating "+" over this tab's content, above the tab bar.
-    func floatingAddButton(day: DayKey, onRequest: @escaping (NewItemRequest) -> Void) -> some View {
+    func floatingAddButton(day: DayKey, namespace: Namespace.ID, onRequest: @escaping (NewItemRequest) -> Void) -> some View {
         overlay(alignment: .bottomTrailing) {
-            FloatingAddButton(day: day, onRequest: onRequest)
+            FloatingAddButton(day: day, namespace: namespace, onRequest: onRequest)
         }
     }
 }

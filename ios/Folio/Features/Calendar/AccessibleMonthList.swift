@@ -41,7 +41,7 @@ struct AccessibleMonthList: View {
                     .padding(.horizontal, Spacing.sideMargin)
                     .id(day)
                 }
-                DayPanel(model: model, onTitleTap: {})
+                DayPanel(model: model, zoomNamespace: nil, onTitleTap: {})
                     .padding(.horizontal, Spacing.sideMargin)
                     .padding(.bottom, Spacing.m)
             }

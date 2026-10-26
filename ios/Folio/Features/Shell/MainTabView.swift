@@ -6,23 +6,25 @@ struct MainTabView: View {
     @State private var selection: AppTab = .calendar
     @State private var calendar: CalendarModel?
     @State private var requester = NewItemRequester()
+    @State private var toasts = ToastCenter()
+    @Namespace private var composerNamespace
 
     var body: some View {
         TabView(selection: $selection) {
             Tab("Calendar", systemImage: "calendar", value: .calendar) {
                 if let calendar {
                     CalendarScreen(model: calendar)
-                        .floatingAddButton(day: calendar.selectedDay, onRequest: present)
+                        .floatingAddButton(day: calendar.selectedDay, namespace: composerNamespace, onRequest: present)
                 }
             }
             Tab("Journal", systemImage: "book.pages", value: .journal) {
                 PlaceholderTabView(title: "Journal", systemImage: "book.pages",
                                    message: "Your journal is empty. Tap + to write your first page.")
-                    .floatingAddButton(day: store.today, onRequest: present)
+                    .floatingAddButton(day: store.today, namespace: composerNamespace, onRequest: present)
             }
             Tab("To-do", systemImage: "checklist", value: .todo) {
                 PlaceholderTabView(title: "To-do", systemImage: "checkmark.seal", message: "All clear.")
-                    .floatingAddButton(day: store.today, onRequest: present)
+                    .floatingAddButton(day: store.today, namespace: composerNamespace, onRequest: present)
             }
             Tab("Profile", systemImage: "person.crop.circle", value: .profile) {
                 ProfilePlaceholderView()
@@ -30,8 +32,11 @@ struct MainTabView: View {
         }
         .tabBarMinimizeBehavior(selection.minimisesTabBar ? .onScrollDown : .never)
         .environment(\.newItemRequest, requester)
+        .environment(toasts)
+        .toastHost(toasts, bottomPadding: 96)
         .sheet(item: $requester.pending) { request in
-            ComposerPlaceholderSheet(request: request)
+            ComposerRoute(request: request, calendar: selection == .calendar ? calendar : nil, namespace: composerNamespace)
+                .environment(toasts)
         }
         .task {
             guard calendar == nil else { return }

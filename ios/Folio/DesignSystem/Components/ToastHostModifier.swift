@@ -4,6 +4,7 @@ import SwiftUI
 /// from the bottom and leave the same way; under Reduce Motion they only fade.
 struct ToastHostModifier: ViewModifier {
     let center: ToastCenter
+    var bottomPadding: Double = Spacing.xs
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -17,14 +18,14 @@ struct ToastHostModifier: ViewModifier {
                 }
             }
             .padding(.horizontal, Spacing.sideMargin)
-            .padding(.bottom, Spacing.xs)
+            .padding(.bottom, bottomPadding)
             .animation(FolioMotion.standard(reduceMotion: reduceMotion), value: center.current)
         }
     }
 }
 
 extension View {
-    func toastHost(_ center: ToastCenter) -> some View {
-        modifier(ToastHostModifier(center: center))
+    func toastHost(_ center: ToastCenter, bottomPadding: Double = Spacing.xs) -> some View {
+        modifier(ToastHostModifier(center: center, bottomPadding: bottomPadding))
     }
 }

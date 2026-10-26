@@ -3,6 +3,8 @@ import SwiftUI
 /// The selected day's entries and tasks, under the grid (SPEC §6.2).
 struct DayPanel: View {
     let model: CalendarModel
+    /// Entry cards are the source of the zoom into entry detail (SPEC §3.6).
+    let zoomNamespace: Namespace.ID?
     let onTitleTap: () -> Void
 
     @Environment(DiaryStore.self) private var store
@@ -36,6 +38,7 @@ struct DayPanel: View {
                     ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
                         NavigationLink(value: entry.id) {
                             EntryCard(entry: entry, category: entry.categoryID.flatMap { categories[$0] }, calendar: store.calendar)
+                                .zoomSource(id: entry.id, in: zoomNamespace)
                         }
                         .buttonStyle(.pressable)
                         .staggeredAppear(index: index)

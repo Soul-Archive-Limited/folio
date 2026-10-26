@@ -10,7 +10,7 @@ Status key: ✅ done · 🟡 in progress · ⬜ not started
 | 1 | Design system, greeting, privacy cover | Colour tokens, category palette, type scale, spacing, glass components, `AuraBackground`, toast, motion + haptics, accessibility fallbacks, DEBUG Design Gallery, greeting intro, app-switcher cover (§3, §4) | ✅ |
 | 2 | Data + crypto core | SwiftData models, `DayKey`, sync fields, `@Observable` store, `MarkdownCodec` + shared fixtures, image pipeline, `PreviewData`, `FolioCrypto` + shared vectors, recovery key, X25519 link handshake, greeting summary on real data (§5, §10.3, §10.4) | ✅ |
 | 3 | Tabs + Calendar | Native TabView shell, floating "+", Calendar tab, endless month paging, all cell states, filter, Today pill, day panel, collapse to week, Jump sheet, long-press menus, VoiceOver + rotor (§2, §6.2, §6.3, §15.1) | ✅ |
-| 4 | Composer + entry detail | Composer half sheet, rich text, photos, drafts, entry detail with zoom (§5.1, §6.4, §6.5) | ⬜ |
+| 4 | Composer + entry detail | Composer half sheet, rich text, photos, drafts, entry detail with zoom (§5.1, §6.4, §6.5) | ✅ |
 | 5 | To-do | To-do tab, task composer, complete/undo flow, quick-add (§6.7, §6.8) | ⬜ |
 | 6 | Journal + Categories | Journal tab (Timeline / Photos), categories manager (§6.6, §6.10) | ⬜ |
 | 7 | Onboarding + tour + Profile | Welcome pages, name, sync choice UI, recovery key + unlock screens, TipKit tour, Profile tab (guest mode), iPad split view (§6.1, §6.9, §6.13, §6.15, §6.16) | ⬜ |
@@ -52,3 +52,9 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - Day panel (entry cards, tasks that tick in place and stay), finger-tracking collapse to a swipeable week strip with snapping, Jump sheet (year strip 1900→+10, months with entry dots).
 - VoiceOver labels + "Days with entries" rotor; AX-size list layout; 10k-entry performance test.
 - Journal, To-do and Profile are placeholders; composers are placeholder sheets (Phases 4–7).
+
+### Phase 4 — Composer + entry detail (2026-10-27)
+- Half-sheet composer over the calendar (tap a day to move the entry), date pill back to 1900 with optional time, Save/Cancel with discard confirm.
+- iOS 26 rich `TextEditor` limited to SPEC §5.1 via a formatting definition; Aa popover (5 inline + 5 block styles, tick checklist item); saved through `MarkdownCodec`.
+- PhotosPicker (no permission), camera with explainer, photo strip (drag to reorder, × to remove), category chips with inline create, 2 s draft autosave + "Continue your draft?".
+- Entry detail: zoom from the card, full-res carousel + full-screen pinch, share, change date, duplicate, delete with Undo toast, "Same day in other years".

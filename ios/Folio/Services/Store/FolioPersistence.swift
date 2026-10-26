@@ -11,7 +11,7 @@ import SwiftData
 enum FolioPersistence {
     static let logger = Logger(subsystem: "com.devilsense.folio", category: "persistence")
 
-    static var storeDirectory: URL {
+    nonisolated static var storeDirectory: URL {
         URL.applicationSupportDirectory.appending(path: "Folio", directoryHint: .isDirectory)
     }
 

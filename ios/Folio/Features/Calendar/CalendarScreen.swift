@@ -12,6 +12,7 @@ struct CalendarScreen: View {
     @State private var width: Double = 402
     @State private var scrollPosition = ScrollPosition(edge: .top)
     @State private var viewportHeight: Double = 600
+    @Namespace private var entryZoom
 
     var body: some View {
         NavigationStack {
@@ -25,7 +26,8 @@ struct CalendarScreen: View {
             .background { AuraBackground(month: model.visibleMonth.month) }
             .toolbarVisibility(.hidden, for: .navigationBar)
             .navigationDestination(for: UUID.self) { id in
-                EntryDetailPlaceholder(entryID: id)
+                EntryDetailView(entryID: id)
+                    .navigationTransition(.zoom(sourceID: id, in: entryZoom))
             }
         }
         .sheet(isPresented: $model.showsJumpSheet) {
@@ -42,7 +44,7 @@ struct CalendarScreen: View {
                 .padding(.horizontal, Spacing.sideMargin)
             ZStack(alignment: .top) {
                 ScrollView {
-                    DayPanel(model: model, onTitleTap: expand)
+                    DayPanel(model: model, zoomNamespace: entryZoom, onTitleTap: expand)
                         .padding(.horizontal, Spacing.sideMargin)
                         .padding(.top, Spacing.m)
                         .padding(.bottom, Spacing.m)
