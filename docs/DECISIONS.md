@@ -70,3 +70,4 @@ Every API and architecture decision, newest last. Format: date · phase · decis
 55. **Performance budget is checked by a test** (`CalendarPerformanceTests`). With 10,000 entries and 5,000 photos, a month's markers compute cold in under 120 ms and read from cache in under 2 ms. The 120 fps Instruments pass is Phase 13.
 56. **The "+" button's centre is 127 pt above the bottom edge on iPhone 17 Pro** (home indicator 34 + tab bar 49 + 16 + 28). The greeting mark travels to this point.
 57. **Synthetic Simulator taps need ~0.15 s on Liquid Glass buttons and ~0.3 s inside horizontal scroll views.** This is a tooling quirk only, recorded so screenshot scripts don't misread it as a bug.
+58. **The privacy cover only engages after the app has been active once.** A cold launch passes through `.inactive` before the first `.active`, and the cover was flashing "See you soon" over the launch greeting. A frame-by-frame look at the Batch A recording caught it.

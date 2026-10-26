@@ -7,6 +7,9 @@ struct PrivacyCoverModifier: ViewModifier {
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage(PreferenceKeys.privacyCoverEnabled) private var isEnabled = true
     @Environment(DiaryStore.self) private var store: DiaryStore?
+    /// A cold launch passes through `.inactive` before the first `.active`; covering then
+    /// would flash over the launch greeting. Only cover after the app has been on screen.
+    @State private var hasBeenActive = false
 
     func body(content: Content) -> some View {
         content.overlay {
@@ -16,10 +19,13 @@ struct PrivacyCoverModifier: ViewModifier {
                 .accessibilityHidden(!isCovered)
                 .animation(isCovered ? nil : .easeOut(duration: 0.2), value: isCovered)
         }
+        .onChange(of: scenePhase, initial: true) { _, phase in
+            if phase == .active { hasBeenActive = true }
+        }
     }
 
     private var isCovered: Bool {
-        isEnabled && scenePhase != .active
+        isEnabled && hasBeenActive && scenePhase != .active
     }
 }
 
