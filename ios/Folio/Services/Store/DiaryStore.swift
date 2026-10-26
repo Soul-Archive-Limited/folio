@@ -150,6 +150,14 @@ final class DiaryStore {
         return GreetingSummary(tasksToday: tasksToday, tasksOverdue: overdue, pagesThisWeek: pages, onThisDayYear: onThisDay)
     }
 
+    /// Months (1–12) of `year` that have at least one entry, for the Jump sheet dots.
+    func monthsWithEntries(in year: Int) -> Set<Int> {
+        _ = revision
+        let prefix = String(year).count == 4 ? "\(year)-" : String(format: "%04d-", year)
+        let entries = fetch(FetchDescriptor<Entry>(predicate: #Predicate { $0.dayKey.starts(with: prefix) && !$0.isTombstone }))
+        return Set(entries.compactMap { $0.day?.month })
+    }
+
     func usage(of category: Category) -> CategoryUsage {
         let id: UUID? = category.id
         let entries = fetchCount(FetchDescriptor<Entry>(predicate: #Predicate { $0.categoryID == id && !$0.isTombstone }))

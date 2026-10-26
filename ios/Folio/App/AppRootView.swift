@@ -28,10 +28,10 @@ struct AppRootView: View {
         switch DebugLaunchOptions.screen {
         case .gallery: DesignGalleryView()
         case .cover: PrivacyCoverView(name: store.settings().displayName)
-        case .greeting, nil: HomePlaceholderView()
+        case .greeting, nil: MainTabView()
         }
         #else
-        HomePlaceholderView()
+        MainTabView()
         #endif
     }
 

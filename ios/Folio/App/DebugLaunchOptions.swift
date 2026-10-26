@@ -11,6 +11,10 @@ import Foundation
 /// - `-FolioResetData YES` erases the local store first.
 /// - `-FolioSampleData YES` loads sample data into an empty store.
 /// - `-FolioStressData YES` loads 10,000 entries for performance checks.
+/// - `-FolioSelectDay 2026-10-25` selects a day on the calendar.
+/// - `-FolioFilter Travel` turns on the category filter for that category name.
+/// - `-FolioJumpSheet YES` opens the Jump sheet.
+/// - `-FolioCollapsed YES` collapses the calendar to the selected week.
 enum DebugLaunchOptions {
     enum Screen: String {
         case gallery, cover, greeting
@@ -33,6 +37,23 @@ enum DebugLaunchOptions {
         if let name = defaults.string(forKey: "displayName"), store.settings().displayName != name {
             store.updateSettings { $0.displayName = name }
         }
+    }
+
+    @MainActor
+    static func apply(to calendar: CalendarModel, store: DiaryStore) {
+        let defaults = UserDefaults.standard
+        if let raw = defaults.string(forKey: "FolioSelectDay"), let day = DayKey(rawValue: raw) {
+            calendar.jump(to: day.monthKey, selecting: day)
+        }
+        if let name = defaults.string(forKey: "FolioFilter"),
+           let category = store.categories().first(where: { $0.name == name }) {
+            calendar.filter = [category.id]
+        }
+        calendar.showsJumpSheet = defaults.bool(forKey: "FolioJumpSheet")
+    }
+
+    static var startsCollapsed: Bool {
+        UserDefaults.standard.bool(forKey: "FolioCollapsed")
     }
 
     static var fakeNow: Date? {

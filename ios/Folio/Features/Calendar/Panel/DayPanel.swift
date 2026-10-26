@@ -1,0 +1,73 @@
+import SwiftUI
+
+/// The selected day's entries and tasks, under the grid (SPEC §6.2).
+struct DayPanel: View {
+    let model: CalendarModel
+    let onTitleTap: () -> Void
+
+    @Environment(DiaryStore.self) private var store
+    @Environment(\.newItemRequest) private var request
+
+    var body: some View {
+        let day = model.selectedDay
+        let entries = store.entries(on: day)
+        let tasks = store.tasks(on: day)
+        let categories = Dictionary(uniqueKeysWithValues: store.categories().map { ($0.id, $0) })
+
+        VStack(alignment: .leading, spacing: Spacing.m) {
+            HStack {
+                Button(action: onTitleTap) {
+                    Text(day.utcDate, format: Date.FormatStyle(timeZone: .gmt).weekday(.wide).day().month(.wide))
+                        .folioFont(.title2)
+                        .foregroundStyle(.ink)
+                        .multilineTextAlignment(.leading)
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(.isHeader)
+                Spacer()
+                GlassIconButton(title: "New entry for this day", systemImage: "plus") { request?.send(.entry(day)) }
+            }
+
+            if entries.isEmpty && tasks.isEmpty {
+                DayPanelEmptyState(day: day)
+            } else {
+                if !entries.isEmpty {
+                    PanelSectionTitle(title: "Pages")
+                    ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
+                        NavigationLink(value: entry.id) {
+                            EntryCard(entry: entry, category: entry.categoryID.flatMap { categories[$0] }, calendar: store.calendar)
+                        }
+                        .buttonStyle(.pressable)
+                        .staggeredAppear(index: index)
+                    }
+                }
+                if !tasks.isEmpty {
+                    PanelSectionTitle(title: "Tasks")
+                    VStack(spacing: 0) {
+                        ForEach(Array(tasks.enumerated()), id: \.element.id) { index, task in
+                            DayTaskRow(task: task, tint: task.categoryID.flatMap { categories[$0]?.color.color } ?? .ink) {
+                                store.setCompleted(task, !task.isCompleted)
+                            }
+                            .staggeredAppear(index: entries.count + index)
+                        }
+                    }
+                    .padding(.horizontal, Spacing.xs)
+                    .folioGlass(in: .rect(cornerRadius: Radius.card))
+                }
+            }
+        }
+        .id(day)
+    }
+}
+
+/// Small uppercase section heading.
+struct PanelSectionTitle: View {
+    let title: LocalizedStringKey
+
+    var body: some View {
+        Text(title)
+            .folioFont(.caption)
+            .foregroundStyle(.inkTertiary)
+            .accessibilityAddTraits(.isHeader)
+    }
+}

@@ -1,0 +1,59 @@
+import SwiftUI
+
+/// One month's 6×7 grid. While collapsing, the selected week slides to the top and the
+/// other weeks fade, so the collapse reads as one continuous motion (SPEC §6.2).
+struct MonthGridView: View {
+    let month: MonthKey
+    let model: CalendarModel
+    let layout: CalendarLayout
+    let firstWeekday: Int
+
+    @Environment(DiaryStore.self) private var store
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @AppStorage(PreferenceKeys.showPhotoTiles) private var showsPhotoTiles = true
+
+    var body: some View {
+        let days = month.gridDays(firstWeekday: firstWeekday)
+        let markers = store.markers(for: month, firstWeekday: firstWeekday)
+        let today = store.today
+        let selectedRow = month == model.selectedDay.monthKey ? model.selectedRow(firstWeekday: firstWeekday) : 0
+        let progress = model.collapseProgress
+        let categoryColors = Dictionary(uniqueKeysWithValues: store.categories().map { ($0.id, $0.color.color) })
+
+        VStack(spacing: CalendarLayout.gap) {
+            ForEach(0..<6, id: \.self) { row in
+                HStack(spacing: CalendarLayout.gap) {
+                    ForEach(days[(row * 7)..<(row * 7 + 7)], id: \.self) { day in
+                        DayCell(
+                            state: DayCellState(
+                                day: day, marker: markers[day], isToday: day == today,
+                                isSelected: day == model.selectedDay, isInMonth: day.monthKey == month,
+                                matchesFilter: matches(markers[day]), showsPhotoTiles: showsPhotoTiles
+                            ),
+                            size: layout.cellSize,
+                            categoryColor: { $0.flatMap { categoryColors[$0] } ?? .inkSecondary },
+                            onTap: { tap(day) }
+                        )
+                        .contextMenu {
+                            DayContextMenu(day: day)
+                        }
+                    }
+                }
+                .opacity(row == selectedRow ? 1 : 1 - progress)
+            }
+        }
+        .offset(y: -Double(selectedRow) * layout.rowHeight * progress)
+        .padding(CalendarLayout.panelPadding)
+        .frame(width: layout.panelWidth, alignment: .top)
+    }
+
+    private func matches(_ marker: DayMarker?) -> Bool {
+        guard model.isFiltering else { return true }
+        guard let marker else { return false }
+        return !marker.categoryIDs.isDisjoint(with: model.filter)
+    }
+
+    private func tap(_ day: DayKey) {
+        model.select(day, reduceMotion: reduceMotion)
+    }
+}
