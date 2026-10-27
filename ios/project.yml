@@ -8,6 +8,12 @@ options:
     iOS: "26.0"
   createIntermediateGroups: true
   groupSortPosition: top
+  # Build number: CI_BUILD_NUMBER on Xcode Cloud, git commit count locally (Batch D).
+  preGenCommand: ../scripts/write-build-number.sh
+
+configFiles:
+  Debug: Config/BuildNumber.xcconfig
+  Release: Config/BuildNumber.xcconfig
 
 settings:
   base:
@@ -17,7 +23,7 @@ settings:
     ENABLE_USER_SCRIPT_SANDBOXING: YES
     DEAD_CODE_STRIPPING: YES
     MARKETING_VERSION: "0.1.0"
-    CURRENT_PROJECT_VERSION: "1"
+    # CURRENT_PROJECT_VERSION comes from Config/BuildNumber.xcconfig (generated, git-ignored).
     CODE_SIGN_STYLE: Automatic
     # Apple Developer Team ID (10 characters, not secret): Soul Archive Ltd. Needed for real
     # devices and capabilities like Sign in with Apple — see README "Signing".
@@ -39,6 +45,9 @@ targets:
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSRequiresIPhoneOS: true
+        # Only Apple's CryptoKit and HTTPS: encryption within the operating system, exempt from
+        # export documentation (DECISIONS 143). Never add a third-party crypto library.
+        ITSAppUsesNonExemptEncryption: false
         NSCameraUsageDescription: "Folio uses the camera only when you choose to take a photo for an entry."
         NSMicrophoneUsageDescription: "Folio uses the microphone only while you dictate. Audio is processed on your iPhone and never stored or sent anywhere."
         NSSpeechRecognitionUsageDescription: "Folio turns your voice into text on your iPhone. Nothing is sent to a server."

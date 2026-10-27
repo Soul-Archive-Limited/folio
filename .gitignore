@@ -22,6 +22,8 @@ xcuserdata/
 DerivedData/
 build/
 *.xcresult
+ios/Config/BuildNumber.xcconfig
+*.xcarchive
 
 # --- Node / Wrangler / Astro ---
 node_modules/
