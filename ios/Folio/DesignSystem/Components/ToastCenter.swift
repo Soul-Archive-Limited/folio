@@ -7,7 +7,14 @@ final class ToastCenter {
     private(set) var current: ToastMessage?
     @ObservationIgnored private var dismissTask: Task<Void, Never>?
 
-    static let displayDuration: Duration = .seconds(4)
+    static var displayDuration: Duration {
+        #if DEBUG
+        // UI tests on slow CI runners need longer than 4 s to find and tap Undo.
+        let seconds = UserDefaults.standard.double(forKey: "FolioToastSeconds")
+        if seconds > 0 { return .seconds(seconds) }
+        #endif
+        return .seconds(4)
+    }
 
     func show(_ message: ToastMessage) {
         current = message

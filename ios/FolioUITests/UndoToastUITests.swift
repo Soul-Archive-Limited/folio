@@ -7,7 +7,7 @@ final class UndoToastUITests: XCTestCase {
     func testUndoToastBringsATaskBack() throws {
         let app = XCUIApplication()
         let title = "Fold the laundry"
-        app.launchArguments = ["-hasOnboarded", "YES", "-com.apple.TipKit.HideAllTips", "1", "-FolioResetData", "YES", "-FolioSkipGreeting", "YES", "-FolioSeedTask", title,
+        app.launchArguments = ["-FolioToastSeconds", "15", "-hasOnboarded", "YES", "-com.apple.TipKit.HideAllTips", "1", "-FolioResetData", "YES", "-FolioSkipGreeting", "YES", "-FolioSeedTask", title,
                                "-FolioTab", "todo", "-AppleLocale", "en_GB", "-AppleLanguages", "(en-GB)"]
         app.launch()
 

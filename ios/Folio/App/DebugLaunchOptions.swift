@@ -27,6 +27,7 @@ import Foundation
 /// - `-FolioDemo dictation|intelligence` scripted dictation / canned ✦ results (screenshots).
 /// - `-FolioOpenTool mic|titles|polish|tasks` opens that tool in the composer.
 /// - `-FolioFakeIntelligenceUnavailable YES` pretends Apple's model is unavailable.
+/// - `-FolioToastSeconds 15` keeps toasts up longer (UI tests on slow CI).
 enum DebugLaunchOptions {
     enum Screen: String {
         case gallery, cover, greeting
