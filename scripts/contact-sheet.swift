@@ -23,8 +23,12 @@ for (index, (path, image)) in images.enumerated() {
     let y = size.height - header - Double(row + 1) * (tileHeight + labelHeight + gap) + labelHeight
     let rect = NSRect(x: x, y: y, width: tileWidth, height: tileHeight)
     NSGraphicsContext.current?.saveGraphicsState()
-    NSBezierPath(roundedRect: rect, xRadius: 18, yRadius: 18).addClip()
-    image.draw(in: rect)
+    // Aspect-fit, so landscape web screenshots aren't stretched into a phone-shaped tile.
+    let scale = min(rect.width / image.size.width, rect.height / image.size.height)
+    let fitted = NSRect(x: rect.midX - image.size.width * scale / 2, y: rect.midY - image.size.height * scale / 2,
+                        width: image.size.width * scale, height: image.size.height * scale)
+    NSBezierPath(roundedRect: fitted, xRadius: 18, yRadius: 18).addClip()
+    image.draw(in: fitted)
     NSGraphicsContext.current?.restoreGraphicsState()
     let name = (URL(fileURLWithPath: path).deletingPathExtension().lastPathComponent)
     name.draw(at: NSPoint(x: x + 4, y: y - labelHeight + 8), withAttributes: labelAttributes)

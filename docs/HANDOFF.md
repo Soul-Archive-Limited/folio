@@ -2,17 +2,17 @@
 
 The next session starts here. Read this, then `CLAUDE.md`, `docs/SPEC.md`, `docs/PHASES.md` and the last entries of `docs/DECISIONS.md`. Updated at the end of every batch.
 
-_Last updated: 2026-10-27, start of Batch D._
+_Last updated: 2026-10-27, end of Batch D._
 
 ## Where things stand
 
 | Phase | State |
 |---|---|
 | 0–8 | ✅ Done (setup, design system, data + crypto, calendar, composer, To-do, Journal + categories, onboarding/tour/Profile, dictation + ✦). |
-| Batch C fixes | In Batch D, Part 1. |
-| Recently Deleted (SPEC §5.2) | In Batch D, Part 2. New feature, not a numbered phase. |
-| 11 Website | In Batch D, Part 3 (`/web`). |
-| Xcode Cloud → TestFlight | In Batch D, Part 4. |
+| Batch C fixes | ✅ Batch D Part 1. |
+| Recently Deleted (SPEC §5.2) | ✅ Batch D Part 2 (schema v3). |
+| 11 Website | ✅ Batch D Part 3 (`/web`). Not deployed until the owner connects Cloudflare Pages. |
+| Xcode Cloud → TestFlight | ✅ Workflow "TestFlight" set up; first build from tag `testflight-0.1.0`. |
 | 9 Backend, 10 Sign-in + sync, 12 Web app, 13 Motion polish, 14 Release | ⬜ Not started. |
 
 Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8, Batch D = C fixes + Recently Deleted + 11 + Xcode Cloud.
@@ -23,8 +23,9 @@ Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8
 - `ios/Folio/{App,DesignSystem,Models,Features/*,Services/*}`; tests in `ios/FolioTests` (Swift Testing), `ios/FolioUITests` (XCTest), `ios/FolioCryptoTests`.
 - `ios/Folio/Services/Store/DiaryStore.swift` is the single `@Observable` store (all queries, CRUD, markers, export inputs).
 - `shared/` design tokens + Markdown/crypto fixtures (used by iOS and later the web app).
-- `web/` Astro site (Phase 11). `api/` empty until Phase 9.
-- `scripts/`: `sim-shot.sh` (screenshot), `contact-sheet.swift`, `setup-hooks.sh` (gitleaks hook, run once per clone).
+- `web/` Astro site: `src/config/site.ts` (all CTAs), `src/data/faq.ts`, `src/components/HeroCalendar.tsx` (hero island), `public/_headers`. `api/` empty until Phase 9.
+- `scripts/`: `sim-shot.sh` (screenshot), `contact-sheet.swift`, `setup-hooks.sh` (gitleaks hook, run once per clone), `write-build-number.sh` (XcodeGen preGenCommand), `testflight.sh` (fallback upload only).
+- `ios/ci_scripts/ci_post_clone.sh`: Xcode Cloud installs XcodeGen and generates the project.
 
 ## Build, run, test
 
@@ -48,6 +49,23 @@ cd ios && xcodebuild build -project Folio.xcodeproj -scheme Folio -destination "
 
 Release check (what CI does): `xcodebuild build -configuration Release -destination "generic/platform=iOS Simulator" CODE_SIGNING_ALLOWED=NO`.
 
+Website:
+
+```bash
+cd web && npm ci && npm test
+```
+
+`npm test` = build (tokens → Astro → CSP script hashes into `dist/_headers`) + 13 checks. `npm run dev` for local work.
+
+## TestFlight (Xcode Cloud) — budget rule
+
+The owner allows only about **two Xcode Cloud builds across all 14 phases** (monthly hour limit). The workflow **TestFlight** starts **only on git tags beginning `testflight-`** (plus a manual start); pushes to main never build. It archives (no tests — GitHub Actions runs them) and sends to the internal group **Owner**. Never push a `testflight-` tag unless the owner asks. Build 1 = tag `testflight-0.1.0` (Batch D); one build left for later.
+
+- Build number: `CI_BUILD_NUMBER` on Xcode Cloud, git commit count locally (`ios/Config/BuildNumber.xcconfig`, generated). Marketing version 0.1.0 in `project.yml`.
+- App Store Connect app: **Folio Diary**, bundle `com.devilsense.folio`, SKU per the record, team 25DH3LUCPC. Xcode on this Mac is signed in (team Soul Archive Ltd).
+- Fallback if Xcode Cloud is down: `scripts/testflight.sh` (archives and uploads through Xcode's account; build number must exceed the last Xcode Cloud one).
+- Website deploys are free: Cloudflare Pages builds every push once connected (root `web`, build `npm run build`, output `dist`).
+
 CI (GitHub Actions): `ios.yml` (test + Release build on macos-26), `node.yml` (api/web: `npm ci --ignore-scripts`, audit, test), `secrets.yml` (gitleaks). Check with `gh run list --limit 5`.
 
 ## Screenshots and recordings
@@ -57,7 +75,8 @@ CI (GitHub Actions): `ios.yml` (test + Release build on macos-26), `node.yml` (a
 - Dark mode: `xcrun simctl ui "$SIM" appearance dark` (back to `light` afterwards).
 - Recordings: `xcrun simctl io "$SIM" recordVideo --codec h264 out.mov` (Ctrl-C / kill -INT to stop), then `ffmpeg -i out.mov -vf "setpts=PTS/2,scale=480:-2" -an -c:v libx264 -crf 30 out.mp4` — tune speed/crf until < 1 MB.
 - Contact sheet: `swift scripts/contact-sheet.swift docs/screenshots/<batch>/00-contact-sheet.png 5 "Title" <pngs…>`.
-- Web: `cd web && npm run build && npm run preview`, then Playwright (MCP) screenshots; Lighthouse via `npx lighthouse <url> --only-categories=performance,accessibility,best-practices,seo --chrome-flags=--headless`.
+- Recently Deleted shots: `TEST_RUNNER_FOLIO_SHOTS=<abs folder> xcodebuild test … -only-testing:FolioUITests/ScreenshotUITests`. Paced flow for recordings: `TEST_RUNNER_FOLIO_RECORDING=1 … -only-testing:FolioUITests/RecentlyDeletedUITests` while `simctl io recordVideo` runs.
+- Web: there's **no Chrome** on this Mac, so Playwright MCP fails; use `playwright-core` + Lighthouse with Brave (`executablePath: /Applications/Brave Browser.app/Contents/MacOS/Brave Browser`, `CHROME_PATH` for Lighthouse), installed in the session scratchpad, not the repo. Serve `web/dist` with a tiny Node server that applies `_headers` and gzip so CSP and scores are realistic. Full-page shots need `img.decode()` first or lazy images come out blank.
 
 ## Hard-won gotchas
 
@@ -74,13 +93,20 @@ CI (GitHub Actions): `ios.yml` (test + Release build on macos-26), `node.yml` (a
 11. **Simulator can't run Apple's on-device model or record the Mac mic**: use `-FolioDemo dictation|intelligence` for screenshots and label them "simulated".
 12. **`#Preview`s using sample data must be `#if DEBUG`**, or Release builds fail (CI checks Release).
 13. **Never set the team in Xcode's Signing tab** — it lives in `ios/project.yml` (`DEVELOPMENT_TEAM 25DH3LUCPC`).
+14. **The iOS 26 tab bar's frame never changes when it minimises**; only which subview is hidden does. `TabBarShapeReader` reads that (public `UIView` state) so To-do's quick-add bar can drop beside the circle. `.tabViewBottomAccessory` was rejected (hidden behind the keyboard; per-tab `isEnabled` is iOS 26.1+).
+15. **Live queries must filter `trashedAt == nil`** (Recently Deleted). Permanent deletes are `deletePermanently(_:)`; everyday Delete is `trash(_:)`.
+16. **Pin npm packages to releases ≥ 2 weeks old** (`npm view <pkg> time --json`), and run `npm audit`.
+17. **Xcode Cloud warns "scheme may only exist locally"** — expected, because the project is generated in `ci_post_clone.sh`.
 
 ## Open issues
 
-- Speech-recognition permission prompt on a real device: unknown until the owner tests on TestFlight.
+- First Xcode Cloud build (tag `testflight-0.1.0`): confirm it reached TestFlight; if it failed, the owner copies the log from Xcode's Report navigator → Cloud.
+- Website not deployed yet: owner connects Cloudflare Pages (steps in the Batch D report).
+- Owner's iPhone checks (Batch D report checklist): speech-permission prompt, dictation, ✦, Recently Deleted, photos, onboarding, tour.
+- Legal pages need the owner's legal review; US year-end encryption self-classification is an open question for their adviser (DECISIONS 143).
 - iPad split view (§6.16) deferred to Phase 13.
 - Phase 9/10 not started: sign-in buttons are DEBUG-only; Release shows Continue (guest).
 
 ## What's next
 
-Finish Batch D (see below once updated), then Phase 9 (backend) on the owner's go-ahead.
+Phase 9 (backend) on the owner's go-ahead. Batches end with a push to main once CI is green; no TestFlight build unless the owner asks (budget rule above).

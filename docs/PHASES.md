@@ -28,7 +28,7 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - [x] Part 1 — Batch C fixes
 - [x] Part 2 — Recently Deleted (SPEC §5.2)
 - [x] Part 3 — Phase 11 website
-- [ ] Part 4 — Xcode Cloud → TestFlight
+- [x] Part 4 — Xcode Cloud → TestFlight (workflow set up; first build from tag `testflight-0.1.0`)
 
 ## Log
 
@@ -108,3 +108,7 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - CTAs from `src/config/site.ts`, rendered only when set. No cookies, analytics or forms.
 - `_headers` with SPEC §11.3 headers and build-time script hashes; `npm test` builds and runs 13 checks. Lighthouse ≥ 96 on every page.
 - Deploy: waiting on the owner to connect Cloudflare Pages (root `web`, output `dist`, domain `folio.devilsense.com`).
+
+### Xcode Cloud → TestFlight (2026-10-27)
+- `ios/ci_scripts/ci_post_clone.sh` (XcodeGen), build number from `CI_BUILD_NUMBER`, `ITSAppUsesNonExemptEncryption = NO`, privacy manifest, `scripts/testflight.sh` fallback.
+- App Store Connect app "Folio Diary"; workflow "TestFlight" builds only on `testflight-*` tags (owner's budget: about two builds across all phases) and sends to the internal group Owner.
