@@ -3,6 +3,7 @@ import SwiftUI
 /// Profile until Phase 7. In DEBUG builds it holds the developer tools.
 struct ProfilePlaceholderView: View {
     @Environment(DiaryStore.self) private var store
+    @State private var showsCategories = false
     #if DEBUG
     @State private var showsGallery = false
     #endif
@@ -12,9 +13,7 @@ struct ProfilePlaceholderView: View {
             ScrollView {
                 VStack(spacing: Spacing.l) {
                     GlassCard {
-                        NavigationLink {
-                            CategoriesManagerView()
-                        } label: {
+                        Button { showsCategories = true } label: {
                             Label("Categories", systemImage: "tag")
                                 .folioFont(.headline)
                                 .foregroundStyle(.ink)
@@ -39,7 +38,14 @@ struct ProfilePlaceholderView: View {
             }
             .background { AuraBackground() }
             .navigationTitle("Profile")
+            .navigationDestination(isPresented: $showsCategories) { CategoriesManagerView() }
         }
+        #if DEBUG
+        .onAppear {
+            let open = DebugLaunchOptions.string("FolioOpen")
+            if open == "categories" || open == "categoryEdit" { showsCategories = true }
+        }
+        #endif
         #if DEBUG
         .fullScreenCover(isPresented: $showsGallery) {
             DesignGalleryView()

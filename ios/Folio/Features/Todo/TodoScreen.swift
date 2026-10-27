@@ -58,6 +58,12 @@ struct TodoScreen: View {
             .animation(FolioMotion.standard(), value: sections.completed.map(\.id))
             .navigationTitle("To-do")
         }
+        #if DEBUG
+        .onAppear {
+            if let name = DebugLaunchOptions.string("FolioTodoFilter"),
+               let category = store.categories().first(where: { $0.name == name }) { model.filter = [category.id] }
+        }
+        #endif
         .sheet(item: $editing) { task in TaskComposerSheet(task: task, day: nil) }
         .confirmationDialog("Move to", isPresented: isRescheduling, titleVisibility: .visible, presenting: rescheduling) { task in
             Button("Today") { store.reschedule(task, to: today, minutesFromMidnight: task.minutesFromMidnight) }

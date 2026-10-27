@@ -32,6 +32,9 @@ struct JournalScreen: View {
                     .navigationTransition(.zoom(sourceID: id, in: zoom))
             }
         }
+        #if DEBUG
+        .onAppear { model.applyDebugOptions() }
+        #endif
     }
 }
 
@@ -40,3 +43,11 @@ struct JournalScreen: View {
         .environment(PreviewData.previewStore())
         .environment(ToastCenter())
 }
+
+#if DEBUG
+extension JournalModel {
+    func applyDebugOptions() {
+        if DebugLaunchOptions.string("FolioJournalMode") == "photos" { mode = .photos }
+    }
+}
+#endif

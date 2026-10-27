@@ -17,6 +17,11 @@ import Foundation
 /// - `-FolioCollapsed YES` collapses the calendar to the selected week.
 /// - `-FolioSkipGreeting YES` skips the launch greeting (UI tests).
 /// - `-FolioSeedTask "Title"` adds one task for today (UI tests).
+/// - `-FolioTab calendar|journal|todo|profile` opens a tab.
+/// - `-FolioJournalMode photos` opens the Journal's Photos view.
+/// - `-FolioTodoFilter Family` filters the To-do list by a category name.
+/// - `-FolioOpen composer|composerLarge|taskComposer|entry|categories|categoryEdit` opens a screen
+///   (composerLarge and entry use the selected day's first entry; categoryEdit edits the first category).
 enum DebugLaunchOptions {
     enum Screen: String {
         case gallery, cover, greeting
@@ -57,6 +62,20 @@ enum DebugLaunchOptions {
             calendar.filter = [category.id]
         }
         calendar.showsJumpSheet = defaults.bool(forKey: "FolioJumpSheet")
+    }
+
+    static var tab: AppTab? {
+        switch UserDefaults.standard.string(forKey: "FolioTab") {
+        case "calendar": .calendar
+        case "journal": .journal
+        case "todo": .todo
+        case "profile": .profile
+        default: nil
+        }
+    }
+
+    static func string(_ key: String) -> String? {
+        UserDefaults.standard.string(forKey: key)
     }
 
     static var startsCollapsed: Bool {

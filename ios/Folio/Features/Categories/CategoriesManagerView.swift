@@ -51,6 +51,14 @@ struct CategoriesManagerView: View {
             Text(deleteMessage(category))
         }
         .folioHaptic(.warning, trigger: deleting?.id)
+        #if DEBUG
+        .task {
+            if DebugLaunchOptions.string("FolioOpen") == "categoryEdit", let first = store.categories().first {
+                try? await Task.sleep(for: .milliseconds(400))
+                editing = .existing(first)
+            }
+        }
+        #endif
     }
 
     private var deleteTitle: String {

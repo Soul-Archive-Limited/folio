@@ -15,7 +15,7 @@ struct CalendarScreen: View {
     @Namespace private var entryZoom
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $model.path) {
             Group {
                 if dynamicTypeSize.isAccessibilitySize {
                     AccessibleMonthList(model: model, onTitleTap: { model.showsJumpSheet = true })

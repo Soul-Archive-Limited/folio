@@ -14,6 +14,8 @@ final class CalendarModel {
     /// 0 = full month grid, 1 = collapsed to the selected week. Tracks the finger.
     var collapseProgress: Double = 0
     var showsJumpSheet = false
+    /// The Calendar tab's navigation stack (entry detail).
+    var path: [UUID] = []
     /// One selection haptic per gesture (SPEC §3.7). A tap on another month's day pages the
     /// month too, but that page change must not add a second haptic.
     private(set) var selectionHapticCount = 0

@@ -13,6 +13,7 @@ enum FloatingButtonMetrics {
     /// row: the button plus its 16 pt gap (owner review, Batch A).
     static let clearance: Double = diameter + Spacing.m
 
-    /// Toasts sit above the "+" and the To-do quick-add bar, never on top of them.
-    static let toastBottomPadding: Double = 49 + Spacing.m + diameter + Spacing.s
+    /// Toasts sit above the "+" and the To-do quick-add bar, never on top of them. Measured
+    /// from the tab content's bottom edge, which is already above the tab bar.
+    static let toastBottomPadding: Double = Spacing.m + diameter + Spacing.s
 }

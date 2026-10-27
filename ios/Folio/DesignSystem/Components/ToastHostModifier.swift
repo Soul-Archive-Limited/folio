@@ -2,6 +2,9 @@ import SwiftUI
 
 /// Presents `ToastCenter` toasts at the bottom of the view it's attached to. Toasts rise
 /// from the bottom and leave the same way; under Reduce Motion they only fade.
+///
+/// Attach it inside each tab's content, not on the `TabView`: an overlay on the `TabView`
+/// draws on top but doesn't receive touches, so Undo would fall through to the list below.
 struct ToastHostModifier: ViewModifier {
     let center: ToastCenter
     var bottomPadding: Double = Spacing.xs
