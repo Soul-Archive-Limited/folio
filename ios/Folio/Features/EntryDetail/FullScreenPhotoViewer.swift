@@ -68,7 +68,7 @@ struct ZoomablePhoto: View {
         }
         .task(id: photoID) {
             guard let data = store.photo(id: photoID)?.imageData else { return }
-            image = await ThumbnailCache.decode(data)
+            image = await DisplayImageCache.decode(data, maxPixel: 2048)
         }
         .accessibilityLabel("Photo")
     }

@@ -153,3 +153,9 @@ Every API and architecture decision, newest last. Format: date · phase · decis
 114. **Polish works on the entry's Markdown** so formatting survives Accept. The preview compares plain words, with emphasis markers left out, and lists removals before additions.
 115. **DEBUG-only demo modes** (`-FolioDemo dictation|intelligence`, `-FolioOpenTool`) drive the capsule with scripted words and return canned ✦ results. They exist because this Simulator's host model fails (`promptTemplateNotFound` from the system model service, not Folio), and so the Simulator never records the Mac's microphone. Screenshots made this way are labelled as simulated; the real behaviour is checked on the owner's iPhone.
 116. **"Erase data on this iPhone" now also deletes the composer draft and its photos.** Found while testing; a test covers it.
+
+## Batch C wrap-up (2026-10-27)
+
+117. **Bug found and fixed: Journal Photos tiles never loaded.** ImageIO's HEIC decoder blocks its thread waiting on the hardware decoder, so a grid of tiles decoding display renditions at once used every thread in Swift's concurrency pool, and nothing else could run, the JPEG thumbnails included. Photo decoding now runs on a dedicated serial `DispatchQueue` (`DisplayImageCache.decode`), never the pool; the full-screen viewer uses it too. The photo pipeline's own encode/decode still runs `@concurrent`, but it handles one photo at a time.
+118. **The To-do scrim covers the toast as well as the quick-add bar**, so when a toast shows, rows fade out under it instead of showing through (owner: toasts never overlap rows).
+119. **`CFBundleShortVersionString` / `CFBundleVersion` come from `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION`**, so Profile → About shows 0.1.0 (1) rather than XcodeGen's default 1.0.

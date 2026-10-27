@@ -16,8 +16,12 @@ struct ProfileIntelligenceSection: View {
                 ForEach(locales, id: \.identifier) { locale in
                     Text(Self.name(of: locale)).tag(locale.identifier)
                 }
+                // A stored choice that's no longer supported still shows, so it can be changed.
+                if !dictationLocale.isEmpty, !locales.contains(where: { $0.identifier == dictationLocale }) {
+                    Text(Self.name(of: Locale(identifier: dictationLocale))).tag(dictationLocale)
+                }
             } label: {
-                ProfileRowLabel(title: "Dictation language", systemImage: "mic")
+                ProfileRowLabel(title: "Dictation", systemImage: "mic")
             }
             Text(isSupported
                  ? "Dictation runs on your iPhone. Audio is never stored or sent anywhere."

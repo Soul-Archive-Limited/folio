@@ -90,18 +90,21 @@ struct TodoScreen: View {
             ToastSlot(center: toasts)
                 .padding(.horizontal, Spacing.sideMargin)
             TodoQuickAddBar { title, day in request?.send(.task(day, title: title)) }
-                .background(alignment: .bottom) {
-                    VStack(spacing: 0) {
-                        LinearGradient(colors: [.bg.opacity(0), .bg], startPoint: .top, endPoint: .bottom)
-                            .frame(height: Self.scrimFade)
-                        Rectangle().fill(.bg)
-                    }
-                    .padding(.top, -Self.scrimFade)
-                    .ignoresSafeArea(edges: .bottom)
-                    .allowsHitTesting(false)
-                    .accessibilityHidden(true)
-                }
         }
+        // The scrim sits behind the toast too, so rows fade out under it rather than show
+        // through (owner review, Batch B: toasts never overlap rows).
+        .background(alignment: .bottom) {
+            VStack(spacing: 0) {
+                LinearGradient(colors: [.bg.opacity(0), .bg], startPoint: .top, endPoint: .bottom)
+                    .frame(height: Self.scrimFade)
+                Rectangle().fill(.bg)
+            }
+            .padding(.top, -Self.scrimFade)
+            .ignoresSafeArea(edges: .bottom)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+        }
+        .animation(FolioMotion.toast(), value: toasts.current)
     }
 
     private static let scrimFade: Double = 60

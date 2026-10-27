@@ -35,8 +35,18 @@ final class DisplayImageCache {
         "\(id.uuidString)-\(rendition.rawValue)-\(maxPixel)" as NSString
     }
 
-    @concurrent
+    /// Decodes on a dedicated serial queue, never the Swift concurrency pool: ImageIO's HEIC
+    /// decoder blocks its thread waiting on the hardware decoder, and a grid of tiles decoding
+    /// at once used every pool thread, so nothing else (thumbnails included) could run.
     nonisolated static func decode(_ data: Data, maxPixel: Int) async -> UIImage? {
+        await withCheckedContinuation { continuation in
+            decodeQueue.async { continuation.resume(returning: decodeNow(data, maxPixel: maxPixel)) }
+        }
+    }
+
+    private nonisolated static let decodeQueue = DispatchQueue(label: "com.devilsense.folio.photo-decode", qos: .userInitiated)
+
+    private nonisolated static func decodeNow(_ data: Data, maxPixel: Int) -> UIImage? {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
         let options: [CFString: Any] = [
             kCGImageSourceCreateThumbnailFromImageAlways: true,
