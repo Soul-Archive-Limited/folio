@@ -12,17 +12,22 @@ struct SameDayOtherYears: View {
         if !entries.isEmpty {
             VStack(alignment: .leading, spacing: Spacing.s) {
                 PanelSectionTitle(title: "Same day in other years")
+                // Cards sit straight on the page (owner review, Batch B): a clipping scroll
+                // view gives glass its own backdrop, which showed as a lighter band.
                 ScrollView(.horizontal) {
-                    HStack(spacing: Spacing.s) {
-                        ForEach(entries) { entry in
-                            NavigationLink(value: entry.id) {
-                                OtherYearCard(entry: entry)
+                    GlassEffectContainer(spacing: 0) {
+                        HStack(alignment: .top, spacing: Spacing.s) {
+                            ForEach(entries) { entry in
+                                NavigationLink(value: entry.id) {
+                                    OtherYearCard(entry: entry)
+                                }
+                                .buttonStyle(.pressable)
                             }
-                            .buttonStyle(.pressable)
                         }
                     }
                 }
                 .scrollIndicators(.hidden)
+                .scrollClipDisabled()
             }
             .padding(.top, Spacing.l)
         }
@@ -43,7 +48,7 @@ struct OtherYearCard: View {
                 .lineLimit(2)
         }
         .padding(Spacing.s)
-        .frame(width: 160, alignment: .leading)
+        .frame(width: 160, height: 96, alignment: .topLeading)
         .folioGlass(in: .rect(cornerRadius: Radius.card), interactive: true)
         .accessibilityElement(children: .combine)
     }

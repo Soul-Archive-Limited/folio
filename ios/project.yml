@@ -19,9 +19,9 @@ settings:
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
     CODE_SIGN_STYLE: Automatic
-    # Apple Developer Team ID (10 characters, not secret). Set before running on a real
-    # device or using capabilities like Sign in with Apple — see README "Signing".
-    DEVELOPMENT_TEAM: ""
+    # Apple Developer Team ID (10 characters, not secret): Soul Archive Ltd. Needed for real
+    # devices and capabilities like Sign in with Apple — see README "Signing".
+    DEVELOPMENT_TEAM: "25DH3LUCPC"
 
 targets:
   Folio:

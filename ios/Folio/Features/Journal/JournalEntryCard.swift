@@ -11,7 +11,7 @@ struct JournalEntryCard: View {
             // A clear 16:9 frame carries the size; the photo fills it (an image would impose its own ratio).
             Color.clear
                 .aspectRatio(16 / 9, contentMode: .fit)
-                .overlay { FullPhotoImage(photoID: cover.id, maxPixel: 1200) }
+                .overlay { FullPhotoImage(photoID: cover.id, rendition: .display, maxPixel: 1080) }
                 .clipped()
                 .overlay(alignment: .bottomLeading) {
                     VStack(alignment: .leading, spacing: 2) {

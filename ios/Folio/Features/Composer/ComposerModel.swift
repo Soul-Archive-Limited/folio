@@ -91,13 +91,24 @@ final class ComposerModel {
         guard editsSinceDraft else { return }
         editsSinceDraft = false
         let draft = makeDraft(context: context)
-        if draft.isEmpty { drafts.clear() } else { drafts.save(draft) }
+        if draft.isEmpty {
+            drafts.clear()
+        } else {
+            let newPhotos = photos.reduce(into: [UUID: ProcessedPhoto]()) { $0[$1.id] = $1.processed }
+            drafts.save(draft, newPhotos: newPhotos)
+        }
     }
 
     func makeDraft(context: Font.Context) -> ComposerDraft {
         ComposerDraft(entryID: entryID, dayKey: day.rawValue, minutesFromMidnight: minutesFromMidnight, title: title,
                       bodyMarkdown: RichTextBridge.markdown(from: body, context: context, writingFont: writingFont),
-                      categoryID: categoryID, savedAt: AppClock.now)
+                      categoryID: categoryID,
+                      photos: photos.map { photo in
+                          DraftPhoto(id: photo.id, storedPhotoID: photo.storedPhotoID,
+                                     pixelWidth: photo.processed?.pixelWidth ?? 0, pixelHeight: photo.processed?.pixelHeight ?? 0,
+                                     imageType: photo.processed?.imageType ?? "public.heic")
+                      },
+                      savedAt: AppClock.now)
     }
 
     func restoreDraft() {
@@ -107,6 +118,12 @@ final class ComposerModel {
         title = draft.title
         body = RichTextBridge.attributedString(fromMarkdown: draft.bodyMarkdown, writingFont: writingFont)
         categoryID = draft.categoryID
+        let original = Set(photos.compactMap(\.storedPhotoID))
+        photos = draft.photos.compactMap { kept in
+            if let stored = kept.storedPhotoID { return original.contains(stored) ? .stored(stored) : nil }
+            return drafts.loadPhoto(kept).map { ComposerPhoto(id: kept.id, storedPhotoID: nil, processed: $0) }
+        }
+        removedPhotoIDs = original.subtracting(photos.compactMap(\.storedPhotoID))
         pendingDraft = nil
     }
 

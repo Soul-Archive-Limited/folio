@@ -21,6 +21,7 @@ struct AppRootView: View {
             }
         }
         .task { prepareGreetingIfNeeded() }
+        .task(priority: .utility) { await store.backfillDisplayRenditions() }
     }
 
     @ViewBuilder private var content: some View {

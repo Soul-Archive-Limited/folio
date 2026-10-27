@@ -5,15 +5,18 @@ import UniformTypeIdentifiers
 
 /// Turns picked or captured photos into what Folio stores (SPEC §5):
 /// - long edge ≤ 2048 px, HEIC at quality 0.75 (target ≤ 600 KB),
-/// - a 240 px JPEG thumbnail,
+/// - a 1080 px "display" HEIC at quality 0.6 (~150 KB) for cards, grids and the composer,
+/// - a 240 px JPEG thumbnail for day cells,
 /// - **all** metadata removed, GPS included: images are re-encoded from pixels only, with
 ///   orientation baked in.
 ///
 /// Runs off the main actor (`@concurrent`): decoding and encoding are the expensive part.
 nonisolated struct PhotoProcessor: Sendable {
     var maxPixelSize = 2048
+    var displayPixelSize = 1080
     var thumbnailPixelSize = 240
     var imageQuality = 0.75
+    var displayQuality = 0.6
     var thumbnailQuality = 0.7
 
     enum ProcessingError: Error, Equatable {
@@ -30,6 +33,7 @@ nonisolated struct PhotoProcessor: Sendable {
         guard let source = CGImageSourceCreateWithData(data as CFData, [kCGImageSourceShouldCache: false] as CFDictionary),
               CGImageSourceGetCount(source) > 0 else { throw ProcessingError.unreadableImage }
         let full = try downsample(source, to: maxPixelSize)
+        let display = try downsample(source, to: displayPixelSize)
         let thumbnail = try downsample(source, to: thumbnailPixelSize)
 
         let heic = encode(full, as: .heic, quality: imageQuality)
@@ -41,8 +45,22 @@ nonisolated struct PhotoProcessor: Sendable {
             thumbnailData: try encodeOrThrow(thumbnail, as: .jpeg, quality: thumbnailQuality),
             pixelWidth: full.width,
             pixelHeight: full.height,
-            imageType: type
+            imageType: type,
+            displayData: try encodeDisplay(display)
         )
+    }
+
+    /// The display rendition for a photo stored before renditions had one (backfill).
+    @concurrent
+    func displayRendition(of imageData: Data) async throws -> Data {
+        guard let source = CGImageSourceCreateWithData(imageData as CFData, [kCGImageSourceShouldCache: false] as CFDictionary),
+              CGImageSourceGetCount(source) > 0 else { throw ProcessingError.unreadableImage }
+        return try encodeDisplay(try downsample(source, to: displayPixelSize))
+    }
+
+    private func encodeDisplay(_ image: CGImage) throws -> Data {
+        if let heic = encode(image, as: .heic, quality: displayQuality) { return heic }
+        return try encodeOrThrow(image, as: .jpeg, quality: displayQuality)
     }
 
     /// Decodes straight to the target size (never the full-resolution bitmap) and applies

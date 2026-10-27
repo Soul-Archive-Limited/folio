@@ -80,6 +80,43 @@ struct ComposerModelTests {
         #expect(drafts.load() == nil, "saving clears the draft")
     }
 
+    @Test("Drafts keep new photos as files, in order, and remove them once saved")
+    func draftPhotos() throws {
+        let entry = try store.createEntry(title: "Beach", day: store.today)
+        let stored = try store.addPhoto(Self.photo, to: entry)
+        let model = ComposerModel(entry: entry, writingFont: .newYork, drafts: drafts)
+        let fresh = ProcessedPhoto(imageData: Data([7, 7]), thumbnailData: Data([8]), pixelWidth: 6, pixelHeight: 4,
+                                   imageType: "public.heic", displayData: Data([9]))
+        model.photos = [.new(fresh), .stored(stored.id)]
+        model.writeDraftIfNeeded(context: context)
+
+        let reopened = ComposerModel(entry: entry, writingFont: .newYork, drafts: drafts)
+        #expect(reopened.pendingDraft?.photos.count == 2)
+        reopened.restoreDraft()
+        #expect(reopened.photos.count == 2)
+        #expect(reopened.photos[0].processed == fresh)
+        #expect(reopened.photos[1].storedPhotoID == stored.id)
+
+        try reopened.save(to: store, context: context)
+        #expect(entry.orderedPhotos.count == 2)
+        #expect(entry.orderedPhotos[0].displayData == Data([9]))
+        #expect(drafts.load() == nil)
+        #expect(drafts.loadPhoto(DraftPhoto(id: model.photos[0].id)) == nil, "saving removes the draft's photo files")
+    }
+
+    @Test("A draft photo removed from the strip loses its file")
+    func draftPhotoRemoved() throws {
+        let model = ComposerModel(day: store.today, categoryID: nil, writingFont: .newYork, drafts: drafts)
+        model.title = "Walk"
+        model.photos = [.new(Self.photo)]
+        model.writeDraftIfNeeded(context: context)
+        let id = model.photos[0].id
+        #expect(drafts.loadPhoto(DraftPhoto(id: id)) != nil)
+        model.removePhoto(model.photos[0])
+        model.writeDraftIfNeeded(context: context)
+        #expect(drafts.loadPhoto(DraftPhoto(id: id)) == nil)
+    }
+
     @Test("Discarding clears the draft")
     func discard() {
         let model = ComposerModel(day: store.today, categoryID: nil, writingFont: .newYork, drafts: drafts)

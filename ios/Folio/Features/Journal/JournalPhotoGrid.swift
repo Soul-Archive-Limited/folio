@@ -18,7 +18,7 @@ struct JournalPhotoGrid: View {
                         ForEach(column, id: \.id) { photo in
                             if let entryID = photo.entry?.id {
                                 NavigationLink(value: entryID) {
-                                    PhotoTile(photoID: photo.id, cornerRadius: 12)
+                                    FullPhotoImage(photoID: photo.id, rendition: .display, maxPixel: 600, cornerRadius: 12)
                                         .aspectRatio(Self.aspect(photo), contentMode: .fit)
                                         .matchedTransitionSource(id: entryID, in: zoom)
                                 }

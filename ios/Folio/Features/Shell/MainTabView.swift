@@ -5,6 +5,7 @@ struct MainTabView: View {
     @Environment(DiaryStore.self) private var store
     @State private var selection: AppTab = .calendar
     @State private var calendar: CalendarModel?
+    @State private var journal = JournalModel()
     @State private var requester = NewItemRequester()
     @State private var toasts = ToastCenter()
     @Namespace private var composerNamespace
@@ -13,24 +14,26 @@ struct MainTabView: View {
         TabView(selection: $selection) {
             Tab("Calendar", systemImage: "calendar", value: .calendar) {
                 if let calendar {
+                    let isRoot = calendar.path.isEmpty
                     CalendarScreen(model: calendar)
-                        .floatingAddButton(day: calendar.selectedDay, namespace: composerNamespace, onRequest: present)
-                        .toastHost(toasts, bottomPadding: FloatingButtonMetrics.toastBottomPadding)
+                        .floatingAddButton(day: calendar.selectedDay, isVisible: isRoot, namespace: composerNamespace, onRequest: present)
+                        .toastHost(toasts, trailingClearance: isRoot ? FloatingButtonMetrics.toastTrailingClearance : 0)
                 }
             }
             Tab("Journal", systemImage: "book.pages", value: .journal) {
-                JournalScreen()
-                    .floatingAddButton(day: store.today, namespace: composerNamespace, onRequest: present)
-                    .toastHost(toasts, bottomPadding: FloatingButtonMetrics.toastBottomPadding)
+                let isRoot = journal.path.isEmpty
+                JournalScreen(model: journal)
+                    .floatingAddButton(day: store.today, isVisible: isRoot, namespace: composerNamespace, onRequest: present)
+                    .toastHost(toasts, trailingClearance: isRoot ? FloatingButtonMetrics.toastTrailingClearance : 0)
             }
+            // No "+" on To-do: the full-width quick-add bar has its own expand button, and the
+            // toast rides above that bar (owner review, Batch B).
             Tab("To-do", systemImage: "checklist", value: .todo) {
                 TodoScreen()
-                    .floatingAddButton(day: store.today, namespace: composerNamespace, onRequest: present)
-                    .toastHost(toasts, bottomPadding: FloatingButtonMetrics.toastBottomPadding)
             }
             Tab("Profile", systemImage: "person.crop.circle", value: .profile) {
                 ProfilePlaceholderView()
-                    .toastHost(toasts, bottomPadding: Spacing.m)
+                    .toastHost(toasts)
             }
         }
         .tabBarMinimizeBehavior(selection.minimisesTabBar ? .onScrollDown : .never)

@@ -226,6 +226,20 @@ final class DiaryStore {
         return photo
     }
 
+    /// Gives photos stored under schema v1 their 1080 px display rendition, a few at a time
+    /// off the main actor. A derived rendition isn't an edit, so `updatedAt` is untouched.
+    func backfillDisplayRenditions() async {
+        let missing = fetch(FetchDescriptor<EntryPhoto>(predicate: #Predicate { $0.displayData == nil && !$0.isTombstone }))
+        guard !missing.isEmpty else { return }
+        let processor = PhotoProcessor()
+        for photo in missing {
+            guard !Task.isCancelled else { break }
+            guard let display = try? await processor.displayRendition(of: photo.imageData) else { continue }
+            photo.displayData = display
+        }
+        commit()
+    }
+
     /// Deleting is the only way an item leaves the calendar (SPEC §5).
     func delete(_ entry: Entry) {
         for photo in entry.photos { retire(photo) }
@@ -287,7 +301,7 @@ final class DiaryStore {
             categoryID: entry.categoryID,
             photos: entry.orderedPhotos.map {
                 ProcessedPhoto(imageData: $0.imageData, thumbnailData: $0.thumbData, pixelWidth: $0.pixelWidth,
-                               pixelHeight: $0.pixelHeight, imageType: "public.heic")
+                               pixelHeight: $0.pixelHeight, imageType: "public.heic", displayData: $0.displayData ?? Data())
             }
         )
     }

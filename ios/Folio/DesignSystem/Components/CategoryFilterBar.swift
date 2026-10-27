@@ -9,17 +9,22 @@ struct CategoryFilterBar: View {
         let categories = store.categories()
         if !categories.isEmpty {
             ScrollView(.horizontal) {
-                HStack(spacing: Spacing.xs) {
-                    Chip(title: String(localized: "All"), isSelected: selection.isEmpty) { selection.removeAll() }
-                    ForEach(categories) { category in
-                        Chip(title: category.name, systemImage: category.symbol, category: category.color,
-                             isSelected: selection.contains(category.id)) { toggle(category.id) }
+                GlassEffectContainer(spacing: 0) {
+                    HStack(spacing: Spacing.xs) {
+                        Chip(title: String(localized: "All"), isSelected: selection.isEmpty) { selection.removeAll() }
+                        ForEach(categories) { category in
+                            Chip(title: category.name, systemImage: category.symbol, category: category.color,
+                                 isSelected: selection.contains(category.id)) { toggle(category.id) }
+                        }
                     }
                 }
                 .padding(.horizontal, Spacing.sideMargin)
             }
             .scrollIndicators(.hidden)
             .fixedSize(horizontal: false, vertical: true)
+            // Chips share one glass container and the scroll view doesn't clip: separate glass
+            // shapes in a clipping scroll view showed a lighter band behind them.
+            .scrollClipDisabled()
         }
     }
 

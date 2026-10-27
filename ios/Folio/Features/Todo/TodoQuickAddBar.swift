@@ -1,8 +1,11 @@
 import SwiftUI
 
-/// The glass quick-add bar above the tab bar (SPEC §6.7). "Call Mum tomorrow" is dated
-/// tomorrow; Return adds and keeps the keyboard up for the next one.
+/// The full-width glass quick-add bar above the tab bar (SPEC §6.7). "Call Mum tomorrow" is
+/// dated tomorrow; Return adds and keeps the keyboard up for the next one. The expand button
+/// opens the full task composer with whatever has been typed so far.
 struct TodoQuickAddBar: View {
+    let onExpand: (_ title: String, _ day: DayKey?) -> Void
+
     @Environment(DiaryStore.self) private var store
     @State private var text = ""
     @State private var addedCount = 0
@@ -17,14 +20,20 @@ struct TodoQuickAddBar: View {
                 .focused($isFocused)
                 .submitLabel(.done)
                 .onSubmit(add)
+            Button("Open task composer", systemImage: "arrow.up.left.and.arrow.down.right", action: expand)
+                .labelStyle(.iconOnly)
+                .font(.body.weight(.semibold))
+                .foregroundStyle(.inkSecondary)
+                .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
+                .contentShape(.rect)
+                .accessibilityInputLabels(["Expand", "Open task composer", "Full composer"])
         }
-        .padding(.horizontal, Spacing.m)
+        .padding(.leading, Spacing.m)
+        .padding(.trailing, Spacing.xxs)
         .frame(minHeight: 48)
         .folioGlass(in: .capsule, interactive: true)
-        .padding(.leading, Spacing.sideMargin)
-        // Leave room for the floating "+" so the two never overlap.
-        .padding(.trailing, Spacing.sideMargin + FloatingButtonMetrics.diameter + Spacing.s)
-        .padding(.bottom, Spacing.m + 4)
+        .padding(.horizontal, Spacing.sideMargin)
+        .padding(.bottom, Spacing.s)
         .folioHaptic(.success, trigger: addedCount)
     }
 
@@ -34,5 +43,12 @@ struct TodoQuickAddBar: View {
         text = ""
         addedCount += 1
         isFocused = true
+    }
+
+    private func expand() {
+        let parsed = QuickAddParser.parse(text, today: store.today)
+        isFocused = false
+        text = ""
+        onExpand(parsed.title, parsed.day)
     }
 }

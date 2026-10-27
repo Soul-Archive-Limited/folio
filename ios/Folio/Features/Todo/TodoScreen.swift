@@ -52,8 +52,10 @@ struct TodoScreen: View {
             .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
             .background { AuraBackground() }
-            .contentMargins(.bottom, FloatingButtonMetrics.clearance + 16, for: .scrollContent)
-            .safeAreaInset(edge: .bottom) { TodoQuickAddBar() }
+            // The inset holds the toast and the quick-add bar, so the last row always scrolls
+            // clear of both and of the tab bar; the margin adds a little air under it.
+            .contentMargins(.bottom, Spacing.m, for: .scrollContent)
+            .safeAreaInset(edge: .bottom, spacing: 0) { bottomBar }
             .animation(FolioMotion.standard(), value: sections.active.map(\.id))
             .animation(FolioMotion.standard(), value: sections.completed.map(\.id))
             .navigationTitle("To-do")
@@ -79,6 +81,29 @@ struct TodoScreen: View {
         }
         .folioHaptic(.warning, trigger: confirmingDelete?.id)
     }
+
+    /// Toast, then the full-width quick-add bar over a soft scrim (owner review, Batch B):
+    /// the page colour fades in over 60 pt so rows don't show through behind the bar.
+    private var bottomBar: some View {
+        VStack(spacing: Spacing.s) {
+            ToastSlot(center: toasts)
+                .padding(.horizontal, Spacing.sideMargin)
+            TodoQuickAddBar { title, day in request?.send(.task(day, title: title)) }
+                .background(alignment: .bottom) {
+                    VStack(spacing: 0) {
+                        LinearGradient(colors: [.bg.opacity(0), .bg], startPoint: .top, endPoint: .bottom)
+                            .frame(height: Self.scrimFade)
+                        Rectangle().fill(.bg)
+                    }
+                    .padding(.top, -Self.scrimFade)
+                    .ignoresSafeArea(edges: .bottom)
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+                }
+        }
+    }
+
+    private static let scrimFade: Double = 60
 
     private func row(_ task: TaskItem, colors: [UUID: Color], today: DayKey) -> some View {
         TodoRow(task: task, isTicked: model.isTicked(task), tint: task.categoryID.flatMap { colors[$0] } ?? .ink,

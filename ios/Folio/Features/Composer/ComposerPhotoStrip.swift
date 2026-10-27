@@ -40,7 +40,7 @@ struct ComposerPhotoThumb: View {
     var body: some View {
         Group {
             if let stored = photo.storedPhotoID {
-                PhotoTile(photoID: stored, cornerRadius: 14)
+                FullPhotoImage(photoID: stored, rendition: .display, maxPixel: 240, cornerRadius: 14)
             } else {
                 Rectangle().fill(.hairline)
                     .overlay {
@@ -48,7 +48,9 @@ struct ComposerPhotoThumb: View {
                     }
                     .clipShape(.rect(cornerRadius: 14))
                     .task {
-                        if let data = photo.processed?.thumbnailData { image = await ThumbnailCache.decode(data) }
+                        guard let processed = photo.processed else { return }
+                        let data = processed.displayData.isEmpty ? processed.thumbnailData : processed.displayData
+                        image = await DisplayImageCache.decode(data, maxPixel: 240)
                     }
             }
         }

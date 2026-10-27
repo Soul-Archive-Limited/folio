@@ -4,11 +4,11 @@ import SwiftUI
 struct JournalScreen: View {
     @Environment(DiaryStore.self) private var store
     @Environment(\.newItemRequest) private var request
-    @State private var model = JournalModel()
+    @Bindable var model: JournalModel
     @Namespace private var zoom
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $model.path) {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: Spacing.m, pinnedViews: .sectionHeaders) {
                     JournalControls(model: model) { request?.send(.pastEntry) }
@@ -39,7 +39,7 @@ struct JournalScreen: View {
 }
 
 #Preview {
-    JournalScreen()
+    JournalScreen(model: JournalModel())
         .environment(PreviewData.previewStore())
         .environment(ToastCenter())
 }

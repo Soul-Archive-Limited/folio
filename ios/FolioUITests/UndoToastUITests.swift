@@ -19,6 +19,11 @@ final class UndoToastUITests: XCTestCase {
         let undo = app.buttons["Undo"]
         XCTAssertTrue(undo.waitForExistence(timeout: 3), "toast with Undo appears")
         XCTAssertTrue(undo.isHittable, "Undo must receive touches")
+        // Owner review, Batch B: the toast rests just above the quick-add bar, never on it.
+        let quickAdd = app.textFields["Add a task…"]
+        XCTAssertTrue(quickAdd.exists)
+        XCTAssertLessThanOrEqual(undo.frame.maxY, quickAdd.frame.minY, "toast sits above the quick-add bar")
+        XCTAssertFalse(app.buttons["New entry"].exists, "no floating + on To-do")
         undo.tap()
 
         XCTAssertTrue(undo.waitForNonExistence(timeout: 3), "toast closes after Undo")

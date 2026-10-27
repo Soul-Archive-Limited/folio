@@ -15,11 +15,14 @@ struct TaskComposerSheet: View {
     @State private var categoryID: UUID?
     @State private var confirmsDelete = false
     @State private var saveCount = 0
-    @FocusState private var titleFocused: Bool
+    @State private var detent: PresentationDetent = .medium
+    @FocusState private var focus: Field?
 
-    init(task: TaskItem?, day: DayKey?, categoryID: UUID? = nil) {
+    private enum Field { case title, notes }
+
+    init(task: TaskItem?, day: DayKey?, title: String = "", categoryID: UUID? = nil) {
         self.task = task
-        _title = State(initialValue: task?.title ?? "")
+        _title = State(initialValue: task?.title ?? title)
         _notes = State(initialValue: task?.notes ?? "")
         _hasDate = State(initialValue: task?.dayKey != nil || day != nil)
         _day = State(initialValue: task?.day ?? day ?? DayKey(date: AppClock.now, calendar: .current))
@@ -29,34 +32,46 @@ struct TaskComposerSheet: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section {
-                    TextField("Title", text: $title, axis: .vertical)
-                        .folioFont(.headline)
-                        .focused($titleFocused)
-                    TextField("Notes", text: $notes, axis: .vertical)
-                        .lineLimit(2...6)
-                }
-                Section {
-                    Toggle("Date", isOn: $hasDate.animation())
-                        .tint(.ember)
-                    if hasDate {
-                        ComposerDatePicker(day: $day, minutes: $minutes)
-                            .listRowInsets(EdgeInsets())
-                    }
-                }
-                Section("Category") {
-                    ComposerCategoryRow(selection: $categoryID)
-                        .listRowBackground(Color.clear)
-                }
-                if task != nil {
+            ScrollViewReader { proxy in
+                Form {
                     Section {
-                        Button("Delete task", role: .destructive) { confirmsDelete = true }
-                            .frame(maxWidth: .infinity)
+                        TextField("Title", text: $title, axis: .vertical)
+                            .folioFont(.headline)
+                            .focused($focus, equals: .title)
+                        TextField("Notes", text: $notes, axis: .vertical)
+                            .lineLimit(2...6)
+                            .focused($focus, equals: .notes)
+                    }
+                    Section {
+                        Toggle("Date", isOn: $hasDate.animation())
+                            .tint(.ember)
+                        if hasDate {
+                            ComposerDatePicker(day: $day, minutes: $minutes)
+                                .listRowInsets(EdgeInsets())
+                                .id(Self.datePickerID)
+                        }
+                    }
+                    Section("Category") {
+                        ComposerCategoryRow(selection: $categoryID)
+                            .listRowBackground(Color.clear)
+                    }
+                    if task != nil {
+                        Section {
+                            Button("Delete task", role: .destructive) { confirmsDelete = true }
+                                .frame(maxWidth: .infinity)
+                        }
                     }
                 }
+                .scrollContentBackground(.hidden)
+                // Turning on Date or Time puts the keyboard away and brings the whole picker into
+                // view (owner review, Batch B).
+                .onChange(of: hasDate) { _, isOn in if isOn { revealDatePicker(proxy) } }
+                .onChange(of: minutes == nil) { _, noTime in if !noTime { revealDatePicker(proxy) } }
+                // When a date is already on at open, picking a day or scrolling also puts the
+                // keyboard away.
+                .onChange(of: day) { withAnimation(.smooth(duration: 0.35)) { focus = nil } }
+                .scrollDismissesKeyboard(.immediately)
             }
-            .scrollContentBackground(.hidden)
             .navigationTitle(task == nil ? "New task" : "Edit task")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -69,16 +84,29 @@ struct TaskComposerSheet: View {
                 }
             }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents([.medium, .large], selection: $detent)
         .presentationDragIndicator(.visible)
         .presentationBackground(.thickMaterial)
         .privacyCovered()
-        .onAppear { if task == nil { titleFocused = true } }
+        .onAppear { if task == nil { focus = .title } }
         .confirmationDialog("Delete this task?", isPresented: $confirmsDelete, titleVisibility: .visible) {
             Button("Delete", role: .destructive, action: delete)
         }
         .folioHaptic(.warning, trigger: confirmsDelete)
         .folioHaptic(.success, trigger: saveCount)
+    }
+
+    private static let datePickerID = "date-picker"
+
+    private func revealDatePicker(_ proxy: ScrollViewProxy) {
+        withAnimation(.smooth(duration: 0.35)) {
+            focus = nil
+            detent = .large
+        }
+        Task {
+            try? await Task.sleep(for: .milliseconds(350))
+            withAnimation(.smooth(duration: 0.35)) { proxy.scrollTo(Self.datePickerID, anchor: .top) }
+        }
     }
 
     private func save() {

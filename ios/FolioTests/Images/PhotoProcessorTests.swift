@@ -46,7 +46,7 @@ struct PhotoProcessorTests {
         #expect(processed.pixelWidth == 1536)
         #expect(processed.pixelHeight == 2048)
 
-        for data in [processed.imageData, processed.thumbnailData] {
+        for data in [processed.imageData, processed.displayData, processed.thumbnailData] {
             let properties = try Self.properties(of: data)
             #expect(properties[kCGImagePropertyGPSDictionary] == nil)
             let exif = properties[kCGImagePropertyExifDictionary] as? [CFString: Any]
@@ -59,6 +59,17 @@ struct PhotoProcessorTests {
         #expect(thumbSize == 240)
         #expect(processed.thumbnailData.count < 25_000)
         #expect(processed.imageData.count < 600_000)
+    }
+
+    @Test("The display rendition is a 1080 px HEIC of about 150 KB")
+    func displayRendition() throws {
+        let jpeg = try #require(SampleImageRenderer.jpeg(seed: 5, width: 4000, height: 3000))
+        let processed = try PhotoProcessor().processSynchronously(jpeg)
+        let display = try Self.properties(of: processed.displayData)
+        let longEdge = max(display[kCGImagePropertyPixelWidth] as? Int ?? 0, display[kCGImagePropertyPixelHeight] as? Int ?? 0)
+        #expect(longEdge == 1080)
+        #expect(processed.displayData.count < 250_000)
+        #expect(processed.displayData.count < processed.imageData.count)
     }
 
     @Test("Small photos are not upscaled")

@@ -22,6 +22,11 @@ enum FolioMotion {
     }
 
     /// The Reduce Motion substitute: short, no overshoot.
+    /// Toasts slide in and out on a light spring (owner review, Batch B).
+    static func toast(reduceMotion: Bool = false) -> Animation {
+        reduceMotion ? reduced : .spring(duration: 0.45, bounce: 0.25)
+    }
+
     static let reduced: Animation = .easeOut(duration: 0.2)
 
     /// Delay between items in a staggered list (SPEC §3.6: 30 ms).

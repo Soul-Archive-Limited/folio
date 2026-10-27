@@ -10,7 +10,7 @@ struct EntryCard: View {
     var body: some View {
         HStack(alignment: .top, spacing: Spacing.s) {
             if let photo = entry.orderedPhotos.first {
-                PhotoTile(photoID: photo.id, cornerRadius: 14)
+                FullPhotoImage(photoID: photo.id, rendition: .display, maxPixel: 240, cornerRadius: 14)
                     .frame(width: 64, height: 64)
             }
             VStack(alignment: .leading, spacing: Spacing.xxs) {

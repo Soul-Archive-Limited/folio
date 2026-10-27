@@ -2,7 +2,8 @@ import Foundation
 import FolioCrypto
 import SwiftData
 
-/// A photo attached to an entry (SPEC §5). Image bytes live in external storage.
+/// A photo attached to an entry (SPEC §5). Image bytes live in external storage, in three
+/// renditions: full (`imageData`), display (1080 px) and thumbnail (240 px).
 @Model nonisolated
 final class EntryPhoto: SyncedRecord {
     #Unique<EntryPhoto>([\.id])
@@ -16,6 +17,9 @@ final class EntryPhoto: SyncedRecord {
     var sortIndex: Int
     @Attribute(.externalStorage) var imageData: Data
     @Attribute(.externalStorage) var thumbData: Data
+    /// Added in schema v2. Optional so the migration is lightweight; photos from v1 get it
+    /// from `DiaryStore.backfillDisplayRenditions()`.
+    @Attribute(.externalStorage) var displayData: Data?
     var pixelWidth: Int
     var pixelHeight: Int
     var blobUploaded: Bool
@@ -33,6 +37,7 @@ final class EntryPhoto: SyncedRecord {
         self.sortIndex = sortIndex
         self.imageData = processed.imageData
         self.thumbData = processed.thumbnailData
+        self.displayData = processed.displayData.isEmpty ? nil : processed.displayData
         self.pixelWidth = processed.pixelWidth
         self.pixelHeight = processed.pixelHeight
         self.blobUploaded = false
@@ -42,4 +47,7 @@ final class EntryPhoto: SyncedRecord {
         self.isDirty = true
         self.isTombstone = false
     }
+
+    /// The display rendition, or the full image for a photo the backfill hasn't reached yet.
+    var displayOrFullData: Data { displayData ?? imageData }
 }

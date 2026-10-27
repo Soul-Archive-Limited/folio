@@ -1,9 +1,12 @@
 import ImageIO
 import SwiftUI
 
-/// Full photos decoded at the size they're shown (journal covers, the detail carousel),
-/// cached by photo and size. Decoding a 2048 px HEIC for a 360 pt card would waste memory.
+/// Photos decoded at the size they're shown, cached by photo, rendition and size. Cards,
+/// grids and the composer read the 1080 px display rendition; the detail carousel reads the
+/// full image. Decoding a 2048 px HEIC for a 120 pt tile would waste memory.
 final class DisplayImageCache {
+    enum Rendition: String { case display, full }
+
     static let shared = DisplayImageCache()
 
     private let cache: NSCache<NSString, UIImage> = {
@@ -12,21 +15,25 @@ final class DisplayImageCache {
         return cache
     }()
 
-    func cached(_ id: UUID, maxPixel: Int) -> UIImage? {
-        cache.object(forKey: key(id, maxPixel))
+    func cached(_ id: UUID, rendition: Rendition, maxPixel: Int) -> UIImage? {
+        cache.object(forKey: key(id, rendition, maxPixel))
     }
 
-    func image(for id: UUID, maxPixel: Int, store: DiaryStore) async -> UIImage? {
-        if let cached = cached(id, maxPixel: maxPixel) { return cached }
-        guard let data = store.photo(id: id)?.imageData, let image = await Self.decode(data, maxPixel: maxPixel) else { return nil }
+    func image(for id: UUID, rendition: Rendition, maxPixel: Int, store: DiaryStore) async -> UIImage? {
+        if let cached = cached(id, rendition: rendition, maxPixel: maxPixel) { return cached }
+        guard let photo = store.photo(id: id) else { return nil }
+        let data = rendition == .display ? photo.displayOrFullData : photo.imageData
+        guard let image = await Self.decode(data, maxPixel: maxPixel) else { return nil }
         let cost = Int(image.size.width * image.size.height * image.scale * image.scale * 4)
-        cache.setObject(image, forKey: key(id, maxPixel), cost: cost)
+        cache.setObject(image, forKey: key(id, rendition, maxPixel), cost: cost)
         return image
     }
 
     func removeAll() { cache.removeAllObjects() }
 
-    private func key(_ id: UUID, _ maxPixel: Int) -> NSString { "\(id.uuidString)-\(maxPixel)" as NSString }
+    private func key(_ id: UUID, _ rendition: Rendition, _ maxPixel: Int) -> NSString {
+        "\(id.uuidString)-\(rendition.rawValue)-\(maxPixel)" as NSString
+    }
 
     @concurrent
     nonisolated static func decode(_ data: Data, maxPixel: Int) async -> UIImage? {

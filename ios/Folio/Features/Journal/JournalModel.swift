@@ -10,6 +10,8 @@ final class JournalModel {
     }
 
     var mode: Mode = .timeline
+    /// Pushed entries; the floating "+" shows only while this is empty.
+    var path: [UUID] = []
     var filter: Set<UUID> = []
 
     struct MonthSection: Identifiable {

@@ -25,8 +25,8 @@ struct ComposerRoute: View {
             ComposerSheet(model: ComposerModel(day: store.today.adding(days: -1), categoryID: store.settings().defaultCategoryID,
                                                writingFont: writingFont),
                           calendar: calendar, opensDatePicker: true, onSaved: saved)
-        case .task(let day):
-            TaskComposerSheet(task: nil, day: day, categoryID: store.settings().defaultCategoryID)
+        case .task(let day, let title):
+            TaskComposerSheet(task: nil, day: day, title: title, categoryID: store.settings().defaultCategoryID)
         }
     }
 
