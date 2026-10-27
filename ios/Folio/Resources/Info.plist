@@ -24,6 +24,10 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Folio uses the camera only when you choose to take a photo for an entry.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Folio uses the microphone only while you dictate. Audio is processed on your iPhone and never stored or sent anywhere.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Folio turns your voice into text on your iPhone. Nothing is sent to a server.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -7,6 +7,8 @@ struct ComposerSheet: View {
     let calendar: CalendarModel?
     var startsLarge = false
     var opensDatePicker = false
+    /// "Dictate an entry" (long-press "+"): opens listening (SPEC §8).
+    var startsDictation = false
     let onSaved: (Entry) -> Void
 
     @Environment(DiaryStore.self) private var store
@@ -18,11 +20,15 @@ struct ComposerSheet: View {
     @State private var errorMessage: String?
     @State private var saveCount = 0
     @FocusState private var focus: Field?
+    @State private var dictation = DictationController()
+    @State private var assistant = WritingAssistant()
+    @State private var writingTool: WritingTool?
 
     enum Field { case title, body }
 
     init(model: ComposerModel, calendar: CalendarModel?, startsLarge: Bool = false, opensDatePicker: Bool = false,
-         onSaved: @escaping (Entry) -> Void) {
+         startsDictation: Bool = false, onSaved: @escaping (Entry) -> Void) {
+        self.startsDictation = startsDictation
         _model = State(initialValue: model)
         self.calendar = calendar
         self.startsLarge = startsLarge
@@ -48,7 +54,8 @@ struct ComposerSheet: View {
             .padding(.horizontal, Spacing.sideMargin)
             .padding(.top, Spacing.xs)
             .toolbar { toolbar }
-            .safeAreaInset(edge: .bottom) { ComposerToolRow(model: model) }
+            .safeAreaInset(edge: .bottom) { bottomBar }
+            .animation(reduceMotion ? FolioMotion.reduced : .spring(duration: 0.4, bounce: 0.2), value: dictation.isVisible)
             .navigationBarTitleDisplayMode(.inline)
         }
         .presentationDetents([.medium, .large], selection: $detent)
@@ -80,7 +87,40 @@ struct ComposerSheet: View {
             if let newDay, newDay != model.day { model.day = newDay }
         }
         .onAppear(perform: appear)
-        .onDisappear { model.writeDraftIfNeeded(context: fontContext); model.stopAutosave() }
+        .task { await dictation.checkSupport() }
+        .onChange(of: focus) { _, field in if field == .body { model.hasPlacedCursor = true } }
+        .dictationPermissions(dictation)
+        .sheet(item: $writingTool) { tool in
+            WritingToolsSheet(tool: tool, model: model, assistant: assistant)
+        }
+        .onDisappear {
+            model.writeDraftIfNeeded(context: fontContext)
+            model.stopAutosave()
+            Task { await dictation.session.cancel() }
+        }
+    }
+
+    /// The tool row, or the dictation capsule while listening (SPEC §6.11).
+    @ViewBuilder private var bottomBar: some View {
+        if dictation.isVisible {
+            DictationCapsule(session: dictation.session,
+                             onDone: { Task { await dictation.session.finish() } },
+                             onDismiss: { Task { await dictation.session.cancel() } })
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+        } else {
+            ComposerToolRow(model: model, onDictate: dictateAction, onWritingTool: writingToolAction)
+                .transition(.opacity)
+        }
+    }
+
+    private var dictateAction: (() -> Void)? {
+        guard dictation.isSupported else { return nil }
+        return { dictation.micTapped() }
+    }
+
+    private var writingToolAction: ((WritingTool) -> Void)? {
+        guard assistant.availability == .available else { return nil }
+        return { tool in writingTool = tool }
     }
 
     @ToolbarContentBuilder
@@ -114,6 +154,17 @@ struct ComposerSheet: View {
     private func appear() {
         if startsLarge { detent = .large }
         model.startAutosave(context: fontContext)
+        dictation.session.onCommit = { [model] phrase in model.insertDictation(phrase) }
+        if startsDictation { dictation.micTapped() }
+        #if DEBUG
+        switch DebugLaunchOptions.string("FolioOpenTool") {
+        case "mic": dictation.micTapped()
+        case "titles": writingTool = .titles
+        case "polish": writingTool = .polish
+        case "tasks": writingTool = .tasks
+        default: break
+        }
+        #endif
         // No auto-focus: the keyboard would lift the sheet and hide the calendar that's meant
         // to stay visible above it (SPEC §6.4). Tapping the page starts writing.
     }
@@ -123,11 +174,21 @@ struct ComposerSheet: View {
     }
 
     private func discard() {
+        Task { await dictation.session.cancel() }
         model.discard()
         dismiss()
     }
 
+    /// Finishes dictation first so the last words heard are part of the entry.
     private func save() {
+        guard dictation.session.isRunning else { return commit() }
+        Task {
+            await dictation.session.finish()
+            commit()
+        }
+    }
+
+    private func commit() {
         do {
             let entry = try model.save(to: store, context: fontContext)
             saveCount += 1

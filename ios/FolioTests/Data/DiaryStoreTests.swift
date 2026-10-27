@@ -192,7 +192,7 @@ struct DiaryStoreTests {
 @MainActor
 @Suite("Erase data on this iPhone (SPEC §6.9)")
 struct EraseTests {
-    @Test("Erase removes every entry, photo, task, category and setting")
+    @Test("Erase removes every entry, photo, task, category, setting and draft")
     func eraseAll() throws {
         let container = try FolioPersistence.makeContainer(inMemory: true)
         let store = DiaryStore(context: container.mainContext)
@@ -201,7 +201,12 @@ struct EraseTests {
         _ = try store.addPhoto(DiaryStoreTests.fakePhoto, to: entry)
         _ = try store.createTask(title: "T", day: store.today)
         _ = store.settings()
+        store.drafts = DraftStore(directory: URL.temporaryDirectory.appending(path: "erase-\(UUID().uuidString)"))
+        store.drafts.save(ComposerDraft(entryID: nil, dayKey: "2026-10-27", minutesFromMidnight: nil, title: "Half a thought",
+                                        bodyMarkdown: "", categoryID: nil, savedAt: .now))
+        #expect(store.drafts.load() != nil)
         store.eraseAll()
+        #expect(store.drafts.load() == nil, "drafts are erased too")
         let context = container.mainContext
         #expect(try context.fetchCount(FetchDescriptor<Entry>()) == 0)
         #expect(try context.fetchCount(FetchDescriptor<EntryPhoto>()) == 0)

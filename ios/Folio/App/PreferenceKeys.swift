@@ -12,4 +12,8 @@ enum PreferenceKeys {
     static let todoCompletedExpanded = "todoCompletedExpanded"
     /// Onboarding (SPEC §6.1) has been completed or skipped on this device.
     static let hasOnboarded = "hasOnboarded"
+    /// Dictation language as a locale identifier; empty follows the device (SPEC §8).
+    static let dictationLocale = "dictationLocale"
+    /// DEBUG only: pretend Apple's on-device model is unavailable (SPEC §9 testing).
+    static let fakeIntelligenceUnavailable = "FolioFakeIntelligenceUnavailable"
 }

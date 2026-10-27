@@ -14,7 +14,7 @@ struct ComposerRoute: View {
         case .entry(let day), .dictation(let day):
             ComposerSheet(model: ComposerModel(day: day, categoryID: store.settings().defaultCategoryID,
                                                writingFont: writingFont),
-                          calendar: calendar, onSaved: saved)
+                          calendar: calendar, startsDictation: request == .dictation(day), onSaved: saved)
                 .navigationTransition(.zoom(sourceID: FloatingAddButton.transitionID, in: namespace))
         case .editEntry(let id):
             if let entry = store.entry(id: id) {

@@ -22,6 +22,11 @@ import Foundation
 /// - `-FolioTodoFilter Family` filters the To-do list by a category name.
 /// - `-FolioOpen composer|composerLarge|taskComposer|entry|categories|categoryEdit` opens a screen
 ///   (composerLarge and entry use the selected day's first entry; categoryEdit edits the first category).
+/// - `-FolioTourStep N` resets TipKit and starts the tour at step N (1–6).
+/// - `-FolioOnboardingPage N` opens onboarding at page N (0–4) when it shows.
+/// - `-FolioDemo dictation|intelligence` scripted dictation / canned ✦ results (screenshots).
+/// - `-FolioOpenTool mic|titles|polish|tasks` opens that tool in the composer.
+/// - `-FolioFakeIntelligenceUnavailable YES` pretends Apple's model is unavailable.
 enum DebugLaunchOptions {
     enum Screen: String {
         case gallery, cover, greeting

@@ -12,6 +12,7 @@ final class DiaryStore {
     /// The phone's calendar: decides what "today" is. Never used to place stored items.
     var calendar: Calendar
     @ObservationIgnored let now: () -> Date
+    @ObservationIgnored var drafts = DraftStore()
 
     private(set) var revision = 0
 
@@ -474,6 +475,8 @@ final class DiaryStore {
         commit()
         ThumbnailCache.shared.removeAll()
         DisplayImageCache.shared.removeAll()
+        // A draft (and its photos) is diary content too.
+        drafts.clear()
     }
 
     // MARK: - Helpers

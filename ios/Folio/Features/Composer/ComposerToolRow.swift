@@ -6,8 +6,11 @@ import SwiftUI
 /// above the keyboard when one is up: the tools are reachable with or without typing.
 struct ComposerToolRow: View {
     @Bindable var model: ComposerModel
-    /// Nil until dictation is available (Phase 8): the mic then shows disabled.
+    /// Nil when dictation isn't available for the chosen language: the mic is hidden, and
+    /// Profile points to the keyboard's own mic instead (SPEC §8).
     var onDictate: (() -> Void)?
+    /// Nil when Apple's on-device model isn't available: ✦ is hidden (SPEC §9).
+    var onWritingTool: ((WritingTool) -> Void)?
 
     @Environment(TourModel.self) private var tour: TourModel?
 
@@ -18,10 +21,14 @@ struct ComposerToolRow: View {
             ComposerCameraButton(model: model)
             ComposerCategoryMenu(selection: $model.categoryID)
             Spacer(minLength: 0)
-            Button("Dictate", systemImage: "mic") { onDictate?() }
-                .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
-                .disabled(onDictate == nil)
-                .accessibilityInputLabels(["Dictate", "Microphone"])
+            if let onDictate {
+                Button("Dictate", systemImage: "mic", action: onDictate)
+                    .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
+                    .accessibilityInputLabels(["Dictate", "Microphone"])
+            }
+            if let onWritingTool {
+                WritingToolsMenu(onPick: onWritingTool)
+            }
         }
         .labelStyle(.iconOnly)
         .font(.title3)

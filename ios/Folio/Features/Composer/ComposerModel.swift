@@ -164,6 +164,35 @@ final class ComposerModel {
         photos.insert(photo, at: to)
     }
 
+    // MARK: Dictation
+
+    /// Set when the body editor has had focus, so dictation knows the cursor is meaningful.
+    @ObservationIgnored var hasPlacedCursor = false
+
+    /// Inserts a committed dictation phrase at the cursor (SPEC §6.11), spaced from the text
+    /// before it and in the same font. Without a cursor it goes at the end.
+    func insertDictation(_ phrase: String) {
+        if !hasPlacedCursor {
+            selection = AttributedTextSelection(insertionPoint: body.endIndex)
+            hasPlacedCursor = true
+        }
+        let point: AttributedString.Index = switch selection.indices(in: body) {
+        case .insertionPoint(let index): index
+        case .ranges(let ranges): ranges.ranges.first?.lowerBound ?? body.endIndex
+        }
+        let previous = point > body.startIndex ? body.characters[body.characters.index(before: point)] : nil
+        let text = DictationRules.insertion(phrase, after: previous)
+        guard !text.isEmpty else { return }
+        var styled = AttributedString(text)
+        if point > body.startIndex {
+            let before = body.characters.index(before: point)
+            styled.mergeAttributes(body[before..<point].runs.first?.attributes ?? AttributeContainer())
+        } else {
+            styled.font = RichTextBridge.baseFont(writingFont)
+        }
+        body.replaceSelection(&selection, with: styled)
+    }
+
     // MARK: Save
 
     /// Saves to the store (local-first) and clears the draft.

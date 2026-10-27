@@ -201,6 +201,7 @@ struct ProfileDeveloperSection: View {
     @Binding var showsGallery: Bool
     @Environment(DiaryStore.self) private var store
     @AppStorage(PreferenceKeys.hasOnboarded) private var hasOnboarded = true
+    @AppStorage(PreferenceKeys.fakeIntelligenceUnavailable) private var fakesUnavailable = false
 
     var body: some View {
         Section("Developer") {
@@ -208,6 +209,7 @@ struct ProfileDeveloperSection: View {
             Button("Load sample data", systemImage: "tray.and.arrow.down") { PreviewData.loadIfEmpty(into: store) }
                 .disabled(!store.isEmpty)
             Button("Show onboarding again", systemImage: "arrow.counterclockwise") { hasOnboarded = false }
+            Toggle("Fake “writing tools unavailable”", systemImage: "sparkles", isOn: $fakesUnavailable)
         }
         .listRowBackground(ProfileRowBackground())
     }

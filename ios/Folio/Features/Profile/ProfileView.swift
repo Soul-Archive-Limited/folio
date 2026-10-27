@@ -39,6 +39,7 @@ struct ProfileView: View {
 
                 ProfileAppearanceSection()
                 ProfileWritingSection()
+                ProfileIntelligenceSection()
                 ProfilePrivacySection()
                 ProfileDataSection()
 

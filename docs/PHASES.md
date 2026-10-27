@@ -14,7 +14,7 @@ Status key: ✅ done · 🟡 in progress · ⬜ not started
 | 5 | To-do | To-do tab, task composer, complete/undo flow, quick-add (§6.7, §6.8) | ✅ |
 | 6 | Journal + Categories | Journal tab (Timeline / Photos), categories manager (§6.6, §6.10) | ✅ |
 | 7 | Onboarding + tour + Profile | Welcome pages, name, sync choice UI, TipKit tour, Profile tab in guest mode (§6.1 steps 1–5 and 8, §6.9, §6.15) | ✅ |
-| 8 | Dictation + AI | SpeechAnalyzer dictation overlay, Foundation Models ✦ menu, permission explainers (§6.11, §6.12, §7, §8, §9) | ⬜ |
+| 8 | Dictation + AI | SpeechAnalyzer dictation overlay, Foundation Models ✦ menu, permission explainers (§6.11, §6.12, §7, §8, §9) | ✅ |
 | 9 | Backend | Worker, D1 schema, R2, `UserHub`, Better Auth (Apple/Google/email OTP via Resend), sync, blobs, linking, delete account, rate limits, admin usage (§10, §13, §15.2) | ⬜ |
 | 10 | iPhone sign-in + sync | Sign-in flows, recovery key + unlock screens (§6.1 steps 6–7, §6.13), Keychain, DK + recovery key, sync engine, live socket, background refresh, QR device linking, delete account in-app (§10.2–10.6) | ⬜ |
 | 11 | Website | Astro marketing site, legal pages, support/FAQ, headers, SEO (§11.1, §11.2, §14) | ⬜ |
@@ -79,3 +79,8 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - TipKit tour: six ordered glass tips that advance on the user's action, Skip tour, never repeat, replay from Profile → Help.
 - Profile (guest): header with monogram and name editing, archive tiles that open filtered tabs, Account card, Categories, Appearance, Writing, Privacy, Your data (JSON + photos zip export, erase), Help, About.
 - Composer tools now live in a glass row that works with or without the keyboard; Release build fixed and checked in CI.
+
+### Phase 8 — Dictation + on-device intelligence (2026-10-27)
+- Dictation: `SpeechAnalyzer` + `DictationTranscriber`, on device; glass capsule with live waveform, dim volatile words, finals inserted at the cursor, Pause/Done, model download progress, auto-stop (2 min silence / 30 min), one session at a time, "Dictate an entry".
+- ✦ writing tools on `SystemLanguageModel.default` only: three title chips, grammar diff with Accept/Discard, find tasks to tick and add; rate-limited; hidden when unavailable with Profile explaining why; DEBUG switch to fake unavailable.
+- Profile: Dictation & Intelligence section with dictation language. Erase now clears drafts too.
