@@ -32,7 +32,7 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 
 ### Batch E checklist
 - [x] Part 1 — Batch D fixes (owner's iPhone test of 0.1.0 (1))
-- [ ] Part 2 — Phase 9 backend
+- [ ] Part 2 — Phase 9 backend (code, tests, /vibesec done; deploy waits on owner setup)
 - [ ] Part 3 — Phase 10 iPhone sign-in, encryption, sync
 - [ ] Part 4 — TestFlight build from this Mac + owner's test list
 

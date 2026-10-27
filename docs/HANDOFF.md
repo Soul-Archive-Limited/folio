@@ -2,7 +2,12 @@
 
 The next session starts here. Read this, then `CLAUDE.md`, `docs/SPEC.md`, `docs/PHASES.md` and the last entries of `docs/DECISIONS.md`. Updated at the end of every batch.
 
-_Last updated: 2026-10-27, end of Batch D._
+_Last updated: 2026-10-28, mid Batch E (usage limit reached)._
+
+## Batch E status (resume here)
+- ✅ Part 1 "Batch D fixes" committed (b96e69c): all 10 fixes, tests, before/after shots in `docs/screenshots/batch-e/`, tour recording.
+- 🟡 Part 2 Phase 9: `/api` code + 52 Vitest tests + /vibesec fixes committed; **not deployed**. Owner was given the 23-step setup list (Pages, R2, $1 alert, Turnstile, Access, Resend + DNS, Apple Services ID/key/email relay, Google Web client). Next: `npx wrangler login` (owner clicks Allow), `wrangler d1 create folio-db` → put id in `api/wrangler.jsonc`, `wrangler r2 bucket create folio-blobs`, `wrangler d1 migrations apply folio-db --remote`, set vars APPLE_KEY_ID / GOOGLE_CLIENT_ID / ACCESS_TEAM_DOMAIN / ACCESS_AUD, secrets (owner pastes: GOOGLE_CLIENT_SECRET, RESEND_API_KEY, TURNSTILE_SECRET, APPLE_PRIVATE_KEY via `< file.p8`, REVIEW_CODE; generated straight into `wrangler secret put`: OTP_PEPPER, TOKEN_ENCRYPTION_KEY), deploy, smoke-test.
+- ⬜ Part 3 (iPhone sign-in, crypto, sync), Part 4 (TestFlight via `scripts/testflight.sh`), Xcode Cloud usage check (owner signs in to App Store Connect in the browser pane), Batch E report + contact sheet.
 
 ## Where things stand
 

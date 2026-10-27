@@ -1,0 +1,36 @@
+// Folio API (SPEC §10.1). No secrets here: they live in Cloudflare's secret store
+// (`npx wrangler secret put NAME`) and, for local dev only, in the git-ignored .dev.vars.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "folio-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "routes": [{ "pattern": "folio.devilsense.com/api/*", "zone_name": "devilsense.com" }],
+  "workers_dev": false,
+  "preview_urls": false,
+  "d1_databases": [
+    { "binding": "DB", "database_name": "folio-db", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "migrations" }
+  ],
+  "r2_buckets": [{ "binding": "BLOBS", "bucket_name": "folio-blobs" }],
+  "durable_objects": { "bindings": [{ "name": "USER_HUB", "class_name": "UserHub" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["UserHub"] }],
+  // Per-minute burst guard per user/IP (one Cloudflare location). Longer windows (per 15 min,
+  // hour, day — SPEC §10.7) are D1 counters in `rate_limits`.
+  "ratelimits": [{ "name": "BURST", "namespace_id": "4401", "simple": { "limit": 120, "period": 60 } }],
+  "vars": {
+    "APP_ORIGIN": "https://folio.devilsense.com",
+    "APPLE_BUNDLE_ID": "com.devilsense.folio",
+    "APPLE_SERVICES_ID": "com.devilsense.folio.web",
+    "APPLE_TEAM_ID": "25DH3LUCPC",
+    "APPLE_KEY_ID": "",
+    "GOOGLE_CLIENT_ID": "",
+    "EMAIL_FROM": "Folio <no-reply@folio.devilsense.com>",
+    "REVIEW_EMAIL": "review@devilsense.com",
+    "REVIEW_ENABLED": "true",
+    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_AUD": ""
+  },
+  // Nightly clean-up of expired rows (D1 size is the free plan's tightest limit).
+  "triggers": { "crons": ["17 3 * * *"] },
+  "observability": { "enabled": true, "head_sampling_rate": 1, "traces": { "enabled": true } }
+}
