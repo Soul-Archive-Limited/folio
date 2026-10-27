@@ -52,7 +52,7 @@ struct ProfileHeaderCard: View {
 
     private func summary(_ stats: ProfileStats) -> String {
         guard let since = stats.writingSince, stats.entries > 0 else { return String(localized: "Your first page is waiting.") }
-        let month = since.formatted(.dateTime.month(.wide).year())
+        let month = since.startDate(in: store.calendar).formatted(.dateTime.month(.wide).year())
         let pages = stats.entries == 1 ? String(localized: "1 page") : String(localized: "\(stats.entries) pages")
         return String(localized: "Writing since \(month) · \(pages)")
     }

@@ -16,6 +16,7 @@ struct TaskComposerSheet: View {
     @State private var confirmsDelete = false
     @State private var saveCount = 0
     @State private var detent: PresentationDetent = .medium
+    @State private var scroll = ScrollPosition(edge: .top)
     @FocusState private var focus: Field?
 
     private enum Field { case title, notes }
@@ -32,46 +33,52 @@ struct TaskComposerSheet: View {
 
     var body: some View {
         NavigationStack {
-            ScrollViewReader { proxy in
-                Form {
-                    Section {
-                        TextField("Title", text: $title, axis: .vertical)
-                            .folioFont(.headline)
-                            .focused($focus, equals: .title)
-                        TextField("Notes", text: $notes, axis: .vertical)
-                            .lineLimit(2...6)
-                            .focused($focus, equals: .notes)
-                    }
-                    Section {
-                        Toggle("Date", isOn: $hasDate.animation())
-                            .tint(.ember)
-                        if hasDate {
-                            ComposerDatePicker(day: $day, minutes: $minutes)
-                                .listRowInsets(EdgeInsets())
-                                .id(Self.datePickerID)
-                        }
-                    }
-                    Section("Category") {
-                        ComposerCategoryRow(selection: $categoryID)
-                            .listRowBackground(Color.clear)
-                    }
-                    if task != nil {
-                        Section {
-                            Button("Delete task", role: .destructive) { confirmsDelete = true }
-                                .frame(maxWidth: .infinity)
-                        }
+            Form {
+                Section {
+                    TextField("Title", text: $title, axis: .vertical)
+                        .folioFont(.headline)
+                        .focused($focus, equals: .title)
+                    TextField("Notes", text: $notes, axis: .vertical)
+                        .lineLimit(2...6)
+                        .focused($focus, equals: .notes)
+                }
+                Section {
+                    Toggle("Date", isOn: $hasDate.animation())
+                        .tint(.ember)
+                    if hasDate {
+                        ComposerDatePicker(day: $day, minutes: $minutes)
+                            .listRowInsets(EdgeInsets())
                     }
                 }
-                .scrollContentBackground(.hidden)
-                // Turning on Date or Time puts the keyboard away and brings the whole picker into
-                // view (owner review, Batch B).
-                .onChange(of: hasDate) { _, isOn in if isOn { revealDatePicker(proxy) } }
-                .onChange(of: minutes == nil) { _, noTime in if !noTime { revealDatePicker(proxy) } }
-                // When a date is already on at open, picking a day or scrolling also puts the
-                // keyboard away.
-                .onChange(of: day) { withAnimation(.smooth(duration: 0.35)) { focus = nil } }
-                .scrollDismissesKeyboard(.immediately)
+                // The chips live in the header, not a row: a row sits on the section's
+                // panel, which showed as a faint band behind the glass (owner review, Batch C).
+                Section {
+                } header: {
+                    VStack(alignment: .leading, spacing: Spacing.s) {
+                        Text("Category")
+                        ComposerCategoryRow(selection: $categoryID)
+                            .textCase(nil)
+                            .padding(.horizontal, -Spacing.m)
+                    }
+                }
+                if task != nil {
+                    Section {
+                        Button("Delete task", role: .destructive) { confirmsDelete = true }
+                            .frame(maxWidth: .infinity)
+                    }
+                }
             }
+            .scrollContentBackground(.hidden)
+            .scrollPosition($scroll)
+            // Turning on Date or Time puts the keyboard away, raises the sheet and scrolls the
+            // form back to its start, so Title stays visible above the picker instead of being
+            // half-clipped under the sheet header (owner review, Batches B and C).
+            .onChange(of: hasDate) { _, isOn in if isOn { revealDatePicker() } }
+            .onChange(of: minutes == nil) { _, noTime in if !noTime { revealDatePicker() } }
+            // When a date is already on at open, picking a day or scrolling also puts the
+            // keyboard away.
+            .onChange(of: day) { withAnimation(.smooth(duration: 0.35)) { focus = nil } }
+            .scrollDismissesKeyboard(.immediately)
             .navigationTitle(task == nil ? "New task" : "Edit task")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -96,16 +103,15 @@ struct TaskComposerSheet: View {
         .folioHaptic(.success, trigger: saveCount)
     }
 
-    private static let datePickerID = "date-picker"
 
-    private func revealDatePicker(_ proxy: ScrollViewProxy) {
+    private func revealDatePicker() {
         withAnimation(.smooth(duration: 0.35)) {
             focus = nil
             detent = .large
         }
         Task {
             try? await Task.sleep(for: .milliseconds(350))
-            withAnimation(.smooth(duration: 0.35)) { proxy.scrollTo(Self.datePickerID, anchor: .top) }
+            withAnimation(.smooth(duration: 0.35)) { scroll.scrollTo(edge: .top) }
         }
     }
 

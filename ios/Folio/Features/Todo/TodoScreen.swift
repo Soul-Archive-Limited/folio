@@ -10,6 +10,11 @@ struct TodoScreen: View {
     @State private var editing: TaskItem?
     @State private var rescheduling: TaskItem?
     @State private var confirmingDelete: TaskItem?
+    @State private var tabBar: TabBarShape?
+    @State private var isScrolling = false
+    @State private var isTyping = false
+    @State private var quickAddHeight: Double = 48
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         let today = store.today
@@ -57,6 +62,11 @@ struct TodoScreen: View {
             // clear of both and of the tab bar; the margin adds a little air under it.
             .contentMargins(.bottom, Spacing.m, for: .scrollContent)
             .safeAreaInset(edge: .bottom, spacing: 0) { bottomBar }
+            .onScrollPhaseChange { _, phase in isScrolling = phase.isScrolling }
+            .background {
+                TabBarShapeReader(isTracking: isScrolling) { tabBar = $0 }
+                    .accessibilityHidden(true)
+            }
             .animation(FolioMotion.standard(), value: sections.active.map(\.id))
             .animation(FolioMotion.standard(), value: sections.completed.map(\.id))
             .navigationTitle("To-do")
@@ -85,12 +95,22 @@ struct TodoScreen: View {
 
     /// Toast, then the full-width quick-add bar over a soft scrim (owner review, Batch B):
     /// the page colour fades in over 60 pt so rows don't show through behind the bar.
+    /// When the tab bar minimises, the bar drops into the tab bar's row beside the small
+    /// circle, so there's never a gap under it (owner review, Batch C).
     private var bottomBar: some View {
-        VStack(spacing: Spacing.s) {
+        let inline = inlinePlacement
+        return VStack(spacing: Spacing.s) {
             ToastSlot(center: toasts)
                 .padding(.horizontal, Spacing.sideMargin)
-            TodoQuickAddBar { title, day in request?.send(.task(day, title: title)) }
+            TodoQuickAddBar(leadingInset: inline?.leading ?? Spacing.sideMargin,
+                            onFocusChange: { isTyping = $0 }) { title, day in
+                request?.send(.task(day, title: title))
+            }
+            .onGeometryChange(for: Double.self) { $0.size.height - Spacing.s } action: { quickAddHeight = $0 }
         }
+        // A negative bottom padding shrinks the inset too, so the list's last row follows the bar down.
+        .padding(.bottom, -(inline?.drop ?? 0))
+        .animation(FolioMotion.standard(reduceMotion: reduceMotion), value: inline)
         // The scrim sits behind the toast too, so rows fade out under it rather than show
         // through (owner review, Batch B: toasts never overlap rows).
         .background(alignment: .bottom) {
@@ -108,6 +128,22 @@ struct TodoScreen: View {
     }
 
     private static let scrimFade: Double = 60
+
+    /// Where the quick-add bar goes while the tab bar is minimised: down by `drop` so it's
+    /// centred on the small circle, and in from the leading edge past it. Not while typing:
+    /// the keyboard covers the tab bar, and the bar rides above the keyboard.
+    private var inlinePlacement: InlinePlacement? {
+        guard let tabBar, tabBar.isMinimised, !isTyping else { return nil }
+        let restingMidY = tabBar.top - Spacing.s - quickAddHeight / 2
+        let drop = tabBar.platter.midY - restingMidY
+        guard drop > 0 else { return nil }
+        return InlinePlacement(drop: drop, leading: tabBar.platter.maxX + Spacing.xs)
+    }
+
+    private struct InlinePlacement: Equatable {
+        var drop: Double
+        var leading: Double
+    }
 
     private func row(_ task: TaskItem, colors: [UUID: Color], today: DayKey) -> some View {
         TodoRow(task: task, isTicked: model.isTicked(task), tint: task.categoryID.flatMap { colors[$0] } ?? .ink,

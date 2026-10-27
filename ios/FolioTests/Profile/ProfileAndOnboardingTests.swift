@@ -34,7 +34,7 @@ struct ProfileTests {
         #expect(stats.photos == 1)
         #expect(stats.daysWrittenOn == 2)
         #expect(stats.tasksDone == 1)
-        #expect(stats.writingSince == TestCalendar.date(2026, 10, 27, 9), "when it was written, not the day it's for")
+        #expect(stats.writingSince?.rawValue == "1999-01-01", "the earliest day written for, not when it was written")
     }
 
     @Test("An empty diary has no 'writing since'")

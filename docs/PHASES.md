@@ -22,7 +22,13 @@ Status key: ✅ done · 🟡 in progress · ⬜ not started
 | 13 | Motion polish | Hitch audit with Instruments, 120 fps pass, Reduce Motion pass, web motion, iPad split view (§3.6, §6.16, §15.1) | ⬜ |
 | 14 | Release | Privacy manifest, App Store checklist, accessibility audit, review account, TestFlight (§12) | ⬜ |
 
-Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1–3 run as **Batch A**, 4–6 as **Batch B**, and the Batch B fixes plus 7–8 as **Batch C**.
+Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1–3 run as **Batch A**, 4–6 as **Batch B**, the Batch B fixes plus 7–8 as **Batch C**, and the Batch C fixes, Recently Deleted, Phase 11 and Xcode Cloud TestFlight builds as **Batch D**.
+
+### Batch D checklist
+- [x] Part 1 — Batch C fixes
+- [ ] Part 2 — Recently Deleted (SPEC §5.2)
+- [ ] Part 3 — Phase 11 website
+- [ ] Part 4 — Xcode Cloud → TestFlight
 
 ## Log
 
@@ -84,3 +90,8 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - Dictation: `SpeechAnalyzer` + `DictationTranscriber`, on device; glass capsule with live waveform, dim volatile words, finals inserted at the cursor, Pause/Done, model download progress, auto-stop (2 min silence / 30 min), one session at a time, "Dictate an entry".
 - ✦ writing tools on `SystemLanguageModel.default` only: three title chips, grammar diff with Accept/Discard, find tasks to tick and add; rate-limited; hidden when unavailable with Profile explaining why; DEBUG switch to fake unavailable.
 - Profile: Dictation & Intelligence section with dictation language. Erase now clears drafts too.
+
+### Batch C fixes (2026-10-27)
+- Profile "Writing since" uses the earliest day written for.
+- Task composer: turning on Date scrolls the form to its top (Title visible above the full picker); category chips without the row panel.
+- To-do quick-add follows the minimising tab bar into its row (no gap); `.tabViewBottomAccessory` checked and rejected (hidden behind the keyboard, per-tab variant needs iOS 26.1).

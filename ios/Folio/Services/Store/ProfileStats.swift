@@ -6,8 +6,9 @@ nonisolated struct ProfileStats: Equatable, Sendable {
     var photos = 0
     var daysWrittenOn = 0
     var tasksDone = 0
-    /// When the first entry was written in Folio (not the day it's for).
-    var writingSince: Date?
+    /// The earliest day the diary has an entry for, so old diaries moved in count
+    /// (owner review, Batch C) — not the install or creation date.
+    var writingSince: DayKey?
 }
 
 extension DiaryStore {
@@ -18,7 +19,7 @@ extension DiaryStore {
             photos: allPhotos().count,
             daysWrittenOn: Set(entries.map(\.dayKey)).count,
             tasksDone: allTasks().count { $0.isCompleted },
-            writingSince: entries.map(\.createdAt).min()
+            writingSince: entries.compactMap(\.day).min()
         )
     }
 }

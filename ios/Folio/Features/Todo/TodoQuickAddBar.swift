@@ -4,6 +4,9 @@ import SwiftUI
 /// dated tomorrow; Return adds and keeps the keyboard up for the next one. The expand button
 /// opens the full task composer with whatever has been typed so far.
 struct TodoQuickAddBar: View {
+    /// Space before the bar: the side margin, or room for the minimised tab bar beside it.
+    var leadingInset: Double = Spacing.sideMargin
+    var onFocusChange: (Bool) -> Void = { _ in }
     let onExpand: (_ title: String, _ day: DayKey?) -> Void
 
     @Environment(DiaryStore.self) private var store
@@ -32,8 +35,10 @@ struct TodoQuickAddBar: View {
         .padding(.trailing, Spacing.xxs)
         .frame(minHeight: 48)
         .folioGlass(in: .capsule, interactive: true)
-        .padding(.horizontal, Spacing.sideMargin)
+        .padding(.leading, leadingInset)
+        .padding(.trailing, Spacing.sideMargin)
         .padding(.bottom, Spacing.s)
+        .onChange(of: isFocused) { _, focused in onFocusChange(focused) }
         .folioHaptic(.success, trigger: addedCount)
     }
 
