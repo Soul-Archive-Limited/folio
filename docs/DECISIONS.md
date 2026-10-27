@@ -105,3 +105,11 @@ Every API and architecture decision, newest last. Format: date · phase · decis
 81. **Undated tasks reorder with `List.onMove`**, which works on iOS 26 (`reorderable()` is iOS 27+). Only undated tasks have a manual order (SPEC §6.7).
 82. **UI test target `FolioUITests`** (XCTest, which UI automation requires) proves SPEC §5 end to end: ticking keeps a task on its calendar day, marked done, and only Delete removes it. Rows carry accessibility identifiers (`todo-row`, `day-task-row`) so the test can't match the hidden Calendar tab's copy.
 83. **Bug found and fixed: "Erase data on this iPhone" didn't erase.** SwiftData's `context.delete(model:)` batch delete fails on the Entry → EntryPhoto inverse ("mandatory OTO nullify inverse") and only logs it. Erase now deletes object by object, and a test covers it.
+
+## Phase 6 — Journal + Categories (2026-10-27)
+
+84. **Journal sections are cached per store revision and filter** (`JournalModel`), so a 10,000-entry journal doesn't regroup on every redraw. The Timeline is a `LazyVStack` with pinned glass month headers.
+85. **Photos masonry is three `LazyVStack` columns with greedy shortest-column placement** by aspect ratio, keeping columns within about one photo of each other. Tiles use the 240 px thumbnails, so they're slightly soft at 3×; a medium rendition can come in Phase 13 if needed.
+86. **Covers and the detail carousel decode at display size** (`DisplayImageCache`: ImageIO downsampling, cost-limited `NSCache` of 120 MB) instead of decoding the full 2048 px image for a card. A clear 16:9 or 4:3 frame carries the size, because an `Image` would impose its own aspect ratio.
+87. **"Write for a past day"** opens a new entry for yesterday with the date picker already open (back to 1900). The placeholder switches to "What do you remember about this day?".
+88. **Categories manager:** `List.onMove` for reordering, swipe to delete with a confirmation that states what will happen ("3 entries and 2 tasks will keep their content and lose this category"), and tap to edit. The edit sheet has a live chip preview, the 12-swatch grid (selection shown with a checkmark, not only a ring) and "None" plus the 40 curated symbols. The "+" is disabled at 30. It's reachable from the Profile placeholder until Phase 7. Category filters now work on Calendar, Journal and To-do.

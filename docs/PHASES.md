@@ -12,7 +12,7 @@ Status key: ✅ done · 🟡 in progress · ⬜ not started
 | 3 | Tabs + Calendar | Native TabView shell, floating "+", Calendar tab, endless month paging, all cell states, filter, Today pill, day panel, collapse to week, Jump sheet, long-press menus, VoiceOver + rotor (§2, §6.2, §6.3, §15.1) | ✅ |
 | 4 | Composer + entry detail | Composer half sheet, rich text, photos, drafts, entry detail with zoom (§5.1, §6.4, §6.5) | ✅ |
 | 5 | To-do | To-do tab, task composer, complete/undo flow, quick-add (§6.7, §6.8) | ✅ |
-| 6 | Journal + Categories | Journal tab (Timeline / Photos), categories manager (§6.6, §6.10) | 🟡 |
+| 6 | Journal + Categories | Journal tab (Timeline / Photos), categories manager (§6.6, §6.10) | ✅ |
 | 7 | Onboarding + tour + Profile | Welcome pages, name, sync choice UI, recovery key + unlock screens, TipKit tour, Profile tab (guest mode), iPad split view (§6.1, §6.9, §6.13, §6.15, §6.16) | ⬜ |
 | 8 | Dictation + AI | SpeechAnalyzer dictation overlay, Foundation Models ✦ menu, permission explainers (§6.11, §6.12, §7, §8, §9) | ⬜ |
 | 9 | Backend | Worker, D1 schema, R2, `UserHub`, Better Auth (Apple/Google/email OTP via Resend), sync, blobs, linking, delete account, rate limits, admin usage (§10, §13, §15.2) | ⬜ |
@@ -65,7 +65,7 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - Swipe actions (Done, Delete with confirm for notes, Edit, Date menu), glass quick-add bar recognising today/tomorrow, task composer sheet (also from long-press "+").
 - UI test proving only Delete removes a task from the calendar; erase-all bug fixed.
 
-### Phase 6 — Journal + Categories (2026-10-27, in progress)
-- Built: Journal Timeline (sticky month headers, 16:9 cover and text cards, zoom to detail), Photos (3-column masonry), category chips, "Write for a past day" (composer opens with the date picker).
-- Built: Categories manager (reorder, swipe delete with counts, edit sheet with 12-swatch grid, 40 symbols, live chip preview, max 30), linked from Profile.
-- Not yet done: visual check of the categories manager, Phase 6 unit tests, Batch B screenshots, contact sheet, recordings and report.
+### Phase 6 — Journal + Categories (2026-10-27)
+- Journal Timeline (sticky month headers, 16:9 cover cards and text cards, zoom to detail), Photos (3-column masonry), category chips, "Write for a past day".
+- Categories manager (reorder, swipe delete with counts, edit sheet with 12-swatch grid, 40 symbols, live chip preview, max 30), linked from Profile.
+- Category filters on Calendar, Journal and To-do; tests for month grouping, caching, filters, masonry balance, reorder and edit validation.
