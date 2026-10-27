@@ -102,7 +102,18 @@ CI (GitHub Actions): `ios.yml` (test + Release build on macos-26), `node.yml` (a
 
 - Build 1 (0.1.0 (1), tag `testflight-0.1.0`) is installed on the owner's iPhone. TestFlight shows builds to the Apple Account that accepted the invitation email (the owner's phone uses a personal account; the tester is admin@devilsense.com), so new testers must open the invite on the device.
 - Website not deployed yet: owner connects Cloudflare Pages (steps in the Batch D report).
-- Owner's iPhone checks (Batch D report checklist): speech-permission prompt, dictation, ✦, Recently Deleted, photos, onboarding, tour.
+- **Owner's iPhone test of build 1 (2026-10-27)** — to fix in Batch E:
+  1. Speech: iOS **does** show the Speech Recognition prompt after the microphone one (answers the Phase 8 open question). SPEC §7 wants a glass explainer before each system prompt, so the explainer must cover speech too.
+  2. Photos: no permission prompt, gallery opens directly — correct (PhotosPicker runs out of process, SPEC §7).
+  3. A composer item about the Photos button and the calendar/date icon on the same line — the owner's sentence was cut off; ask what they meant.
+  4. Onboarding: after typing a name, the keyboard stays up on the next page and can't be dismissed by tapping.
+  5. Tour: the next tip appears while the previous step's screen is still showing; no step count ("2 of 6"); it should move to the next screen/step by itself instead of waiting.
+  6. Fast Calendar ↔ Journal tab switching: a photo briefly draws outside its container's rounded border.
+  7. Photo tiles on the calendar: the day number and dots are hard to read on some photos (needs a scrim/dim).
+  8. No way to delete a page from a list: add swipe and long-press Delete (day panel, Journal) — currently only entry detail → ••• → Delete.
+  9. Draft bug: reopening an entry that was already saved still asks "Continue your draft?". Only unsaved changes should prompt.
+  10. Share: unclear what is shared. Make it explicit (e.g. text vs text + photos, with a preview).
+  Recently Deleted (delete, Undo, restore) worked on device.
 - Legal pages need the owner's legal review; US year-end encryption self-classification is an open question for their adviser (DECISIONS 143).
 - iPad split view (§6.16) deferred to Phase 13.
 - Phase 9/10 not started: sign-in buttons are DEBUG-only; Release shows Continue (guest).
