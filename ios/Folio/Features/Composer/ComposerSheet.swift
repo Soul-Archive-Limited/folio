@@ -6,6 +6,7 @@ struct ComposerSheet: View {
     @State private var model: ComposerModel
     let calendar: CalendarModel?
     var startsLarge = false
+    var opensDatePicker = false
     let onSaved: (Entry) -> Void
 
     @Environment(DiaryStore.self) private var store
@@ -20,10 +21,12 @@ struct ComposerSheet: View {
 
     enum Field { case title, body }
 
-    init(model: ComposerModel, calendar: CalendarModel?, startsLarge: Bool = false, onSaved: @escaping (Entry) -> Void) {
+    init(model: ComposerModel, calendar: CalendarModel?, startsLarge: Bool = false, opensDatePicker: Bool = false,
+         onSaved: @escaping (Entry) -> Void) {
         _model = State(initialValue: model)
         self.calendar = calendar
         self.startsLarge = startsLarge
+        self.opensDatePicker = opensDatePicker
         self.onSaved = onSaved
     }
 
@@ -86,7 +89,7 @@ struct ComposerSheet: View {
             Button("Cancel", systemImage: "xmark", action: cancel)
         }
         ToolbarItem(placement: .principal) {
-            ComposerDatePill(day: $model.day, minutes: $model.minutesFromMidnight)
+            ComposerDatePill(day: $model.day, minutes: $model.minutesFromMidnight, opensPickerOnAppear: opensDatePicker)
         }
         ToolbarItem(placement: .confirmationAction) {
             Button("Save", action: save)

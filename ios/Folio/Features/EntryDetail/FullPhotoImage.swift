@@ -4,6 +4,8 @@ import SwiftUI
 /// The thumbnail shows instantly while the full image decodes off the main thread.
 struct FullPhotoImage: View {
     let photoID: UUID
+    /// Longest edge to decode at, in pixels.
+    var maxPixel = 1600
 
     @Environment(DiaryStore.self) private var store
     @State private var image: UIImage?
@@ -21,8 +23,8 @@ struct FullPhotoImage: View {
         .clipped()
         .animation(.easeOut(duration: 0.2), value: image != nil)
         .task(id: photoID) {
-            guard let data = store.photo(id: photoID)?.imageData else { return }
-            image = await ThumbnailCache.decode(data)
+            image = DisplayImageCache.shared.cached(photoID, maxPixel: maxPixel)
+            if image == nil { image = await DisplayImageCache.shared.image(for: photoID, maxPixel: maxPixel, store: store) }
         }
         .accessibilityHidden(true)
     }

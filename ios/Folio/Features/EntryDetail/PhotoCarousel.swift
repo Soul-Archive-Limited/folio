@@ -10,7 +10,8 @@ struct PhotoCarousel: View {
     var body: some View {
         TabView(selection: $current) {
             ForEach(photoIDs, id: \.self) { id in
-                FullPhotoImage(photoID: id)
+                Color.clear
+                    .overlay { FullPhotoImage(photoID: id) }
                     .clipShape(.rect(cornerRadius: Radius.photo))
                     .tag(Optional(id))
                     .onTapGesture { onOpen(id) }

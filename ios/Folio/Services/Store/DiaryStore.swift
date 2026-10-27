@@ -65,6 +65,14 @@ final class DiaryStore {
         return fetch(descriptor)
     }
 
+    /// Every live photo, newest day first, for the Journal's Photos view (SPEC §6.6).
+    func allPhotos() -> [EntryPhoto] {
+        _ = revision
+        return fetch(FetchDescriptor<EntryPhoto>(predicate: #Predicate { !$0.isTombstone }))
+            .filter { $0.entry?.isTombstone == false }
+            .sorted { ($0.entry?.dayKey ?? "", $1.sortIndex) > ($1.entry?.dayKey ?? "", $0.sortIndex) }
+    }
+
     func categories() -> [Category] {
         _ = revision
         let descriptor = FetchDescriptor<Category>(predicate: #Predicate { !$0.isTombstone }, sortBy: [SortDescriptor(\.sortIndex)])
@@ -451,6 +459,7 @@ final class DiaryStore {
         for settings in fetch(FetchDescriptor<UserSettings>()) { context.delete(settings) }
         commit()
         ThumbnailCache.shared.removeAll()
+        DisplayImageCache.shared.removeAll()
     }
 
     // MARK: - Helpers

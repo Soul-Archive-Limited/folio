@@ -18,8 +18,7 @@ struct MainTabView: View {
                 }
             }
             Tab("Journal", systemImage: "book.pages", value: .journal) {
-                PlaceholderTabView(title: "Journal", systemImage: "book.pages",
-                                   message: "Your journal is empty. Tap + to write your first page.")
+                JournalScreen()
                     .floatingAddButton(day: store.today, namespace: composerNamespace, onRequest: present)
             }
             Tab("To-do", systemImage: "checklist", value: .todo) {

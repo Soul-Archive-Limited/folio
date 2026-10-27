@@ -11,7 +11,16 @@ struct ProfilePlaceholderView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: Spacing.l) {
-                    EmptyStateView(systemImage: "person.crop.circle", message: "Your profile arrives soon.")
+                    GlassCard {
+                        NavigationLink {
+                            CategoriesManagerView()
+                        } label: {
+                            Label("Categories", systemImage: "tag")
+                                .folioFont(.headline)
+                                .foregroundStyle(.ink)
+                                .frame(maxWidth: .infinity, minHeight: Spacing.minHitTarget, alignment: .leading)
+                        }
+                    }
                     #if DEBUG
                     GlassCard {
                         VStack(alignment: .leading, spacing: Spacing.s) {

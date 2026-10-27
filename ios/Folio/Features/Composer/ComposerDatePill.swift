@@ -5,6 +5,7 @@ import SwiftUI
 struct ComposerDatePill: View {
     @Binding var day: DayKey
     @Binding var minutes: Int?
+    var opensPickerOnAppear = false
 
     @Environment(DiaryStore.self) private var store
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -32,6 +33,12 @@ struct ComposerDatePill: View {
         .accessibilityLabel("Date")
         .accessibilityValue(day.utcDate.formatted(Date.FormatStyle(timeZone: .gmt).weekday(.wide).day().month(.wide).year()))
         .accessibilityHint("Change the day this entry is for")
+        .task {
+            if opensPickerOnAppear {
+                try? await Task.sleep(for: .milliseconds(450))
+                showsPicker = true
+            }
+        }
         .popover(isPresented: $showsPicker) {
             ComposerDatePicker(day: $day, minutes: $minutes)
                 .presentationCompactAdaptation(.popover)
