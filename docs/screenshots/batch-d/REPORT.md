@@ -54,6 +54,7 @@ Home's accessibility 96: the hero phone keeps the app's white-on-ember "27" and 
 - `ITSAppUsesNonExemptEncryption = NO` (CryptoKit + HTTPS only; verified against Apple's current pages), `PrivacyInfo.xcprivacy`, `scripts/testflight.sh` fallback.
 - Local signed Release archive + App Store export succeeded ("iOS Team Store Provisioning Profile: com.devilsense.folio").
 - Workflow "TestFlight": starts only on tags `testflight-*` (+ manual), Archive – iOS → TestFlight (Internal Testing Only) → group Owner. Owner's budget: about two builds across all phases.
+- **Build 1 = 0.1.0 (1)** from tag `testflight-0.1.0`: archived in ~4 min on Xcode Cloud, in TestFlight and installed on the owner's iPhone. Its 3 compiler warnings were fixed afterwards (`c317855`, no new build).
 
 ## Screenshots (one line each)
 

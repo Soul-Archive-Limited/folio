@@ -12,7 +12,7 @@ _Last updated: 2026-10-27, end of Batch D._
 | Batch C fixes | ✅ Batch D Part 1. |
 | Recently Deleted (SPEC §5.2) | ✅ Batch D Part 2 (schema v3). |
 | 11 Website | ✅ Batch D Part 3 (`/web`). Not deployed until the owner connects Cloudflare Pages. |
-| Xcode Cloud → TestFlight | ✅ Workflow "TestFlight" set up; first build from tag `testflight-0.1.0`. |
+| Xcode Cloud → TestFlight | ✅ Workflow "TestFlight"; build 1 (0.1.0 (1)) installed on the owner's iPhone. One build left in the budget. |
 | 9 Backend, 10 Sign-in + sync, 12 Web app, 13 Motion polish, 14 Release | ⬜ Not started. |
 
 Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8, Batch D = C fixes + Recently Deleted + 11 + Xcode Cloud.
@@ -100,7 +100,7 @@ CI (GitHub Actions): `ios.yml` (test + Release build on macos-26), `node.yml` (a
 
 ## Open issues
 
-- First Xcode Cloud build (tag `testflight-0.1.0`): confirm it reached TestFlight; if it failed, the owner copies the log from Xcode's Report navigator → Cloud.
+- Build 1 (0.1.0 (1), tag `testflight-0.1.0`) is installed on the owner's iPhone. TestFlight shows builds to the Apple Account that accepted the invitation email (the owner's phone uses a personal account; the tester is admin@devilsense.com), so new testers must open the invite on the device.
 - Website not deployed yet: owner connects Cloudflare Pages (steps in the Batch D report).
 - Owner's iPhone checks (Batch D report checklist): speech-permission prompt, dictation, ✦, Recently Deleted, photos, onboarding, tour.
 - Legal pages need the owner's legal review; US year-end encryption self-classification is an open question for their adviser (DECISIONS 143).
