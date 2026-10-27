@@ -18,6 +18,7 @@ struct FolioApp: App {
                 ?? { fatalError("SwiftData could not create even an in-memory store") }()
         }
         self.container = container
+        TourModel.configure()
         let store = DiaryStore(context: container.mainContext)
         #if DEBUG
         DebugLaunchOptions.apply(to: store)

@@ -132,9 +132,11 @@ struct TaskComposerSheet: View {
     }
 }
 
+#if DEBUG
 #Preview {
     Color.bg.sheet(isPresented: .constant(true)) {
         TaskComposerSheet(task: nil, day: DayKey(date: .now, calendar: .current))
     }
     .environment(PreviewData.previewStore())
 }
+#endif

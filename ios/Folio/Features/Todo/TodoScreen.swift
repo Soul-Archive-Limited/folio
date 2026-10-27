@@ -18,12 +18,6 @@ struct TodoScreen: View {
         NavigationStack {
             List {
                 Section {
-                    CategoryFilterBar(selection: $model.filter)
-                        .listRowInsets(EdgeInsets())
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                }
-                Section {
                     if sections.active.isEmpty {
                         EmptyStateView(systemImage: "checkmark.seal", message: "All clear.")
                             .frame(maxWidth: .infinity)
@@ -36,6 +30,13 @@ struct TodoScreen: View {
                         row(task, colors: colors, today: today)
                     }
                     .onMove { indices, offset in move(sections.undated, indices: indices, offset: offset) }
+                } header: {
+                    // A header, not a row: rows sit on the section's panel, which showed as a
+                    // band behind the glass chips.
+                    CategoryFilterBar(selection: $model.filter)
+                        .textCase(nil)
+                        .padding(.horizontal, -Spacing.sideMargin - Spacing.m)
+                        .padding(.bottom, Spacing.s)
                 }
                 if !sections.completed.isEmpty {
                     Section {
@@ -156,8 +157,10 @@ struct TodoScreen: View {
     }
 }
 
+#if DEBUG
 #Preview {
     TodoScreen()
         .environment(PreviewData.previewStore())
         .environment(ToastCenter())
 }
+#endif

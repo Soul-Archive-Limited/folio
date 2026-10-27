@@ -13,6 +13,7 @@ struct FloatingAddButton: View {
     static let transitionID = "composer"
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(TourModel.self) private var tour: TourModel?
     @Namespace private var glass
 
     var body: some View {
@@ -37,6 +38,7 @@ struct FloatingAddButton: View {
                 .accessibilityHint("Touch and hold for more options")
                 .accessibilityInputLabels(["New entry", "Plus", "Add"])
                 .matchedTransitionSource(id: Self.transitionID, in: namespace)
+                .tourTip(AddEntryTip.self, tour, arrowEdge: .bottom)
                 .transition(FolioMotion.transition(.scale(scale: 0.4).combined(with: .opacity), reduceMotion: reduceMotion))
             }
         }

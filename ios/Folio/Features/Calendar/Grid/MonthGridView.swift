@@ -11,6 +11,7 @@ struct MonthGridView: View {
     @Environment(DiaryStore.self) private var store
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @AppStorage(PreferenceKeys.showPhotoTiles) private var showsPhotoTiles = true
+    @Environment(TourModel.self) private var tour: TourModel?
 
     var body: some View {
         let days = month.gridDays(firstWeekday: firstWeekday)
@@ -39,6 +40,7 @@ struct MonthGridView: View {
                         .contextMenu {
                             DayContextMenu(day: day)
                         }
+                        .modifier(TodayTourTip(isToday: inMonth && day == today, tour: tour))
                     }
                 }
                 .opacity(row == selectedRow ? 1 : 1 - progress)
@@ -51,5 +53,16 @@ struct MonthGridView: View {
 
     private func tap(_ day: DayKey) {
         model.select(day, reduceMotion: reduceMotion)
+        tour?.didSelectDay()
+    }
+}
+
+/// Tour step 2 points at today's cell (SPEC §6.15).
+private struct TodayTourTip: ViewModifier {
+    let isToday: Bool
+    let tour: TourModel?
+
+    func body(content: Content) -> some View {
+        if isToday { content.tourTip(TapDayTip.self, tour, arrowEdge: .top) } else { content }
     }
 }

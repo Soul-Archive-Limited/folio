@@ -13,16 +13,16 @@ Status key: ✅ done · 🟡 in progress · ⬜ not started
 | 4 | Composer + entry detail | Composer half sheet, rich text, photos, drafts, entry detail with zoom (§5.1, §6.4, §6.5) | ✅ |
 | 5 | To-do | To-do tab, task composer, complete/undo flow, quick-add (§6.7, §6.8) | ✅ |
 | 6 | Journal + Categories | Journal tab (Timeline / Photos), categories manager (§6.6, §6.10) | ✅ |
-| 7 | Onboarding + tour + Profile | Welcome pages, name, sync choice UI, recovery key + unlock screens, TipKit tour, Profile tab (guest mode), iPad split view (§6.1, §6.9, §6.13, §6.15, §6.16) | ⬜ |
+| 7 | Onboarding + tour + Profile | Welcome pages, name, sync choice UI, TipKit tour, Profile tab in guest mode (§6.1 steps 1–5 and 8, §6.9, §6.15) | ✅ |
 | 8 | Dictation + AI | SpeechAnalyzer dictation overlay, Foundation Models ✦ menu, permission explainers (§6.11, §6.12, §7, §8, §9) | ⬜ |
 | 9 | Backend | Worker, D1 schema, R2, `UserHub`, Better Auth (Apple/Google/email OTP via Resend), sync, blobs, linking, delete account, rate limits, admin usage (§10, §13, §15.2) | ⬜ |
-| 10 | iPhone sign-in + sync | Sign-in flows, Keychain, DK + recovery key, sync engine, live socket, background refresh, QR device linking, delete account in-app (§10.2–10.6) | ⬜ |
+| 10 | iPhone sign-in + sync | Sign-in flows, recovery key + unlock screens (§6.1 steps 6–7, §6.13), Keychain, DK + recovery key, sync engine, live socket, background refresh, QR device linking, delete account in-app (§10.2–10.6) | ⬜ |
 | 11 | Website | Astro marketing site, legal pages, support/FAQ, headers, SEO (§11.1, §11.2, §14) | ⬜ |
 | 12 | Web app | `/app` sign-in + unlock, calendar, entries, tasks, Tiptap editor, live sync, delete account (§11.3) | ⬜ |
-| 13 | Motion polish | Hitch audit with Instruments, 120 fps pass, Reduce Motion pass, web motion (§3.6, §15.1) | ⬜ |
+| 13 | Motion polish | Hitch audit with Instruments, 120 fps pass, Reduce Motion pass, web motion, iPad split view (§3.6, §6.16, §15.1) | ⬜ |
 | 14 | Release | Privacy manifest, App Store checklist, accessibility audit, review account, TestFlight (§12) | ⬜ |
 
-Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1–3 run as **Batch A**.
+Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1–3 run as **Batch A**, 4–6 as **Batch B**, and the Batch B fixes plus 7–8 as **Batch C**.
 
 ## Log
 
@@ -69,3 +69,13 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - Journal Timeline (sticky month headers, 16:9 cover cards and text cards, zoom to detail), Photos (3-column masonry), category chips, "Write for a past day".
 - Categories manager (reorder, swipe delete with counts, edit sheet with 12-swatch grid, 40 symbols, live chip preview, max 30), linked from Profile.
 - Category filters on Calendar, Journal and To-do; tests for month grouping, caching, filters, masonry balance, reorder and edit validation.
+
+### Batch B fixes (2026-10-27)
+- "+" only on Calendar/Journal roots (morphs away on pushed screens); To-do gets a full-width quick-add with an expand button, a 60 pt scrim and a proper bottom inset; toasts rest above the bar and spring.
+- Display photo rendition (1080 px HEIC) with schema v2 migration and backfill; drafts keep photos; file-protection/sync rule decided for Phase 10.
+
+### Phase 7 — Onboarding, tour, Profile (2026-10-27)
+- Onboarding: three welcome pages with scroll-tied parallax (assembling month, old date flipping in, privacy), name, sync choice (Apple / Google / email per brand rules; DEBUG toasts, Release guest-only), then greeting → tour.
+- TipKit tour: six ordered glass tips that advance on the user's action, Skip tour, never repeat, replay from Profile → Help.
+- Profile (guest): header with monogram and name editing, archive tiles that open filtered tabs, Account card, Categories, Appearance, Writing, Privacy, Your data (JSON + photos zip export, erase), Help, About.
+- Composer tools now live in a glass row that works with or without the keyboard; Release build fixed and checked in CI.

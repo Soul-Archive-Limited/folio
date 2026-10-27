@@ -13,7 +13,7 @@ final class TaskLifecycleUITests: XCTestCase {
     @MainActor
     func testOnlyDeleteRemovesATaskFromTheCalendar() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["-FolioResetData", "YES", "-FolioSkipGreeting", "YES", "-FolioSeedTask", title,
+        app.launchArguments = ["-hasOnboarded", "YES", "-com.apple.TipKit.HideAllTips", "1", "-FolioResetData", "YES", "-FolioSkipGreeting", "YES", "-FolioSeedTask", title,
                                "-AppleLocale", "en_GB", "-AppleLanguages", "(en-GB)"]
         app.launch()
 

@@ -92,7 +92,9 @@ enum CategoryEditTarget: Identifiable {
     }
 }
 
+#if DEBUG
 #Preview {
     NavigationStack { CategoriesManagerView() }
         .environment(PreviewData.previewStore())
 }
+#endif

@@ -38,11 +38,13 @@ struct JournalScreen: View {
     }
 }
 
+#if DEBUG
 #Preview {
     JournalScreen(model: JournalModel())
         .environment(PreviewData.previewStore())
         .environment(ToastCenter())
 }
+#endif
 
 #if DEBUG
 extension JournalModel {

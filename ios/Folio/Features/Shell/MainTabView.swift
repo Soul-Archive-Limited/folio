@@ -3,11 +3,13 @@ import SwiftUI
 /// The native iOS 26 tab bar (real Liquid Glass) with the four main tabs (SPEC §2).
 struct MainTabView: View {
     @Environment(DiaryStore.self) private var store
+    @Environment(TourModel.self) private var tour: TourModel?
     @State private var selection: AppTab = .calendar
     @State private var calendar: CalendarModel?
     @State private var journal = JournalModel()
     @State private var requester = NewItemRequester()
     @State private var toasts = ToastCenter()
+    @State private var router = TabRouter()
     @Namespace private var composerNamespace
 
     var body: some View {
@@ -32,12 +34,21 @@ struct MainTabView: View {
                 TodoScreen()
             }
             Tab("Profile", systemImage: "person.crop.circle", value: .profile) {
-                ProfilePlaceholderView()
+                ProfileView()
                     .toastHost(toasts)
             }
         }
         .tabBarMinimizeBehavior(selection.minimisesTabBar ? .onScrollDown : .never)
+        .overlay(alignment: .bottom) { TabBarTourAnchors(tour: tour) }
+        .onChange(of: selection) { _, tab in tour?.didSelect(tab) }
+        .onChange(of: requester.pending?.id) { old, new in
+            if new != nil { tour?.didOpenComposer() } else if old != nil { tour?.didCloseComposer() }
+        }
         .environment(\.newItemRequest, requester)
+        .environment(\.tabRouter, router)
+        .onChange(of: router.pending) { _, destination in
+            if let destination { route(to: destination) }
+        }
         .environment(toasts)
         .sheet(item: $requester.pending) { request in
             ComposerRoute(request: request, calendar: selection == .calendar ? calendar : nil, namespace: composerNamespace)
@@ -69,11 +80,30 @@ struct MainTabView: View {
     }
     #endif
 
+    /// Archive tiles and the tour replay land on a tab's root, already filtered.
+    private func route(to destination: TabRouter.Destination) {
+        router.pending = nil
+        switch destination {
+        case .entries, .photos:
+            journal.path = []
+            journal.filter = []
+            journal.mode = destination == .photos ? .photos : .timeline
+            selection = .journal
+        case .daysWrittenOn:
+            calendar?.path = []
+            selection = .calendar
+        case .tasksDone:
+            UserDefaults.standard.set(true, forKey: PreferenceKeys.todoCompletedExpanded)
+            selection = .todo
+        }
+    }
+
     private func present(_ request: NewItemRequest) {
         requester.send(request)
     }
 }
 
+#if DEBUG
 #Preview("Light") {
     MainTabView()
         .environment(PreviewData.previewStore())
@@ -84,3 +114,4 @@ struct MainTabView: View {
         .environment(PreviewData.previewStore())
         .preferredColorScheme(.dark)
 }
+#endif

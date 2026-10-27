@@ -1,25 +1,39 @@
 import PhotosUI
 import SwiftUI
 
-/// The glass keyboard toolbar (SPEC §6.4): Aa · Photo · Camera · Category · Mic · ✦.
-/// Mic and ✦ are visible but disabled until Phase 8.
-struct ComposerKeyboardToolbar: ToolbarContent {
+/// The composer's glass tool row (SPEC §6.4): Aa · Photo · Camera · Category · Mic · ✦.
+/// It sits in the bottom safe-area inset, so it rests at the bottom of the sheet and rides
+/// above the keyboard when one is up: the tools are reachable with or without typing.
+struct ComposerToolRow: View {
     @Bindable var model: ComposerModel
+    /// Nil until dictation is available (Phase 8): the mic then shows disabled.
+    var onDictate: (() -> Void)?
 
-    var body: some ToolbarContent {
-        ToolbarItemGroup(placement: .keyboard) {
+    @Environment(TourModel.self) private var tour: TourModel?
+
+    var body: some View {
+        HStack(spacing: Spacing.xxs) {
             FormatButton(model: model)
             ComposerPhotoPickerButton(model: model)
             ComposerCameraButton(model: model)
             ComposerCategoryMenu(selection: $model.categoryID)
-            Spacer()
-            Button("Dictate", systemImage: "mic") {}
-                .disabled(true)
-                .accessibilityHint("Dictation arrives in a later update")
-            Button("Writing tools", systemImage: "sparkles") {}
-                .disabled(true)
-                .accessibilityHint("Writing tools arrive in a later update")
+            Spacer(minLength: 0)
+            Button("Dictate", systemImage: "mic") { onDictate?() }
+                .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
+                .disabled(onDictate == nil)
+                .accessibilityInputLabels(["Dictate", "Microphone"])
         }
+        .labelStyle(.iconOnly)
+        .font(.title3)
+        .buttonStyle(.borderless)
+        .foregroundStyle(.ink)
+        .tint(.ink)
+        .padding(.horizontal, Spacing.s)
+        .frame(minHeight: 52)
+        .folioGlass(in: .capsule)
+        .tourTip(ComposerToolsTip.self, tour, arrowEdge: .bottom)
+        .padding(.horizontal, Spacing.sideMargin)
+        .padding(.bottom, Spacing.xs)
     }
 }
 
@@ -30,6 +44,7 @@ struct FormatButton: View {
 
     var body: some View {
         Button("Format", systemImage: "textformat") { showsPopover = true }
+            .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
             .popover(isPresented: $showsPopover) {
                 FormatPopover(model: model)
                     .presentationCompactAdaptation(.popover)
@@ -45,6 +60,7 @@ struct ComposerPhotoPickerButton: View {
         // PhotosPicker runs out of process: no photo-library permission is needed (SPEC §7).
         PhotosPicker(selection: $items, maxSelectionCount: max(model.remainingPhotoSlots, 1), matching: .images) {
             Label("Add photos", systemImage: "photo.on.rectangle")
+                .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
         }
         .disabled(model.remainingPhotoSlots == 0)
         .onChange(of: items) { _, picked in
@@ -71,6 +87,7 @@ struct ComposerCategoryMenu: View {
             }
         } label: {
             Label("Category", systemImage: "tag")
+                .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
         }
     }
 }

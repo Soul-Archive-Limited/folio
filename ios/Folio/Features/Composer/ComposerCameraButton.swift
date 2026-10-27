@@ -13,6 +13,7 @@ struct ComposerCameraButton: View {
 
     var body: some View {
         Button("Camera", systemImage: "camera", action: tap)
+            .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
             .disabled(!CameraPicker.isAvailable || model.remainingPhotoSlots == 0)
             .accessibilityHint(CameraPicker.isAvailable ? "" : "This device has no camera")
             .sheet(isPresented: $showsExplainer) {

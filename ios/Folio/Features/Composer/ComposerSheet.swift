@@ -48,7 +48,7 @@ struct ComposerSheet: View {
             .padding(.horizontal, Spacing.sideMargin)
             .padding(.top, Spacing.xs)
             .toolbar { toolbar }
-            .toolbar { ComposerKeyboardToolbar(model: model) }
+            .safeAreaInset(edge: .bottom) { ComposerToolRow(model: model) }
             .navigationBarTitleDisplayMode(.inline)
         }
         .presentationDetents([.medium, .large], selection: $detent)
@@ -142,6 +142,7 @@ struct ComposerSheet: View {
     }
 }
 
+#if DEBUG
 #Preview {
     let store = PreviewData.previewStore()
     Color.bg.sheet(isPresented: .constant(true)) {
@@ -151,3 +152,4 @@ struct ComposerSheet: View {
     }
     .environment(store)
 }
+#endif

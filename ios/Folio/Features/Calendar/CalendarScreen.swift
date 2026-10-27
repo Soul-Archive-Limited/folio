@@ -98,6 +98,7 @@ struct CalendarScreen: View {
     }
 }
 
+#if DEBUG
 #Preview("Light") {
     let store = PreviewData.previewStore()
     CalendarScreen(model: CalendarModel(today: store.today))
@@ -110,3 +111,4 @@ struct CalendarScreen: View {
         .environment(store)
         .preferredColorScheme(.dark)
 }
+#endif

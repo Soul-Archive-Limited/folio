@@ -7,7 +7,7 @@ final class RecordingUITests: XCTestCase {
     func testRecordTickMoveUndo() throws {
         try XCTSkipUnless(ProcessInfo.processInfo.environment["FOLIO_RECORDING"] == "1", "Only for screen recordings")
         let app = XCUIApplication()
-        app.launchArguments = ["-FolioSkipGreeting", "YES", "-FolioTab", "todo", "-AppleLocale", "en_GB", "-AppleLanguages", "(en-GB)"]
+        app.launchArguments = ["-hasOnboarded", "YES", "-com.apple.TipKit.HideAllTips", "1", "-FolioSkipGreeting", "YES", "-FolioTab", "todo", "-AppleLocale", "en_GB", "-AppleLanguages", "(en-GB)"]
         app.launch()
 
         let row = app.descendants(matching: .any).matching(identifier: "todo-row")

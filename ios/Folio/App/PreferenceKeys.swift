@@ -10,4 +10,6 @@ enum PreferenceKeys {
     static let showPhotoTiles = "showPhotoTiles"
     /// To-do: whether the Completed section is expanded (SPEC §6.7, "state persisted").
     static let todoCompletedExpanded = "todoCompletedExpanded"
+    /// Onboarding (SPEC §6.1) has been completed or skipped on this device.
+    static let hasOnboarded = "hasOnboarded"
 }

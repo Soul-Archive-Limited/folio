@@ -8,6 +8,7 @@ struct CalendarGridArea: View {
     let firstWeekday: Int
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(TourModel.self) private var tour: TourModel?
     @State private var jumpScale = 1.0
     @State private var jumpOpacity = 1.0
 
@@ -29,6 +30,7 @@ struct CalendarGridArea: View {
         .clipShape(.rect(cornerRadius: Radius.card))
         .contentShape(.rect(cornerRadius: Radius.card))
         .folioGlass(in: .rect(cornerRadius: Radius.card))
+        .tourTip(MonthGridTip.self, tour, arrowEdge: .top)
         .onChange(of: model.jumpCount) { playJump() }
         .onChange(of: model.visibleMonthID) { _, id in
             if let id { model.monthDidChange(to: MonthKey(year: 0, month: id + 1)) }

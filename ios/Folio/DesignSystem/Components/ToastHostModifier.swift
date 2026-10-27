@@ -4,6 +4,8 @@ import SwiftUI
 /// same way; under Reduce Motion it only fades. Place it where the toast should rest.
 struct ToastSlot: View {
     let center: ToastCenter
+    /// The edge the toast slides in from.
+    var edge: Edge = .bottom
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -12,7 +14,7 @@ struct ToastSlot: View {
             if let message = center.current {
                 ToastView(message: message, onUndo: center.performUndo)
                     .id(message.id)
-                    .transition(FolioMotion.transition(.move(edge: .bottom).combined(with: .opacity), reduceMotion: reduceMotion))
+                    .transition(FolioMotion.transition(.move(edge: edge).combined(with: .opacity), reduceMotion: reduceMotion))
             }
         }
         .animation(FolioMotion.toast(reduceMotion: reduceMotion), value: center.current)
