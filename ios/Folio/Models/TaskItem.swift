@@ -4,7 +4,7 @@ import SwiftData
 
 /// A to-do (SPEC §5). Completing a task never removes it from its day; only deleting does.
 @Model nonisolated
-final class TaskItem: SyncedRecord {
+final class TaskItem: TrashableRecord {
     #Unique<TaskItem>([\.id])
     #Index<TaskItem>([\.dayKey], [\.isTombstone, \.isCompleted])
 
@@ -28,6 +28,8 @@ final class TaskItem: SyncedRecord {
     var serverVersion: Int64?
     var isDirty: Bool
     var isTombstone: Bool
+    /// When it was moved to Recently Deleted (SPEC §5.2); nil while live. Added in schema v3.
+    var trashedAt: Date?
 
     init(id: UUID = UUID(), title: String, notes: String? = nil, day: DayKey? = nil, minutesFromMidnight: Int? = nil,
          categoryID: UUID? = nil, sortIndex: Int, now: Date) {

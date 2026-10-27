@@ -12,6 +12,10 @@ final class JournalModel {
     var mode: Mode = .timeline
     /// Pushed entries; the floating "+" shows only while this is empty.
     var path: [UUID] = []
+    /// Recently Deleted, pushed from the end of the timeline (SPEC §5.2).
+    var showsTrash = false
+    /// The floating "+" belongs to the Journal's root screen only.
+    var isAtRoot: Bool { path.isEmpty && !showsTrash }
     var filter: Set<UUID> = []
 
     struct MonthSection: Identifiable {

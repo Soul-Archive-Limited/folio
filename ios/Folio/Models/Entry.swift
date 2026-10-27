@@ -4,7 +4,7 @@ import SwiftData
 
 /// A diary entry for one floating day (SPEC §5).
 @Model nonisolated
-final class Entry: SyncedRecord {
+final class Entry: TrashableRecord {
     #Unique<Entry>([\.id])
     #Index<Entry>([\.dayKey], [\.isTombstone, \.dayKey])
 
@@ -27,6 +27,8 @@ final class Entry: SyncedRecord {
     var serverVersion: Int64?
     var isDirty: Bool
     var isTombstone: Bool
+    /// When it was moved to Recently Deleted (SPEC §5.2); nil while live. Added in schema v3.
+    var trashedAt: Date?
 
     init(id: UUID = UUID(), title: String, bodyMarkdown: String, day: DayKey, minutesFromMidnight: Int? = nil,
          categoryID: UUID? = nil, now: Date) {

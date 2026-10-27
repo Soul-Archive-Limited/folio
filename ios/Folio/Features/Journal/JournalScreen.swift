@@ -22,11 +22,16 @@ struct JournalScreen: View {
                         JournalPhotoGrid(photos: model.photos(store: store), zoom: zoom)
                             .padding(.horizontal, Spacing.sideMargin)
                     }
+                    if model.mode == .timeline, store.trashCount > 0 {
+                        RecentlyDeletedLink(count: store.trashCount) { model.showsTrash = true }
+                            .padding(.top, Spacing.s)
+                    }
                 }
                 .padding(.bottom, FloatingButtonMetrics.clearance + Spacing.l)
             }
             .background { AuraBackground() }
             .navigationTitle("Journal")
+            .navigationDestination(isPresented: $model.showsTrash) { RecentlyDeletedView() }
             .navigationDestination(for: UUID.self) { id in
                 EntryDetailView(entryID: id)
                     .navigationTransition(.zoom(sourceID: id, in: zoom))

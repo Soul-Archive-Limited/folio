@@ -28,6 +28,8 @@ import Foundation
 /// - `-FolioOpenTool mic|titles|polish|tasks` opens that tool in the composer.
 /// - `-FolioFakeIntelligenceUnavailable YES` pretends Apple's model is unavailable.
 /// - `-FolioToastSeconds 15` keeps toasts up longer (UI tests on slow CI).
+/// - `-FolioTrashSamples YES` puts a few sample items in Recently Deleted.
+/// - `-FolioOpen recentlyDeleted` (with `-FolioTab profile`) opens Recently Deleted.
 enum DebugLaunchOptions {
     enum Screen: String {
         case gallery, cover, greeting
@@ -51,6 +53,7 @@ enum DebugLaunchOptions {
         if defaults.bool(forKey: "FolioResetData") { store.eraseAll() }
         if defaults.bool(forKey: "FolioSampleData") { PreviewData.loadIfEmpty(into: store) }
         if defaults.bool(forKey: "FolioStressData"), store.isEmpty { PreviewData.loadStressData(into: store) }
+        if defaults.bool(forKey: "FolioTrashSamples") { PreviewData.trashSamples(in: store) }
         if let title = defaults.string(forKey: "FolioSeedTask") { _ = try? store.createTask(title: title, day: store.today) }
         if let name = defaults.string(forKey: "displayName"), store.settings().displayName != name {
             store.updateSettings { $0.displayName = name }

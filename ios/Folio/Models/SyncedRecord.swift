@@ -26,3 +26,8 @@ nonisolated extension SyncedRecord {
         isDirty = true
     }
 }
+
+/// A record that goes to Recently Deleted before it's permanently deleted (SPEC §5.2).
+nonisolated protocol TrashableRecord: SyncedRecord {
+    var trashedAt: Date? { get set }
+}

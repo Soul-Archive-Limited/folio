@@ -23,7 +23,7 @@ struct MainTabView: View {
                 }
             }
             Tab("Journal", systemImage: "book.pages", value: .journal) {
-                let isRoot = journal.path.isEmpty
+                let isRoot = journal.isAtRoot
                 JournalScreen(model: journal)
                     .floatingAddButton(day: store.today, isVisible: isRoot, namespace: composerNamespace, onRequest: present)
                     .toastHost(toasts, trailingClearance: isRoot ? FloatingButtonMetrics.toastTrailingClearance : 0)
@@ -86,6 +86,7 @@ struct MainTabView: View {
         switch destination {
         case .entries, .photos:
             journal.path = []
+            journal.showsTrash = false
             journal.filter = []
             journal.mode = destination == .photos ? .photos : .timeline
             selection = .journal
@@ -94,6 +95,12 @@ struct MainTabView: View {
             selection = .calendar
         case .tasksDone:
             UserDefaults.standard.set(true, forKey: PreferenceKeys.todoCompletedExpanded)
+            selection = .todo
+        case .day(let day):
+            calendar?.path = []
+            calendar?.jump(to: day.monthKey, selecting: day)
+            selection = .calendar
+        case .todo:
             selection = .todo
         }
     }

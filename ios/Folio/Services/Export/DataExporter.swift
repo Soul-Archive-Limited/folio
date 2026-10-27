@@ -9,6 +9,8 @@ import os
 ///   `NSFileCoordinator` (the system's own zip; no third-party code).
 struct DataExporter {
     let store: DiaryStore
+    /// "Include Recently Deleted" (SPEC §5.2): off by default; trashed items then carry `trashedAt`.
+    var includesTrash = false
     var directory = URL.temporaryDirectory.appending(path: "FolioExport-\(UUID().uuidString)", directoryHint: .isDirectory)
 
     enum ExportError: Error { case zipFailed }
@@ -24,7 +26,8 @@ struct DataExporter {
         try fileManager.createDirectory(at: photoFolder, withIntermediateDirectories: true)
 
         var entries: [ExportEntry] = []
-        for entry in store.allEntries() {
+        let allEntries = store.allEntries() + (includesTrash ? store.trashedEntries() : [])
+        for entry in allEntries {
             var photoNames: [String] = []
             for (index, photo) in entry.orderedPhotos.enumerated() {
                 let name = "\(entry.dayKey) \(entry.id.uuidString.prefix(8)) \(index + 1).heic"
@@ -34,20 +37,23 @@ struct DataExporter {
             }
             entries.append(ExportEntry(id: entry.id, day: entry.dayKey, minutesFromMidnight: entry.minutesFromMidnight,
                                        title: entry.title, bodyMarkdown: entry.bodyMarkdown, categoryID: entry.categoryID,
-                                       photos: photoNames, createdAt: entry.createdAt, updatedAt: entry.updatedAt))
+                                       photos: photoNames, createdAt: entry.createdAt, updatedAt: entry.updatedAt,
+                                       trashedAt: entry.trashedAt))
         }
         let settings = store.settings()
         let document = ExportDocument(
             exportedAt: AppClock.now,
             appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "",
             displayName: settings.displayName,
-            categories: store.categories().map {
-                ExportCategory(id: $0.id, name: $0.name, color: $0.colorKey, symbol: $0.symbol, sortIndex: $0.sortIndex)
+            categories: (store.categories() + (includesTrash ? store.trashedCategories() : [])).map {
+                ExportCategory(id: $0.id, name: $0.name, color: $0.colorKey, symbol: $0.symbol, sortIndex: $0.sortIndex,
+                               trashedAt: $0.trashedAt)
             },
             entries: entries,
-            tasks: store.allTasks().map {
+            tasks: (store.allTasks() + (includesTrash ? store.trashedTasks() : [])).map {
                 ExportTask(id: $0.id, title: $0.title, notes: $0.notes, day: $0.dayKey, minutesFromMidnight: $0.minutesFromMidnight,
-                           categoryID: $0.categoryID, isCompleted: $0.isCompleted, completedAt: $0.completedAt)
+                           categoryID: $0.categoryID, isCompleted: $0.isCompleted, completedAt: $0.completedAt,
+                           trashedAt: $0.trashedAt)
             }
         )
         let encoder = JSONEncoder()
@@ -78,46 +84,4 @@ struct DataExporter {
             throw ExportError.zipFailed
         }
     }
-}
-
-nonisolated struct ExportDocument: Codable, Sendable {
-    var format = "folio-export-1"
-    let exportedAt: Date
-    let appVersion: String
-    let displayName: String
-    let categories: [ExportCategory]
-    let entries: [ExportEntry]
-    let tasks: [ExportTask]
-}
-
-nonisolated struct ExportCategory: Codable, Sendable {
-    let id: UUID
-    let name: String
-    let color: String
-    let symbol: String?
-    let sortIndex: Int
-}
-
-nonisolated struct ExportEntry: Codable, Sendable {
-    let id: UUID
-    let day: String
-    let minutesFromMidnight: Int?
-    let title: String
-    let bodyMarkdown: String
-    let categoryID: UUID?
-    /// File names inside `Folio Photos.zip`, in order.
-    let photos: [String]
-    let createdAt: Date
-    let updatedAt: Date
-}
-
-nonisolated struct ExportTask: Codable, Sendable {
-    let id: UUID
-    let title: String
-    let notes: String?
-    let day: String?
-    let minutesFromMidnight: Int?
-    let categoryID: UUID?
-    let isCompleted: Bool
-    let completedAt: Date?
 }

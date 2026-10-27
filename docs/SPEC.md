@@ -170,19 +170,27 @@ var isDeleted: Bool         // tombstone, kept until server acknowledges, then p
 **`dayKey`:** the owner travels across time zones constantly. A diary day must never move when the phone changes time zone. Store the user-chosen calendar day as a floating string `"YYYY-MM-DD"` plus optional `minutesFromMidnight`. All grouping uses `dayKey`, never `Date` comparisons.
 
 ```swift
-@Model final class Category { id; name: String (1–24, unique ci); colorKey: String; symbol: String?; sortIndex: Int; + shared fields }
-@Model final class Entry { id; title: String (0–120); bodyMarkdown: String; dayKey: String; minutesFromMidnight: Int?; categoryID: UUID?; @Relationship(deleteRule: .cascade) photos: [EntryPhoto]; + shared }
+@Model final class Category { id; name: String (1–24, unique ci); colorKey: String; symbol: String?; sortIndex: Int; trashedAt: Date?; unassignedIDs: [UUID]?; + shared fields }
+@Model final class Entry { id; title: String (0–120); bodyMarkdown: String; dayKey: String; minutesFromMidnight: Int?; categoryID: UUID?; trashedAt: Date?; @Relationship(deleteRule: .cascade) photos: [EntryPhoto]; + shared }
 @Model final class EntryPhoto { id; entryID: UUID; sortIndex: Int; @Attribute(.externalStorage) imageData: Data; @Attribute(.externalStorage) thumbData: Data; pixelWidth: Int; pixelHeight: Int; blobUploaded: Bool; + shared }
-@Model final class TaskItem { id; title: String (1–200); notes: String? (≤ 2000); dayKey: String?; minutesFromMidnight: Int?; categoryID: UUID?; isCompleted: Bool; completedAt: Date?; sortIndex: Int; + shared }
+@Model final class TaskItem { id; title: String (1–200); notes: String? (≤ 2000); dayKey: String?; minutesFromMidnight: Int?; categoryID: UUID?; isCompleted: Bool; completedAt: Date?; sortIndex: Int; trashedAt: Date?; + shared }
 ```
 - Photos: max 10/entry; GPS EXIF stripped; HEIC long edge ≤ 2048 at quality 0.75 (target ≤ 600 KB); 240 px JPEG thumb.
-- Deleting a category un-assigns its items (confirm with counts).
-- **Deleting is the only way an item leaves the calendar. Completing a task never removes it.**
+- Deleting a category un-assigns its items and remembers which ones (`unassignedIDs`), so restoring it re-links them.
+- **Deleting (moving to Recently Deleted, §5.2) is the only way an item leaves the calendar. Completing a task never removes it.** `trashedAt` (in Recently Deleted) and `isDeleted`/`isTombstone` (permanently deleted, kept only until the server acknowledges it) are separate.
 - Synced user settings (display name, appearance, writing font, first weekday, default category) live in one encrypted `Settings` record; device-only settings in `@AppStorage`.
 - `PreviewData.swift`: ~40 entries across 3 years (some with sample photos), 25 tasks, 6 categories; DEBUG "Load sample data".
 
 ### 5.1 Formatted text
 Only: bold, italic, underline, strikethrough, highlight, one heading level, bulleted list, numbered list, checklist, quote. Edit with the iOS 26 rich-text `TextEditor(text: $attributedString, selection:)` + an `AttributedTextFormattingDefinition` limited to these. Canonical storage = Markdown via `MarkdownCodec` (underline `<u>…</u>`, highlight `==…==`, checklist `- [ ]`/`- [x]`). Round-trip unit tests; the same test vectors (JSON fixtures in `/shared/markdown-fixtures.json`) are used by the web editor.
+
+### 5.2 Recently Deleted
+- **Delete moves an entry (with its photos), task or category to Recently Deleted** by setting `trashedAt`. No "Are you sure?": a toast "Moved to Recently Deleted · Undo" (§6.14 toast rules). Only *Delete now* and *Empty* ask first (with a `.warning` haptic).
+- **Trashed items are invisible everywhere else:** Calendar markers, day panel, Journal (Timeline and Photos), To-do, Jump-sheet dots, Profile stats, the greeting summary, "Same day in other years", category counts, ✦ and export (export has an "Include Recently Deleted" toggle, off by default).
+- **Screen "Recently Deleted"** (Profile → Your data → Recently Deleted · N; also a quiet "Recently Deleted · N" link at the end of the Journal timeline and the To-do list when N > 0): segmented Entries / Tasks / Categories; rows show the original date and "N days left"; tap → read-only preview with Restore / Delete now; swipe leading Restore, trailing Delete now; Select → Restore selected / Delete selected; "Empty" with confirmation. Glass style. Empty state: "Nothing here. Deleted items stay for 30 days."
+- **Restore** clears `trashedAt`, putting the item back on its original day and category (a completed task stays completed). Toast "Restored to Tue 27 Oct · Show" (Show jumps to that day). Restoring a category re-links the entries and tasks it un-assigned, unless they've been given another category since; a name clash gets a number ("Travel 2").
+- **Auto-purge after 30 days:** items whose `trashedAt` is more than 30 days ago are permanently deleted (tombstoned for sync; photos and any draft of that entry removed) on launch, on foreground and in background refresh, only while protected data is available. The clock used is a stored high-water mark (`max(now, last seen now)`), so moving the device clock backwards never brings anything back or extends a countdown in a confusing way; nothing permanently deleted is ever resurrected.
+- "Erase data on this iPhone" also empties Recently Deleted.
 
 ---
 
@@ -229,7 +237,7 @@ Over `AuraBackground`:
 - Draft autosave every 2 s locally; "Continue your draft?" on reopen. Cancel with changes → "Discard this entry?".
 
 ### 6.5 Entry detail
-Zoom-in from the card. Photo carousel (4:3, paging, pinch to full-screen) · date line `caption` · category chip · title · rendered body (line height 1.45). Toolbar: Edit (composer `.large`) · Share (system share sheet) · ••• Change date / Duplicate / Delete (confirm). Footer strip "Same day in other years" when applicable.
+Zoom-in from the card. Photo carousel (4:3, paging, pinch to full-screen) · date line `caption` · category chip · title · rendered body (line height 1.45). Toolbar: Edit (composer `.large`) · Share (system share sheet) · ••• Change date / Duplicate / Delete (to Recently Deleted, §5.2). Footer strip "Same day in other years" when applicable.
 
 ### 6.6 Journal tab
 Large title "Journal"; category chips [G]; view toggle [G] *Timeline* / *Photos*. Timeline: sticky month headers, cards with cover photo (16:9, title over gradient) or text cards. Photos: 3-column masonry of all photos. "Write for a past day" button opens composer with date picker. Empty: "Your journal is empty. Tap + to write your first page." Search is not shown until built.
@@ -237,10 +245,10 @@ Large title "Journal"; category chips [G]; view toggle [G] *Timeline* / *Photos*
 ### 6.7 To-do tab
 Large title, category chips. **Active**: overdue first (ember chip) → dated ascending → undated by drag order. **Completed** (collapsible "Completed · 12", state persisted) by `completedAt` desc. Row: 26 pt circular checkbox in category colour · title · 1-line notes · date/time chip.
 **Complete flow:** tap → fill + check + strike + haptic → stays **1.2 s** → moves to Completed; undo toast [G] 4 s; tapping again during 1.2 s cancels. Untick in Completed → back instantly.
-Swipes: leading Complete/Uncomplete; trailing Delete (confirm if notes) · Edit · Date (Today / Tomorrow / Next week / Pick / Remove). Quick-add bar [G] above tab bar ("Add a task…", recognises "today"/"tomorrow"). Empty Active → "All clear." with `checkmark.seal`.
+Swipes: leading Complete/Uncomplete; trailing Delete (to Recently Deleted, §5.2) · Edit · Date (Today / Tomorrow / Next week / Pick / Remove). Quick-add bar [G] above tab bar ("Add a task…", recognises "today"/"tomorrow"). Empty Active → "All clear." with `checkmark.seal`.
 
 ### 6.8 Task composer (`.medium` sheet)
-Title (required) · Notes · Date toggle → graphical DatePicker · Time toggle (if date) · Category chips · Save. Existing task: Delete at bottom (confirm).
+Title (required) · Notes · Date toggle → graphical DatePicker · Time toggle (if date) · Category chips · Save. Existing task: Delete at bottom (to Recently Deleted, §5.2).
 
 ### 6.9 Profile tab
 Inset-grouped glass sections:
@@ -254,12 +262,12 @@ Inset-grouped glass sections:
 - **Writing:** Default category · Show photo tiles on calendar.
 - **Dictation & Intelligence** (§8–9) with availability explanation.
 - **Privacy & Security:** Hide content in app switcher · Face ID lock (later; hidden until built).
-- **Your data:** Export as JSON + photos zip (decrypted, local) · Export PDF (later; hidden) · Erase data on this iPhone.
+- **Your data:** **Recently Deleted · N** (§5.2) · Export as JSON + photos zip (decrypted, local; "Include Recently Deleted" toggle, off by default) · Export PDF (later; hidden) · Erase data on this iPhone (also empties Recently Deleted).
 - **Help:** "Show the tour again" · Support & FAQ · Contact support (mailto).
 - **About:** Website · Privacy Policy · Terms · Open Source (GitHub) · Acknowledgements · Rate Folio (`requestReview` only here) · Version · "Made by Soul Archive Ltd".
 
 ### 6.10 Categories manager
-Rows: colour dot, symbol, name, count. Drag reorder, swipe delete (confirm with counts), tap edit. Edit sheet: name, 12-swatch grid, optional symbol from 40 curated SF Symbols, live chip preview. Max 30.
+Rows: colour dot, symbol, name, count. Drag reorder, swipe delete (to Recently Deleted, §5.2; Undo or Restore re-links its items), tap edit. Edit sheet: name, 12-swatch grid, optional symbol from 40 curated SF Symbols, live chip preview. Max 30.
 
 ### 6.11 Dictation overlay
 Glass capsule above keyboard: live waveform from mic level, volatile words `inkTertiary`, final words `ink`, Pause · Done; text inserted at the cursor.
@@ -348,6 +356,7 @@ Speech framework **`SpeechAnalyzer` + `DictationTranscriber`** (verify with Cont
 - Lost all devices + lost recovery key = diary unreadable. Stated plainly in onboarding, the recovery key screen and the FAQ.
 
 ### 10.5 Sync protocol
+- **Recently Deleted:** `trashedAt` (and a category's `unassignedIDs`) travel **inside the encrypted payload** like any other field, so the server can't tell a trashed item from a live one. Trash and restore are ordinary updates (last-writer-wins). The 30-day purge is a permanent delete: `deleted: true` tombstone, R2 blobs removed. A device that sees a tombstone never recreates the record.
 - **Push:** `POST /api/sync/push` `{changes:[{id,type,ciphertext,nonce,clientUpdatedAt,baseVersion,deleted}]}` ≤ 200 changes / ≤ 1 MB per request. Server assigns a per-user monotonic `version`. Conflict (baseVersion behind server): **last-writer-wins by `clientUpdatedAt`**; loser returned so the client can update.
 - **Pull:** `GET /api/sync/pull?since=<cursor>&limit=500` → changes after cursor + next cursor.
 - **Blobs:** `PUT /api/blobs/:id` (≤ 4 MB, streamed to R2 via binding), `GET /api/blobs/:id` (streamed, `Cache-Control: private, max-age=31536000, immutable` — content is encrypted and immutable). Uploads max 2 concurrent; thumbnails first.
@@ -450,7 +459,7 @@ Every page: title, meta description, OG image, favicons, sitemap.xml, robots.txt
 - Processors: Cloudflare (hosting, database, storage — data may be processed in Cloudflare's global network), Resend (sending sign-in codes). Apple and Google (only if you choose to sign in with them).
 - Dictation and Intelligence run on your iPhone; audio and text are not sent to us.
 - Cookies: one strictly necessary session cookie on the web app; no analytics or advertising cookies.
-- Retention: account data until you delete your account; deletion is immediate with server cleanup completing within 30 days at most (backups); support emails kept up to 24 months.
+- Retention: account data until you delete your account; deletion is immediate with server cleanup completing within 30 days at most (backups); items you delete go to Recently Deleted on your devices and are permanently deleted after 30 days (or sooner if you empty it); support emails kept up to 24 months.
 - Your UK GDPR / EU GDPR rights (access, export — use the in-app export —, deletion, complaint to the ICO).
 - Children: not directed at under-13s.
 - Changes + effective date.

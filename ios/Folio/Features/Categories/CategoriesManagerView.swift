@@ -1,11 +1,11 @@
 import SwiftUI
 
 /// Categories (SPEC §6.10): colour, symbol, name and how many items use each. Drag to
-/// reorder, swipe to delete (with counts), tap to edit. Up to 30.
+/// reorder, swipe to move to Recently Deleted (SPEC §5.2), tap to edit. Up to 30.
 struct CategoriesManagerView: View {
     @Environment(DiaryStore.self) private var store
     @State private var editing: CategoryEditTarget?
-    @State private var deleting: Category?
+    @Environment(ToastCenter.self) private var toasts: ToastCenter?
 
     var body: some View {
         let categories = store.categories()
@@ -21,7 +21,7 @@ struct CategoriesManagerView: View {
                 }
                 .buttonStyle(.plain)
                 .swipeActions(edge: .trailing) {
-                    Button("Delete", systemImage: "trash", role: .destructive) { deleting = category }
+                    Button("Delete", systemImage: "trash", role: .destructive) { delete(category) }
                 }
             }
             .onMove { indices, offset in
@@ -45,12 +45,6 @@ struct CategoriesManagerView: View {
             }
         }
         .sheet(item: $editing) { target in CategoryEditSheet(target: target) }
-        .confirmationDialog(deleteTitle, isPresented: isDeleting, titleVisibility: .visible, presenting: deleting) { category in
-            Button("Delete category", role: .destructive) { store.delete(category) }
-        } message: { category in
-            Text(deleteMessage(category))
-        }
-        .folioHaptic(.warning, trigger: deleting?.id)
         #if DEBUG
         .task {
             if DebugLaunchOptions.string("FolioOpen") == "categoryEdit", let first = store.categories().first {
@@ -61,21 +55,11 @@ struct CategoriesManagerView: View {
         #endif
     }
 
-    private var deleteTitle: String {
-        String(localized: "Delete “\(deleting?.name ?? "")”?")
-    }
-
-    /// "3 entries and 2 tasks will keep their content and lose this category."
-    private func deleteMessage(_ category: Category) -> String {
-        let usage = store.usage(of: category)
-        if usage.entries == 0 && usage.tasks == 0 { return String(localized: "Nothing uses this category.") }
-        let entries = String(AttributedString(localized: "^[\(usage.entries) entry](inflect: true)").characters)
-        let tasks = String(AttributedString(localized: "^[\(usage.tasks) task](inflect: true)").characters)
-        return String(localized: "\(entries) and \(tasks) will keep their content and lose this category.")
-    }
-
-    private var isDeleting: Binding<Bool> {
-        Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } })
+    /// Straight to Recently Deleted (SPEC §5.2). Its entries and tasks keep their content and
+    /// lose the category; Undo or Restore re-links them.
+    private func delete(_ category: Category) {
+        store.trash(category)
+        toasts?.show(.movedToTrash { try? store.restoreFromTrash(category) })
     }
 }
 

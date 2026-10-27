@@ -4,7 +4,7 @@ import SwiftData
 
 /// A user category with its own colour (SPEC §5, §6.10).
 @Model nonisolated
-final class Category: SyncedRecord {
+final class Category: TrashableRecord {
     #Unique<Category>([\.id])
 
     static let recordType: RecordType = .category
@@ -23,6 +23,11 @@ final class Category: SyncedRecord {
     var serverVersion: Int64?
     var isDirty: Bool
     var isTombstone: Bool
+    /// When it was moved to Recently Deleted (SPEC §5.2); nil while live. Added in schema v3.
+    var trashedAt: Date?
+    /// The entries and tasks this category was taken off when it was trashed, so a restore
+    /// can re-link them (SPEC §5.2).
+    var unassignedIDs: [UUID]?
 
     init(id: UUID = UUID(), name: String, color: CategoryColor, symbol: String? = nil, sortIndex: Int, now: Date) {
         self.id = id

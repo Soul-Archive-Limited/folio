@@ -19,7 +19,7 @@ struct FolioApp: App {
         }
         self.container = container
         TourModel.configure()
-        let store = DiaryStore(context: container.mainContext)
+        let store = DiaryStore(context: container.mainContext, trashClockDefaults: .standard)
         #if DEBUG
         DebugLaunchOptions.apply(to: store)
         #endif
@@ -31,6 +31,12 @@ struct FolioApp: App {
             AppRootView()
                 .environment(store)
                 .modelContainer(container)
+        }
+        .backgroundTask(.appRefresh(TrashMaintenance.refreshTaskID)) {
+            await MainActor.run { [store] in
+                TrashMaintenance.purgeIfPossible(store)
+                TrashMaintenance.scheduleRefresh()
+            }
         }
     }
 }

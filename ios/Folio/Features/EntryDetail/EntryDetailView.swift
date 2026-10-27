@@ -10,7 +10,6 @@ struct EntryDetailView: View {
     @Environment(\.newItemRequest) private var request
     @Environment(\.dismiss) private var dismiss
     @State private var showsDateSheet = false
-    @State private var confirmsDelete = false
     @State private var fullScreenPhoto: UUID?
 
     var body: some View {
@@ -63,16 +62,10 @@ struct EntryDetailView: View {
                     Button("Change date", systemImage: "calendar") { showsDateSheet = true }
                     Button("Duplicate", systemImage: "plus.square.on.square") { duplicate(entry) }
                     Divider()
-                    Button("Delete", systemImage: "trash", role: .destructive) { confirmsDelete = true }
+                    Button("Delete", systemImage: "trash", role: .destructive) { delete(entry) }
                 }
             }
         }
-        .confirmationDialog("Delete this entry?", isPresented: $confirmsDelete, titleVisibility: .visible) {
-            Button("Delete", role: .destructive) { delete(entry) }
-        } message: {
-            Text("Its photos are deleted too.")
-        }
-        .folioHaptic(.warning, trigger: confirmsDelete)
         .sheet(isPresented: $showsDateSheet) {
             ChangeDateSheet(entry: entry)
         }
@@ -105,13 +98,11 @@ struct EntryDetailView: View {
         }
     }
 
+    /// Moves the entry and its photos to Recently Deleted; no "Are you sure?" (SPEC §5.2).
     private func delete(_ entry: Entry) {
-        let snapshot = store.snapshot(of: entry)
-        store.delete(entry)
+        store.trash(entry)
         dismiss()
-        toasts.show(ToastMessage(text: "Entry deleted", systemImage: "trash", undo: ToastUndo {
-            if let snapshot { store.restore(snapshot) }
-        }))
+        toasts.show(.movedToTrash { store.restoreFromTrash(entry) })
     }
 }
 

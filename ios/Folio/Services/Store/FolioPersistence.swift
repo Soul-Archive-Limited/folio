@@ -16,7 +16,7 @@ enum FolioPersistence {
     }
 
     static func makeContainer(inMemory: Bool = false) throws -> ModelContainer {
-        let schema = Schema(versionedSchema: FolioSchemaV2.self)
+        let schema = Schema(versionedSchema: FolioSchemaV3.self)
         let configuration: ModelConfiguration
         if inMemory {
             configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)

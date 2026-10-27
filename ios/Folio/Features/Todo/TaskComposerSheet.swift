@@ -7,13 +7,13 @@ struct TaskComposerSheet: View {
 
     @Environment(DiaryStore.self) private var store
     @Environment(\.dismiss) private var dismiss
+    @Environment(ToastCenter.self) private var toasts: ToastCenter?
     @State private var title: String
     @State private var notes: String
     @State private var hasDate: Bool
     @State private var day: DayKey
     @State private var minutes: Int?
     @State private var categoryID: UUID?
-    @State private var confirmsDelete = false
     @State private var saveCount = 0
     @State private var detent: PresentationDetent = .medium
     @State private var scroll = ScrollPosition(edge: .top)
@@ -63,7 +63,7 @@ struct TaskComposerSheet: View {
                 }
                 if task != nil {
                     Section {
-                        Button("Delete task", role: .destructive) { confirmsDelete = true }
+                        Button("Delete task", role: .destructive, action: delete)
                             .frame(maxWidth: .infinity)
                     }
                 }
@@ -96,10 +96,6 @@ struct TaskComposerSheet: View {
         .presentationBackground(.thickMaterial)
         .privacyCovered()
         .onAppear { if task == nil { focus = .title } }
-        .confirmationDialog("Delete this task?", isPresented: $confirmsDelete, titleVisibility: .visible) {
-            Button("Delete", role: .destructive, action: delete)
-        }
-        .folioHaptic(.warning, trigger: confirmsDelete)
         .folioHaptic(.success, trigger: saveCount)
     }
 
@@ -132,8 +128,12 @@ struct TaskComposerSheet: View {
         }
     }
 
+    /// To Recently Deleted, with Undo (SPEC §5.2).
     private func delete() {
-        if let task { store.delete(task) }
+        if let task {
+            store.trash(task)
+            toasts?.show(.movedToTrash { store.restoreFromTrash(task) })
+        }
         dismiss()
     }
 }

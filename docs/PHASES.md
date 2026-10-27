@@ -26,7 +26,7 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 
 ### Batch D checklist
 - [x] Part 1 — Batch C fixes
-- [ ] Part 2 — Recently Deleted (SPEC §5.2)
+- [x] Part 2 — Recently Deleted (SPEC §5.2)
 - [ ] Part 3 — Phase 11 website
 - [ ] Part 4 — Xcode Cloud → TestFlight
 
@@ -95,3 +95,9 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - Profile "Writing since" uses the earliest day written for.
 - Task composer: turning on Date scrolls the form to its top (Title visible above the full picker); category chips without the row panel.
 - To-do quick-add follows the minimising tab bar into its row (no gap); `.tabViewBottomAccessory` checked and rejected (hidden behind the keyboard, per-tab variant needs iOS 26.1).
+
+### Recently Deleted (2026-10-27)
+- SPEC §5.2 written (plus §5 rule, §6.5/6.7/6.8/6.9/6.10, §10.5, §14.1).
+- Schema v3 (`trashedAt` on Entry/TaskItem/Category, `Category.unassignedIDs`) with frozen v2 models and a lightweight migration; every live query skips trash.
+- Delete → "Moved to Recently Deleted · Undo" (no confirmation); Recently Deleted screen (segments, days left, preview, swipe Restore/Delete now, Select, Empty, empty state); Profile row with count, quiet links on Journal and To-do; "Restored to Tue 27 Oct · Show".
+- 30-day purge on launch, foreground and background refresh, on a clock that never runs backwards; export toggle; Erase empties it. 11 unit tests, migration test, UI test.

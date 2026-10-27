@@ -6,7 +6,7 @@ import Testing
 @MainActor
 @Suite("Schema migration")
 struct SchemaMigrationTests {
-    @Test("A v1 store opens as v2; its photos get a display rendition from the backfill")
+    @Test("A v1 store opens as the current schema; its photos get a display rendition from the backfill")
     func v1ToV2() async throws {
         let url = URL.temporaryDirectory.appending(path: "migration-\(UUID().uuidString).store")
         defer { try? FileManager.default.removeItem(at: url) }
@@ -25,7 +25,7 @@ struct SchemaMigrationTests {
             try container.mainContext.save()
         }
 
-        let schema = Schema(versionedSchema: FolioSchemaV2.self)
+        let schema = Schema(versionedSchema: FolioSchemaV3.self)
         let container = try ModelContainer(for: schema, migrationPlan: FolioMigrationPlan.self,
                                            configurations: ModelConfiguration(schema: schema, url: url))
         let store = DiaryStore(context: container.mainContext, calendar: TestCalendar.london, now: { .now })
@@ -36,5 +36,33 @@ struct SchemaMigrationTests {
         await store.backfillDisplayRenditions()
         let display = try #require(entry.orderedPhotos.first?.displayData)
         #expect(!display.isEmpty && display.count < jpeg.count)
+    }
+
+    @Test("A v2 store opens as v3 (Recently Deleted): nothing is trashed, everything stays")
+    func v2ToV3() throws {
+        let url = URL.temporaryDirectory.appending(path: "migration-\(UUID().uuidString).store")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let categoryID = UUID(), entryID = UUID(), taskID = UUID()
+
+        do {
+            let schema = Schema(versionedSchema: FolioSchemaV2.self)
+            let container = try ModelContainer(for: schema, configurations: ModelConfiguration(schema: schema, url: url))
+            let context = container.mainContext
+            context.insert(FolioSchemaV2.Category(id: categoryID, name: "Travel", colorKey: "ocean", sortIndex: 0, now: .now))
+            context.insert(FolioSchemaV2.Entry(id: entryID, title: "Lisbon", bodyMarkdown: "", dayKey: "2025-05-04",
+                                               categoryID: categoryID, now: .now))
+            context.insert(FolioSchemaV2.TaskItem(id: taskID, title: "Pack", dayKey: nil, sortIndex: 0, now: .now))
+            try context.save()
+        }
+
+        let schema = Schema(versionedSchema: FolioSchemaV3.self)
+        let container = try ModelContainer(for: schema, migrationPlan: FolioMigrationPlan.self,
+                                           configurations: ModelConfiguration(schema: schema, url: url))
+        let store = DiaryStore(context: container.mainContext, calendar: TestCalendar.london, now: { .now })
+        let entry = try #require(store.entry(id: entryID))
+        #expect(entry.trashedAt == nil && entry.categoryID == categoryID)
+        #expect(store.categories().first?.trashedAt == nil && store.categories().first?.unassignedIDs == nil)
+        #expect(store.task(id: taskID)?.trashedAt == nil)
+        #expect(store.trashCount == 0)
     }
 }

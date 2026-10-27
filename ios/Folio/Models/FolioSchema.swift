@@ -8,7 +8,7 @@ enum FolioSchemaV1: VersionedSchema {
     static let versionIdentifier = Schema.Version(1, 0, 0)
 
     static var models: [any PersistentModel.Type] {
-        [Category.self, Entry.self, EntryPhoto.self, TaskItem.self, UserSettings.self]
+        [FolioSchemaV2.Category.self, Entry.self, EntryPhoto.self, FolioSchemaV2.TaskItem.self, UserSettings.self]
     }
 
     @Model nonisolated
@@ -79,8 +79,20 @@ enum FolioSchemaV1: VersionedSchema {
 }
 
 /// Schema version 2 (Batch C): `EntryPhoto.displayData`, the 1080 px display rendition.
+/// Its frozen models are in `FolioSchemaV2Models.swift`.
 enum FolioSchemaV2: VersionedSchema {
     static let versionIdentifier = Schema.Version(2, 0, 0)
+
+    static var models: [any PersistentModel.Type] {
+        [FolioSchemaV2.Category.self, FolioSchemaV2.Entry.self, FolioSchemaV2.EntryPhoto.self,
+         FolioSchemaV2.TaskItem.self, UserSettings.self]
+    }
+}
+
+/// Schema version 3 (Batch D, SPEC §5.2): `trashedAt` on Entry, TaskItem and Category, and
+/// `Category.unassignedIDs`, for Recently Deleted. These are the live models.
+enum FolioSchemaV3: VersionedSchema {
+    static let versionIdentifier = Schema.Version(3, 0, 0)
 
     static var models: [any PersistentModel.Type] {
         [Category.self, Entry.self, EntryPhoto.self, TaskItem.self, UserSettings.self]
@@ -88,11 +100,12 @@ enum FolioSchemaV2: VersionedSchema {
 }
 
 enum FolioMigrationPlan: SchemaMigrationPlan {
-    static var schemas: [any VersionedSchema.Type] { [FolioSchemaV1.self, FolioSchemaV2.self] }
+    static var schemas: [any VersionedSchema.Type] { [FolioSchemaV1.self, FolioSchemaV2.self, FolioSchemaV3.self] }
 
-    /// Adding an optional attribute is lightweight; renditions are backfilled after launch
-    /// rather than inside the migration, so opening the store stays fast.
+    /// Each step only adds optional attributes, so both are lightweight. Renditions are
+    /// backfilled after launch rather than inside the migration, so opening the store stays fast.
     static var stages: [MigrationStage] {
-        [.lightweight(fromVersion: FolioSchemaV1.self, toVersion: FolioSchemaV2.self)]
+        [.lightweight(fromVersion: FolioSchemaV1.self, toVersion: FolioSchemaV2.self),
+         .lightweight(fromVersion: FolioSchemaV2.self, toVersion: FolioSchemaV3.self)]
     }
 }

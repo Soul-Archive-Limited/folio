@@ -42,6 +42,9 @@ targets:
         NSCameraUsageDescription: "Folio uses the camera only when you choose to take a photo for an entry."
         NSMicrophoneUsageDescription: "Folio uses the microphone only while you dictate. Audio is processed on your iPhone and never stored or sent anywhere."
         NSSpeechRecognitionUsageDescription: "Folio turns your voice into text on your iPhone. Nothing is sent to a server."
+        # Background refresh runs the Recently Deleted purge (SPEC §5.2) and, from Phase 10, sync.
+        UIBackgroundModes: [fetch]
+        BGTaskSchedulerPermittedIdentifiers: [com.devilsense.folio.refresh]
         UILaunchScreen:
           UIColorName: bg
           UIImageName: AppMark

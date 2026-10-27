@@ -56,11 +56,11 @@ struct DiaryStoreTests {
         #expect(task.completedAt == nil)
         #expect(store.tasks(on: today).count == 1)
 
-        store.delete(task)
+        store.trash(task)
         #expect(store.tasks(on: today).isEmpty)
     }
 
-    @Test("Deleting a category un-assigns its items and keeps them (SPEC §5)")
+    @Test("Deleting a category un-assigns its items and keeps them (SPEC §5, §5.2)")
     func categoryDelete() throws {
         let travel = try store.createCategory(name: "Travel", color: .ocean)
         let entry = try store.createEntry(title: "Lisbon", day: store.today, categoryID: travel.id)
@@ -68,9 +68,10 @@ struct DiaryStoreTests {
         store.updateSettings { $0.defaultCategoryID = travel.id }
 
         #expect(store.usage(of: travel) == CategoryUsage(entries: 1, tasks: 1))
-        store.delete(travel)
+        #expect(store.trash(travel) == 2)
 
         #expect(store.categories().isEmpty)
+        #expect(store.trashedCategories().map(\.id) == [travel.id])
         #expect(entry.categoryID == nil && task.categoryID == nil)
         #expect(entry.isDirty && task.isDirty)
         #expect(store.settings().defaultCategoryID == nil)
@@ -93,12 +94,12 @@ struct DiaryStoreTests {
     @Test("Never-synced items are deleted outright; synced ones become tombstones")
     func tombstones() throws {
         let local = try store.createEntry(title: "Local", day: store.today)
-        store.delete(local)
+        store.deletePermanently(local)
         #expect(try container.mainContext.fetchCount(FetchDescriptor<Entry>()) == 0)
 
         let synced = try store.createEntry(title: "Synced", day: store.today)
         synced.serverVersion = 7
-        store.delete(synced)
+        store.deletePermanently(synced)
         #expect(synced.isTombstone && synced.isDirty)
         #expect(try container.mainContext.fetchCount(FetchDescriptor<Entry>()) == 1)
         #expect(store.entries(on: store.today).isEmpty)

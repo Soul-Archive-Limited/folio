@@ -9,6 +9,7 @@ struct ProfileView: View {
     @Environment(\.tabRouter) private var router
     @Environment(\.requestReview) private var requestReview
     @State private var showsCategories = false
+    @State private var showsRecentlyDeleted = false
     #if DEBUG
     @State private var showsGallery = false
     #endif
@@ -41,7 +42,7 @@ struct ProfileView: View {
                 ProfileWritingSection()
                 ProfileIntelligenceSection()
                 ProfilePrivacySection()
-                ProfileDataSection()
+                ProfileDataSection(showsRecentlyDeleted: $showsRecentlyDeleted)
 
                 Section("Help") {
                     Button {
@@ -101,6 +102,7 @@ struct ProfileView: View {
             .background { AuraBackground() }
             .navigationTitle("Profile")
             .navigationDestination(isPresented: $showsCategories) { CategoriesManagerView() }
+            .navigationDestination(isPresented: $showsRecentlyDeleted) { RecentlyDeletedView() }
             // Leave the toast room above the tab bar.
             .contentMargins(.bottom, Spacing.xxl, for: .scrollContent)
         }
@@ -108,6 +110,7 @@ struct ProfileView: View {
         .onAppear {
             let open = DebugLaunchOptions.string("FolioOpen")
             if open == "categories" || open == "categoryEdit" { showsCategories = true }
+            if open == "recentlyDeleted" { showsRecentlyDeleted = true }
         }
         .fullScreenCover(isPresented: $showsGallery) {
             DesignGalleryView()

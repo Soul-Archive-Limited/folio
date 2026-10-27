@@ -53,9 +53,9 @@ struct JournalModelTests {
         #expect(model.photos(store: store).count == 3)
         model.filter = [food.id]
         #expect(model.photos(store: store).map { $0.entry?.title } == ["Lunch"])
-        store.delete(walk)
+        store.trash(walk)
         model.filter = []
-        #expect(model.photos(store: store).count == 1, "deleted entries' photos disappear")
+        #expect(model.photos(store: store).count == 1, "trashed entries' photos disappear")
     }
 
     @Test("Masonry spreads photos so the three columns stay balanced")

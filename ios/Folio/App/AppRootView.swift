@@ -29,7 +29,10 @@ struct AppRootView: View {
         .onChange(of: scenePhase) { _, phase in
             if phase == .background {
                 UserDefaults.standard.set(AppClock.now, forKey: PreferenceKeys.lastBackgroundAt)
+                TrashMaintenance.scheduleRefresh()
             }
+            // Launch reaches `.active` too, so this covers launch and every foreground.
+            if phase == .active { TrashMaintenance.purgeIfPossible(store) }
         }
         .task { prepareGreetingIfNeeded() }
         .task(priority: .utility) { await store.backfillDisplayRenditions() }

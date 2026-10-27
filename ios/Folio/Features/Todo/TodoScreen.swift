@@ -9,7 +9,7 @@ struct TodoScreen: View {
     @AppStorage(PreferenceKeys.todoCompletedExpanded) private var showsCompleted = true
     @State private var editing: TaskItem?
     @State private var rescheduling: TaskItem?
-    @State private var confirmingDelete: TaskItem?
+    @State private var showsTrash = false
     @State private var tabBar: TabBarShape?
     @State private var isScrolling = false
     @State private var isTyping = false
@@ -54,6 +54,12 @@ struct TodoScreen: View {
                         TodoCompletedHeader(count: sections.completed.count, isExpanded: $showsCompleted)
                     }
                 }
+                if store.trashCount > 0 {
+                    Section {
+                        RecentlyDeletedLink(count: store.trashCount) { showsTrash = true }
+                            .listRowBackground(Color.clear)
+                    }
+                }
             }
             .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
@@ -70,6 +76,9 @@ struct TodoScreen: View {
             .animation(FolioMotion.standard(), value: sections.active.map(\.id))
             .animation(FolioMotion.standard(), value: sections.completed.map(\.id))
             .navigationTitle("To-do")
+            // To-do's own toast slot lives in the root list's bottom bar, so the pushed screen
+            // hosts its own.
+            .navigationDestination(isPresented: $showsTrash) { RecentlyDeletedView().toastHost(toasts) }
         }
         #if DEBUG
         .onAppear {
@@ -85,12 +94,6 @@ struct TodoScreen: View {
             Button("Pick a date…") { editing = task }
             if task.dayKey != nil { Button("Remove date", role: .destructive) { store.reschedule(task, to: nil) } }
         }
-        .confirmationDialog("Delete this task?", isPresented: isConfirmingDelete, titleVisibility: .visible, presenting: confirmingDelete) { task in
-            Button("Delete", role: .destructive) { store.delete(task) }
-        } message: { _ in
-            Text("Its notes are deleted too.")
-        }
-        .folioHaptic(.warning, trigger: confirmingDelete?.id)
     }
 
     /// Toast, then the full-width quick-add bar over a soft scrim (owner review, Batch B):
@@ -176,9 +179,10 @@ struct TodoScreen: View {
         }))
     }
 
-    /// Tasks with notes ask first; plain tasks delete straight away (SPEC §6.7).
+    /// Moves the task to Recently Deleted straight away, with Undo (SPEC §5.2).
     private func delete(_ task: TaskItem) {
-        if let notes = task.notes, !notes.isEmpty { confirmingDelete = task } else { store.delete(task) }
+        store.trash(task)
+        toasts.show(.movedToTrash { store.restoreFromTrash(task) })
     }
 
     private func move(_ undated: [TaskItem], indices: IndexSet, offset: Int) {
@@ -189,10 +193,6 @@ struct TodoScreen: View {
 
     private var isRescheduling: Binding<Bool> {
         Binding(get: { rescheduling != nil }, set: { if !$0 { rescheduling = nil } })
-    }
-
-    private var isConfirmingDelete: Binding<Bool> {
-        Binding(get: { confirmingDelete != nil }, set: { if !$0 { confirmingDelete = nil } })
     }
 }
 

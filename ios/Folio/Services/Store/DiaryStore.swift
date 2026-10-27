@@ -13,6 +13,9 @@ final class DiaryStore {
     var calendar: Calendar
     @ObservationIgnored let now: () -> Date
     @ObservationIgnored var drafts = DraftStore()
+    /// Keeps the Recently Deleted clock's high-water mark (SPEC §5.2). Nil keeps it in memory only.
+    @ObservationIgnored let trashClockDefaults: UserDefaults?
+    @ObservationIgnored var trashClockHighWater: Date?
 
     private(set) var revision = 0
 
@@ -25,10 +28,12 @@ final class DiaryStore {
         let firstWeekday: Int
     }
 
-    init(context: ModelContext, calendar: Calendar = .current, now: @escaping () -> Date = { AppClock.now }) {
+    init(context: ModelContext, calendar: Calendar = .current, now: @escaping () -> Date = { AppClock.now },
+         trashClockDefaults: UserDefaults? = nil) {
         self.context = context
         self.calendar = calendar
         self.now = now
+        self.trashClockDefaults = trashClockDefaults
     }
 
     var today: DayKey {
@@ -41,26 +46,26 @@ final class DiaryStore {
     func entries(on day: DayKey) -> [Entry] {
         _ = revision
         let raw = day.rawValue
-        let descriptor = FetchDescriptor<Entry>(predicate: #Predicate { $0.dayKey == raw && !$0.isTombstone })
+        let descriptor = FetchDescriptor<Entry>(predicate: #Predicate { $0.dayKey == raw && !$0.isTombstone && $0.trashedAt == nil })
         return fetch(descriptor).sorted(by: Self.entryOrder)
     }
 
     func tasks(on day: DayKey) -> [TaskItem] {
         _ = revision
         let raw: String? = day.rawValue
-        let descriptor = FetchDescriptor<TaskItem>(predicate: #Predicate { $0.dayKey == raw && !$0.isTombstone })
+        let descriptor = FetchDescriptor<TaskItem>(predicate: #Predicate { $0.dayKey == raw && !$0.isTombstone && $0.trashedAt == nil })
         return fetch(descriptor).sorted(by: Self.taskOrder)
     }
 
     func allTasks() -> [TaskItem] {
         _ = revision
-        return fetch(FetchDescriptor<TaskItem>(predicate: #Predicate { !$0.isTombstone })).sorted(by: Self.taskOrder)
+        return fetch(FetchDescriptor<TaskItem>(predicate: #Predicate { !$0.isTombstone && $0.trashedAt == nil })).sorted(by: Self.taskOrder)
     }
 
     func allEntries() -> [Entry] {
         _ = revision
         let descriptor = FetchDescriptor<Entry>(
-            predicate: #Predicate { !$0.isTombstone },
+            predicate: #Predicate { !$0.isTombstone && $0.trashedAt == nil },
             sortBy: [SortDescriptor(\.dayKey, order: .reverse), SortDescriptor(\.createdAt, order: .reverse)]
         )
         return fetch(descriptor)
@@ -70,13 +75,13 @@ final class DiaryStore {
     func allPhotos() -> [EntryPhoto] {
         _ = revision
         return fetch(FetchDescriptor<EntryPhoto>(predicate: #Predicate { !$0.isTombstone }))
-            .filter { $0.entry?.isTombstone == false }
+            .filter { $0.entry?.isTombstone == false && $0.entry?.trashedAt == nil }
             .sorted { ($0.entry?.dayKey ?? "", $1.sortIndex) > ($1.entry?.dayKey ?? "", $0.sortIndex) }
     }
 
     func categories() -> [Category] {
         _ = revision
-        let descriptor = FetchDescriptor<Category>(predicate: #Predicate { !$0.isTombstone }, sortBy: [SortDescriptor(\.sortIndex)])
+        let descriptor = FetchDescriptor<Category>(predicate: #Predicate { !$0.isTombstone && $0.trashedAt == nil }, sortBy: [SortDescriptor(\.sortIndex)])
         return fetch(descriptor)
     }
 
@@ -107,10 +112,10 @@ final class DiaryStore {
 
     func computeMarkers(for days: [DayKey]) -> [DayKey: DayMarker] {
         let keys = days.map(\.rawValue)
-        let entries = fetch(FetchDescriptor<Entry>(predicate: #Predicate { keys.contains($0.dayKey) && !$0.isTombstone }))
+        let entries = fetch(FetchDescriptor<Entry>(predicate: #Predicate { keys.contains($0.dayKey) && !$0.isTombstone && $0.trashedAt == nil }))
         // `??` inside #Predicate compiles but crashes in SQL generation; compare optionals instead.
         let optionalKeys: [String?] = keys
-        let tasks = fetch(FetchDescriptor<TaskItem>(predicate: #Predicate { optionalKeys.contains($0.dayKey) && !$0.isTombstone }))
+        let tasks = fetch(FetchDescriptor<TaskItem>(predicate: #Predicate { optionalKeys.contains($0.dayKey) && !$0.isTombstone && $0.trashedAt == nil }))
 
         var markers: [DayKey: DayMarker] = [:]
         for (raw, dayEntries) in Dictionary(grouping: entries, by: \.dayKey) {
@@ -140,17 +145,17 @@ final class DiaryStore {
     func greetingSummary() -> GreetingSummary {
         let today = today
         let todayRaw = today.rawValue
-        let open = fetch(FetchDescriptor<TaskItem>(predicate: #Predicate { !$0.isCompleted && !$0.isTombstone && $0.dayKey != nil }))
+        let open = fetch(FetchDescriptor<TaskItem>(predicate: #Predicate { !$0.isCompleted && !$0.isTombstone && $0.trashedAt == nil && $0.dayKey != nil }))
         let tasksToday = open.count { $0.dayKey == todayRaw }
         let overdue = open.count { ($0.dayKey ?? todayRaw) < todayRaw }
 
         let week = (0..<7).map { today.adding(days: -$0).rawValue }
-        let pages = fetchCount(FetchDescriptor<Entry>(predicate: #Predicate { week.contains($0.dayKey) && !$0.isTombstone }))
+        let pages = fetchCount(FetchDescriptor<Entry>(predicate: #Predicate { week.contains($0.dayKey) && !$0.isTombstone && $0.trashedAt == nil }))
 
         let earlierYears = (max(today.year - 120, 1)..<today.year).compactMap {
             DayKey(year: $0, month: today.month, day: today.day)?.rawValue
         }
-        let onThisDay = fetch(FetchDescriptor<Entry>(predicate: #Predicate { earlierYears.contains($0.dayKey) && !$0.isTombstone }))
+        let onThisDay = fetch(FetchDescriptor<Entry>(predicate: #Predicate { earlierYears.contains($0.dayKey) && !$0.isTombstone && $0.trashedAt == nil }))
             .compactMap(\.day?.year).max()
 
         return GreetingSummary(tasksToday: tasksToday, tasksOverdue: overdue, pagesThisWeek: pages, onThisDayYear: onThisDay)
@@ -160,14 +165,14 @@ final class DiaryStore {
     func monthsWithEntries(in year: Int) -> Set<Int> {
         _ = revision
         let prefix = String(year).count == 4 ? "\(year)-" : String(format: "%04d-", year)
-        let entries = fetch(FetchDescriptor<Entry>(predicate: #Predicate { $0.dayKey.starts(with: prefix) && !$0.isTombstone }))
+        let entries = fetch(FetchDescriptor<Entry>(predicate: #Predicate { $0.dayKey.starts(with: prefix) && !$0.isTombstone && $0.trashedAt == nil }))
         return Set(entries.compactMap { $0.day?.month })
     }
 
     func usage(of category: Category) -> CategoryUsage {
         let id: UUID? = category.id
-        let entries = fetchCount(FetchDescriptor<Entry>(predicate: #Predicate { $0.categoryID == id && !$0.isTombstone }))
-        let tasks = fetchCount(FetchDescriptor<TaskItem>(predicate: #Predicate { $0.categoryID == id && !$0.isTombstone }))
+        let entries = fetchCount(FetchDescriptor<Entry>(predicate: #Predicate { $0.categoryID == id && !$0.isTombstone && $0.trashedAt == nil }))
+        let tasks = fetchCount(FetchDescriptor<TaskItem>(predicate: #Predicate { $0.categoryID == id && !$0.isTombstone && $0.trashedAt == nil }))
         return CategoryUsage(entries: entries, tasks: tasks)
     }
 
@@ -241,8 +246,10 @@ final class DiaryStore {
         commit()
     }
 
-    /// Deleting is the only way an item leaves the calendar (SPEC §5).
-    func delete(_ entry: Entry) {
+    /// Permanent delete: Delete now, Empty, the 30-day purge (SPEC §5.2). Everyday Delete is
+    /// `trash(_:)`. Any draft of this entry (and its photo files) goes too.
+    func deletePermanently(_ entry: Entry) {
+        if drafts.load()?.entryID == entry.id { drafts.clear() }
         for photo in entry.photos { retire(photo) }
         retire(entry)
         commit()
@@ -256,7 +263,7 @@ final class DiaryStore {
 
     func entry(id: UUID) -> Entry? {
         _ = revision
-        var descriptor = FetchDescriptor<Entry>(predicate: #Predicate { $0.id == id && !$0.isTombstone })
+        var descriptor = FetchDescriptor<Entry>(predicate: #Predicate { $0.id == id && !$0.isTombstone && $0.trashedAt == nil })
         descriptor.fetchLimit = 1
         return fetch(descriptor).first
     }
@@ -268,7 +275,7 @@ final class DiaryStore {
             year == day.year ? nil : DayKey(year: year, month: day.month, day: day.day)?.rawValue
         }
         let descriptor = FetchDescriptor<Entry>(
-            predicate: #Predicate { keys.contains($0.dayKey) && !$0.isTombstone && $0.id != id },
+            predicate: #Predicate { keys.contains($0.dayKey) && !$0.isTombstone && $0.trashedAt == nil && $0.id != id },
             sortBy: [SortDescriptor(\.dayKey, order: .reverse)]
         )
         return fetch(descriptor)
@@ -379,12 +386,13 @@ final class DiaryStore {
     }
 
     func task(id: UUID) -> TaskItem? {
-        var descriptor = FetchDescriptor<TaskItem>(predicate: #Predicate { $0.id == id && !$0.isTombstone })
+        var descriptor = FetchDescriptor<TaskItem>(predicate: #Predicate { $0.id == id && !$0.isTombstone && $0.trashedAt == nil })
         descriptor.fetchLimit = 1
         return fetch(descriptor).first
     }
 
-    func delete(_ task: TaskItem) {
+    /// Permanent delete (SPEC §5.2); everyday Delete is `trash(_:)`.
+    func deletePermanently(_ task: TaskItem) {
         retire(task)
         commit()
     }
@@ -419,25 +427,36 @@ final class DiaryStore {
         commit()
     }
 
-    /// Deleting a category un-assigns its entries and tasks; it never deletes them (SPEC §5).
-    func delete(_ category: Category) {
+    /// Permanent delete (SPEC §5.2). Its entries and tasks were already un-assigned when it
+    /// went to Recently Deleted (`trash(_:)`); this also covers a live one, for safety.
+    func deletePermanently(_ category: Category) {
+        if category.trashedAt == nil { unassign(category, at: now()) }
+        retire(category)
+        commit()
+    }
+
+    /// Takes every entry and task (live or trashed) off a category and returns their ids.
+    /// Deleting a category never deletes its items (SPEC §5).
+    @discardableResult
+    func unassign(_ category: Category, at stamp: Date) -> [UUID] {
         let id: UUID? = category.id
-        let stamp = now()
-        for entry in fetch(FetchDescriptor<Entry>(predicate: #Predicate { $0.categoryID == id })) {
+        var ids: [UUID] = []
+        for entry in fetch(FetchDescriptor<Entry>(predicate: #Predicate { $0.categoryID == id && !$0.isTombstone })) {
             entry.categoryID = nil
             entry.markChanged(at: stamp)
+            ids.append(entry.id)
         }
-        for task in fetch(FetchDescriptor<TaskItem>(predicate: #Predicate { $0.categoryID == id })) {
+        for task in fetch(FetchDescriptor<TaskItem>(predicate: #Predicate { $0.categoryID == id && !$0.isTombstone })) {
             task.categoryID = nil
             task.markChanged(at: stamp)
+            ids.append(task.id)
         }
         let settings = settings()
         if settings.defaultCategoryID == category.id {
             settings.defaultCategoryID = nil
             settings.markChanged(at: stamp)
         }
-        retire(category)
-        commit()
+        return ids
     }
 
     private func validatedCategoryName(_ name: String, ignoring id: UUID?) throws(StoreError) -> String {
@@ -483,7 +502,7 @@ final class DiaryStore {
 
     /// Never-synced records are deleted outright; synced ones become tombstones until the
     /// server acknowledges the deletion (SPEC §5).
-    private func retire(_ record: some SyncedRecord & PersistentModel) {
+    func retire(_ record: some SyncedRecord & PersistentModel) {
         if record.serverVersion == nil {
             context.delete(record)
         } else {
@@ -492,7 +511,7 @@ final class DiaryStore {
         }
     }
 
-    private func commit() {
+    func commit() {
         save()
         revision += 1
     }
@@ -506,7 +525,7 @@ final class DiaryStore {
         }
     }
 
-    private func fetch<T: PersistentModel>(_ descriptor: FetchDescriptor<T>) -> [T] {
+    func fetch<T: PersistentModel>(_ descriptor: FetchDescriptor<T>) -> [T] {
         do {
             return try context.fetch(descriptor)
         } catch {
@@ -515,7 +534,7 @@ final class DiaryStore {
         }
     }
 
-    private func fetchCount<T: PersistentModel>(_ descriptor: FetchDescriptor<T>) -> Int {
+    func fetchCount<T: PersistentModel>(_ descriptor: FetchDescriptor<T>) -> Int {
         (try? context.fetchCount(descriptor)) ?? 0
     }
 

@@ -113,11 +113,15 @@ struct ProfilePrivacySection: View {
     }
 }
 
-/// Your data: export (JSON + photos zip, via the share sheet) and erase this iPhone.
+/// Your data: Recently Deleted, export (JSON + photos zip, via the share sheet) and erase
+/// this iPhone, which also empties Recently Deleted (SPEC §5.2).
 struct ProfileDataSection: View {
+    @Binding var showsRecentlyDeleted: Bool
+
     @Environment(DiaryStore.self) private var store
     @Environment(ToastCenter.self) private var toasts
     @State private var exporting = false
+    @State private var exportIncludesTrash = false
     @State private var shareItems: ShareItems?
     @State private var confirmsErase = false
 
@@ -129,6 +133,10 @@ struct ProfileDataSection: View {
 
     var body: some View {
         Section {
+            Button { showsRecentlyDeleted = true } label: {
+                ProfileRowLabel(title: "Recently Deleted", systemImage: "trash", detail: "\(store.trashCount)")
+            }
+            .accessibilityIdentifier("profile-recently-deleted")
             Button(action: export) {
                 HStack {
                     ProfileRowLabel(title: "Export as JSON + photos", systemImage: "square.and.arrow.up")
@@ -136,6 +144,10 @@ struct ProfileDataSection: View {
                 }
             }
             .disabled(exporting)
+            Toggle(isOn: $exportIncludesTrash) {
+                ProfileRowLabel(title: "Include Recently Deleted in export", systemImage: "tray.full")
+            }
+            .tint(.ember)
             Button(role: .destructive) { confirmsErase = true } label: {
                 HStack(spacing: Spacing.s) {
                     Image(systemName: "trash").frame(width: 26).accessibilityHidden(true)
@@ -148,7 +160,7 @@ struct ProfileDataSection: View {
         } header: {
             Text("Your data")
         } footer: {
-            Text("The export is made on your iPhone and isn't encrypted, so keep it somewhere safe.")
+            Text("Deleted items stay in Recently Deleted for 30 days. The export is made on your iPhone and isn't encrypted, so keep it somewhere safe.")
         }
         .listRowBackground(ProfileRowBackground())
         .sheet(item: $shareItems, onDismiss: { shareItems?.exporter.cleanUp() }) { items in
@@ -161,14 +173,14 @@ struct ProfileDataSection: View {
                 toasts.show(ToastMessage(text: "Data erased", systemImage: "trash"))
             }
         } message: {
-            Text("Every entry, photo, task and category on this iPhone is removed. This can't be undone.")
+            Text("Every entry, photo, task and category on this iPhone is removed, including Recently Deleted. This can't be undone.")
         }
         .folioHaptic(.warning, trigger: confirmsErase)
     }
 
     private func export() {
         exporting = true
-        let exporter = DataExporter(store: store)
+        let exporter = DataExporter(store: store, includesTrash: exportIncludesTrash)
         Task {
             defer { exporting = false }
             do {

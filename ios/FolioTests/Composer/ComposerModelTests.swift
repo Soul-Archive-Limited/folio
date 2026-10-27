@@ -139,12 +139,12 @@ struct ComposerModelTests {
         #expect(model.isPastDay(today: store.today))
     }
 
-    @Test("Delete with Undo restores the entry and its photos; duplicate copies it")
+    @Test("A snapshot recreates a permanently deleted entry with its photos; duplicate copies it")
     func undoAndDuplicate() throws {
         let entry = try store.createEntry(title: "Keep me", body: "Text", day: store.today)
         _ = try store.addPhoto(Self.photo, to: entry)
         let snapshot = try #require(store.snapshot(of: entry))
-        store.delete(entry)
+        store.deletePermanently(entry)
         #expect(store.entries(on: store.today).isEmpty)
         let restored = try #require(store.restore(snapshot))
         #expect(restored.title == "Keep me" && restored.orderedPhotos.count == 1)
