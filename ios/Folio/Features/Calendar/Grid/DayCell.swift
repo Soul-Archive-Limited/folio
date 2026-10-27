@@ -36,7 +36,7 @@ struct DayCell: View {
     /// Selected day without a photo: an ember square that springs from 0.6 to 1 (SPEC §3.6).
     private var selectionFill: some View {
         RoundedRectangle(cornerRadius: Radius.dayCell)
-            .fill(.ember)
+            .fill(.emberStrong)
             .scaleEffect(state.isSelected || reduceMotion ? 1 : 0.6)
             .opacity(state.isSelected && state.thumbnailPhotoID == nil ? 1 : 0)
             .animation(FolioMotion.confirm(reduceMotion: reduceMotion), value: state.isSelected)

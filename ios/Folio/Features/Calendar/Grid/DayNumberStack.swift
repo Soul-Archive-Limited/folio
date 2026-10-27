@@ -30,7 +30,7 @@ struct DayNumberStack: View {
 
     private var numberStyle: AnyShapeStyle {
         if state.isSelected { return AnyShapeStyle(.white) }
-        if state.isToday { return AnyShapeStyle(.ember) }
+        if state.isToday { return AnyShapeStyle(.emberText) }
         return state.isInMonth ? AnyShapeStyle(.ink) : AnyShapeStyle(.inkTertiary)
     }
 }

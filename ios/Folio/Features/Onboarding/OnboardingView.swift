@@ -13,6 +13,8 @@ struct OnboardingView: View {
     @State private var toasts = ToastCenter()
     @State private var lastMove = Date.distantPast
     @State private var proxy: ScrollViewProxy?
+    @FocusState private var nameFocused: Bool
+    @State private var keyboardShown = false
 
     var body: some View {
         ScrollViewReader { reader in
@@ -29,6 +31,9 @@ struct OnboardingView: View {
             .scrollTargetBehavior(.paging)
             .scrollPosition(id: $page)
             .onAppear { proxy = reader }
+            // Swiping away from the name page counts too. (The keyboard's own resize can
+            // report the position again, so only a real move off the page dismisses.)
+            .onChange(of: page) { _, new in if let new, new != .name { nameFocused = false } }
         }
         .scrollIndicators(.hidden)
         .scrollDismissesKeyboard(.immediately)
@@ -43,6 +48,8 @@ struct OnboardingView: View {
         }
         .environment(toasts)
         .onAppear(perform: applyDebugPage)
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in keyboardShown = true }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardDidHideNotification)) { _ in keyboardShown = false }
     }
 
     @ViewBuilder
@@ -51,7 +58,8 @@ struct OnboardingView: View {
         case .kept, .anyDay, .privacy:
             OnboardingWelcomePage(page: item, isCurrent: page == item) { go(to: item.next) }
         case .name:
-            OnboardingNameStep(name: $name, onContinue: { go(to: .sync) }, onSkip: { name = ""; go(to: .sync) })
+            OnboardingNameStep(name: $name, focused: $nameFocused,
+                               onContinue: { go(to: .sync) }, onSkip: { name = ""; go(to: .sync) })
         case .sync:
             OnboardingSyncStep(onGuest: finish)
         }
@@ -74,11 +82,18 @@ struct OnboardingView: View {
     private func go(to next: OnboardingPage?) {
         guard let next, Date.now.timeIntervalSince(lastMove) > 0.5 else { return }
         lastMove = .now
-        // `scrollTo` rather than setting the position binding: on a lazy stack the binding
-        // alone doesn't always move the pager.
-        withAnimation(reduceMotion ? FolioMotion.reduced : .smooth(duration: 0.45)) {
-            proxy?.scrollTo(next, anchor: .leading)
-            page = next
+        // The keyboard goes first, so it never rides along to the next page. Its height
+        // change resizes the pages, which would cancel a scroll started at the same moment,
+        // so the pager moves once the keyboard is down.
+        nameFocused = false
+        Task {
+            for _ in 0..<12 where keyboardShown { try? await Task.sleep(for: .milliseconds(50)) }
+            // `scrollTo` rather than setting the position binding: on a lazy stack the
+            // binding alone doesn't always move the pager.
+            withAnimation(reduceMotion ? FolioMotion.reduced : .smooth(duration: 0.45)) {
+                proxy?.scrollTo(next, anchor: .leading)
+                page = next
+            }
         }
     }
 

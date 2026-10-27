@@ -16,13 +16,16 @@ struct JournalPhotoGrid: View {
                 ForEach(Array(Self.columns(for: photos).enumerated()), id: \.offset) { _, column in
                     LazyVStack(spacing: 6) {
                         ForEach(column, id: \.id) { photo in
-                            if let entryID = photo.entry?.id {
+                            if let entry = photo.entry {
+                                let entryID = entry.id
                                 NavigationLink(value: entryID) {
                                     FullPhotoImage(photoID: photo.id, rendition: .display, maxPixel: 600, cornerRadius: 12)
                                         .aspectRatio(Self.aspect(photo), contentMode: .fit)
-                                        .matchedTransitionSource(id: entryID, in: zoom)
+                                        .zoomSource(id: entryID, in: zoom, cornerRadius: 12)
                                 }
                                 .buttonStyle(.pressable)
+                                // Tiles are a third of the width: long-press only, no swipes.
+                                .entryActions(entry, swipes: false, cornerRadius: 12)
                                 .accessibilityLabel(photo.entry?.title.isEmpty == false ? photo.entry?.title ?? "" : "Photo")
                             }
                         }

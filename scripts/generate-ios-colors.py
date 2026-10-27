@@ -50,8 +50,8 @@ for name, token in TOKENS["colors"].items():
     write(name, token)
 for name, token in TOKENS["categories"].items():
     write("category" + name[0].upper() + name[1:], token)
-# App-wide accent colour = ember.
+# App-wide accent colour = emberText (system text buttons and links must pass AA).
 accent = ROOT / "ios/Folio/Resources/Assets.xcassets/AccentColor.colorset"
 accent.mkdir(parents=True, exist_ok=True)
-(accent / "Contents.json").write_text(json.dumps(colorset(TOKENS["colors"]["ember"]), indent=2) + "\n")
+(accent / "Contents.json").write_text(json.dumps(colorset(TOKENS["colors"]["emberText"]), indent=2) + "\n")
 print(f"Wrote {len(TOKENS['colors']) + len(TOKENS['categories'])} colour sets to {OUT.relative_to(ROOT)}")

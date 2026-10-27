@@ -22,6 +22,14 @@ final class ComposerModel {
     @ObservationIgnored private var editsSinceDraft = false
     @ObservationIgnored private let drafts: DraftStore
     @ObservationIgnored private var isLoading = true
+    /// What's already saved: the entry as stored, or nothing for a new entry. A draft is only
+    /// kept while the writing differs from it (owner's iPhone test, Batch E).
+    @ObservationIgnored private var baseline: ComposerDraft
+    /// The saved entry as the editor writes it back (Markdown round trip), captured before the
+    /// first edit, so normalised formatting never looks like an unsaved change.
+    @ObservationIgnored private var editorBaseline: ComposerDraft?
+    /// Set once the entry is saved or discarded; nothing is written as a draft after that.
+    @ObservationIgnored private var isFinished = false
 
     static let autosaveInterval: Duration = .seconds(2)
 
@@ -32,6 +40,8 @@ final class ComposerModel {
         self.categoryID = categoryID
         self.writingFont = writingFont
         self.drafts = drafts
+        baseline = ComposerDraft(entryID: nil, dayKey: day.rawValue, minutesFromMidnight: nil, title: "", bodyMarkdown: "",
+                                 categoryID: categoryID, savedAt: .distantPast)
         if let draft = drafts.load(), draft.entryID == nil, !draft.isEmpty { pendingDraft = draft }
         isLoading = false
     }
@@ -47,7 +57,14 @@ final class ComposerModel {
         photos = entry.orderedPhotos.map { .stored($0.id) }
         self.writingFont = writingFont
         self.drafts = drafts
-        if let draft = drafts.load(), draft.entryID == entry.id, !draft.isEmpty { pendingDraft = draft }
+        baseline = ComposerDraft(entryID: entry.id, dayKey: entry.dayKey, minutesFromMidnight: entry.minutesFromMidnight,
+                                 title: entry.title, bodyMarkdown: entry.bodyMarkdown, categoryID: entry.categoryID,
+                                 photos: entry.orderedPhotos.map { DraftPhoto(id: $0.id, storedPhotoID: $0.id) },
+                                 savedAt: .distantPast)
+        if let draft = drafts.load(), draft.entryID == entry.id, !draft.isEmpty {
+            // A leftover draft that only repeats what's saved isn't unsaved work: drop it quietly.
+            if draft.hasSameContent(as: baseline) { drafts.clear() } else { pendingDraft = draft }
+        }
         isLoading = false
     }
 
@@ -73,6 +90,7 @@ final class ComposerModel {
     // MARK: Drafts
 
     func startAutosave(context: Font.Context) {
+        if !hasChanges, pendingDraft == nil, editorBaseline == nil { editorBaseline = makeDraft(context: context) }
         autosave?.cancel()
         autosave = Task { [weak self] in
             while !Task.isCancelled {
@@ -87,16 +105,22 @@ final class ComposerModel {
         autosave = nil
     }
 
+    /// Keeps a draft only while there are unsaved changes compared with the saved entry; when
+    /// the writing matches it again (or is empty), the draft is removed.
     func writeDraftIfNeeded(context: Font.Context) {
-        guard editsSinceDraft else { return }
+        guard editsSinceDraft, !isFinished else { return }
         editsSinceDraft = false
         let draft = makeDraft(context: context)
-        if draft.isEmpty {
+        if draft.isEmpty || matchesSaved(draft) {
             drafts.clear()
         } else {
             let newPhotos = photos.reduce(into: [UUID: ProcessedPhoto]()) { $0[$1.id] = $1.processed }
             drafts.save(draft, newPhotos: newPhotos)
         }
+    }
+
+    private func matchesSaved(_ draft: ComposerDraft) -> Bool {
+        draft.hasSameContent(as: baseline) || editorBaseline.map(draft.hasSameContent(as:)) == true
     }
 
     func makeDraft(context: Font.Context) -> ComposerDraft {
@@ -131,6 +155,9 @@ final class ComposerModel {
         drafts.clear()
         pendingDraft = nil
     }
+
+    /// Whether a draft is on disk for this composer (tests).
+    var hasStoredDraft: Bool { drafts.load() != nil }
 
     // MARK: Photos
 
@@ -221,14 +248,21 @@ final class ComposerModel {
             }
         }
         store.setPhotoOrder(entry, ids: order)
-        stopAutosave()
-        drafts.clear()
-        hasChanges = false
+        finish()
         return entry
     }
 
     func discard() {
+        finish()
+    }
+
+    /// Saved or discarded: stop autosave, remove the draft, and write no more drafts — the
+    /// sheet's `onDisappear` would otherwise store the last few seconds of edits again.
+    private func finish() {
         stopAutosave()
         drafts.clear()
+        isFinished = true
+        editsSinceDraft = false
+        hasChanges = false
     }
 }

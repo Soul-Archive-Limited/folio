@@ -11,6 +11,7 @@ struct EntryDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showsDateSheet = false
     @State private var fullScreenPhoto: UUID?
+    @State private var sharesTextAndPhotos = false
 
     var body: some View {
         Group {
@@ -57,7 +58,9 @@ struct EntryDetailView: View {
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 Button("Edit", systemImage: "square.and.pencil") { request?.send(.editEntry(entry.id)) }
-                ShareLink(item: shareText(entry), subject: Text(entry.title))
+                // A small menu that says exactly what's shared (owner's iPhone test, Batch E).
+                Menu("Share", systemImage: "square.and.arrow.up") { EntryShareMenu(entry: entry) { sharesTextAndPhotos = true } }
+                    .accessibilityIdentifier("entry.share")
                 Menu("More", systemImage: "ellipsis") {
                     Button("Change date", systemImage: "calendar") { showsDateSheet = true }
                     Button("Duplicate", systemImage: "plus.square.on.square") { duplicate(entry) }
@@ -69,6 +72,7 @@ struct EntryDetailView: View {
         .sheet(isPresented: $showsDateSheet) {
             ChangeDateSheet(entry: entry)
         }
+        .textAndPhotosShare(isPresented: $sharesTextAndPhotos, entry: entry)
         .fullScreenCover(item: $fullScreenPhoto) { photoID in
             FullScreenPhotoViewer(photoIDs: entry.orderedPhotos.map(\.id), initial: photoID)
                 .privacyCovered()
@@ -85,11 +89,6 @@ struct EntryDetailView: View {
         let calendar = store.calendar
         let time = calendar.date(byAdding: .minute, value: minutes, to: day.startDate(in: calendar)) ?? .now
         return "\(date) · \(time.formatted(.dateTime.hour().minute()))"
-    }
-
-    private func shareText(_ entry: Entry) -> String {
-        let body = MarkdownCodec.document(from: entry.bodyMarkdown).plainText
-        return entry.title.isEmpty ? body : "\(entry.title)\n\n\(body)"
     }
 
     private func duplicate(_ entry: Entry) {

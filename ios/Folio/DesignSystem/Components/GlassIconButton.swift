@@ -10,7 +10,7 @@ struct GlassIconButton: View {
 
     var body: some View {
         if prominent {
-            button.buttonStyle(.glassProminent).tint(.ember)
+            button.buttonStyle(.glassProminent).tint(.emberStrong)
         } else {
             button.buttonStyle(.glass)
         }

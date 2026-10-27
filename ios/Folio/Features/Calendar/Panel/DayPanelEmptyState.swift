@@ -14,7 +14,7 @@ struct DayPanelEmptyState: View {
                 HStack(spacing: Spacing.s) {
                     Button("Write", systemImage: "square.and.pencil") { request?.send(.entry(day)) }
                         .buttonStyle(.glassProminent)
-                        .tint(.ember)
+                        .tint(.emberStrong)
                     Button("Add task", systemImage: "checklist") { request?.send(.task(day)) }
                         .buttonStyle(.glass)
                 }

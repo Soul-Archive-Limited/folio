@@ -41,6 +41,7 @@ struct DayPanel: View {
                                 .zoomSource(id: entry.id, in: zoomNamespace)
                         }
                         .buttonStyle(.pressable)
+                        .entryActions(entry)
                         .staggeredAppear(index: index)
                     }
                 }

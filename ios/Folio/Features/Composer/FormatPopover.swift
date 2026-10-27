@@ -48,7 +48,7 @@ struct FormatPopover: View {
         }
         .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
         .foregroundStyle(isOn ? AnyShapeStyle(.white) : AnyShapeStyle(.ink))
-        .background(isOn ? AnyShapeStyle(.ember) : AnyShapeStyle(.clear), in: .circle)
+        .background(isOn ? AnyShapeStyle(.emberStrong) : AnyShapeStyle(.clear), in: .circle)
         .glassEffect(.regular.interactive(), in: .circle)
         .accessibilityAddTraits(isOn ? .isSelected : [])
     }
@@ -65,7 +65,7 @@ struct FormatPopover: View {
         }
         .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
         .foregroundStyle(isOn ? AnyShapeStyle(.white) : AnyShapeStyle(.ink))
-        .background(isOn ? AnyShapeStyle(.ember) : AnyShapeStyle(.clear), in: .circle)
+        .background(isOn ? AnyShapeStyle(.emberStrong) : AnyShapeStyle(.clear), in: .circle)
         .glassEffect(.regular.interactive(), in: .circle)
         .accessibilityAddTraits(isOn ? .isSelected : [])
     }

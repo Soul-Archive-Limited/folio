@@ -14,7 +14,7 @@ struct GalleryMotionSection: View {
                         .labelStyle(.iconOnly)
                         .frame(width: 56, height: 56)
                         .foregroundStyle(.white)
-                        .glassEffect(.regular.tint(.ember).interactive(), in: .circle)
+                        .glassEffect(.regular.tint(.emberStrong).interactive(), in: .circle)
                         .glassEffectID("plus", in: glass)
                     if expanded {
                         Label("New entry", systemImage: "square.and.pencil")

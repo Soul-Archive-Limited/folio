@@ -15,7 +15,7 @@ struct ToastView: View {
             if let undo = message.undo {
                 Button(String(localized: undo.title), action: onUndo)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.ember)
+                    .foregroundStyle(.emberText)
                     .frame(minHeight: Spacing.minHitTarget)
             }
         }

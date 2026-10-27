@@ -1,96 +1,195 @@
 import SwiftUI
-import TipKit
 
-/// Runs the guided tour (SPEC §6.15) as one ordered `TipGroup` shared by every screen that
-/// anchors a tip, so only the current step is ever shown.
+/// Runs the guided tour (SPEC §6.15, reworked after the owner's iPhone test, Batch E):
+/// - a step's card never shows while the previous step's screen or sheet is still moving —
+///   the tour hides the card, navigates, waits for the transition, then shows the next one;
+/// - every card says where you are ("2 of 6") and has Back, Next and Skip tour;
+/// - steps that live on another screen go there by themselves (after the composer step the
+///   tour closes the composer and switches to To-do);
+/// - look-only steps move on after about 4 s, action steps when the user does the thing.
+///   With VoiceOver on, nothing moves on by itself.
 @Observable
 final class TourModel {
-    @ObservationIgnored let group = TipGroup(.ordered) {
-        MonthGridTip()
-        TapDayTip()
-        AddEntryTip()
-        ComposerToolsTip()
-        TodoTabTip()
-        ProfileTabTip()
+    /// The step the tour is on, nil when it isn't running.
+    private(set) var current: TourStep?
+    /// The step whose card is on screen. Lags `current` while a transition settles.
+    private(set) var visible: TourStep?
+    /// Anchor frames in global coordinates, reported by `.tourAnchor(_:)`.
+    var anchors: [TourStep: CGRect] = [:]
+
+    /// Whether the open composer has writing in it; the composer reports it. The tour never
+    /// closes a composer with writing in it, and its card steps aside while the user types.
+    private(set) var composerHasChanges = false
+
+    /// Set by `MainTabView` so the tour can move between screens.
+    @ObservationIgnored var navigator: TourNavigator?
+    /// Where to go once the user closes a composer the tour couldn't close for them.
+    @ObservationIgnored private var afterComposerCloses: TourStep?
+    @ObservationIgnored private var pending: Task<Void, Never>?
+    @ObservationIgnored private let defaults: UserDefaults
+    @ObservationIgnored private let settle: Duration
+
+    static let autoAdvanceDelay: Duration = .seconds(4)
+    private static let stepKey = "tourStep"
+
+    init(defaults: UserDefaults = .standard, settle: Duration = .milliseconds(550)) {
+        self.defaults = defaults
+        self.settle = settle
     }
 
-    private static let allTips: [any Tip] = [
-        MonthGridTip(), TapDayTip(), AddEntryTip(), ComposerToolsTip(), TodoTabTip(), ProfileTabTip(),
-    ]
+    var isRunning: Bool { current != nil }
 
-    /// The tip to show now, if it's of the type the caller anchors.
-    func current<T: Tip>(_ type: T.Type) -> T? {
-        group.currentTip as? T
+    /// Whether `visible` should move on by itself (look-only, and VoiceOver is off).
+    var autoAdvances: Bool {
+        guard let visible else { return false }
+        return visible.isLookOnly && !UIAccessibility.isVoiceOverRunning && !(visible == .composerTools && composerHasChanges)
     }
 
-    func start() {
-        MonthGridTip.tourActive = true
-    }
+    // MARK: Starting and stopping
+
+    /// After onboarding and its greeting.
+    func start() { go(to: .month) }
 
     /// Profile → Help → "Show the tour again".
-    func replay() async {
-        for tip in Self.allTips { await tip.resetEligibility() }
-        MonthGridTip.tourActive = true
+    func replay() { go(to: .month) }
+
+    /// Picks up a tour the app was closed in the middle of, at that step's screen. Inside the
+    /// composer it restarts from "+" instead, since the composer isn't open after a launch.
+    func resumeIfNeeded() {
+        guard current == nil, let step = TourStep(rawValue: defaults.integer(forKey: Self.stepKey)) else { return }
+        go(to: step == .composerTools ? .add : step)
     }
 
-    func skip() {
-        for tip in Self.allTips { tip.invalidate(reason: .tipClosed) }
-        MonthGridTip.tourActive = false
+    func skip() { stop() }
+
+    private func stop() {
+        pending?.cancel()
+        afterComposerCloses = nil
+        current = nil
+        visible = nil
+        defaults.removeObject(forKey: Self.stepKey)
     }
 
-    /// Routes a tip's buttons: Next and Got it finish that step, Skip ends the tour.
-    func handle(_ action: Tips.Action, for tip: some Tip) {
-        switch action.id {
-        case TourAction.skip: skip()
-        default: tip.invalidate(reason: .actionPerformed)
+    // MARK: Buttons
+
+    func next() {
+        guard let current else { return }
+        if let step = current.next { go(to: step) } else { stop() }
+    }
+
+    func back() {
+        guard let step = current?.previous else { return }
+        go(to: step)
+    }
+
+    // MARK: Things the user does
+
+    func didSelectDay() {
+        if current == .tapDay { next() }
+    }
+
+    /// The composer opened. On "+" that's the step done; the tools card shows once the sheet
+    /// has finished rising.
+    func didOpenComposer() {
+        guard current == .add else { return }
+        show(.composerTools, after: settle)
+    }
+
+    /// The user closed the composer themselves while its card was up (Save or Cancel).
+    func didCloseComposer() {
+        composerHasChanges = false
+        guard current == .composerTools else { return }
+        let step = afterComposerCloses ?? .todo
+        afterComposerCloses = nil
+        go(to: step)
+    }
+
+    /// Typing in the composer hides its card; closing the composer carries on to To-do.
+    func composerChanged(hasChanges: Bool) {
+        composerHasChanges = hasChanges
+        if hasChanges, visible == .composerTools { visible = nil }
+    }
+
+    // MARK: Moving
+
+    /// Hides the card, moves to the step's screen, waits for the transition, then shows it.
+    func go(to step: TourStep) {
+        let from = current
+        visible = nil
+        current = step
+        defaults.set(step.rawValue, forKey: Self.stepKey)
+        var moved = false
+        if let navigator {
+            if step == .composerTools {
+                if !navigator.isComposerOpen() { navigator.openComposer(); moved = true }
+            } else if navigator.isComposerOpen() {
+                // Only an empty composer is closed for the user; one with writing in it waits
+                // for them to save or cancel (didCloseComposer carries on from there).
+                guard !composerHasChanges else {
+                    current = .composerTools
+                    afterComposerCloses = step
+                    return
+                }
+                navigator.closeComposer()
+                moved = true
+            }
+            if navigator.selectedTab() != step.tab {
+                navigator.select(step.tab)
+                moved = true
+            }
+        }
+        show(step, after: moved || from == nil ? settle : .zero)
+    }
+
+    private func show(_ step: TourStep, after delay: Duration) {
+        pending?.cancel()
+        visible = nil
+        current = step
+        defaults.set(step.rawValue, forKey: Self.stepKey)
+        pending = Task { [weak self] in
+            if delay > .zero { try? await Task.sleep(for: delay) }
+            // Wait (briefly) for the step's anchor to be laid out on its screen.
+            for _ in 0..<20 where self?.hasAnchor(for: step) == false {
+                try? await Task.sleep(for: .milliseconds(50))
+            }
+            guard let self, !Task.isCancelled, self.current == step else { return }
+            self.visible = step
+            await self.autoAdvance(from: step)
         }
     }
 
-    // MARK: Steps that finish when the user does the thing
+    private func hasAnchor(for step: TourStep) -> Bool {
+        step == .todo || step == .profile || anchors[step] != nil
+    }
 
-    func didSelectDay() { TapDayTip().invalidate(reason: .actionPerformed) }
-    func didOpenComposer() { AddEntryTip().invalidate(reason: .actionPerformed) }
-    func didCloseComposer() { ComposerToolsTip().invalidate(reason: .actionPerformed) }
-
-    func didSelect(_ tab: AppTab) {
-        switch tab {
-        case .todo: TodoTabTip().invalidate(reason: .actionPerformed)
-        case .profile:
-            ProfileTabTip().invalidate(reason: .actionPerformed)
-            MonthGridTip.tourActive = false
-        default: break
-        }
+    private func autoAdvance(from step: TourStep) async {
+        guard autoAdvances else { return }
+        try? await Task.sleep(for: Self.autoAdvanceDelay)
+        guard !Task.isCancelled, visible == step, autoAdvances else { return }
+        next()
     }
 
     // MARK: Setup
 
-    /// Call once from `App.init`, before any tip can show.
-    static func configure() {
+    /// DEBUG `-FolioTourStep N` starts the tour at step N; UI tests pass
+    /// `-com.apple.TipKit.HideAllTips 1` (kept from the TipKit tour) or `-FolioNoTour YES` to
+    /// keep it away.
+    static func configure(defaults: UserDefaults = .standard) {
         #if DEBUG
-        let step = UserDefaults.standard.integer(forKey: "FolioTourStep")
-        if step > 0 { try? Tips.resetDatastore() }
-        #endif
-        do {
-            try Tips.configure([.displayFrequency(.immediate), .datastoreLocation(.applicationDefault)])
-        } catch {
-            FolioPersistence.logger.error("TipKit configuration failed: \(String(describing: type(of: error)), privacy: .public)")
+        if defaults.bool(forKey: "com.apple.TipKit.HideAllTips") || defaults.bool(forKey: "FolioNoTour") {
+            defaults.removeObject(forKey: stepKey)
         }
-        #if DEBUG
-        if step > 0 {
-            MonthGridTip.tourActive = true
-            for tip in allTips.prefix(step - 1) { tip.invalidate(reason: .actionPerformed) }
-        }
+        let step = defaults.integer(forKey: "FolioTourStep")
+        if TourStep(rawValue: step) != nil { defaults.set(step, forKey: stepKey) }
         #endif
     }
 }
 
-extension View {
-    /// Anchors a tour tip here when it's the current step, wiring its buttons to the tour.
-    func tourTip<T: Tip>(_ type: T.Type, _ tour: TourModel?, arrowEdge: Edge = .top) -> some View {
-        let tip = tour?.current(type)
-        return popoverTip(tip, arrowEdge: arrowEdge) { action in
-            if let tip { tour?.handle(action, for: tip) }
-        }
-        .tint(.ember)
-    }
+/// What the tour may do to the app's navigation; supplied by `MainTabView`.
+struct TourNavigator {
+    let selectedTab: () -> AppTab
+    let select: (AppTab) -> Void
+    let isComposerOpen: () -> Bool
+    let openComposer: () -> Void
+    let closeComposer: () -> Void
 }

@@ -46,8 +46,8 @@ struct ProfileView: View {
 
                 Section("Help") {
                     Button {
-                        Task { await tour?.replay() }
                         router?.open(.daysWrittenOn)
+                        tour?.replay()
                     } label: {
                         ProfileRowLabel(title: "Show the tour again", systemImage: "sparkles.rectangle.stack")
                     }
@@ -98,7 +98,7 @@ struct ProfileView: View {
             }
             .listStyle(.insetGrouped)
             .scrollContentBackground(.hidden)
-            .tint(.ember)
+            .tint(.emberStrong)
             .background { AuraBackground() }
             .navigationTitle("Profile")
             .navigationDestination(isPresented: $showsCategories) { CategoriesManagerView() }

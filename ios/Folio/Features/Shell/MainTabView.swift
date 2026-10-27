@@ -39,8 +39,8 @@ struct MainTabView: View {
             }
         }
         .tabBarMinimizeBehavior(selection.minimisesTabBar ? .onScrollDown : .never)
-        .overlay(alignment: .bottom) { TabBarTourAnchors(tour: tour) }
-        .onChange(of: selection) { _, tab in tour?.didSelect(tab) }
+        .tourHost(.main, tour)
+        .onAppear(perform: connectTour)
         .onChange(of: requester.pending?.id) { old, new in
             if new != nil { tour?.didOpenComposer() } else if old != nil { tour?.didCloseComposer() }
         }
@@ -107,6 +107,23 @@ struct MainTabView: View {
 
     private func present(_ request: NewItemRequest) {
         requester.send(request)
+    }
+
+    /// Lets the tour move between tabs and open or close the composer (SPEC §6.15).
+    private func connectTour() {
+        tour?.navigator = TourNavigator(
+            selectedTab: { selection },
+            select: { tab in
+                calendar?.path = []
+                selection = tab
+            },
+            isComposerOpen: { requester.pending != nil },
+            openComposer: {
+                calendar?.path = []
+                requester.send(.entry(calendar?.selectedDay ?? store.today))
+            },
+            closeComposer: { requester.pending = nil }
+        )
     }
 }
 

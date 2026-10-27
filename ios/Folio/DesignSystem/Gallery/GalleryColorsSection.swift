@@ -4,7 +4,7 @@ import SwiftUI
 struct GalleryColorsSection: View {
     private let tokens: [(String, ColorResource)] = [
         ("bg", .bg), ("bgElevated", .bgElevated), ("ink", .ink), ("inkSecondary", .inkSecondary),
-        ("inkTertiary", .inkTertiary), ("hairline", .hairline), ("ember", .ember), ("done", .done),
+        ("inkTertiary", .inkTertiary), ("hairline", .hairline), ("ember", .ember), ("emberStrong", .emberStrong), ("emberText", .emberText), ("done", .done),
         ("danger", .danger), ("aura1", .aura1), ("aura2", .aura2), ("aura3", .aura3),
     ]
 

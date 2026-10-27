@@ -1,9 +1,11 @@
 import SwiftUI
 
-/// The one-line glass explainer shown before any system permission prompt (SPEC §7).
+/// The glass explainer shown before any system permission prompt (SPEC §7). One explainer
+/// may cover several prompts in a row (dictation: microphone, then speech recognition).
 struct PermissionExplainer: View {
     let systemImage: String
     let message: LocalizedStringKey
+    var footnote: LocalizedStringKey?
     let onContinue: () -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -20,18 +22,24 @@ struct PermissionExplainer: View {
                 .folioFont(.body)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
+            if let footnote {
+                Text(footnote)
+                    .folioFont(.callout)
+                    .foregroundStyle(.inkSecondary)
+                    .multilineTextAlignment(.center)
+            }
             GlassEffectContainer(spacing: Spacing.s) {
                 HStack(spacing: Spacing.s) {
                     Button("Not now") { dismiss() }
                         .buttonStyle(.glass)
                     Button("Continue", action: onContinue)
                         .buttonStyle(.glassProminent)
-                        .tint(.ember)
+                        .tint(.emberStrong)
                 }
             }
         }
         .padding(Spacing.xl)
-        .presentationDetents([.height(300)])
+        .presentationDetents([.height(footnote == nil ? 300 : 340)])
         .presentationDragIndicator(.visible)
     }
 }

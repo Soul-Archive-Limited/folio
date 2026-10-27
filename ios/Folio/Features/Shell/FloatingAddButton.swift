@@ -28,7 +28,7 @@ struct FloatingAddButton: View {
                         .font(.title2.weight(.semibold))
                         .foregroundStyle(.white)
                         .frame(width: FloatingButtonMetrics.diameter, height: FloatingButtonMetrics.diameter)
-                        .glassEffect(.regular.tint(.ember).interactive(), in: .circle)
+                        .glassEffect(.regular.tint(.emberStrong).interactive(), in: .circle)
                         .glassEffectID("add", in: glass)
                         .glassEffectTransition(reduceMotion ? .identity : .materialize)
                 } primaryAction: {
@@ -38,7 +38,7 @@ struct FloatingAddButton: View {
                 .accessibilityHint("Touch and hold for more options")
                 .accessibilityInputLabels(["New entry", "Plus", "Add"])
                 .matchedTransitionSource(id: Self.transitionID, in: namespace)
-                .tourTip(AddEntryTip.self, tour, arrowEdge: .bottom)
+                .tourAnchor(.add, tour)
                 .transition(FolioMotion.transition(.scale(scale: 0.4).combined(with: .opacity), reduceMotion: reduceMotion))
             }
         }

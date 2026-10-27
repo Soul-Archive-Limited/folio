@@ -32,9 +32,12 @@ struct EntryCard: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(Spacing.s)
-        .folioGlass(in: .rect(cornerRadius: Radius.card), interactive: true)
+        // Behind the content and not interactive: either would take the long press from the
+        // card's context menu.
+        .folioGlass(in: .rect(cornerRadius: Radius.card), behindContent: true)
         .accessibilityElement(children: .combine)
         .accessibilityHint("Opens the entry")
+        .accessibilityIdentifier("entry-card")
     }
 
     private var preview: String {

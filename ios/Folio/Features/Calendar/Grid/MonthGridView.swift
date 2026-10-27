@@ -40,7 +40,7 @@ struct MonthGridView: View {
                         .contextMenu {
                             DayContextMenu(day: day)
                         }
-                        .modifier(TodayTourTip(isToday: inMonth && day == today, tour: tour))
+                        .modifier(TodayTourAnchor(isToday: inMonth && day == today, tour: tour))
                     }
                 }
                 .opacity(row == selectedRow ? 1 : 1 - progress)
@@ -58,11 +58,11 @@ struct MonthGridView: View {
 }
 
 /// Tour step 2 points at today's cell (SPEC §6.15).
-private struct TodayTourTip: ViewModifier {
+private struct TodayTourAnchor: ViewModifier {
     let isToday: Bool
     let tour: TourModel?
 
     func body(content: Content) -> some View {
-        if isToday { content.tourTip(TapDayTip.self, tour, arrowEdge: .top) } else { content }
+        if isToday { content.tourAnchor(.tapDay, tour) } else { content }
     }
 }

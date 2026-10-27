@@ -18,7 +18,7 @@ struct TaskDateChip: View {
             .foregroundStyle(overdue ? AnyShapeStyle(.white) : AnyShapeStyle(.inkSecondary))
             .padding(.horizontal, overdue ? Spacing.xs : 0)
             .padding(.vertical, overdue ? 2 : 0)
-            .background(overdue ? AnyShapeStyle(.ember) : AnyShapeStyle(.clear), in: .capsule)
+            .background(overdue ? AnyShapeStyle(.emberStrong) : AnyShapeStyle(.clear), in: .capsule)
             .accessibilityLabel(overdue ? "Overdue, \(label(day))" : label(day))
         }
     }

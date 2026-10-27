@@ -38,7 +38,7 @@ struct ComposerToolRow: View {
         .padding(.horizontal, Spacing.s)
         .frame(minHeight: 52)
         .folioGlass(in: .capsule)
-        .tourTip(ComposerToolsTip.self, tour, arrowEdge: .bottom)
+        .tourAnchor(.composerTools, tour)
         .padding(.horizontal, Spacing.sideMargin)
         .padding(.bottom, Spacing.xs)
     }

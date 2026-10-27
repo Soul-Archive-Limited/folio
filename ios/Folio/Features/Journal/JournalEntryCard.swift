@@ -11,8 +11,8 @@ struct JournalEntryCard: View {
             // A clear 16:9 frame carries the size; the photo fills it (an image would impose its own ratio).
             Color.clear
                 .aspectRatio(16 / 9, contentMode: .fit)
-                .overlay { FullPhotoImage(photoID: cover.id, rendition: .display, maxPixel: 1080) }
-                .clipped()
+                .overlay { FullPhotoImage(photoID: cover.id, rendition: .display, maxPixel: 1080, cornerRadius: Radius.card) }
+                .clipShape(.rect(cornerRadius: Radius.card))
                 .overlay(alignment: .bottomLeading) {
                     VStack(alignment: .leading, spacing: 2) {
                         dateLine.foregroundStyle(.white.opacity(0.85))
@@ -23,8 +23,10 @@ struct JournalEntryCard: View {
                     .background(LinearGradient(colors: [.black.opacity(0.6), .clear], startPoint: .bottom, endPoint: .top))
                 }
                 .clipShape(.rect(cornerRadius: Radius.card))
+                .contentShape(.rect(cornerRadius: Radius.card))
                 .overlay { RoundedRectangle(cornerRadius: Radius.card).strokeBorder(.hairline, lineWidth: 1) }
                 .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("entry-card")
         } else {
             VStack(alignment: .leading, spacing: Spacing.xxs) {
                 dateLine.foregroundStyle(.inkTertiary)
@@ -36,8 +38,11 @@ struct JournalEntryCard: View {
             }
             .padding(Spacing.m)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .folioGlass(in: .rect(cornerRadius: Radius.card), interactive: true)
+            // Behind the content and not interactive: either would take the long press
+            // from the card's context menu.
+            .folioGlass(in: .rect(cornerRadius: Radius.card), behindContent: true)
             .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("entry-card")
         }
     }
 

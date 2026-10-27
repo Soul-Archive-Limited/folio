@@ -13,6 +13,16 @@ nonisolated struct ComposerDraft: Codable, Equatable, Sendable {
     var photos: [DraftPhoto] = []
     var savedAt: Date
 
+    /// Same writing, ignoring when it was saved and whitespace at the ends of the text, so a
+    /// draft that only repeats the saved entry never counts as unsaved work.
+    func hasSameContent(as other: ComposerDraft) -> Bool {
+        func trimmed(_ text: String) -> String { text.trimmingCharacters(in: .whitespacesAndNewlines) }
+        return entryID == other.entryID && dayKey == other.dayKey && minutesFromMidnight == other.minutesFromMidnight
+            && trimmed(title) == trimmed(other.title) && trimmed(bodyMarkdown) == trimmed(other.bodyMarkdown)
+            && categoryID == other.categoryID
+            && photos.map { $0.storedPhotoID ?? $0.id } == other.photos.map { $0.storedPhotoID ?? $0.id }
+    }
+
     var isEmpty: Bool {
         title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             && bodyMarkdown.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty

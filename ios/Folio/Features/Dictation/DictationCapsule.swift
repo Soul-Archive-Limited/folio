@@ -17,7 +17,7 @@ struct DictationCapsule: View {
                 Image(systemName: "arrow.down.circle").foregroundStyle(.ember).accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: Spacing.xxs) {
                     Text("Getting dictation ready on your iPhone…").folioFont(.callout).foregroundStyle(.ink)
-                    ProgressView(value: fraction).tint(.ember)
+                    ProgressView(value: fraction).tint(.emberStrong)
                         .accessibilityLabel("Speech model download")
                         .accessibilityValue(Text(fraction, format: .percent.precision(.fractionLength(0))))
                 }
@@ -42,7 +42,7 @@ struct DictationCapsule: View {
                     .disabled(session.state == .preparing)
                 Button("Done", action: onDone)
                     .buttonStyle(.glassProminent)
-                    .tint(.ember)
+                    .tint(.emberStrong)
             }
         }
         .padding(.horizontal, Spacing.m)

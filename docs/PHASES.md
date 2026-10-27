@@ -30,6 +30,12 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - [x] Part 3 — Phase 11 website
 - [x] Part 4 — Xcode Cloud → TestFlight (workflow set up; first build from tag `testflight-0.1.0`)
 
+### Batch E checklist
+- [x] Part 1 — Batch D fixes (owner's iPhone test of 0.1.0 (1))
+- [ ] Part 2 — Phase 9 backend
+- [ ] Part 3 — Phase 10 iPhone sign-in, encryption, sync
+- [ ] Part 4 — TestFlight build from this Mac + owner's test list
+
 ## Log
 
 ### Phase 0 — Setup (2026-10-25)
@@ -112,3 +118,8 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 ### Xcode Cloud → TestFlight (2026-10-27)
 - `ios/ci_scripts/ci_post_clone.sh` (XcodeGen), build number from `CI_BUILD_NUMBER`, `ITSAppUsesNonExemptEncryption = NO`, privacy manifest, `scripts/testflight.sh` fallback.
 - App Store Connect app "Folio Diary"; workflow "TestFlight" builds only on `testflight-*` tags (owner's budget: about two builds across all phases) and sends to the internal group Owner.
+
+### Batch D fixes (2026-10-28)
+- One explainer for microphone + speech recognition; "Past day" pill in Journal; onboarding keyboard always dismissed.
+- Tour rebuilt without TipKit: "n of 6", Back/Next/Skip, moves between screens itself, waits for transitions, auto-advances look-only steps.
+- Photos clipped to their containers (incl. zoom sources); photo tiles get a scrim; swipe + long-press actions on entry cards; drafts only for real changes; Share menu (text / text + photos / image card); `emberStrong`/`emberText` tokens (website home accessibility 100).

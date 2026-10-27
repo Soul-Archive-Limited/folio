@@ -162,7 +162,7 @@ struct TodoScreen: View {
             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                 Button("Delete", systemImage: "trash", role: .destructive) { delete(task) }
                 Button("Edit", systemImage: "pencil") { editing = task }.tint(.indigo)
-                Button("Date", systemImage: "calendar") { rescheduling = task }.tint(.ember)
+                Button("Date", systemImage: "calendar") { rescheduling = task }.tint(.emberStrong)
             }
             .contextMenu {
                 Button("Edit", systemImage: "pencil") { editing = task }

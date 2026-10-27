@@ -17,12 +17,13 @@ import Foundation
 /// - `-FolioCollapsed YES` collapses the calendar to the selected week.
 /// - `-FolioSkipGreeting YES` skips the launch greeting (UI tests).
 /// - `-FolioSeedTask "Title"` adds one task for today (UI tests).
+/// - `-FolioSeedEntry "Title"` adds one entry for today (UI tests).
 /// - `-FolioTab calendar|journal|todo|profile` opens a tab.
 /// - `-FolioJournalMode photos` opens the Journal's Photos view.
 /// - `-FolioTodoFilter Family` filters the To-do list by a category name.
 /// - `-FolioOpen composer|composerLarge|taskComposer|entry|categories|categoryEdit` opens a screen
 ///   (composerLarge and entry use the selected day's first entry; categoryEdit edits the first category).
-/// - `-FolioTourStep N` resets TipKit and starts the tour at step N (1–6).
+/// - `-FolioTourStep N` starts the tour at step N (1–6); `-FolioNoTour YES` keeps it away.
 /// - `-FolioOnboardingPage N` opens onboarding at page N (0–4) when it shows.
 /// - `-FolioDemo dictation|intelligence` scripted dictation / canned ✦ results (screenshots).
 /// - `-FolioOpenTool mic|titles|polish|tasks` opens that tool in the composer.
@@ -55,6 +56,9 @@ enum DebugLaunchOptions {
         if defaults.bool(forKey: "FolioStressData"), store.isEmpty { PreviewData.loadStressData(into: store) }
         if defaults.bool(forKey: "FolioTrashSamples") { PreviewData.trashSamples(in: store) }
         if let title = defaults.string(forKey: "FolioSeedTask") { _ = try? store.createTask(title: title, day: store.today) }
+        if let title = defaults.string(forKey: "FolioSeedEntry") {
+            _ = try? store.createEntry(title: title, body: "Seeded for a UI test.", day: store.today)
+        }
         if let name = defaults.string(forKey: "displayName"), store.settings().displayName != name {
             store.updateSettings { $0.displayName = name }
         }

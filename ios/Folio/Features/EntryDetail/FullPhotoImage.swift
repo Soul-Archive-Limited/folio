@@ -14,16 +14,23 @@ struct FullPhotoImage: View {
     @State private var image: UIImage?
 
     var body: some View {
-        ZStack {
-            PhotoTile(photoID: photoID, cornerRadius: cornerRadius)
-            if let image {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFill()
-                    .transition(.opacity)
+        // A shape carries the size, so the view is exactly the frame it's given; a ZStack
+        // would grow to the scaled-to-fill image and its clip with it, letting the photo draw
+        // outside its rounded container (owner's iPhone test, Batch E).
+        Rectangle()
+            .fill(.clear)
+            .overlay { PhotoTile(photoID: photoID, cornerRadius: cornerRadius) }
+            .overlay {
+                if let image {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .clipShape(.rect(cornerRadius: cornerRadius))
+                        .transition(.opacity)
+                }
             }
-        }
-        .clipShape(.rect(cornerRadius: cornerRadius))
+            .clipShape(.rect(cornerRadius: cornerRadius))
+            .contentShape(.rect(cornerRadius: cornerRadius))
         .animation(.easeOut(duration: 0.2), value: image != nil)
         .task(id: photoID) {
             image = DisplayImageCache.shared.cached(photoID, rendition: rendition, maxPixel: maxPixel)

@@ -64,7 +64,7 @@ struct TrashPreviewSheet: View {
                     Label("Restore", systemImage: "arrow.uturn.backward").frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.glassProminent)
-                .tint(.ember)
+                .tint(.emberStrong)
                 Button(role: .destructive) { confirmsDelete = true } label: {
                     Label("Delete now", systemImage: "trash").frame(maxWidth: .infinity)
                 }

@@ -109,7 +109,7 @@ struct WritingToolsSheet: View {
                         ForEach($tasks) { $task in
                             Toggle(isOn: $task.isOn) { Text(task.title).folioFont(.body) }
                                 .toggleStyle(.switch)
-                                .tint(.ember)
+                                .tint(.emberStrong)
                         }
                     } footer: {
                         Text("Ticked tasks are added to \(model.day.startDate(in: store.calendar).formatted(.dateTime.weekday(.wide).day().month(.wide))).")
@@ -131,13 +131,13 @@ struct WritingToolsSheet: View {
                         model.body = RichTextBridge.attributedString(fromMarkdown: polished, writingFont: model.writingFont)
                         dismiss()
                     }
-                    .buttonStyle(.glassProminent).tint(.ember)
+                    .buttonStyle(.glassProminent).tint(.emberStrong)
                 }
             }
             if tool == .tasks, tasks.contains(where: \.isOn) {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Add \(tasks.count { $0.isOn })", action: addTasks)
-                        .buttonStyle(.glassProminent).tint(.ember)
+                        .buttonStyle(.glassProminent).tint(.emberStrong)
                 }
             }
         }

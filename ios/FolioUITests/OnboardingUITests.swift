@@ -21,21 +21,50 @@ final class OnboardingUITests: XCTestCase {
         let name = app.textFields["Your name"]
         XCTAssertTrue(name.waitForExistence(timeout: 10))
         name.tap()
-        name.typeText("Sam\n")  // Return submits, like Continue (which the keyboard covers)
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 3))
+        name.typeText("Sam\n")  // Return is Continue while the keyboard covers the buttons
 
         XCTAssertTrue(app.staticTexts["Keep your diary in sync?"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 3), "the keyboard never follows to the next page")
         app.buttons["Continue with Apple"].firstMatch.tap()
         XCTAssertTrue(app.staticTexts["Available after Phase 10"].waitForExistence(timeout: 10),
                       "sign-in isn't wired yet, and says so")
         Thread.sleep(forTimeInterval: pace)
         app.buttons["Not now — keep it on this iPhone"].tap()
 
-        // Greeting, then the tour's first tip on the calendar.
+        // Greeting, then the tour's first step on the calendar, with its count.
         XCTAssertTrue(app.staticTexts["Your month"].waitForExistence(timeout: 30), "tour starts after the greeting")
+        XCTAssertEqual(app.staticTexts["tour.count"].label.lowercased(), "step 1 of 6")
         Thread.sleep(forTimeInterval: pace)
-        app.buttons["Next"].firstMatch.tap()
+        app.buttons["Next"].firstMatch.press(forDuration: 0.15)
         XCTAssertTrue(app.staticTexts["Tap a day"].waitForExistence(timeout: 10))
+        XCTAssertEqual(app.staticTexts["tour.count"].label.lowercased(), "step 2 of 6")
         Thread.sleep(forTimeInterval: pace * 2)
+    }
+
+    /// Batch E fix 3: a tap outside the name field, and Skip, both put the keyboard away.
+    @MainActor
+    func testNameKeyboardDismisses() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-hasOnboarded", "NO", "-FolioOnboardingPage", "3", "-FolioNoTour", "YES",
+                               "-AppleLocale", "en_GB", "-AppleLanguages", "(en-GB)"]
+        app.launch()
+        let name = app.textFields["Your name"]
+        XCTAssertTrue(name.waitForExistence(timeout: 20))
+        name.tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 3))
+        app.staticTexts["What should we call you?"].tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 3), "tap outside dismisses")
+
+        name.tap()
+        name.typeText("Sam")
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 3))
+        // Tap empty space (the keyboard covers the buttons), then Skip.
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.15)).tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 3), "tap on empty space dismisses")
+        tapVisible(app.buttons.matching(identifier: "Skip"), in: app)
+        XCTAssertTrue(app.staticTexts["Keep your diary in sync?"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 3), "Skip dismisses")
     }
 
     /// Pages off screen keep their buttons in the tree; tap the one that's on screen.

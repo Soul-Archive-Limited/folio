@@ -11,9 +11,10 @@ struct JournalTimeline: View {
                 ForEach(section.entries) { entry in
                     NavigationLink(value: entry.id) {
                         JournalEntryCard(entry: entry)
-                            .matchedTransitionSource(id: entry.id, in: zoom)
+                            .zoomSource(id: entry.id, in: zoom)
                     }
                     .buttonStyle(.pressable)
+                    .entryActions(entry)
                     .padding(.horizontal, Spacing.sideMargin)
                 }
             } header: {

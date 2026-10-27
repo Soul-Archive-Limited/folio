@@ -30,7 +30,7 @@ struct CalendarGridArea: View {
         .clipShape(.rect(cornerRadius: Radius.card))
         .contentShape(.rect(cornerRadius: Radius.card))
         .folioGlass(in: .rect(cornerRadius: Radius.card))
-        .tourTip(MonthGridTip.self, tour, arrowEdge: .top)
+        .tourAnchor(.month, tour)
         .onChange(of: model.jumpCount) { playJump() }
         .onChange(of: model.visibleMonthID) { _, id in
             if let id { model.monthDidChange(to: MonthKey(year: 0, month: id + 1)) }

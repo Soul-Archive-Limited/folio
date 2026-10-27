@@ -40,7 +40,7 @@ struct OnboardingWelcomePage: View {
                 Text("Continue").frame(maxWidth: .infinity, minHeight: 44)
             }
             .buttonStyle(.glassProminent)
-            .tint(.ember)
+            .tint(.emberStrong)
             .padding(.horizontal, Spacing.xxl)
             .padding(.bottom, OnboardingPageDots.clearance)
         }

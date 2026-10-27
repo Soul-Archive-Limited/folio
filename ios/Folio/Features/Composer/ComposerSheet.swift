@@ -23,6 +23,7 @@ struct ComposerSheet: View {
     @State private var dictation = DictationController()
     @State private var assistant = WritingAssistant()
     @State private var writingTool: WritingTool?
+    @Environment(TourModel.self) private var tour: TourModel?
 
     enum Field { case title, body }
 
@@ -58,6 +59,8 @@ struct ComposerSheet: View {
             .animation(reduceMotion ? FolioMotion.reduced : .spring(duration: 0.4, bounce: 0.2), value: dictation.isVisible)
             .navigationBarTitleDisplayMode(.inline)
         }
+        .tourHost(.composer, tour)
+        .onChange(of: model.hasChanges) { _, changed in tour?.composerChanged(hasChanges: changed) }
         .presentationDetents([.medium, .large], selection: $detent)
         .presentationBackgroundInteraction(.enabled(upThrough: .medium))
         .presentationDragIndicator(.visible)
@@ -134,7 +137,7 @@ struct ComposerSheet: View {
         ToolbarItem(placement: .confirmationAction) {
             Button("Save", action: save)
                 .buttonStyle(.glassProminent)
-                .tint(.ember)
+                .tint(.emberStrong)
                 .disabled(!model.hasContent)
         }
     }

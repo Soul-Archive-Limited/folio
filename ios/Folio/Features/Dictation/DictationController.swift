@@ -2,8 +2,10 @@ import AVFoundation
 import Speech
 import SwiftUI
 
-/// Runs the microphone flow for a composer (SPEC §7, §8): a one-line explainer before the
-/// first system prompt, a gentle "Open Settings" path when access is off, then the session.
+/// Runs the microphone flow for a composer (SPEC §7, §8): one explainer before the first
+/// system prompt, covering both prompts iOS shows (microphone, then speech recognition —
+/// confirmed on the owner's iPhone, Batch E), a gentle "Open Settings" path when either is
+/// off, then the session.
 @Observable
 final class DictationController {
     let session = DictationSession()
@@ -31,17 +33,18 @@ final class DictationController {
             Task { await session.finish() }
             return
         }
-        switch AVAudioApplication.shared.recordPermission {
+        switch DictationAccess.current {
         case .granted: Task { await session.start(locale: Self.preferredLocale) }
-        case .undetermined: showsExplainer = true
-        default: showsDenied = true
+        case .needsPrompt: showsExplainer = true
+        case .denied: showsDenied = true
         }
     }
 
+    /// Continue on the explainer: both system prompts, back to back, then the session.
     func requestAccess() {
         showsExplainer = false
         Task {
-            if await AVAudioApplication.requestRecordPermission() {
+            if await DictationAccess.request() {
                 await session.start(locale: Self.preferredLocale)
             } else {
                 showsDenied = true
@@ -68,17 +71,18 @@ private struct DictationPermissionsModifier: ViewModifier {
             .sheet(isPresented: $controller.showsExplainer) {
                 PermissionExplainer(
                     systemImage: "mic",
-                    message: "Folio uses the microphone only while you dictate. Audio is processed on your iPhone and never stored or sent anywhere.",
+                    message: "Dictation needs the microphone and speech recognition. Both are processed on your iPhone — your voice is never stored or sent anywhere.",
+                    footnote: "iOS will ask for each one next.",
                     onContinue: controller.requestAccess
                 )
             }
-            .alert("Microphone is off for Folio", isPresented: $controller.showsDenied) {
+            .alert("Dictation is off for Folio", isPresented: $controller.showsDenied) {
                 Button("Open Settings") {
                     if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
                 }
                 Button("Not now", role: .cancel) {}
             } message: {
-                Text("You can turn it on in Settings whenever you'd like to dictate entries.")
+                Text("Turn on Microphone and Speech Recognition in Settings whenever you'd like to dictate entries.")
             }
     }
 }

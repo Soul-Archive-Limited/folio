@@ -1,5 +1,5 @@
 {
-  "$comment": "Folio colour tokens (SPEC §3.2). Source of truth for iOS asset colours (scripts/generate-ios-colors.py) and, from Phase 11, the web CSS variables. Values are sRGB hex; alpha 0-1. 'contrast' = Increase Contrast variant.",
+  "$comment": "Folio colour tokens (SPEC §3.2). Source of truth for iOS asset colours (scripts/generate-ios-colors.py) and, from Phase 11, the web CSS variables. Values are sRGB hex; alpha 0-1. 'contrast' = Increase Contrast variant. 'ember' is for non-text accents (dots, rings, icons); 'emberStrong' fills anything with white text on it (buttons, selected states; white on it ≥ 4.5:1); 'emberText' is ember-coloured text on the page background (≥ 4.5:1 in both modes).",
   "colors": {
     "bg":           { "light": "#F5F3EF", "dark": "#0A0A0C" },
     "bgElevated":   { "light": "#FFFFFF", "dark": "#141418" },
@@ -8,6 +8,8 @@
     "inkTertiary":  { "light": "#16161A", "dark": "#F4F4F5", "alpha": { "light": 0.34, "dark": 0.36 }, "contrast": { "light": 0.56, "dark": 0.58 } },
     "hairline":     { "light": "#000000", "dark": "#FFFFFF", "alpha": { "light": 0.07, "dark": 0.08 }, "contrast": { "light": 0.22, "dark": 0.24 } },
     "ember":        { "light": "#F0602A", "dark": "#FF7A45" },
+    "emberStrong":  { "light": "#B9441B", "dark": "#C4461A" },
+    "emberText":    { "light": "#B9441B", "dark": "#FF7A45" },
     "done":         { "light": "#2FA35A", "dark": "#7ED69B" },
     "danger":       { "light": "#D93A3F", "dark": "#FF5A5F" },
     "aura1":        { "light": "#FFB38F", "dark": "#FF7A45" },

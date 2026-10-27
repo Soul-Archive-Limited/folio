@@ -59,7 +59,7 @@ struct CategoryEditSheet: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save", action: save)
                         .buttonStyle(.glassProminent)
-                        .tint(.ember)
+                        .tint(.emberStrong)
                         .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }

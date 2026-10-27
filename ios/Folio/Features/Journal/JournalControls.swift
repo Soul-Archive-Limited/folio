@@ -25,7 +25,7 @@ struct JournalControls: View {
                             .foregroundStyle(model.mode == mode ? AnyShapeStyle(.white) : AnyShapeStyle(.ink))
                             .background {
                                 if model.mode == mode {
-                                    Capsule().fill(.ember).matchedGeometryEffect(id: "mode", in: toggle)
+                                    Capsule().fill(.emberStrong).matchedGeometryEffect(id: "mode", in: toggle)
                                 }
                             }
                             .accessibilityAddTraits(model.mode == mode ? .isSelected : [])
@@ -35,12 +35,17 @@ struct JournalControls: View {
                     .glassEffect(.regular, in: .capsule)
                 }
                 Spacer()
-                Button("Write for a past day", systemImage: "calendar.badge.plus", action: onWritePast)
-                    .labelStyle(.iconOnly)
-                    .font(.body.weight(.semibold))
-                    .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
-                    .buttonStyle(.glass)
-                    .buttonBorderShape(.circle)
+                // A labelled pill, not an icon: the calendar glyph alone didn't say what it does
+                // (owner's iPhone test, Batch E).
+                Button(action: onWritePast) {
+                    Label("Past day", systemImage: "calendar.badge.plus")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(minHeight: Spacing.minHitTarget - 8)
+                }
+                .buttonStyle(.glass)
+                .buttonBorderShape(.capsule)
+                .accessibilityLabel("Write for a past day")
+                .accessibilityIdentifier("journal.pastDay")
             }
             .padding(.horizontal, Spacing.sideMargin)
         }

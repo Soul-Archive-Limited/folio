@@ -31,7 +31,7 @@ struct GalleryComponentsSection: View {
                         GlassIconButton(title: "Filter", systemImage: "line.3.horizontal.decrease") {}
                         GlassIconButton(title: "New entry", systemImage: "plus", prominent: true) {}
                         Button("Today") {}.buttonStyle(.glass)
-                        Button("Save") {}.buttonStyle(.glassProminent).tint(.ember)
+                        Button("Save") {}.buttonStyle(.glassProminent).tint(.emberStrong)
                         Button("Delete", role: .destructive) {}.buttonStyle(.glass).tint(.danger)
                     }
                 }

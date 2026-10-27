@@ -33,7 +33,7 @@ struct OnboardingSyncStep: View {
                     SyncSignInButtons()
                     Button("Not now — keep it on this iPhone", action: onGuest)
                         .font(.callout.weight(.semibold))
-                        .foregroundStyle(.ember)
+                        .foregroundStyle(.emberText)
                         .frame(minHeight: Spacing.minHitTarget)
                     LegalFooter()
                 } else {
@@ -41,7 +41,7 @@ struct OnboardingSyncStep: View {
                         Text("Continue").frame(maxWidth: .infinity, minHeight: 44)
                     }
                     .buttonStyle(.glassProminent)
-                    .tint(.ember)
+                    .tint(.emberStrong)
                 }
             }
             .padding(.horizontal, Spacing.xxl)

@@ -12,9 +12,9 @@ struct ComposerDatePicker: View {
         VStack(alignment: .leading, spacing: Spacing.s) {
             DatePicker("Day", selection: dateBinding(calendar), in: range(calendar), displayedComponents: .date)
                 .datePickerStyle(.graphical)
-                .tint(.ember)
+                .tint(.emberStrong)
             Toggle("Time", isOn: hasTime)
-                .tint(.ember)
+                .tint(.emberStrong)
             if minutes != nil {
                 DatePicker("Time", selection: timeBinding(calendar), displayedComponents: .hourAndMinute)
             }

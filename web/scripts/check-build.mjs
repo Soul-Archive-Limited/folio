@@ -75,4 +75,20 @@ check(() => {
   assert.match(read('support.html'), /What happens when I delete something\?/);
 }, 'legal pages and FAQ content');
 
+// Fix 10 (Batch E): white text on `emberStrong` and `emberText` on the background pass WCAG AA in both modes.
+check(() => {
+  const tokens = JSON.parse(readFileSync(new URL('../../shared/design-tokens.json', import.meta.url), 'utf8')).colors;
+  const lum = (hex) => {
+    const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+      .map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  };
+  const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
+  for (const mode of ['light', 'dark']) {
+    assert.ok(ratio(tokens.emberStrong[mode], '#FFFFFF') >= 4.5, `white on emberStrong (${mode})`);
+    assert.ok(ratio(tokens.emberText[mode], tokens.bg[mode]) >= 4.5, `emberText on bg (${mode})`);
+    assert.ok(ratio(tokens.emberText[mode], tokens.bgElevated[mode]) >= 4.5, `emberText on bgElevated (${mode})`);
+  }
+}, 'ember text and fills pass WCAG AA (4.5:1)');
+
 console.log(`\n${checks} checks passed`);

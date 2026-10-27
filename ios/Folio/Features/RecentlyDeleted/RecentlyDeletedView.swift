@@ -131,7 +131,7 @@ struct RecentlyDeletedView: View {
                     Label("Restore selected", systemImage: "arrow.uturn.backward").frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.glassProminent)
-                .tint(.ember)
+                .tint(.emberStrong)
                 Button(role: .destructive) { pendingDelete = selected } label: {
                     Label("Delete selected", systemImage: "trash").frame(maxWidth: .infinity)
                 }

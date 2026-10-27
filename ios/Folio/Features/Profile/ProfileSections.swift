@@ -147,7 +147,7 @@ struct ProfileDataSection: View {
             Toggle(isOn: $exportIncludesTrash) {
                 ProfileRowLabel(title: "Include Recently Deleted in export", systemImage: "tray.full")
             }
-            .tint(.ember)
+            .tint(.emberStrong)
             Button(role: .destructive) { confirmsErase = true } label: {
                 HStack(spacing: Spacing.s) {
                     Image(systemName: "trash").frame(width: 26).accessibilityHidden(true)

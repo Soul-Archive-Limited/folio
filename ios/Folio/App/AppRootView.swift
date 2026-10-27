@@ -34,7 +34,11 @@ struct AppRootView: View {
             // Launch reaches `.active` too, so this covers launch and every foreground.
             if phase == .active { TrashMaintenance.purgeIfPossible(store) }
         }
-        .task { prepareGreetingIfNeeded() }
+        .task {
+            prepareGreetingIfNeeded()
+            // A tour left half-way resumes once the greeting is out of the way.
+            if hasOnboarded, greeting == nil { tour.resumeIfNeeded() }
+        }
         .task(priority: .utility) { await store.backfillDisplayRenditions() }
     }
 
@@ -64,6 +68,8 @@ struct AppRootView: View {
         if startsTourAfterGreeting {
             startsTourAfterGreeting = false
             tour.start()
+        } else {
+            tour.resumeIfNeeded()
         }
     }
 

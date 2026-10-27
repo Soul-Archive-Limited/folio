@@ -37,7 +37,7 @@ struct Chip: View {
         .folioHaptic(.lightImpact, trigger: isSelected)
     }
 
-    private var fill: Color { category?.color ?? .ember }
+    private var fill: Color { category?.color ?? .emberStrong }
 }
 
 #Preview {
