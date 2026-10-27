@@ -1,0 +1,24 @@
+---
+import { site } from '../config/site';
+const year = 2026;
+---
+<footer class="footer">
+  <div class="wrap">
+    <div class="row">
+      <nav aria-label="Footer">
+        <ul>
+          <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/terms">Terms</a></li>
+          <li><a href="/support">Support</a></li>
+          <li><a href="/changelog">Changelog</a></li>
+          <li><a href="/delete-account">Delete account</a></li>
+          <li><a href={site.githubUrl} rel="noopener">GitHub</a></li>
+        </ul>
+      </nav>
+      <p>© {year} {site.company.name}</p>
+    </div>
+    <p class="legal">
+      {site.company.name} · Registered in England and Wales · Company no. {site.company.number} · Registered office: {site.company.office}
+    </p>
+  </div>
+</footer>

@@ -1,0 +1,24 @@
+---
+import Page from '../layouts/Page.astro';
+import { site } from '../config/site';
+---
+<Page title="Open source" heading="Open source" description="Folio's code is public under the Apache License 2.0. Read how encryption works, or build it yourself."
+  lede="Folio is a diary you’re asked to trust, so all of its code is public.">
+  <h2>The code</h2>
+  <p>The iPhone app, the server and this website live in one repository: <a href={site.githubUrl} rel="noopener">github.com/Soul-Archive-Limited/folio</a>, under the <a href={`${site.githubUrl}/blob/main/LICENSE`} rel="noopener">Apache License 2.0</a>. The encryption code and its shared test vectors are in <code>ios/FolioCrypto</code> and <code>shared/</code>.</p>
+  <p>The names Folio and Soul Archive and the app icon aren’t covered by the code licence (see <a href={`${site.githubUrl}/blob/main/NOTICE`} rel="noopener">NOTICE</a>).</p>
+
+  <h2>What Folio is built with</h2>
+  <h3>iPhone app</h3>
+  <p>Only Apple’s frameworks — SwiftUI, SwiftData, CryptoKit, Speech, Foundation Models. No third-party code, SDKs, analytics or ads.</p>
+  <h3>This website</h3>
+  <ul>
+    <li><a href="https://astro.build" rel="noopener">Astro</a> (MIT)</li>
+    <li><a href="https://react.dev" rel="noopener">React</a> (MIT)</li>
+    <li><a href="https://motion.dev" rel="noopener">Motion</a> (MIT)</li>
+    <li><a href="https://github.com/Instrument/instrument-serif" rel="noopener">Instrument Serif</a> by Rodrigo Fuenzalida and Jordan Egstad (<a href="/fonts/InstrumentSerif-OFL.txt">SIL Open Font License 1.1</a>), served from this site</li>
+  </ul>
+
+  <h2>Report a problem</h2>
+  <p>Open an issue on GitHub. For anything security-related, email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a> instead of opening a public issue.</p>
+</Page>

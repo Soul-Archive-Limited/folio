@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Page not found" description="This page isn’t on the Folio website. The home page has the app, privacy and support.">
+  <div class="wrap page lost">
+    <p class="serif big" aria-hidden="true">404</p>
+    <h1>This page isn’t in the diary.</h1>
+    <p class="lede">The link may be old, or mistyped.</p>
+    <p><a class="btn btn-primary" href="/">Go to the home page</a></p>
+  </div>
+</Base>
+<style>
+  .lost { min-height: 60vh; }
+  .big { font-size: clamp(120px, 22vw, 260px); line-height: 0.8; margin: 0 0 24px; color: var(--ember); letter-spacing: -0.04em; }
+  .lost h1 { font-size: clamp(40px, 6vw, 72px); }
+</style>

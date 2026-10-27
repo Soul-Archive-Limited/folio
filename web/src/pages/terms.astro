@@ -1,0 +1,37 @@
+---
+import Page from '../layouts/Page.astro';
+import { site } from '../config/site';
+---
+<Page title="Terms of Use" heading="Terms" updated="27 October 2026"
+  description="The terms for using Folio, the private calendar diary from Soul Archive Ltd."
+  lede="The rules for using Folio, kept as short as we could.">
+  <h2>Using Folio</h2>
+  <p>{site.company.name} gives you a personal, non-exclusive licence to use the Folio app, website and web app. By using them you agree to these terms.</p>
+
+  <h2>Open source</h2>
+  <p>Folio’s source code is published under the Apache License 2.0. That licence covers the code; it doesn’t give you rights to the Folio or Soul Archive names, logos or app icon.</p>
+
+  <h2>Your content</h2>
+  <p>You own everything you write and add. We only store it — encrypted, if you use sync — to provide the service to you.</p>
+
+  <h2>Your recovery key</h2>
+  <p>With sync, your diary is end-to-end encrypted. You are responsible for keeping your recovery key safe. If you lose every device and your recovery key, we can’t restore your diary.</p>
+
+  <h2>Fair use</h2>
+  <p>Don’t use Folio to break the law, to attack or overload our service, or to try to get at other people’s data. We may suspend accounts that do.</p>
+
+  <h2>The service</h2>
+  <p>Folio is provided “as is”. We work to keep it available and your data safe, but we can’t promise it will always be uninterrupted or error-free. Keep an export of anything you can’t afford to lose.</p>
+
+  <h2>Liability</h2>
+  <p>As far as the law allows, we aren’t liable for indirect or consequential losses, or for loss of data you could have kept by exporting it. Nothing in these terms limits liability that can’t be limited by law, or your rights as a consumer.</p>
+
+  <h2>Recently Deleted</h2>
+  <p>Deleted items stay in Recently Deleted for 30 days and are then permanently deleted.</p>
+
+  <h2>Law</h2>
+  <p>These terms are governed by the law of England and Wales.</p>
+
+  <h2>Contact</h2>
+  <p><a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a> · {site.company.name}, {site.company.office}.</p>
+</Page>

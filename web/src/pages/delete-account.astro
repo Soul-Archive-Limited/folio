@@ -1,0 +1,24 @@
+---
+import Page from '../layouts/Page.astro';
+import { site } from '../config/site';
+---
+<Page title="Delete your account" heading="Delete your account" description="How to delete your Folio account and your data, in the app, on the web or by email."
+  lede="You can delete your account and everything we store at any time.">
+  <p>Accounts and sync are coming soon. Until you create one, Folio keeps everything on your iPhone and we hold no account data about you — see “No account?” below.</p>
+  <h2>In the iPhone app</h2>
+  <ol>
+    <li>Open Folio and go to <strong>Profile</strong>.</li>
+    <li>Tap <strong>Account</strong>, then <strong>Delete account</strong>.</li>
+    <li>Confirm who you are (Apple, Google or an email code), type <code>DELETE</code> and confirm.</li>
+  </ol>
+  <p>Your account and every entry, photo and task on our servers is deleted straight away; server clean-up finishes within minutes, and backups within 30 days. Folio then asks whether to keep a copy of your diary on the iPhone.</p>
+
+  <h2>On the web</h2>
+  <p>Once the web app is live, sign in and go to Settings → Account → Delete account.</p>
+
+  <h2>By email</h2>
+  <p>Email <a href={`mailto:${site.privacyEmail}?subject=Delete%20my%20Folio%20account`}>{site.privacyEmail}</a> from the address you signed in with. We’ll confirm before deleting.</p>
+
+  <h2>No account?</h2>
+  <p>Then we hold nothing about you. To clear the app, go to Profile → Your data → <strong>Erase data on this iPhone</strong>. That removes every entry, photo, task and category, including Recently Deleted.</p>
+</Page>

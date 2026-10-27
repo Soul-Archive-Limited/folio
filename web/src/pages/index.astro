@@ -1,0 +1,167 @@
+---
+import Base from '../layouts/Base.astro';
+import HeroCalendar from '../components/HeroCalendar.tsx';
+import PhoneShot from '../components/PhoneShot.astro';
+import Faq from '../components/Faq.astro';
+import { heroCtas, site } from '../config/site';
+import { faq } from '../data/faq';
+
+const ctas = heroCtas();
+
+// Each feature is an "entry" on a day: the numeral is the page's typography, as in the app.
+const entries = [
+  {
+    id: 'month', day: '27', when: 'Tue · Oct 2026', title: 'Your month, at a glance',
+    text: 'Days you wrote on show a tiny photo or a coloured dot. Days with tasks get a ring, and a tick once they’re all done. Tap a day and everything on it slides up underneath.',
+    shot: 'calendar', dark: true, alt: 'Folio’s calendar for October with photo tiles and dots on the days written about, and the day panel below.',
+  },
+  {
+    id: 'any-day', day: '4', when: 'Mon · May 1987', title: 'Write for any day',
+    text: 'Pick a date back to 1900 and write in a half sheet while the calendar stays in view. Move your old paper diaries in, photos and all.',
+    shot: 'composer', dark: false, alt: 'The composer open as a half sheet over the calendar, with a title, text and a date pill.',
+  },
+  {
+    id: 'tasks', day: '29', when: 'Thu · Oct 2026', title: 'Tasks stay on their day',
+    text: 'Tick a task and it stays on the calendar, done. Nothing disappears unless you delete it — and even then it waits 30 days in Recently Deleted.',
+    shot: 'todo', dark: false, alt: 'The To-do list with active tasks, coloured category rings and a Completed section.',
+  },
+  {
+    id: 'speak', day: '30', when: 'Fri · Oct 2026', title: 'Speak instead of typing',
+    text: 'Dictate an entry and watch it appear as you talk. Ask ✦ for a title or a light grammar polish. It all runs on your iPhone; your words don’t go anywhere.',
+    shot: 'dictation', dark: false, alt: 'Dictation in the composer: a glass capsule with a live waveform and words appearing.',
+  },
+  {
+    id: 'journal', day: '1', when: 'Sun · Nov 2026', title: 'Read it back like a book',
+    text: 'The Journal lays your pages out by month, with covers from your photos, or as one wall of every picture you’ve kept.',
+    shot: 'journal', dark: true, alt: 'The Journal timeline with month headers and entry cards with cover photos.',
+  },
+];
+
+const trust = ['End-to-end encrypted', 'Works offline', 'On-device dictation', 'Open source', 'Made by Soul Archive Ltd'];
+const homeFaq = [faq.readDiary, faq.lostPhone, faq.account, faq.recentlyDeleted, faq.pastDays, faq.dictation, faq.web, faq.export, faq.who];
+---
+<Base title="Folio" description="A calendar diary for iPhone and the web. Write for any day, keep tasks on the same calendar, and keep it private: encrypted so only you can read it.">
+  <section class="hero">
+    <div class="aura" aria-hidden="true"></div>
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="caption eyebrow">A calendar diary for iPhone</p>
+        <h1 class="serif">Your days, <em>kept.</em></h1>
+        <p class="lede">A calendar diary for iPhone and the web. Encrypted so only you can read it.</p>
+        <div class="ctas">
+          {ctas.map((c) => (
+            <a class={`btn ${c.primary ? 'btn-primary' : 'btn-quiet'}`} href={c.href} rel={c.external ? 'noopener' : undefined}>
+              {c.label} <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          ))}
+        </div>
+      </div>
+      <div class="hero-phone">
+        <HeroCalendar client:idle />
+      </div>
+    </div>
+    <div class="wrap">
+      <ul class="trust" aria-label="At a glance">
+        {trust.map((t) => <li>{t}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section id="features" class="wrap entries" aria-label="Features">
+    {entries.map((e, i) => (
+      <article class={`entry ${i % 2 ? 'flip' : ''}`} id={e.id}>
+        <div class="entry-copy">
+          <p class="date" aria-hidden="true"><span class="serif numeral">{e.day}</span><span class="caption">{e.when}</span></p>
+          <h2 class="serif">{e.title}</h2>
+          <p>{e.text}</p>
+        </div>
+        <PhoneShot name={e.shot} alt={e.alt} dark={e.dark} />
+      </article>
+    ))}
+  </section>
+
+  <section id="privacy" class="privacy">
+    <div class="wrap">
+      <p class="caption">Privacy</p>
+      <ul class="claims">
+        <li class="serif">Encrypted on your device.</li>
+        <li class="serif">No ads.</li>
+        <li class="serif">No tracking.</li>
+      </ul>
+      <div class="privacy-cols">
+        <p>Without an account, your diary stays on your iPhone and we receive nothing. With sync, every entry, photo and task is encrypted before it leaves your device, with a key only your devices hold.</p>
+        <p>The app has no analytics, no advertising and no third-party code. This website sets no cookies. <a href="/privacy">Read the privacy policy</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap open">
+    <h2 class="serif">Open source, so you can check.</h2>
+    <p>Every line of Folio — the iPhone app, the server and this site — is public under the Apache 2.0 licence. Read how encryption works, or build it yourself.</p>
+    <a class="btn btn-quiet" href={site.githubUrl} rel="noopener">Soul-Archive-Limited/folio on GitHub <span class="arrow" aria-hidden="true">→</span></a>
+  </section>
+
+  <section class="wrap questions" aria-labelledby="faq-title">
+    <h2 id="faq-title" class="serif">Questions</h2>
+    <Faq items={homeFaq} />
+    <p class="more">More answers on the <a href="/support">Support</a> page.</p>
+  </section>
+</Base>
+
+<style>
+  .hero { position: relative; padding: clamp(40px, 8vw, 96px) 0 40px; overflow: clip; }
+  .aura {
+    position: absolute; inset: -30% -10% auto; height: 120%; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(32% 40% at 70% 30%, color-mix(in srgb, var(--aura1) 55%, transparent), transparent 70%),
+      radial-gradient(28% 34% at 88% 62%, color-mix(in srgb, var(--aura2) 45%, transparent), transparent 70%),
+      radial-gradient(30% 36% at 12% 70%, color-mix(in srgb, var(--aura3) 35%, transparent), transparent 70%);
+  }
+  @media (prefers-color-scheme: dark) { .aura { opacity: 0.45; } }
+  .hero-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; align-items: center; gap: 48px; }
+  .eyebrow { margin-bottom: 18px; }
+  h1 { font-size: clamp(64px, 10.5vw, 136px); line-height: 0.9; letter-spacing: -0.035em; margin: 0 0 28px; }
+  h1 em { font-style: italic; color: var(--ember); padding-right: 0.06em; }
+  .lede { font-size: clamp(19px, 2vw, 22px); line-height: 1.45; color: var(--text-2); max-width: 30ch; margin-bottom: 32px; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 10px; }
+  .hero-phone { display: flex; justify-content: center; }
+  .trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 28px; margin: 72px 0 0; padding: 22px 0; list-style: none; border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); color: var(--text-2); font-size: 14px; font-weight: 500; }
+  .trust li { display: inline-flex; align-items: center; gap: 10px; }
+  .trust li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--ember); }
+
+  .entries { display: grid; gap: clamp(72px, 12vw, 140px); padding-top: clamp(72px, 10vw, 120px); }
+  .entry { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: clamp(32px, 7vw, 96px); }
+  .entry.flip .entry-copy { order: 2; }
+  .entry-copy { max-width: 44ch; }
+  .date { display: flex; align-items: baseline; gap: 14px; margin: 0 0 12px; }
+  .numeral { font-size: clamp(88px, 12vw, 148px); line-height: 0.8; letter-spacing: -0.04em; color: var(--ink); }
+  .entry h2 { font-size: clamp(34px, 4.2vw, 50px); line-height: 1.02; margin: 0 0 16px; letter-spacing: -0.015em; }
+  .entry-copy > p:last-child { font-size: 18px; color: var(--text-2); }
+
+  .privacy { margin-top: clamp(96px, 14vw, 160px); padding: clamp(64px, 10vw, 112px) 0; background: var(--ink); color: var(--bg); }
+  .privacy .caption { color: color-mix(in srgb, var(--bg) 62%, transparent); }
+  .claims { list-style: none; margin: 16px 0 48px; padding: 0; }
+  .claims li { font-size: clamp(48px, 8vw, 104px); line-height: 0.98; letter-spacing: -0.03em; }
+  .claims li:first-child { color: var(--ember); }
+  .privacy-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; max-width: 900px; color: color-mix(in srgb, var(--bg) 78%, transparent); }
+  .privacy a { color: var(--bg); text-decoration-color: var(--ember); text-underline-offset: 3px; }
+  @media (prefers-color-scheme: dark) { .privacy { background: var(--bg-elevated); color: var(--ink); } .privacy .caption, .privacy-cols { color: var(--text-2); } .privacy a { color: var(--ink); } }
+
+  .open { padding-top: clamp(96px, 12vw, 140px); }
+  .open > * { max-width: 680px; }
+  .open h2, .questions h2 { font-size: clamp(40px, 5.5vw, 64px); line-height: 1; margin: 0 0 16px; letter-spacing: -0.02em; }
+  .open p { font-size: 18px; color: var(--text-2); margin-bottom: 20px; }
+  .open .btn { margin-left: -22px; }
+
+  .questions { padding-top: clamp(96px, 12vw, 140px); }
+  .questions h2 { margin-bottom: 28px; }
+  .more { margin-top: 24px; color: var(--text-2); }
+
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .entry, .entry.flip { grid-template-columns: 1fr; justify-items: center; }
+    .entry.flip .entry-copy { order: 0; }
+    .entry-copy { justify-self: start; }
+    .privacy-cols { grid-template-columns: 1fr; }
+  }
+</style>

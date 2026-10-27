@@ -1,0 +1,160 @@
+@import './tokens.css';
+
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/instrument-serif-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/instrument-serif-latin-400-italic.woff2') format('woff2');
+}
+
+:root {
+  --serif: 'Instrument Serif', 'New York', ui-serif, Georgia, serif;
+  --sans: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+  --side: clamp(20px, 5vw, 56px);
+  --max: 1160px;
+  --radius-card: 22px;
+  --glass: color-mix(in srgb, var(--bg-elevated) 62%, transparent);
+  --text-2: var(--ink-secondary);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root { --glass: color-mix(in srgb, var(--bg-elevated) 70%, transparent); }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: 88px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+a { color: inherit; }
+p { margin: 0 0 1em; }
+
+:focus-visible {
+  outline: 2.5px solid var(--ember);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.skip {
+  position: absolute; left: 12px; top: -48px; z-index: 100;
+  padding: 10px 16px; border-radius: 999px; background: var(--ink); color: var(--bg); text-decoration: none;
+}
+.skip:focus { top: 12px; }
+
+.wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 var(--side); }
+
+.serif { font-family: var(--serif); font-weight: 400; letter-spacing: -0.01em; }
+
+.caption {
+  font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-2);
+}
+
+/* Glass: system-style blur with a solid fallback (SPEC §11.2). */
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--hairline);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  backdrop-filter: blur(24px) saturate(160%);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass { background: var(--bg-elevated); }
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 0 22px; border-radius: 999px;
+  font: 600 16px/1 var(--sans); text-decoration: none; white-space: nowrap;
+  transition: transform 0.2s var(--ease), background-color 0.2s var(--ease);
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--ink); color: var(--bg); }
+.btn-primary:hover { background: color-mix(in srgb, var(--ink) 86%, var(--ember)); }
+.btn-quiet { color: var(--ink); }
+.btn-quiet:hover { background: var(--bg-elevated); }
+.btn .arrow { transition: transform 0.2s var(--ease); }
+.btn:hover .arrow { transform: translateX(3px); }
+
+/* Nav */
+.nav {
+  position: sticky; top: 12px; z-index: 50;
+  margin: 12px auto 0; width: calc(100% - 2 * var(--side)); max-width: calc(var(--max) - 2 * var(--side) + 40px);
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 8px 8px 16px; border-radius: 999px;
+}
+.nav .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font: 400 26px/1 var(--serif); }
+.nav .brand svg { width: 26px; height: 26px; }
+.nav ul { display: flex; gap: 2px; margin: 0 0 0 auto; padding: 0; list-style: none; }
+.nav ul a {
+  display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: 999px;
+  font-size: 15px; font-weight: 500; text-decoration: none; color: var(--text-2);
+}
+.nav ul a:hover, .nav ul a[aria-current='page'] { color: var(--ink); background: var(--bg-elevated); }
+.nav .btn { min-height: 40px; padding: 0 16px; font-size: 15px; }
+@media (max-width: 760px) {
+  .nav { padding-left: 12px; gap: 4px; }
+  .nav .brand { font-size: 22px; gap: 8px; }
+  .nav ul a { padding: 0 9px; font-size: 14px; }
+  .nav ul li:first-child { display: none; }
+  .nav .btn { display: none; }
+}
+
+/* Footer */
+.footer { margin-top: 120px; padding: 48px 0 56px; border-top: 1px solid var(--hairline); color: var(--text-2); font-size: 14px; }
+.footer .row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 24px; }
+.footer nav ul { display: flex; flex-wrap: wrap; gap: 4px 20px; margin: 0; padding: 0; list-style: none; }
+.footer nav a { text-decoration: none; color: var(--ink); }
+.footer nav a:hover { text-decoration: underline; }
+.footer .legal { margin-top: 24px; max-width: 72ch; }
+
+/* Long-form pages (legal, support, open source, changelog) */
+.page { padding-top: clamp(56px, 10vw, 112px); }
+.page h1 { font: 400 clamp(48px, 8vw, 88px)/0.95 var(--serif); letter-spacing: -0.02em; margin: 0 0 16px; }
+.page .lede { font-size: 20px; color: var(--text-2); max-width: 46ch; }
+.prose { max-width: 68ch; margin-top: 48px; }
+.prose h2 { font: 400 34px/1.1 var(--serif); margin: 56px 0 12px; }
+.prose h3 { font-size: 18px; margin: 32px 0 8px; }
+.prose ul { padding-left: 1.2em; }
+.prose li { margin: 0.35em 0; }
+.prose a { color: var(--ink); text-decoration-color: var(--ember); text-underline-offset: 3px; text-decoration-thickness: 2px; }
+.updated { margin-top: 12px; }
+
+/* FAQ */
+.faq { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--hairline); }
+.faq details { border-bottom: 1px solid var(--hairline); }
+.faq summary {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+  padding: 22px 0; cursor: pointer; list-style: none;
+  font: 400 clamp(22px, 2.6vw, 28px)/1.2 var(--serif);
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: '+'; font-family: var(--sans); font-size: 24px; color: var(--ember); transition: transform 0.25s var(--ease); }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq .answer { padding: 0 0 24px; max-width: 64ch; color: var(--text-2); }
+.faq .answer a { color: var(--ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

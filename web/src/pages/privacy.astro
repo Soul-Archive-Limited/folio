@@ -1,0 +1,52 @@
+---
+import Page from '../layouts/Page.astro';
+import { site } from '../config/site';
+---
+<Page title="Privacy Policy" heading="Privacy" updated="27 October 2026"
+  description="How Folio handles your data: nothing leaves your iPhone without an account, and with one your diary is end-to-end encrypted so we can't read it."
+  lede="Plain English, because it’s your diary. The short version: we can’t read it.">
+  <h2>Who we are</h2>
+  <p>Folio is made by {site.company.name}, a company registered in England and Wales (company no. {site.company.number}), registered office {site.company.office}. We are the controller of the little personal data described here. Questions: <a href={`mailto:${site.privacyEmail}`}>{site.privacyEmail}</a>.</p>
+
+  <h2>Without an account</h2>
+  <p>Everything stays on your iPhone. We receive nothing: no diary content, no usage data, no identifiers.</p>
+
+  <h2>With an account</h2>
+  <p>Accounts and sync are coming soon. When you choose to turn them on, we store:</p>
+  <ul>
+    <li>your email address and the IDs of the sign-in providers you use (Apple, Google or email), so you can sign in;</li>
+    <li>the names of your signed-in devices and when each was last seen, so you can manage and sign them out;</li>
+    <li>your diary — entries, photos, tasks, categories and settings — <strong>only in end-to-end encrypted form</strong>. It is encrypted on your device with a key only your devices hold. We can’t read it, and we can’t recover it without your devices or your recovery key.</li>
+  </ul>
+  <p>Our servers see only what they need to move encrypted data around: record IDs, sizes, version numbers and timestamps.</p>
+
+  <h2>Who processes data for us</h2>
+  <ul>
+    <li><strong>Cloudflare</strong> hosts this website, our servers, database and storage. Data may be processed anywhere in Cloudflare’s global network.</li>
+    <li><strong>Resend</strong> sends sign-in codes by email.</li>
+    <li><strong>Apple</strong> and <strong>Google</strong>, only if you choose to sign in with them.</li>
+  </ul>
+  <p>We don’t sell or share your data with anyone else, and there is no advertising.</p>
+
+  <h2>Dictation and writing tools</h2>
+  <p>Dictation and the ✦ writing tools run on your iPhone using Apple’s on-device models. Audio and text are not sent to us or to anyone else, and audio is never stored.</p>
+
+  <h2>Cookies</h2>
+  <p>This website sets no cookies and runs no analytics. The web app, when it launches, will use one strictly necessary cookie to keep you signed in — nothing for analytics or advertising, so there’s no cookie banner.</p>
+
+  <h2>How long we keep things</h2>
+  <ul>
+    <li>Account data: until you delete your account. Deletion is immediate for you; server clean-up, including backups, finishes within 30 days at most.</li>
+    <li>Items you delete in Folio go to <strong>Recently Deleted</strong> on your devices for 30 days, then they’re permanently deleted (sooner if you empty it).</li>
+    <li>Support emails: up to 24 months.</li>
+  </ul>
+
+  <h2>Your rights</h2>
+  <p>Under UK GDPR and EU GDPR you can ask for access to your data, a copy of it, correction or deletion. The quickest copy is the in-app export (Profile → Your data → Export). You can delete your account in the app or on the web — see <a href="/delete-account">Delete your account</a>. You can also complain to the UK Information Commissioner’s Office (<a href="https://ico.org.uk" rel="noopener">ico.org.uk</a>).</p>
+
+  <h2>Children</h2>
+  <p>Folio is not directed at children under 13.</p>
+
+  <h2>Changes</h2>
+  <p>If this policy changes, we’ll update the date at the top and, for meaningful changes, tell you in the app.</p>
+</Page>

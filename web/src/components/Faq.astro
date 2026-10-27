@@ -1,0 +1,15 @@
+---
+/** Questions and answers as native disclosure rows (no JavaScript). Answers are HTML strings
+    authored in src/data/faq.ts — never user input — so `set:html` is safe here. */
+export interface Item { q: string; a: string }
+interface Props { items: Item[] }
+const { items } = Astro.props;
+---
+<div class="faq">
+  {items.map((item) => (
+    <details>
+      <summary>{item.q}</summary>
+      <div class="answer" set:html={item.a} />
+    </details>
+  ))}
+</div>

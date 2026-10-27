@@ -17,7 +17,7 @@ Status key: ✅ done · 🟡 in progress · ⬜ not started
 | 8 | Dictation + AI | SpeechAnalyzer dictation overlay, Foundation Models ✦ menu, permission explainers (§6.11, §6.12, §7, §8, §9) | ✅ |
 | 9 | Backend | Worker, D1 schema, R2, `UserHub`, Better Auth (Apple/Google/email OTP via Resend), sync, blobs, linking, delete account, rate limits, admin usage (§10, §13, §15.2) | ⬜ |
 | 10 | iPhone sign-in + sync | Sign-in flows, recovery key + unlock screens (§6.1 steps 6–7, §6.13), Keychain, DK + recovery key, sync engine, live socket, background refresh, QR device linking, delete account in-app (§10.2–10.6) | ⬜ |
-| 11 | Website | Astro marketing site, legal pages, support/FAQ, headers, SEO (§11.1, §11.2, §14) | ⬜ |
+| 11 | Website | Astro marketing site, legal pages, support/FAQ, headers, SEO (§11.1, §11.2, §14) | ✅ |
 | 12 | Web app | `/app` sign-in + unlock, calendar, entries, tasks, Tiptap editor, live sync, delete account (§11.3) | ⬜ |
 | 13 | Motion polish | Hitch audit with Instruments, 120 fps pass, Reduce Motion pass, web motion, iPad split view (§3.6, §6.16, §15.1) | ⬜ |
 | 14 | Release | Privacy manifest, App Store checklist, accessibility audit, review account, TestFlight (§12) | ⬜ |
@@ -27,7 +27,7 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 ### Batch D checklist
 - [x] Part 1 — Batch C fixes
 - [x] Part 2 — Recently Deleted (SPEC §5.2)
-- [ ] Part 3 — Phase 11 website
+- [x] Part 3 — Phase 11 website
 - [ ] Part 4 — Xcode Cloud → TestFlight
 
 ## Log
@@ -101,3 +101,10 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - Schema v3 (`trashedAt` on Entry/TaskItem/Category, `Category.unassignedIDs`) with frozen v2 models and a lightweight migration; every live query skips trash.
 - Delete → "Moved to Recently Deleted · Undo" (no confirmation); Recently Deleted screen (segments, days left, preview, swipe Restore/Delete now, Select, Empty, empty state); Profile row with count, quiet links on Journal and To-do; "Restored to Tue 27 Oct · Show".
 - 30-day purge on launch, foreground and background refresh, on a clock that never runs backwards; export toggle; Erase empties it. 11 unit tests, migration test, UI test.
+
+### Phase 11 — Website (2026-10-27)
+- `/web`: Astro static + React island, paper light/dark from the shared tokens, self-hosted Instrument Serif, live calendar recreation in the hero phone (pauses for Reduced Motion and off screen).
+- Pages: Home, Privacy, Terms, Support, Open source, Changelog, Delete account, 404; company footer; sitemap, robots, OG image, favicons.
+- CTAs from `src/config/site.ts`, rendered only when set. No cookies, analytics or forms.
+- `_headers` with SPEC §11.3 headers and build-time script hashes; `npm test` builds and runs 13 checks. Lighthouse ≥ 96 on every page.
+- Deploy: waiting on the owner to connect Cloudflare Pages (root `web`, output `dist`, domain `folio.devilsense.com`).

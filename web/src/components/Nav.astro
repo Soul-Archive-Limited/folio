@@ -1,0 +1,24 @@
+---
+import Mark from './Mark.astro';
+import { site } from '../config/site';
+
+const path = Astro.url.pathname.replace(/\.html$/, '');
+const links = [
+  { href: '/#features', label: 'Features' },
+  { href: '/privacy', label: 'Privacy' },
+  { href: '/open-source', label: 'Open source' },
+  { href: '/support', label: 'Support' },
+];
+---
+<header class="nav glass">
+  <a class="brand" href="/" aria-label="Folio home"><Mark /> Folio</a>
+  <nav aria-label="Main">
+    <ul>
+      {links.map((l) => <li><a href={l.href} aria-current={path === l.href ? 'page' : undefined}>{l.label}</a></li>)}
+    </ul>
+  </nav>
+  {site.webAppLive && <a class="btn btn-primary" href="/app">Open web app</a>}
+  {!site.webAppLive && (site.appStoreUrl || site.testflightUrl) && (
+    <a class="btn btn-primary" href={site.appStoreUrl || site.testflightUrl} rel="noopener">Get Folio</a>
+  )}
+</header>

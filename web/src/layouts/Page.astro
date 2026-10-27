@@ -1,0 +1,16 @@
+---
+import Base from './Base.astro';
+/** Long-form pages: legal, support, open source, changelog. */
+interface Props { title: string; description: string; heading: string; lede?: string; updated?: string }
+const { title, description, heading, lede, updated } = Astro.props;
+---
+<Base title={title} description={description}>
+  <div class="wrap page">
+    <h1>{heading}</h1>
+    {lede && <p class="lede">{lede}</p>}
+    {updated && <p class="caption updated">Last updated {updated}</p>}
+    <div class="prose">
+      <slot />
+    </div>
+  </div>
+</Base>

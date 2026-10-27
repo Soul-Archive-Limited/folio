@@ -1,0 +1,27 @@
+---
+import Page from '../layouts/Page.astro';
+import Faq from '../components/Faq.astro';
+import { faq } from '../data/faq';
+import { site } from '../config/site';
+
+const items = [
+  faq.readDiary,
+  { q: 'What is the recovery key?', a: 'When you turn on sync, Folio shows a 26-character code. It’s the only way to unlock your diary on a new device if your other devices are gone. Save it somewhere safe — a password manager, or printed in a drawer. We never see it and can’t send it to you.' },
+  faq.lostPhone,
+  faq.recentlyDeleted,
+  { q: 'Using Folio on the web', a: 'When the web app launches, you’ll sign in at folio.devilsense.com and unlock your diary by scanning a QR code with Folio on your iPhone, or with your recovery key.' },
+  { q: 'Sync isn’t working', a: 'Your diary is always safe on your iPhone, and Folio catches up by itself when you’re back online. Check you’re signed in under Profile → Account. If it still says there’s a problem, email us and say what the screen shows.' },
+  { q: 'Dictation or ✦ isn’t showing', a: 'Dictation needs a language Apple’s on-device speech supports; Profile → Dictation & Intelligence shows which one Folio is using. ✦ needs Apple Intelligence turned on, on an iPhone that supports it. Profile explains what’s missing on yours.' },
+  { q: 'My sign-in code hasn’t arrived', a: 'Codes arrive within a minute. Check your spam folder, then ask for a new code after 30 seconds. Codes expire after 10 minutes.' },
+  { q: 'Deleting my account', a: 'See <a href="/delete-account">Delete your account</a>. Without an account there’s nothing on our servers: Profile → Your data → Erase data on this iPhone removes everything from the phone.' },
+  faq.export,
+  faq.dictation,
+];
+---
+<Page title="Support" heading="Support" description="Answers about Folio: privacy, the recovery key, Recently Deleted, sync, dictation and deleting your account."
+  lede="Answers to common questions. If yours isn’t here, email us — a person reads every message.">
+  <Faq items={items} />
+  <h2>Contact</h2>
+  <p>Email <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>. Please don’t include diary content; we never need it to help.</p>
+  <p>To report a security issue, email the same address with “Security” in the subject.</p>
+</Page>
