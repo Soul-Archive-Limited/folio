@@ -63,8 +63,9 @@ struct DictationCapsule: View {
         }
         return VStack(alignment: .leading, spacing: 2) {
             Text(status).folioFont(.caption).foregroundStyle(.inkTertiary)
-            (Text(session.lastCommitted.isEmpty ? "" : session.lastCommitted + " ").foregroundStyle(.ink)
-                + Text(session.volatileText).foregroundStyle(.inkTertiary))
+            let committed = Text(session.lastCommitted.isEmpty ? "" : session.lastCommitted + " ").foregroundStyle(.ink)
+            let volatile = Text(session.volatileText).foregroundStyle(.inkTertiary)
+            Text("\(committed)\(volatile)")
                 .folioFont(.callout)
                 .lineLimit(2)
                 .truncationMode(.head)

@@ -102,6 +102,7 @@ struct TodoScreen: View {
     /// circle, so there's never a gap under it (owner review, Batch C).
     private var bottomBar: some View {
         let inline = inlinePlacement
+        let barPadding = Spacing.s // read here: the geometry closure below is Sendable
         return VStack(spacing: Spacing.s) {
             ToastSlot(center: toasts)
                 .padding(.horizontal, Spacing.sideMargin)
@@ -109,7 +110,7 @@ struct TodoScreen: View {
                             onFocusChange: { isTyping = $0 }) { title, day in
                 request?.send(.task(day, title: title))
             }
-            .onGeometryChange(for: Double.self) { $0.size.height - Spacing.s } action: { quickAddHeight = $0 }
+            .onGeometryChange(for: Double.self) { $0.size.height - barPadding } action: { quickAddHeight = $0 }
         }
         // A negative bottom padding shrinks the inset too, so the list's last row follows the bar down.
         .padding(.bottom, -(inline?.drop ?? 0))

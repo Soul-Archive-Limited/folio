@@ -64,10 +64,12 @@ struct ComposerPhotoPickerButton: View {
     @State private var items: [PhotosPickerItem] = []
 
     var body: some View {
+        // The label closure is Sendable, so read the main-actor token here.
+        let side = Spacing.minHitTarget
         // PhotosPicker runs out of process: no photo-library permission is needed (SPEC §7).
         PhotosPicker(selection: $items, maxSelectionCount: max(model.remainingPhotoSlots, 1), matching: .images) {
             Label("Add photos", systemImage: "photo.on.rectangle")
-                .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
+                .frame(width: side, height: side)
         }
         .disabled(model.remainingPhotoSlots == 0)
         .onChange(of: items) { _, picked in
