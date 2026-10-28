@@ -6,6 +6,8 @@ options:
   bundleIdPrefix: com.devilsense
   deploymentTarget:
     iOS: "26.0"
+  # Matches the Xcode in use, so Xcode doesn't flag "Update to recommended settings" (Batch E).
+  xcodeVersion: "27.1"
   createIntermediateGroups: true
   groupSortPosition: top
   # Build number: CI_BUILD_NUMBER on Xcode Cloud, git commit count locally (Batch D).
@@ -22,6 +24,9 @@ settings:
     SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
     ENABLE_USER_SCRIPT_SANDBOXING: YES
     DEAD_CODE_STRIPPING: YES
+    # Xcode 27.1's recommended project settings (its Base_ProjectSettings template).
+    CLANG_CXX_LANGUAGE_STANDARD: gnu++20
+    GCC_C_LANGUAGE_STANDARD: gnu17
     MARKETING_VERSION: "0.1.0"
     # CURRENT_PROJECT_VERSION comes from Config/BuildNumber.xcconfig (generated, git-ignored).
     CODE_SIGN_STYLE: Automatic
@@ -79,6 +84,7 @@ targets:
         ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: YES
         LOCALIZATION_PREFERS_STRING_CATALOGS: YES
         SWIFT_EMIT_LOC_STRINGS: YES
+        STRING_CATALOG_GENERATE_SYMBOLS: YES
     dependencies:
       - target: FolioCrypto
         embed: false
@@ -99,6 +105,9 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         MACH_O_TYPE: staticlib
         SKIP_INSTALL: YES
+        ENABLE_MODULE_VERIFIER: YES
+        MODULE_VERIFIER_SUPPORTED_LANGUAGES: "objective-c objective-c++"
+        MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS: "gnu17 gnu++20"
         # Library code: callers decide where it runs (write-swift §3).
         SWIFT_DEFAULT_ACTOR_ISOLATION: nonisolated
 
@@ -115,6 +124,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.devilsense.folio.crypto.tests
         GENERATE_INFOPLIST_FILE: YES
+        SWIFT_EMIT_LOC_STRINGS: NO
+        STRING_CATALOG_GENERATE_SYMBOLS: NO
         SWIFT_DEFAULT_ACTOR_ISOLATION: nonisolated
 
   FolioUITests:
@@ -128,6 +139,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.devilsense.folio.uitests
         GENERATE_INFOPLIST_FILE: YES
+        SWIFT_EMIT_LOC_STRINGS: NO
+        STRING_CATALOG_GENERATE_SYMBOLS: NO
         TEST_TARGET_NAME: Folio
         SWIFT_DEFAULT_ACTOR_ISOLATION: nonisolated
 
@@ -144,3 +157,5 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.devilsense.folio.tests
         GENERATE_INFOPLIST_FILE: YES
+        SWIFT_EMIT_LOC_STRINGS: NO
+        STRING_CATALOG_GENERATE_SYMBOLS: NO
