@@ -243,7 +243,9 @@ auth.post('/email/start', async (c) => {
   const email = normaliseEmail(input.email);
   await limit(c.env, `email-start:${await sha256Hex(email)}`, 3, 15 * 60);
   // Any browser request (it carries an Origin) needs Turnstile, whatever `client` it claims.
+  // Until the web app ships with Turnstile (Batch F) there's no secret, so it stays closed.
   const fromBrowser = input.client === 'web' || c.req.header('origin') !== undefined;
+  if (fromBrowser && !c.env.TURNSTILE_SECRET) fail(503, 'web_email_disabled');
   if (fromBrowser && !(await verifyTurnstile(c.env, input.turnstileToken, ip))) fail(400, 'turnstile');
 
   // App Review's demo address gets a fixed code from a Worker secret instead of an email

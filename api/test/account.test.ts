@@ -92,10 +92,9 @@ describe('live socket (SPEC §10.5)', () => {
   });
 });
 
-describe('admin usage (SPEC §15.2)', () => {
-  it('is closed without a Cloudflare Access token', async () => {
-    expect((await api('/admin/usage')).status).toBe(403);
-    expect((await api('/admin/usage', { headers: { 'cf-access-jwt-assertion': 'forged.jwt.token' } })).status).toBe(403);
+describe('no admin endpoint (DECISIONS 176)', () => {
+  it('answers 404', async () => {
+    expect((await api('/admin/usage')).status).toBe(404);
   });
 });
 

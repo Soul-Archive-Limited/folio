@@ -22,8 +22,6 @@ export default defineConfig(async () => ({
           APPLE_PRIVATE_KEY: appleKey,
           GOOGLE_CLIENT_ID: 'test-client.apps.googleusercontent.com',
           GOOGLE_CLIENT_SECRET: 'test-google-secret',
-          ACCESS_TEAM_DOMAIN: 'folio-test.cloudflareaccess.com',
-          ACCESS_AUD: 'test-aud',
         },
       },
     }),

@@ -24,13 +24,11 @@
     "APPLE_BUNDLE_ID": "com.devilsense.folio",
     "APPLE_SERVICES_ID": "com.devilsense.folio.web",
     "APPLE_TEAM_ID": "25DH3LUCPC",
-    "APPLE_KEY_ID": "",
-    "GOOGLE_CLIENT_ID": "",
+    "APPLE_KEY_ID": "RVW7TN9U67",
+    "GOOGLE_CLIENT_ID": "1035938398089-qgeb7hols8h1onoojsr7e7t4no9hut0g.apps.googleusercontent.com",
     "EMAIL_FROM": "Folio <no-reply@folio.devilsense.com>",
     "REVIEW_EMAIL": "review@devilsense.com",
-    "REVIEW_ENABLED": "true",
-    "ACCESS_TEAM_DOMAIN": "",
-    "ACCESS_AUD": ""
+    "REVIEW_ENABLED": "true"
   },
   // Nightly clean-up of expired rows (D1 size is the free plan's tightest limit).
   "triggers": { "crons": ["17 3 * * *"] },

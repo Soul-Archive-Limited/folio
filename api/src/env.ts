@@ -16,8 +16,6 @@ export interface Env {
   EMAIL_FROM: string;
   REVIEW_EMAIL: string;
   REVIEW_ENABLED: string;
-  ACCESS_TEAM_DOMAIN: string;
-  ACCESS_AUD: string;
 
   // Secrets
   APPLE_PRIVATE_KEY?: string;

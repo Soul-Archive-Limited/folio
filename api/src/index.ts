@@ -4,7 +4,6 @@ import { HTTPException } from 'hono/http-exception';
 import type { AppEnv } from './env';
 import { fail, log } from './lib/errors';
 import { account } from './routes/account';
-import { admin } from './routes/admin';
 import { auth } from './routes/auth';
 import { blobs } from './routes/blobs';
 import { keys } from './routes/keys';
@@ -56,7 +55,6 @@ app.route('/keys', keys);
 app.route('/link', link);
 app.route('/live', live);
 app.route('/account', account);
-app.route('/admin', admin);
 app.get('/health', (c) => c.json({ ok: true }));
 
 app.notFound(() => fail(404, 'not_found'));

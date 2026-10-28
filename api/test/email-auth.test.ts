@@ -1,5 +1,6 @@
-import { env } from 'cloudflare:test';
+import { createExecutionContext, env, waitOnExecutionContext } from 'cloudflare:test';
 import { describe, expect, it } from 'vitest';
+import worker from '../src/index';
 import { OutboxSender } from '../src/lib/email';
 import { api, ORIGIN } from './helpers';
 
@@ -79,6 +80,18 @@ describe('email sign-in (SPEC §10.2)', () => {
     const response = await api('/auth/email/start', { method: 'POST', json: { email: 'web@example.com', client: 'web' }, headers: { origin: ORIGIN } });
     expect(response.status).toBe(400);
     expect(await response.json()).toEqual({ error: 'turnstile' });
+  });
+
+  it('stays closed on the web while no Turnstile secret is set (Batch F)', async () => {
+    const request = new Request(`${ORIGIN}/api/auth/email/start`, {
+      method: 'POST', body: JSON.stringify({ email: 'web@example.com', client: 'web', turnstileToken: 'x' }),
+      headers: { 'content-type': 'application/json', origin: ORIGIN },
+    });
+    const ctx = createExecutionContext();
+    const response = await worker.fetch(request, { ...env, TURNSTILE_SECRET: undefined }, ctx);
+    await waitOnExecutionContext(ctx);
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ error: 'web_email_disabled' });
   });
 
   it('App Review address: fixed code from the secret, no email', async () => {

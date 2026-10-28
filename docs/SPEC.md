@@ -479,7 +479,7 @@ Cold launch to interactive calendar < 400 ms (greeting runs while data loads). 1
 
 ### 15.2 Free-tier budget (Cloudflare free plan as of 2026 — verify current numbers)
 Workers 100k requests/day · D1 5 GB, 5M rows read/day, 100k rows written/day · Durable Objects (SQLite) 100k requests/day · R2 ~10 GB storage · Pages static requests unlimited.
-Design targets: ≤ 10 requests per active user per day; photo ≤ 600 KB; thumbnails ≤ 25 KB. Expected: free up to roughly 2–3k daily active users; at ~10k DAU move to Workers Paid ($5/month, 10M requests included) — no code changes needed. Add a tiny admin-only `/api/admin/usage` endpoint (protected by a Cloudflare Access policy, free) showing totals only — no user content.
+Design targets: ≤ 10 requests per active user per day; photo ≤ 600 KB; thumbnails ≤ 25 KB. Expected: free up to roughly 2–3k daily active users; at ~10k DAU move to Workers Paid ($5/month, 10M requests included) — no code changes needed. Usage is watched in the Cloudflare dashboard (Workers, D1, R2 and Durable Objects analytics) — there is no admin endpoint in the API (DECISIONS 176).
 
 ---
 
