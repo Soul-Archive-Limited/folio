@@ -1,38 +1,5 @@
 import SwiftUI
 
-/// Account in guest mode (SPEC §6.9): "Sync & web access" with the sign-in buttons, or,
-/// before sign-in exists in Release builds, a plain note that the diary is on this iPhone.
-struct ProfileAccountSection: View {
-    var body: some View {
-        Section("Account") {
-            VStack(alignment: .leading, spacing: Spacing.m) {
-                Label {
-                    VStack(alignment: .leading, spacing: Spacing.xxs) {
-                        Text(FeatureFlags.showsSignIn ? "Sync & web access" : "On this iPhone only")
-                            .folioFont(.headline)
-                            .foregroundStyle(.ink)
-                        Text(FeatureFlags.showsSignIn
-                             ? "Use Folio on the web and on a new iPhone. Encrypted end to end."
-                             : "Your diary is stored on this iPhone. Export it any time from Your data.")
-                            .folioFont(.callout)
-                            .foregroundStyle(.inkSecondary)
-                    }
-                } icon: {
-                    Image(systemName: FeatureFlags.showsSignIn ? "arrow.triangle.2.circlepath.icloud" : "iphone")
-                        .foregroundStyle(.ember)
-                }
-                if FeatureFlags.showsSignIn {
-                    SyncSignInButtons()
-                    LegalFooter()
-                        .frame(maxWidth: .infinity)
-                }
-            }
-            .padding(.vertical, Spacing.xs)
-        }
-        .listRowBackground(ProfileRowBackground())
-    }
-}
-
 /// Theme, writing font and first day of the week (SPEC §6.9). These are synced settings.
 struct ProfileAppearanceSection: View {
     @Environment(DiaryStore.self) private var store

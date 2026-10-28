@@ -41,10 +41,7 @@ enum TourStep: Int, CaseIterable, Identifiable, Sendable {
         case .add: "Tap + to write. The calendar stays above while you type."
         case .composerTools: "Add photos, pick a category, or dictate instead of typing."
         case .todo: "Tasks you finish stay on their day, ticked."
-        case .profile:
-            FeatureFlags.showsSignIn
-                ? "Make categories with your own colours. Turn on sync any time."
-                : "Make categories with your own colours."
+        case .profile: "Make categories with your own colours. Turn on sync any time."
         }
     }
 

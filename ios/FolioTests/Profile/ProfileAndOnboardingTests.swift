@@ -88,13 +88,4 @@ struct OnboardingTests {
         #expect(OnboardingPage.privacy.next == .name)
         #expect(OnboardingPage.sync.next == nil)
     }
-
-    @Test("Sign-in shows in DEBUG only until Phase 10")
-    func signInFlag() {
-        #if DEBUG
-        #expect(FeatureFlags.showsSignIn)
-        #else
-        #expect(!FeatureFlags.showsSignIn)
-        #endif
-    }
 }

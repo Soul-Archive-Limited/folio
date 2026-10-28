@@ -4,6 +4,7 @@ import SwiftUI
 struct MainTabView: View {
     @Environment(DiaryStore.self) private var store
     @Environment(TourModel.self) private var tour: TourModel?
+    @Environment(SyncEngine.self) private var sync
     @State private var selection: AppTab = .calendar
     @State private var calendar: CalendarModel?
     @State private var journal = JournalModel()
@@ -40,7 +41,11 @@ struct MainTabView: View {
         }
         .tabBarMinimizeBehavior(selection.minimisesTabBar ? .onScrollDown : .never)
         .tourHost(.main, tour)
-        .onAppear(perform: connectTour)
+        .onAppear {
+            connectTour()
+            // Sync's own notices ("Signed out…") use the app's toasts.
+            sync.toasts = toasts
+        }
         .onChange(of: requester.pending?.id) { old, new in
             if new != nil { tour?.didOpenComposer() } else if old != nil { tour?.didCloseComposer() }
         }
