@@ -1,11 +1,14 @@
 import os
 import SwiftData
 import SwiftUI
+import UIKit
 
 @main
 struct FolioApp: App {
     private let container: ModelContainer
     @State private var store: DiaryStore
+    @State private var account: AccountModel
+    @State private var sync: SyncEngine
 
     init() {
         let container: ModelContainer
@@ -24,19 +27,29 @@ struct FolioApp: App {
         DebugLaunchOptions.apply(to: store)
         #endif
         _store = State(initialValue: store)
+        let account = AccountModel()
+        _account = State(initialValue: account)
+        _sync = State(initialValue: SyncEngine(store: store, account: account))
     }
 
     var body: some Scene {
         WindowGroup {
             AppRootView()
                 .environment(store)
+                .environment(account)
+                .environment(sync)
                 .modelContainer(container)
         }
-        .backgroundTask(.appRefresh(TrashMaintenance.refreshTaskID)) {
-            await MainActor.run { [store] in
-                TrashMaintenance.purgeIfPossible(store)
-                TrashMaintenance.scheduleRefresh()
-            }
+        .backgroundTask(.appRefresh(TrashMaintenance.refreshTaskID)) { [store, account, sync] in
+            await Self.backgroundRefresh(store: store, account: account, sync: sync)
         }
+    }
+
+    /// The purge and, when signed in, a sync — only while the store's files are readable
+    /// (DECISIONS 100).
+    private static func backgroundRefresh(store: DiaryStore, account: AccountModel, sync: SyncEngine) async {
+        TrashMaintenance.purgeIfPossible(store)
+        if UIApplication.shared.isProtectedDataAvailable { await sync.backgroundRefresh() }
+        TrashMaintenance.scheduleRefresh(signedIn: account.isSignedIn)
     }
 }

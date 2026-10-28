@@ -84,4 +84,28 @@ struct RecoveryAndLinkTests {
             try DeviceLink.sendDataKey(.generate(), toPublicKey: Data(count: 5), requestID: "r", userID: userID)
         }
     }
+
+    @Test("The envelope's wire form is 93 bytes and round-trips; other versions are refused")
+    func envelopeWire() throws {
+        let envelope = try RecoveryKeyWrapper.wrap(.generate(), with: .generate(), userID: userID)
+        let wire = envelope.wireData
+        #expect(wire.count == 93)
+        #expect(try KeyEnvelope(wireData: wire) == envelope)
+        var future = wire
+        future[0] = 2
+        #expect(throws: FolioCryptoError.unsupportedVersion) { try KeyEnvelope(wireData: future) }
+        #expect(throws: FolioCryptoError.invalidLength) { try KeyEnvelope(wireData: wire.prefix(40)) }
+    }
+
+    @Test("A sealed blob's combined form round-trips")
+    func combinedBlob() throws {
+        let key = DataKey.generate()
+        let photo = UUID()
+        let sealed = try RecordCipher.seal(Data(repeating: 7, count: 300), recordID: photo, type: .displayBlob, userID: userID, using: key)
+        let back = try SealedRecord(combined: sealed.combined)
+        #expect(try RecordCipher.open(back, recordID: photo, type: .displayBlob, userID: userID, using: key) == Data(repeating: 7, count: 300))
+        #expect(throws: FolioCryptoError.authenticationFailed) {
+            try RecordCipher.open(back, recordID: photo, type: .thumbnailBlob, userID: userID, using: key)
+        }
+    }
 }

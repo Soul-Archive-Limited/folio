@@ -25,8 +25,9 @@ struct PhotoTile: View {
                 RoundedRectangle(cornerRadius: cornerRadius).strokeBorder(.hairline, lineWidth: 1)
             }
             .animation(.easeOut(duration: 0.2), value: image != nil)
-            .task(id: photoID) {
-                image = ThumbnailCache.shared.cachedImage(for: photoID)
+            // Re-runs when synced photo bytes arrive (Phase 10).
+            .task(id: PhotoLoadKey(id: photoID, revision: store.photoBytesRevision)) {
+                image = ThumbnailCache.shared.cachedImage(for: photoID) ?? image
                 if image == nil { image = await ThumbnailCache.shared.image(for: photoID, store: store) }
             }
             .accessibilityHidden(true)

@@ -48,6 +48,29 @@ final class EntryPhoto: SyncedRecord {
         self.isTombstone = false
     }
 
+    /// A photo that arrived from another device (Phase 10): metadata first, image bytes once its
+    /// encrypted blobs download. Empty data means "not downloaded yet".
+    init(id: UUID, entryID: UUID, sortIndex: Int, pixelWidth: Int, pixelHeight: Int, createdAt: Date, updatedAt: Date) {
+        self.id = id
+        self.entryID = entryID
+        self.entry = nil
+        self.sortIndex = sortIndex
+        self.imageData = Data()
+        self.thumbData = Data()
+        self.displayData = nil
+        self.pixelWidth = pixelWidth
+        self.pixelHeight = pixelHeight
+        self.blobUploaded = true
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+        self.serverVersion = nil
+        self.isDirty = false
+        self.isTombstone = false
+    }
+
+    /// Bytes still to download from R2.
+    var needsDownload: Bool { thumbData.isEmpty || imageData.isEmpty || displayData == nil }
+
     /// The display rendition, or the full image for a photo the backfill hasn't reached yet.
     var displayOrFullData: Data { displayData ?? imageData }
 }

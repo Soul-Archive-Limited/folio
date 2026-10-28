@@ -32,8 +32,8 @@ struct FullPhotoImage: View {
             .clipShape(.rect(cornerRadius: cornerRadius))
             .contentShape(.rect(cornerRadius: cornerRadius))
         .animation(.easeOut(duration: 0.2), value: image != nil)
-        .task(id: photoID) {
-            image = DisplayImageCache.shared.cached(photoID, rendition: rendition, maxPixel: maxPixel)
+        .task(id: PhotoLoadKey(id: photoID, revision: store.photoBytesRevision)) {
+            image = DisplayImageCache.shared.cached(photoID, rendition: rendition, maxPixel: maxPixel) ?? image
             if image == nil {
                 image = await DisplayImageCache.shared.image(for: photoID, rendition: rendition, maxPixel: maxPixel, store: store)
             }

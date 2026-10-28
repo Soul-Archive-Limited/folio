@@ -18,6 +18,12 @@ final class DiaryStore {
     @ObservationIgnored var trashClockHighWater: Date?
 
     private(set) var revision = 0
+    /// Bumped when synced photo bytes finish downloading, so image views load them.
+    var photoBytesRevision = 0
+    /// Called after every local write, so sync can schedule a push (Phase 10).
+    @ObservationIgnored var onLocalChange: (() -> Void)?
+    /// True while sync applies remote changes, which aren't local edits.
+    @ObservationIgnored var isApplyingRemote = false
 
     @ObservationIgnored private var markerCache: [MarkerCacheKey: [DayKey: DayMarker]] = [:]
     @ObservationIgnored private var markerCacheRevision = 0
@@ -514,9 +520,10 @@ final class DiaryStore {
     func commit() {
         save()
         revision += 1
+        if !isApplyingRemote { onLocalChange?() }
     }
 
-    private func save() {
+    func save() {
         do {
             try context.save()
         } catch {

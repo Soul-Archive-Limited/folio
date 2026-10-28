@@ -13,10 +13,11 @@ enum TrashMaintenance {
         store.purgeExpiredTrash()
     }
 
-    /// Asks for a background refresh in about a day; the system decides when.
-    static func scheduleRefresh() {
+    /// Asks for a background refresh — in about an hour when signed in (sync), a day otherwise
+    /// (the purge); the system decides when.
+    static func scheduleRefresh(signedIn: Bool = false) {
         let request = BGAppRefreshTaskRequest(identifier: refreshTaskID)
-        request.earliestBeginDate = .now.addingTimeInterval(24 * 60 * 60)
+        request.earliestBeginDate = .now.addingTimeInterval(signedIn ? 60 * 60 : 24 * 60 * 60)
         do {
             try BGTaskScheduler.shared.submit(request)
         } catch {

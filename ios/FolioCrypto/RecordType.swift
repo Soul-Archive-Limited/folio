@@ -10,4 +10,6 @@ public enum RecordType: String, CaseIterable, Codable, Sendable {
     case photoBlob = "photo"
     /// Encrypted thumbnail blob in R2.
     case thumbnailBlob = "thumb"
+    /// Encrypted 1080 px display rendition in R2 (Phase 10).
+    case displayBlob = "display"
 }

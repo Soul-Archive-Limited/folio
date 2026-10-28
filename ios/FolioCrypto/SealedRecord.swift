@@ -11,3 +11,14 @@ public struct SealedRecord: Equatable, Codable, Sendable {
         self.ciphertextAndTag = ciphertextAndTag
     }
 }
+
+extension SealedRecord {
+    /// `nonce ‖ ciphertext ‖ tag` in one buffer: the layout of an encrypted photo in R2.
+    public var combined: Data { nonce + ciphertextAndTag }
+
+    public init(combined data: Data) throws(FolioCryptoError) {
+        guard data.count >= AESGCM.nonceByteCount + AESGCM.tagByteCount else { throw .invalidLength }
+        let bytes = [UInt8](data)
+        self.init(nonce: Data(bytes[..<AESGCM.nonceByteCount]), ciphertextAndTag: Data(bytes[AESGCM.nonceByteCount...]))
+    }
+}

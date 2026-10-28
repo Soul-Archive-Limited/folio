@@ -5,6 +5,8 @@ import SwiftUI
 struct AppRootView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(DiaryStore.self) private var store
+    @Environment(AccountModel.self) private var account
+    @Environment(SyncEngine.self) private var sync
     @AppStorage(PreferenceKeys.hasOnboarded) private var hasOnboarded = false
     @State private var greeting: GreetingIntroModel?
     @State private var tour = TourModel()
@@ -29,10 +31,14 @@ struct AppRootView: View {
         .onChange(of: scenePhase) { _, phase in
             if phase == .background {
                 UserDefaults.standard.set(AppClock.now, forKey: PreferenceKeys.lastBackgroundAt)
-                TrashMaintenance.scheduleRefresh()
+                TrashMaintenance.scheduleRefresh(signedIn: account.isSignedIn)
+                sync.enterBackground()
             }
             // Launch reaches `.active` too, so this covers launch and every foreground.
-            if phase == .active { TrashMaintenance.purgeIfPossible(store) }
+            if phase == .active {
+                TrashMaintenance.purgeIfPossible(store)
+                sync.enterForeground()
+            }
         }
         .task {
             prepareGreetingIfNeeded()
@@ -40,6 +46,7 @@ struct AppRootView: View {
             if hasOnboarded, greeting == nil { tour.resumeIfNeeded() }
         }
         .task(priority: .utility) { await store.backfillDisplayRenditions() }
+        .task { await account.checkAppleCredential() }
     }
 
     @ViewBuilder private var content: some View {

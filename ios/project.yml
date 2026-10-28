@@ -43,6 +43,9 @@ targets:
         excludes: ["**/.gitkeep"]
     entitlements:
       path: Folio/Resources/Folio.entitlements
+      properties:
+        # Sign in with Apple (Phase 10). The App ID com.devilsense.folio has the capability.
+        com.apple.developer.applesignin: [Default]
     info:
       path: Folio/Resources/Info.plist
       properties:
@@ -53,10 +56,11 @@ targets:
         # Only Apple's CryptoKit and HTTPS: encryption within the operating system, exempt from
         # export documentation (DECISIONS 143). Never add a third-party crypto library.
         ITSAppUsesNonExemptEncryption: false
-        NSCameraUsageDescription: "Folio uses the camera only when you choose to take a photo for an entry."
+        NSCameraUsageDescription: "Folio uses the camera only when you take a photo for an entry or scan a code to link another device."
+        NSFaceIDUsageDescription: "Folio asks for Face ID before showing your recovery key or letting another device read your diary."
         NSMicrophoneUsageDescription: "Folio uses the microphone only while you dictate. Audio is processed on your iPhone and never stored or sent anywhere."
         NSSpeechRecognitionUsageDescription: "Folio turns your voice into text on your iPhone. Nothing is sent to a server."
-        # Background refresh runs the Recently Deleted purge (SPEC §5.2) and, from Phase 10, sync.
+        # Background refresh runs the Recently Deleted purge (SPEC §5.2) and sync (SPEC §10.5).
         UIBackgroundModes: [fetch]
         BGTaskSchedulerPermittedIdentifiers: [com.devilsense.folio.refresh]
         UILaunchScreen:
