@@ -2,14 +2,21 @@
 
 The next session starts here. Read this, then `CLAUDE.md`, `docs/SPEC.md`, `docs/PHASES.md` and the last entries of `docs/DECISIONS.md`. Updated at the end of every batch.
 
-_Last updated: 2026-10-29, end of Batch E (Phase 9 deployed, Phase 10 done, TestFlight build uploaded)._
+_Last updated: 2026-10-29, end of Batch F (Phase 12 web app live, TestFlight build uploaded)._
 
-## Batch E status (resume here)
-- ✅ Part 1 "Batch D fixes" committed (b96e69c): all 10 fixes, tests, before/after shots in `docs/screenshots/batch-e/`, tour recording.
-- ✅ Step 0 (resume): Release archive 0 warnings; CI fails on any Release warning (5bcae89).
-- ✅ Part 2 Phase 9 **deployed** on `folio.devilsense.com/api/*` (Worker `folio-api`, account 8a423f60…, D1 `folio-db` WEUR, R2 `folio-blobs` WEUR). Secrets set: OTP_PEPPER, TOKEN_ENCRYPTION_KEY (generated into wrangler), APPLE_PRIVATE_KEY (from the .p8), RESEND_API_KEY, GOOGLE_CLIENT_SECRET (owner pasted). Live smoke test passed 2026-10-28 (DECISIONS 179). No admin endpoint, no Cloudflare Access (DECISIONS 176). **`REVIEW_CODE` is a temporary test value** Claude generated into wrangler with the owner's permission for the Simulator tests (DECISIONS 187) — **the owner replaces it before App Review (Phase 14)** with `npx wrangler secret put REVIEW_CODE` and puts the new code in App Store Connect's review notes. **Not set yet:** `TURNSTILE_SECRET` (Batch F — web email sign-in answers 503 until then, DECISIONS 177). Blob uploads are 180/hour (DECISIONS 186, deployed). Wrangler commands need `CLOUDFLARE_ACCOUNT_ID=8a423f60aa5b78df5763a9877746b80e` for anything not reading `wrangler.jsonc` (the login sees two accounts).
-- ✅ Step 3 = Part 3 Phase 10 done: services `ios/Folio/Services/{Account,Sync}`, screens `Features/Account` + Profile (signed-in section, Devices, Link a device, Delete account, `AccountRoutes` presents them). DECISIONS 180–188. Live two-Simulator test passed on the deployed API (`ios/FolioUITests/SyncLiveUITests.swift`, run one step at a time with `FOLIO_REVIEW_CODE=… scripts/sync-live-test.sh <udid> <test>`; Simulators `Folio Sync A/B/C`). The test account was deleted at the end: D1 and R2 are empty except 3 hashed rows in `deletions_log`.
-- ✅ Step 4: **TestFlight 0.1.0 (43)** uploaded from this Mac with `scripts/testflight.sh` on 2026-10-29 after CI went green (e7daeb5). No tag pushed, Xcode Cloud not used. The owner's iPhone checklist is in `docs/reports/batch-e.md` (Part 4). **Next session:** the owner's results → Batch F (fixes + Phase 12 web app with Turnstile).
+## Batch F status (resume here)
+- Part 1: skipped — the owner hadn't tested 0.1.0 (43); they test the Batch F build next. Their notes → Batch G Part 1.
+- ✅ Part 2: Devices (model + OS, added, last seen hourly, This device, rename sealed with the Data Key on the session row, migration 0002), one request per photo (`PUT /api/blobs/photo/:id`, 600/h, 3,000/day), recovery key on two 4-5-4 lines, gitleaks history + tree clean (DECISIONS 189–192).
+- ✅ Part 3: Phase 12 web app at `/app` (DECISIONS 193–201). Code: `web/src/app/lib/*` (crypto, markdown, store, sync, photos, trust) and `web/src/app/ui/*`; page `web/src/pages/app.astro`; `/app` CSP in `web/public/_headers`; `public/_redirects`. Tests: `cd web && npm test` (typecheck + 35 unit tests on the shared vectors/fixtures + build + 15 checks).
+- ✅ Part 4: API deployed with the owner's OK (migration 0002 + Worker version 236d92ae…). **Cloudflare Pages project `folio` is connected to GitHub: every push to main publishes folio.devilsense.com (site + `/app`).** So deploy the API *before* pushing web changes that need new endpoints. **TestFlight 0.1.0 (49)** uploaded from this Mac with `scripts/testflight.sh` on 2026-10-29 after CI went green. Turnstile: secret set by the owner; site key in `web/src/config/app.ts`.
+- **Next session:** the owner's results from the Batch F checklist (iPhone + Brave) → Batch G fixes, then Phase 13 (motion polish).
+
+### Local web + API testing (Batch F)
+- `cd api && npx wrangler dev --ip 127.0.0.1 --port 8787` (local D1/R2; `api/.dev.vars` holds generated throwaway values: OTP_PEPPER, TOKEN_ENCRYPTION_KEY, REVIEW_CODE, Cloudflare's test TURNSTILE_SECRET — never real secrets; regenerate if missing). Apply local migrations with `npx wrangler d1 migrations apply folio-db --local`.
+- `cd web && npm run build && node ../scripts/web-local-server.mjs dist 8788` → http://localhost:8788/app (Pages-like headers/rewrite, `/api` + socket proxied with the production Origin). Turnstile on localhost uses Cloudflare's always-pass test keys.
+- Simulators against it: live UI steps take `FOLIO_API_BASE=http://127.0.0.1:8787/api/`, e.g. `FOLIO_REVIEW_CODE=$(grep ^REVIEW_CODE= api/.dev.vars | cut -d= -f2) scripts/sync-live-test.sh <udid> testA1SignInNewAccount FOLIO_API_BASE=http://127.0.0.1:8787/api/`; link the browser with `testA2ApproveLink FOLIO_LINK_TEXT=<the QR's data-link attribute>`.
+- Email codes are limited to 3 per address per 15 min; on the *local* DB clear with `npx wrangler d1 execute folio-db --local --command "DELETE FROM rate_limits"`.
+- Web screenshots/Lighthouse: `playwright-core` 1.64.1 + `lighthouse` 13.5.0 installed in the session scratchpad (not the repo), Brave as the browser; Playwright's video needs a separate ffmpeg download, so record by screenshot frames + system ffmpeg instead.
 
 ## Where things stand
 
@@ -18,13 +25,14 @@ _Last updated: 2026-10-29, end of Batch E (Phase 9 deployed, Phase 10 done, Test
 | 0–8 | ✅ Done (setup, design system, data + crypto, calendar, composer, To-do, Journal + categories, onboarding/tour/Profile, dictation + ✦). |
 | Batch C fixes | ✅ Batch D Part 1. |
 | Recently Deleted (SPEC §5.2) | ✅ Batch D Part 2 (schema v3). |
-| 11 Website | ✅ Batch D Part 3 (`/web`). Not deployed until the owner connects Cloudflare Pages. |
+| 11 Website | ✅ Batch D Part 3 (`/web`). Live: Pages project `folio` builds every push to main. |
 | Xcode Cloud → TestFlight | ✅ Workflow "TestFlight"; build 1 (0.1.0 (1)) installed on the owner's iPhone. One Xcode Cloud build left in the budget. Builds now come from this Mac (`scripts/testflight.sh`): 0.1.0 (43) is Batch E's. |
 | 9 Backend | ✅ Batch E (deployed). |
-| 10 Sign-in + sync | ✅ Batch E (owner's iPhone test pending). |
-| 12 Web app (+ Turnstile), 13 Motion polish, 14 Release | ⬜ Not started. Next: Batch F = owner's Batch E iPhone feedback + Phase 12. |
+| 10 Sign-in + sync | ✅ Batch E. |
+| 12 Web app (+ Turnstile) | ✅ Batch F (live at /app; owner's Brave test pending). |
+| 13 Motion polish, 14 Release | ⬜ Not started. Next: Batch G = owner's Batch F feedback, then Phase 13. |
 
-Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8, Batch D = C fixes + Recently Deleted + 11 + Xcode Cloud, Batch E = D fixes + 9 + 10 + TestFlight.
+Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8, Batch D = C fixes + Recently Deleted + 11 + Xcode Cloud, Batch E = D fixes + 9 + 10 + TestFlight, Batch F = improvements + 12 + TestFlight.
 
 ## Repo map
 
@@ -32,7 +40,8 @@ Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8
 - `ios/Folio/{App,DesignSystem,Models,Features/*,Services/*}`; tests in `ios/FolioTests` (Swift Testing), `ios/FolioUITests` (XCTest), `ios/FolioCryptoTests`.
 - `ios/Folio/Services/Store/DiaryStore.swift` is the single `@Observable` store (all queries, CRUD, markers, export inputs).
 - `shared/` design tokens + Markdown/crypto fixtures (used by iOS and later the web app).
-- `web/` Astro site: `src/config/site.ts` (all CTAs), `src/data/faq.ts`, `src/components/HeroCalendar.tsx` (hero island), `public/_headers`. `api/` empty until Phase 9.
+- `web/` Astro site: `src/config/site.ts` (all CTAs), `src/data/faq.ts`, `src/components/HeroCalendar.tsx` (hero island), `public/_headers`. Web app: `src/app/{lib,ui}`, `src/pages/app.astro`, `src/config/app.ts` (Turnstile site key).
+- `api/` Worker (Hono, D1, R2, UserHub). `cd api && npm test`.
 - `scripts/`: `sim-shot.sh` (screenshot), `contact-sheet.swift`, `setup-hooks.sh` (gitleaks hook, run once per clone), `write-build-number.sh` (XcodeGen preGenCommand), `testflight.sh` (fallback upload only).
 - `ios/ci_scripts/ci_post_clone.sh`: Xcode Cloud installs XcodeGen and generates the project.
 
@@ -110,7 +119,6 @@ CI (GitHub Actions): `ios.yml` (test + Release build on macos-26), `node.yml` (a
 ## Open issues
 
 - Build 1 (0.1.0 (1), tag `testflight-0.1.0`) is installed on the owner's iPhone. TestFlight shows builds to the Apple Account that accepted the invitation email (the owner's phone uses a personal account; the tester is admin@devilsense.com), so new testers must open the invite on the device.
-- Website not deployed yet: owner connects Cloudflare Pages (steps in the Batch D report).
 - **Owner's iPhone test of build 1 (2026-10-27)** — to fix in Batch E:
   1. Speech: iOS **does** show the Speech Recognition prompt after the microphone one (answers the Phase 8 open question). SPEC §7 wants a glass explainer before each system prompt, so the explainer must cover speech too.
   2. Photos: no permission prompt, gallery opens directly — correct (PhotosPicker runs out of process, SPEC §7).
@@ -125,8 +133,9 @@ CI (GitHub Actions): `ios.yml` (test + Release build on macos-26), `node.yml` (a
   Recently Deleted (delete, Undo, restore) worked on device.
 - Legal pages need the owner's legal review; US year-end encryption self-classification is an open question for their adviser (DECISIONS 143).
 - iPad split view (§6.16) deferred to Phase 13.
-- Phase 9/10 not started: sign-in buttons are DEBUG-only; Release shows Continue (guest).
+- Apple web sign-in needs the Services ID's domain + return URL configured (owner step 1 in the Batch F report) — unverified until the owner tries it.
+- `REVIEW_CODE` is a temporary test value; the owner replaces it before App Review (Phase 14).
 
 ## What's next
 
-Phase 9 (backend) on the owner's go-ahead. Batches end with a push to main once CI is green; no TestFlight build unless the owner asks (budget rule above).
+Batch G: the owner's results from the Batch F checklist (iPhone + Brave), then Phase 13 (motion polish). Batches end with a push to main once CI is green; TestFlight builds come from `scripts/testflight.sh` when the owner asks (Xcode Cloud budget rule above).

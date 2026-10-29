@@ -18,7 +18,7 @@ Status key: ✅ done · 🟡 in progress · ⬜ not started
 | 9 | Backend | Worker, D1 schema, R2, `UserHub`, Better Auth (Apple/Google/email OTP via Resend), sync, blobs, linking, delete account, rate limits, admin usage (§10, §13, §15.2) | ✅ |
 | 10 | iPhone sign-in + sync | Sign-in flows, recovery key + unlock screens (§6.1 steps 6–7, §6.13), Keychain, DK + recovery key, sync engine, live socket, background refresh, QR device linking, delete account in-app (§10.2–10.6) | ✅ |
 | 11 | Website | Astro marketing site, legal pages, support/FAQ, headers, SEO (§11.1, §11.2, §14) | ✅ |
-| 12 | Web app | `/app` sign-in + unlock, calendar, entries, tasks, Tiptap editor, live sync, delete account (§11.3) | 🟡 built and tested locally; deploy pending |
+| 12 | Web app | `/app` sign-in + unlock, calendar, entries, tasks, Tiptap editor, live sync, delete account (§11.3) | ✅ |
 | 13 | Motion polish | Hitch audit with Instruments, 120 fps pass, Reduce Motion pass, web motion, iPad split view (§3.6, §6.16, §15.1) | ⬜ |
 | 14 | Release | Privacy manifest, App Store checklist, accessibility audit, review account, TestFlight (§12) | ⬜ |
 
@@ -41,7 +41,7 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - [ ] Part 1 — owner's iPhone test of 0.1.0 (43) (owner tests after this batch; fixes go in the next one)
 - [x] Part 2 — Devices (model + OS, dates, encrypted rename), one request per photo, two-line recovery key, gitleaks full scan
 - [x] Part 3 — Phase 12 web app at /app (+ Turnstile), tested on the local stack with a Simulator; deploy in Part 4
-- [ ] Part 4 — TestFlight build, web deploy, owner checklist
+- [x] Part 4 — API deployed, web live via Pages (every push to main), TestFlight 0.1.0 (49), owner checklist in the Batch F report
 
 ## Log
 
