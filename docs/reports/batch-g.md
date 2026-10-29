@@ -54,12 +54,13 @@ PHASE 14 REPORT
 
 **Built:**
 - **SPEC §12 and §13 line by line** — ticked in `docs/PHASES.md` with evidence. Added the "© 2026 Soul Archive Ltd" line in Profile → About.
-- **Privacy:** `PrivacyInfo.xcprivacy` final (no tracking; Email Address, User ID, Other Data; UserDefaults `CA92.1` only — one boot-time API swapped for `ContinuousClock` so no unverifiable reason code is needed). Privacy label answers worked out from Apple's current definition of "collect": the end-to-end-encrypted diary isn't declared because we can't access it (DECISIONS 209). The server no longer keeps raw IP addresses in rate-limit rows (keyed hash; API deployed with your OK, version 0cd68092). Privacy policy updated (device model, hashed addresses).
+- **Privacy:** `PrivacyInfo.xcprivacy` final (no tracking; Email Address, Photos or Videos, Other User Content, User ID, Other Data; UserDefaults `CA92.1` only — one boot-time API swapped for `ContinuousClock` so no unverifiable reason code is needed). I first proposed not declaring the end-to-end-encrypted diary (Apple's "collect" means data you can access; DECISIONS 209); you chose to declare it anyway, as Day One and Ente do, so the label, manifest and privacy policy now list photos and other diary content (DECISIONS 212). The server no longer keeps raw IP addresses in rate-limit rows (keyed hash; API deployed with your OK, version 0cd68092). Privacy policy updated (device model, hashed addresses).
 - **Accessibility:** Accessibility Inspector's audit on 13 screens at default size and AX5. First run had 176 findings. Fixed: grey caption text below AA (now 5.5:1 measured), three controls with under-44 pt hit areas, fixed-size sign-in text, and the privacy cover sitting invisibly in the accessibility tree. The rest were checked by hand and are false positives on Liquid Glass (DECISIONS 211). Reduce Motion, Reduce Transparency, Increase Contrast and AX5 checked.
 - **Final /vibesec** across api, web and iOS: one fix (raw IPs, above); no other findings. gitleaks: all 53 commits clean. `npm audit`: 0 vulnerabilities.
 - **`docs/APPSTORE.md`:** name, subtitle, description, keywords, promo text, categories, URLs, privacy label answers, export compliance, age rating answers (→ 4+), EU trader note, App Review notes, TestFlight Test Information, and the list of what's still needed for a public release.
 - **App Store screenshots** (`docs/appstore/`, JPEG, no alpha, sample data): 7 iPhone 6.3" (1206 × 2622) and 4 iPad 13" landscape (2752 × 2064).
-- **TestFlight 0.1.0 (54)** archived and uploaded with `scripts/testflight.sh` on 2026-10-29 after CI went green on 3eca5de (no tag pushed; Xcode Cloud untouched). App Store Connect walk-through for the external group "Friends": done with the owner step by step in this session.
+- **TestFlight:** 0.1.0 (54) uploaded first; after the owner's privacy-label decision (DECISIONS 212) **0.1.0 (56)** was archived and uploaded once CI was green on 48123fa, so the shipped privacy manifest matches the label (the build number is the commit count). No tag pushed; Xcode Cloud untouched.
+- **App Store Connect, done in the browser with the owner's permission (2026-10-29):** App Privacy published (privacy URL; Email Address, Photos or Videos, Other User Content, User ID, Other Data Types — App Functionality, linked, not tracking); version 1.0 listing (description, promotional text, keywords, support + marketing URLs, copyright); App Information (subtitle, Lifestyle / Productivity); age rating questionnaire → **4+**; TestFlight Test Information (beta description, feedback email, marketing + privacy URLs, review contact, review notes with the demo account); external group **Friends** with build 56, **submitted for Beta App Review (Waiting for Review)**; public link **https://testflight.apple.com/join/88BuzSRc** (open to anyone, no limit — testers can join once the build is approved). The owner accepted the updated Apple Developer Program License Agreement themselves. Export compliance needed no answer (Info.plist key). "Sign-in required" is off for Beta App Review because an account is optional; the demo address and code are in the review notes.
 - `/grill-with-me` isn't installed in this setup, so the §12 attack was done by hand as the line-by-line checklist.
 
 **Files changed:** `ios/Folio/Resources/PrivacyInfo.xcprivacy`, `ios/Folio/Features/PrivacyCover/PrivacyCoverModifier.swift`, 25 views moved from `inkTertiary` to `inkSecondary`, `shared/design-tokens.json` (inkSecondary 66 % / 64 %), `ios/FolioUITests/AccessibilityAuditUITests.swift`, `api/src/lib/ratelimit.ts`, `api/src/routes/auth.ts`, `api/test/phase14.test.ts`, `web/src/pages/privacy.astro`, `docs/APPSTORE.md`, `docs/appstore/*`.
@@ -74,7 +75,9 @@ PHASE 14 REPORT
 1. Weekday initials use `inkSecondary` instead of `inkTertiary` (SPEC §6.2) for AA contrast.
 2. `inkSecondary` is a little darker (66 % instead of 60 % in light mode) on iOS and the web.
 
-**Manual steps needed from the owner:** the App Store Connect walk-through (in this session, step by step).
+**Manual steps needed from the owner:**
+1. Wait for Apple's Beta App Review e-mail (usually within a day), then send your friend https://testflight.apple.com/join/88BuzSRc.
+2. Only if you want: tick "Sign-in required" in TestFlight → Test Information and type the demo account yourself (user review@devilsense.com, password = your review code). Not needed — the account is optional and the notes explain it.
 
 **Open questions for the Architect:** none.
 
@@ -89,5 +92,7 @@ PHASE 14 REPORT
 6. A device Instruments run (Animation Hitches).
 7. Google OAuth consent screen verification.
 8. Decide when to turn `REVIEW_ENABLED` off.
+9. EU Digital Services Act trader declaration (left for the public launch, as you asked).
+10. App Store screenshots aren't uploaded yet (they're in `docs/appstore/`; needed for the App Store submission, not for TestFlight).
 
 **Next phase ready:** this was the last phase.

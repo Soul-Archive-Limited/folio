@@ -46,7 +46,7 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 ### Batch G checklist
 - [x] Part 1 — owner's test of 0.1.0 (49) + web app (not tested yet; notes go to the next batch)
 - [x] Part 2 — Phase 13 motion & performance
-- [x] Part 3 — Phase 14 compliance, App Review readiness, TestFlight 0.1.0 (54) for friends
+- [x] Part 3 — Phase 14 compliance, App Review readiness, TestFlight 0.1.0 (56) for friends (Friends group, Beta App Review submitted, public link)
 
 ### Phase 14 — SPEC §12 / §13 checklist (2026-10-29)
 **App Review (§12)**
@@ -58,14 +58,14 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - [x] `requestReview` only behind Profile → Rate Folio.
 
 **Privacy (§12)**
-- [x] `PrivacyInfo.xcprivacy`: no tracking, no domains, Email Address + User ID + Other Data (App Functionality, linked), UserDefaults `CA92.1` only (DECISIONS 209).
-- [x] Privacy label answers in APPSTORE.md; E2E diary content not "collected" per Apple's definition, recorded in DECISIONS 209.
+- [x] `PrivacyInfo.xcprivacy`: no tracking, no domains, Email Address + Photos or Videos + Other User Content + User ID + Other Data (App Functionality, linked), UserDefaults `CA92.1` only (DECISIONS 209, 212).
+- [x] Privacy label published in App Store Connect; the E2E-encrypted diary content is declared (owner decision, DECISIONS 212).
 - [x] GPS/EXIF stripped (Phase 2); content hidden in the app switcher (now only in the tree while covering); no content in logs (Phase 10 /vibesec, re-checked).
 
 **Other (§12)**
 - [x] `ITSAppUsesNonExemptEncryption = NO`; Apple's table checked (OS encryption only → no documentation). US year-end self-classification stays with the owner's adviser (DECISIONS 143).
 - [x] Age rating answers → 4+ (APPSTORE.md).
-- [x] EU DSA: trader Soul Archive Ltd (owner step in App Store Connect).
+- [ ] EU DSA: trader Soul Archive Ltd — left for the public launch (owner).
 - [ ] Google OAuth consent screen verification — owner, before public release (APPSTORE.md list).
 - [x] Accessibility Inspector audit on 13 screens, default + AX5; fixes in DECISIONS 211; Reduce Motion / Transparency / Increase Contrast / AX5 screenshots.
 - [x] Works offline, signed out and after account deletion (guest mode; Phase 10 live tests; airplane-mode run from Batch E).

@@ -7,8 +7,8 @@ _Last updated: 2026-10-29, end of Batch G (Phases 13 and 14 done; TestFlight bui
 ## Batch G status (resume here)
 - Part 1: skipped — the owner hadn't tested 0.1.0 (49) yet. Their notes → next batch's Part 1.
 - ✅ Part 2: Phase 13 (DECISIONS 202–208): iPad split view, motion fixes, main-thread fixes on 10k entries, web motion + idle preload; before/after clips `docs/screenshots/batch-g/rec-0*.mp4`.
-- ✅ Part 3: Phase 14 (DECISIONS 209–211): privacy manifest + label answers, hashed IPs in rate limits (API version 0cd68092), accessibility audit + fixes, §12/§13 checklist in PHASES.md, `docs/APPSTORE.md`, App Store screenshots `docs/appstore/`, TestFlight **0.1.0 (54)** uploaded from this Mac; App Store Connect filled from APPSTORE.md with the owner (external group "Friends", public link).
-- **Next session:** the owner's test notes for the Friends build; then the public-release list at the end of `docs/reports/batch-g.md` (final name, icon, legal review, …).
+- ✅ Part 3: Phase 14 (DECISIONS 209–211): privacy manifest + label answers, hashed IPs in rate limits (API version 0cd68092), accessibility audit + fixes, §12/§13 checklist in PHASES.md, `docs/APPSTORE.md`, App Store screenshots `docs/appstore/`, TestFlight **0.1.0 (56)** uploaded from this Mac; App Store Connect filled from APPSTORE.md in the browser (App Privacy published, listing, age rating 4+, Test Information); external group "Friends" with build 56 **submitted for Beta App Review**; public link https://testflight.apple.com/join/88BuzSRc (works once approved). EU trader declaration and App Store screenshots upload are left for the public launch.
+- **Next session:** check Beta App Review's result for build 56; the owner's and their friend's test notes; then the public-release list at the end of `docs/reports/batch-g.md` (final name, icon, legal review, …).
 
 ### Phase 13/14 tools
 - Hitch audit (Simulator): `-FolioHitchLog YES -FolioPerfScript YES` on a 10k diary (`-FolioStressData YES` once), then read `Documents/hitches.log` from the app container; marks split the flows. Instruments' Animation Hitches refuses the Simulator — use a device.
