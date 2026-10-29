@@ -22,9 +22,13 @@ struct ComposerToolRow: View {
             ComposerCategoryMenu(selection: $model.categoryID)
             Spacer(minLength: 0)
             if let onDictate {
-                Button("Dictate", systemImage: "mic", action: onDictate)
-                    .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
-                    .accessibilityInputLabels(["Dictate", "Microphone"])
+                // The 44 pt frame sits inside the label so the whole square is the hit area.
+                Button(action: onDictate) {
+                    Label("Dictate", systemImage: "mic")
+                        .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
+                        .contentShape(.rect)
+                }
+                .accessibilityInputLabels(["Dictate", "Microphone"])
             }
             if let onWritingTool {
                 WritingToolsMenu(onPick: onWritingTool)
@@ -50,12 +54,15 @@ struct FormatButton: View {
     @State private var showsPopover = false
 
     var body: some View {
-        Button("Format", systemImage: "textformat") { showsPopover = true }
-            .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
-            .popover(isPresented: $showsPopover) {
-                FormatPopover(model: model)
-                    .presentationCompactAdaptation(.popover)
-            }
+        Button { showsPopover = true } label: {
+            Label("Format", systemImage: "textformat")
+                .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
+                .contentShape(.rect)
+        }
+        .popover(isPresented: $showsPopover) {
+            FormatPopover(model: model)
+                .presentationCompactAdaptation(.popover)
+        }
     }
 }
 

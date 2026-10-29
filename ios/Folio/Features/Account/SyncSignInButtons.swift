@@ -28,7 +28,7 @@ struct SyncSignInButtons: View {
             googleButton
             Button(action: onEmail) {
                 Label("Continue with email", systemImage: "envelope")
-                    .font(.system(size: 17, weight: .medium))
+                    .font(.body.weight(.medium))
                     .frame(maxWidth: .infinity, minHeight: Self.height)
             }
             .buttonStyle(.glass)
@@ -70,7 +70,7 @@ struct SyncSignInButtons: View {
                     .frame(width: 20, height: 20)
                     .accessibilityHidden(true)
                 Text("Continue with Google")
-                    .font(.system(size: 17, weight: .medium))
+                    .font(.body.weight(.medium))
                     .foregroundStyle(dark ? Color(red: 0.89, green: 0.89, blue: 0.89) : Color(red: 0.12, green: 0.12, blue: 0.12))
             }
             .frame(maxWidth: .infinity, minHeight: Self.height)
@@ -127,7 +127,7 @@ struct LegalFooter: View {
     var body: some View {
         Text("By continuing you agree to the [Terms](https://folio.devilsense.com/terms) and [Privacy Policy](https://folio.devilsense.com/privacy).")
             .font(.footnote)
-            .foregroundStyle(.inkTertiary)
+            .foregroundStyle(.inkSecondary)
             .tint(.inkSecondary)
             .fixedSize(horizontal: false, vertical: true)
             .multilineTextAlignment(.center)

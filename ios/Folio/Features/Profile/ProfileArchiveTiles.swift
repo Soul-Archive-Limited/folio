@@ -11,7 +11,7 @@ struct ProfileArchiveTiles: View {
         VStack(alignment: .leading, spacing: Spacing.s) {
             Text("Your archive")
                 .folioFont(.caption)
-                .foregroundStyle(.inkTertiary)
+                .foregroundStyle(.inkSecondary)
                 .padding(.leading, Spacing.xxs)
                 .accessibilityAddTraits(.isHeader)
             Grid(horizontalSpacing: Spacing.s, verticalSpacing: Spacing.s) {

@@ -15,13 +15,16 @@ struct JournalControls: View {
                 GlassEffectContainer(spacing: Spacing.xs) {
                     HStack(spacing: 4) {
                         ForEach(JournalModel.Mode.allCases) { mode in
-                            Button(mode == .timeline ? "Timeline" : "Photos",
-                                   systemImage: mode == .timeline ? "list.bullet.below.rectangle" : "square.grid.3x3") {
+                            Button {
                                 withAnimation(FolioMotion.standard(reduceMotion: reduceMotion)) { model.mode = mode }
+                            } label: {
+                                Label(mode == .timeline ? "Timeline" : "Photos",
+                                      systemImage: mode == .timeline ? "list.bullet.below.rectangle" : "square.grid.3x3")
+                                    .padding(.horizontal, Spacing.s)
+                                    .frame(minHeight: Spacing.minHitTarget)
+                                    .contentShape(.capsule)
                             }
                             .font(.subheadline.weight(.semibold))
-                            .padding(.horizontal, Spacing.s)
-                            .frame(minHeight: 36)
                             .foregroundStyle(model.mode == mode ? AnyShapeStyle(.white) : AnyShapeStyle(.ink))
                             .background {
                                 if model.mode == mode {
@@ -31,7 +34,7 @@ struct JournalControls: View {
                             .accessibilityAddTraits(model.mode == mode ? .isSelected : [])
                         }
                     }
-                    .padding(4)
+                    .padding(2)
                     .glassEffect(.regular, in: .capsule)
                 }
                 Spacer()

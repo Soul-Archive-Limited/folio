@@ -24,7 +24,7 @@ struct ProfileHeaderCard: View {
                                 .foregroundStyle(name.isEmpty ? .inkSecondary : .ink)
                             Image(systemName: "pencil")
                                 .font(.footnote.weight(.semibold))
-                                .foregroundStyle(.inkTertiary)
+                                .foregroundStyle(.inkSecondary)
                                 .accessibilityHidden(true)
                         }
                     }

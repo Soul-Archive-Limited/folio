@@ -9,7 +9,7 @@ import { normaliseEmail, resolveUser } from '../auth/users';
 import { hmacHex, randomToken, sealToken, sha256Base64url, sha256Hex, sixDigitCode, timingSafeEqual } from '../lib/crypto';
 import { emailSender, signInCodeEmail } from '../lib/email';
 import { fail, log } from '../lib/errors';
-import { clientIP, limit } from '../lib/ratelimit';
+import { clientIP, ipKey, limit } from '../lib/ratelimit';
 import { clearSessionCookie, createSession, lookupSession, presentedToken, requireSession, setSessionCookie } from '../lib/session';
 import { body, deviceName } from '../lib/validate';
 
@@ -60,7 +60,7 @@ const appleNative = z.object({
 });
 
 auth.post('/apple/native', async (c) => {
-  await limit(c.env, `oauth:${clientIP(c.req.raw)}`, 30, 3600);
+  await limit(c.env, `oauth:${await ipKey(c.env, c.req.raw)}`, 30, 3600);
   const input = await body(c, appleNative);
   let claims;
   try {
@@ -153,7 +153,7 @@ function browserName(agent = ''): string {
 }
 
 auth.get('/google/start', async (c) => {
-  await limit(c.env, `oauth:${clientIP(c.req.raw)}`, 30, 3600);
+  await limit(c.env, `oauth:${await ipKey(c.env, c.req.raw)}`, 30, 3600);
   const query = startQuery.safeParse(c.req.query());
   if (!query.success || !c.env.GOOGLE_CLIENT_ID) fail(400, 'invalid_request');
   const verifier = randomToken(32);
@@ -163,7 +163,7 @@ auth.get('/google/start', async (c) => {
 });
 
 auth.get('/callback/google', async (c) => {
-  await limit(c.env, `oauth:${clientIP(c.req.raw)}`, 30, 3600);
+  await limit(c.env, `oauth:${await ipKey(c.env, c.req.raw)}`, 30, 3600);
   const row = await takeState(c, 'google', c.req.query('state'));
   const code = c.req.query('code');
   const toApp = (params: string) => c.redirect(`folio://auth?${params}`, 302);
@@ -195,7 +195,7 @@ const exchange = z.object({
 });
 
 auth.post('/exchange', async (c) => {
-  await limit(c.env, `oauth:${clientIP(c.req.raw)}`, 30, 3600);
+  await limit(c.env, `oauth:${await ipKey(c.env, c.req.raw)}`, 30, 3600);
   const input = await body(c, exchange);
   const row = await c.env.DB.prepare('DELETE FROM handoff_codes WHERE code_hash = ?1 RETURNING *')
     .bind(await sha256Hex(input.code)).first<{ user_id: string; app_challenge: string; is_new: number; expires_at: number }>();
@@ -205,7 +205,7 @@ auth.post('/exchange', async (c) => {
 });
 
 auth.get('/apple/start', async (c) => {
-  await limit(c.env, `oauth:${clientIP(c.req.raw)}`, 30, 3600);
+  await limit(c.env, `oauth:${await ipKey(c.env, c.req.raw)}`, 30, 3600);
   const query = startQuery.safeParse({ ...c.req.query(), platform: 'web' });
   if (!query.success) fail(400, 'invalid_request');
   const nonce = randomToken(16);
@@ -216,7 +216,7 @@ auth.get('/apple/start', async (c) => {
 // Apple posts the result back (response_mode=form_post), so this is a cross-site POST: it's
 // exempt from the Origin check and bound to the browser by the state cookie instead.
 auth.post('/callback/apple', async (c) => {
-  await limit(c.env, `oauth:${clientIP(c.req.raw)}`, 30, 3600);
+  await limit(c.env, `oauth:${await ipKey(c.env, c.req.raw)}`, 30, 3600);
   const form = await c.req.parseBody();
   const row = await takeState(c, 'apple', typeof form.state === 'string' ? form.state : undefined);
   const code = typeof form.code === 'string' ? form.code : null;
@@ -248,7 +248,7 @@ const emailStart = z.object({
 
 auth.post('/email/start', async (c) => {
   const ip = clientIP(c.req.raw);
-  await limit(c.env, `email-start-ip:${ip}`, 10, 3600);
+  await limit(c.env, `email-start-ip:${await ipKey(c.env, c.req.raw)}`, 10, 3600);
   const input = await body(c, emailStart);
   const email = normaliseEmail(input.email);
   await limit(c.env, `email-start:${await sha256Hex(email)}`, 3, 15 * 60);
@@ -286,7 +286,7 @@ const emailVerify = z.object({
 });
 
 auth.post('/email/verify', async (c) => {
-  await limit(c.env, `email-verify-ip:${clientIP(c.req.raw)}`, 20, 3600);
+  await limit(c.env, `email-verify-ip:${await ipKey(c.env, c.req.raw)}`, 20, 3600);
   const input = await body(c, emailVerify);
   const email = normaliseEmail(input.email);
   const row = await c.env.DB.prepare(

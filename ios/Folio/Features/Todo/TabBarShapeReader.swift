@@ -35,11 +35,11 @@ struct TabBarShapeReader: UIViewRepresentable {
         var onChange: ((TabBarShape?) -> Void)?
         private var link: CADisplayLink?
         private var isTracking = false
-        private var settleUntil: CFTimeInterval = 0
+        private var settleUntil = ContinuousClock.now
         private var last: TabBarShape?
 
         /// The minimise/expand morph finishes a little after scrolling stops.
-        private static let settle: CFTimeInterval = 0.8
+        private static let settle: Duration = .milliseconds(800)
 
         override init(frame: CGRect) {
             super.init(frame: frame)
@@ -62,7 +62,7 @@ struct TabBarShapeReader: UIViewRepresentable {
         func setTracking(_ tracking: Bool) {
             guard tracking != isTracking else { return }
             isTracking = tracking
-            if !tracking { settleUntil = CACurrentMediaTime() + Self.settle }
+            if !tracking { settleUntil = .now + Self.settle }
             startLink()
         }
 
@@ -80,7 +80,7 @@ struct TabBarShapeReader: UIViewRepresentable {
 
         @objc private func tick() {
             read()
-            if !isTracking, CACurrentMediaTime() > settleUntil { stopLink() }
+            if !isTracking, ContinuousClock.now > settleUntil { stopLink() }
         }
 
         private func read() {

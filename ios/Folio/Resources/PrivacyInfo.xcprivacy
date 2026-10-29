@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!-- Privacy manifest (SPEC §12). No tracking and, until accounts exist (Phase 10), no data
-     collected. Required-reason APIs: UserDefaults, read and written only by Folio itself. -->
+<!-- Privacy manifest (SPEC §12, final in Phase 14; DECISIONS 209). No tracking, no tracking
+     domains. Collected: the account email (App Functionality, linked, not tracking), only for
+     people who choose to sign in. Diary content is end-to-end encrypted and readable only on
+     the person's devices, so it isn't declared as collected. Required-reason APIs: UserDefaults
+     (CA92.1, Folio's own settings only). No file-timestamp, disk-space, boot-time or keyboard
+     APIs in Release code. -->
 <plist version="1.0">
 <dict>
 	<key>NSPrivacyTracking</key>
@@ -9,7 +13,20 @@
 	<key>NSPrivacyTrackingDomains</key>
 	<array/>
 	<key>NSPrivacyCollectedDataTypes</key>
-	<array/>
+	<array>
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeEmailAddress</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<true/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+			</array>
+		</dict>
+	</array>
 	<key>NSPrivacyAccessedAPITypes</key>
 	<array>
 		<dict>

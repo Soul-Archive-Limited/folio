@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Weekday initials in `caption` / `inkTertiary`, starting on the chosen first weekday.
+/// Weekday initials in `caption` / `inkSecondary` (AA contrast; DECISIONS 211), starting on the chosen first weekday.
 struct WeekdayRow: View {
     let firstWeekday: Int
     let layout: CalendarLayout
@@ -11,7 +11,7 @@ struct WeekdayRow: View {
                 let weekday = (firstWeekday - 1 + offset) % 7
                 Text(Self.symbols[weekday])
                     .folioFont(.caption)
-                    .foregroundStyle(.inkTertiary)
+                    .foregroundStyle(.inkSecondary)
                     .frame(width: layout.cellSize)
                     .accessibilityHidden(true)
             }

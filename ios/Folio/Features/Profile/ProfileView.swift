@@ -87,9 +87,10 @@ struct ProfileView: View {
                 .listRowBackground(ProfileRowBackground())
 
                 Section {
-                    Text("Made by Soul Archive Ltd")
+                    Text("Made by Soul Archive Ltd\n© 2026 Soul Archive Ltd")
+                        .multilineTextAlignment(.center)
                         .folioFont(.caption)
-                        .foregroundStyle(.inkTertiary)
+                        .foregroundStyle(.inkSecondary)
                         .frame(maxWidth: .infinity)
                         .listRowBackground(Color.clear)
                 }
@@ -160,7 +161,7 @@ struct ProfileRowLabel: View {
             if external {
                 Image(systemName: "arrow.up.right")
                     .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.inkTertiary)
+                    .foregroundStyle(.inkSecondary)
                     .accessibilityHidden(true)
             }
         }

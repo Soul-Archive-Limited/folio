@@ -42,7 +42,7 @@ struct LinkQRView: View {
                     .accessibilityLabel("Link code")
                 Text(timerInterval: Date.now...expiresAt, countsDown: true)
                     .folioFont(.caption)
-                    .foregroundStyle(.inkTertiary)
+                    .foregroundStyle(.inkSecondary)
                     .monospacedDigit()
                 #if DEBUG
                 // Simulators have no camera: the approving device can paste this instead.

@@ -15,12 +15,12 @@ struct JournalEntryCard: View {
                 .clipShape(.rect(cornerRadius: Radius.card))
                 .overlay(alignment: .bottomLeading) {
                     VStack(alignment: .leading, spacing: 2) {
-                        dateLine.foregroundStyle(.white.opacity(0.85))
+                        dateLine.foregroundStyle(.white)
                         Text(displayTitle).folioFont(.title2).foregroundStyle(.white).lineLimit(2)
                     }
                     .padding(Spacing.m)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(LinearGradient(colors: [.black.opacity(0.6), .clear], startPoint: .bottom, endPoint: .top))
+                    .background(LinearGradient(colors: [.black.opacity(0.7), .black.opacity(0.35), .clear], startPoint: .bottom, endPoint: .top))
                 }
                 .clipShape(.rect(cornerRadius: Radius.card))
                 .contentShape(.rect(cornerRadius: Radius.card))
@@ -29,7 +29,7 @@ struct JournalEntryCard: View {
                 .accessibilityIdentifier("entry-card")
         } else {
             VStack(alignment: .leading, spacing: Spacing.xxs) {
-                dateLine.foregroundStyle(.inkTertiary)
+                dateLine.foregroundStyle(.inkSecondary)
                 Text(displayTitle).folioFont(.headline).foregroundStyle(.ink)
                 if !preview.isEmpty {
                     Text(preview).folioFont(.callout).foregroundStyle(.inkSecondary).lineLimit(3)

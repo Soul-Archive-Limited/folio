@@ -36,7 +36,7 @@ struct JournalMonthHeader: View {
             Spacer()
             Text("^[\(count) page](inflect: true)")
                 .folioFont(.caption)
-                .foregroundStyle(.inkTertiary)
+                .foregroundStyle(.inkSecondary)
         }
         .padding(.horizontal, Spacing.m)
         .frame(minHeight: 40)

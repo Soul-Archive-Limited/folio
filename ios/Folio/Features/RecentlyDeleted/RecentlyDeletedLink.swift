@@ -13,7 +13,7 @@ struct RecentlyDeletedLink: View {
                 Text("Recently Deleted · \(count)")
             }
             .folioFont(.callout)
-            .foregroundStyle(.inkTertiary)
+            .foregroundStyle(.inkSecondary)
             .frame(maxWidth: .infinity, minHeight: Spacing.minHitTarget)
             .contentShape(.rect)
         }

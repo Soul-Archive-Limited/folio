@@ -26,7 +26,7 @@ struct EntryCard: View {
                 }
                 HStack(spacing: Spacing.s) {
                     if let category { CategoryTag(category: category) }
-                    if let time { Text(time, format: .dateTime.hour().minute()).folioFont(.caption).foregroundStyle(.inkTertiary) }
+                    if let time { Text(time, format: .dateTime.hour().minute()).folioFont(.caption).foregroundStyle(.inkSecondary) }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)

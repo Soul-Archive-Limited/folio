@@ -21,7 +21,7 @@ struct SyncStatusRow: View {
                     if let lastSynced = sync.lastSynced {
                         Text("Last synced \(lastSynced, format: .relative(presentation: .named))")
                             .folioFont(.caption)
-                            .foregroundStyle(.inkTertiary)
+                            .foregroundStyle(.inkSecondary)
                     }
                 }
                 Spacer(minLength: 0)

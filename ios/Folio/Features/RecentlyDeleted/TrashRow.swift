@@ -25,7 +25,7 @@ struct TrashRow: View {
             Spacer(minLength: Spacing.xs)
             Text(daysLeft)
                 .folioFont(.caption)
-                .foregroundStyle(row.daysLeft <= 3 ? .danger : .inkTertiary)
+                .foregroundStyle(row.daysLeft <= 3 ? .danger : .inkSecondary)
                 .multilineTextAlignment(.trailing)
         }
         .frame(minHeight: Spacing.minHitTarget)

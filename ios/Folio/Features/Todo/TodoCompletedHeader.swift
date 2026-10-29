@@ -17,7 +17,7 @@ struct TodoCompletedHeader: View {
                 Spacer()
                 Image(systemName: "chevron.down")
                     .font(.caption.weight(.bold))
-                    .foregroundStyle(.inkTertiary)
+                    .foregroundStyle(.inkSecondary)
                     .rotationEffect(.degrees(isExpanded ? 0 : -90))
             }
             .contentShape(.rect)

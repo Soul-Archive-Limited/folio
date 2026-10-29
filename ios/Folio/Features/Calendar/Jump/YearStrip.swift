@@ -18,7 +18,7 @@ struct YearStrip: View {
                     Text(year, format: .number.grouping(.never))
                         .folioFont(year == selectedYear ? .display : .title2)
                         .monospacedDigit()
-                        .foregroundStyle(year == selectedYear ? AnyShapeStyle(.ink) : AnyShapeStyle(.inkTertiary))
+                        .foregroundStyle(year == selectedYear ? AnyShapeStyle(.ink) : AnyShapeStyle(.inkSecondary))
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
                         .frame(width: Self.itemWidth)

@@ -1,4 +1,5 @@
 import type { Env } from '../env';
+import { hmacHex } from './crypto';
 import { fail } from './errors';
 
 /**
@@ -28,4 +29,10 @@ export async function burst(env: Env, key: string): Promise<void> {
 
 export function clientIP(request: Request): string {
   return request.headers.get('cf-connecting-ip') ?? 'unknown';
+}
+
+/** The caller's IP as a rate-limit key: keyed-hashed, so D1 never holds raw IP addresses
+ *  (rows are kept two days; Phase 14 privacy review, DECISIONS 210). */
+export async function ipKey(env: Env, request: Request): Promise<string> {
+  return (await hmacHex(env.OTP_PEPPER, `ip|${clientIP(request)}`)).slice(0, 32);
 }

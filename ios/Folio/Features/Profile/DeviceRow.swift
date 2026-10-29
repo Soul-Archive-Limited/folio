@@ -19,7 +19,7 @@ struct DeviceRow: View {
                 }
                 Text(details)
                     .folioFont(.callout)
-                    .foregroundStyle(.inkTertiary)
+                    .foregroundStyle(.inkSecondary)
             }
             Spacer(minLength: Spacing.xs)
             if device.current {

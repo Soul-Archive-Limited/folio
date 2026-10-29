@@ -47,7 +47,7 @@ struct LinkDeviceView: View {
                     .frame(maxHeight: 360)
                     .padding(.horizontal, Spacing.xl)
             } else {
-                Text("This device can't scan codes.").folioFont(.callout).foregroundStyle(.inkTertiary)
+                Text("This device can't scan codes.").folioFont(.callout).foregroundStyle(.inkSecondary)
             }
             #if DEBUG
             HStack {

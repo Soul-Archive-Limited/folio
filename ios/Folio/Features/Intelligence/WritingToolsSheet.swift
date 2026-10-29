@@ -87,7 +87,7 @@ struct WritingToolsSheet: View {
                         Text("Nothing to fix. It reads well as it is.").folioFont(.callout).foregroundStyle(.inkSecondary)
                     } else {
                         Text("Removed words are struck through. New words are underlined.")
-                            .font(.footnote).foregroundStyle(.inkTertiary)
+                            .font(.footnote).foregroundStyle(.inkSecondary)
                         Text(PolishPreview.attributed(from: original, to: polished ?? original))
                             .font(model.writingFont.font())
                             .lineSpacing(5)

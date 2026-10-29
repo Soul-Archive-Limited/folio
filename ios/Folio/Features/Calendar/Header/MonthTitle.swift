@@ -25,7 +25,7 @@ struct MonthTitle: View {
                 .contentTransition(.numericText(value: Double(month.year)))
             Image(systemName: "chevron.down")
                 .font(.footnote.weight(.bold))
-                .foregroundStyle(.inkTertiary)
+                .foregroundStyle(.inkSecondary)
                 .accessibilityHidden(true)
         }
         .animation(FolioMotion.standard(reduceMotion: reduceMotion), value: month)

@@ -4,7 +4,7 @@
     "bg":           { "light": "#F5F3EF", "dark": "#0A0A0C" },
     "bgElevated":   { "light": "#FFFFFF", "dark": "#141418" },
     "ink":          { "light": "#16161A", "dark": "#F4F4F5" },
-    "inkSecondary": { "light": "#16161A", "dark": "#F4F4F5", "alpha": { "light": 0.60, "dark": 0.62 }, "contrast": { "light": 0.78, "dark": 0.80 } },
+    "inkSecondary": { "light": "#16161A", "dark": "#F4F4F5", "alpha": { "light": 0.66, "dark": 0.64 }, "contrast": { "light": 0.78, "dark": 0.80 } },
     "inkTertiary":  { "light": "#16161A", "dark": "#F4F4F5", "alpha": { "light": 0.34, "dark": 0.36 }, "contrast": { "light": 0.56, "dark": 0.58 } },
     "hairline":     { "light": "#000000", "dark": "#FFFFFF", "alpha": { "light": 0.07, "dark": 0.08 }, "contrast": { "light": 0.22, "dark": 0.24 } },
     "ember":        { "light": "#F0602A", "dark": "#FF7A45" },

@@ -17,7 +17,7 @@ struct CategoryManagerRow: View {
             Text("\(usage.entries + usage.tasks)")
                 .folioFont(.callout)
                 .monospacedDigit()
-                .foregroundStyle(.inkTertiary)
+                .foregroundStyle(.inkSecondary)
                 .accessibilityLabel("^[\(usage.entries + usage.tasks) item](inflect: true)")
         }
         .frame(minHeight: Spacing.minHitTarget)

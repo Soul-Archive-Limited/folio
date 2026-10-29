@@ -11,7 +11,7 @@ struct TrashEntryPreview: View {
             PhotoCarousel(photoIDs: photos.map(\.id)) { _ in }
         }
         if let day = entry.day {
-            Text(TrashRowData.longDay(day)).folioFont(.caption).foregroundStyle(.inkTertiary)
+            Text(TrashRowData.longDay(day)).folioFont(.caption).foregroundStyle(.inkSecondary)
         }
         if let category = store.category(id: entry.categoryID) {
             CategoryTag(category: category)
@@ -30,7 +30,7 @@ struct TrashTaskPreview: View {
     var body: some View {
         Label(task.isCompleted ? "Done" : "Not done", systemImage: task.isCompleted ? "checkmark.circle.fill" : "circle")
             .folioFont(.caption)
-            .foregroundStyle(task.isCompleted ? .done : .inkTertiary)
+            .foregroundStyle(task.isCompleted ? .done : .inkSecondary)
         Text(task.title).folioFont(.title2).foregroundStyle(.ink).accessibilityAddTraits(.isHeader)
         if let notes = task.notes, !notes.isEmpty {
             Text(notes).folioFont(.body).foregroundStyle(.inkSecondary)

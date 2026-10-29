@@ -4,7 +4,7 @@
   --bg: #f5f3ef;
   --bg-elevated: #ffffff;
   --ink: #16161a;
-  --ink-secondary: rgb(22 22 26 / 0.6);
+  --ink-secondary: rgb(22 22 26 / 0.66);
   --ink-tertiary: rgb(22 22 26 / 0.34);
   --hairline: rgb(0 0 0 / 0.07);
   --ember: #f0602a;
@@ -34,7 +34,7 @@
     --bg: #0a0a0c;
     --bg-elevated: #141418;
     --ink: #f4f4f5;
-    --ink-secondary: rgb(244 244 245 / 0.62);
+    --ink-secondary: rgb(244 244 245 / 0.64);
     --ink-tertiary: rgb(244 244 245 / 0.36);
     --hairline: rgb(255 255 255 / 0.08);
     --ember: #ff7a45;
@@ -69,7 +69,7 @@
   --bg: #0a0a0c;
   --bg-elevated: #141418;
   --ink: #f4f4f5;
-  --ink-secondary: rgb(244 244 245 / 0.62);
+  --ink-secondary: rgb(244 244 245 / 0.64);
   --ink-tertiary: rgb(244 244 245 / 0.36);
   --hairline: rgb(255 255 255 / 0.08);
   --ember: #ff7a45;

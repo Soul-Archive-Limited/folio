@@ -13,11 +13,15 @@ struct PrivacyCoverModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content.overlay {
-            PrivacyCoverView(name: isCovered ? store?.settings().displayName ?? "" : "")
-                .opacity(isCovered ? 1 : 0)
-                .allowsHitTesting(isCovered)
-                .accessibilityHidden(!isCovered)
-                .animation(isCovered ? nil : .easeOut(duration: 0.2), value: isCovered)
+            // Only in the view tree while covering: an invisible copy was still found by
+            // accessibility audits (Phase 14). Appears instantly, fades out over 0.2 s.
+            ZStack {
+                if isCovered {
+                    PrivacyCoverView(name: store?.settings().displayName ?? "")
+                        .transition(.opacity)
+                }
+            }
+            .animation(isCovered ? nil : .easeOut(duration: 0.2), value: isCovered)
         }
         .onChange(of: scenePhase, initial: true) { _, phase in
             if phase == .active { hasBeenActive = true }

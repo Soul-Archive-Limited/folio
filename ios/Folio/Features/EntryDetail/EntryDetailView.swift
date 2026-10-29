@@ -36,7 +36,7 @@ struct EntryDetailView: View {
                 if let day = entry.day {
                     Text(dateLine(day: day, minutes: entry.minutesFromMidnight))
                         .folioFont(.caption)
-                        .foregroundStyle(.inkTertiary)
+                        .foregroundStyle(.inkSecondary)
                 }
                 if let category = store.category(id: entry.categoryID) {
                     CategoryTag(category: category)

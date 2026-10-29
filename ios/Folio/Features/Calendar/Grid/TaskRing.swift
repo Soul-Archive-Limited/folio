@@ -27,6 +27,6 @@ struct TaskRing: View {
 
     private func ringStyle(_ marker: DayMarker) -> AnyShapeStyle {
         if marker.allTasksDone { return AnyShapeStyle(.done) }
-        return isPhoto ? AnyShapeStyle(.white.opacity(0.75)) : AnyShapeStyle(.inkTertiary)
+        return isPhoto ? AnyShapeStyle(.white.opacity(0.75)) : AnyShapeStyle(.inkSecondary)
     }
 }

@@ -77,7 +77,7 @@ struct PanelSectionTitle: View {
     var body: some View {
         Text(title)
             .folioFont(.caption)
-            .foregroundStyle(.inkTertiary)
+            .foregroundStyle(.inkSecondary)
             .accessibilityAddTraits(.isHeader)
     }
 }
