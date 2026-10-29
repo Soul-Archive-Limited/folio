@@ -10,7 +10,7 @@
     "preview": "astro preview",
     "test": "npm run typecheck && npm run test:unit && npm run build && node scripts/check-build.mjs",
     "test:unit": "node --test test/*.test.ts",
-    "typecheck": "tsc --noEmit -p ."
+    "typecheck": "astro sync && tsc --noEmit -p ."
   },
   "engines": {
     "node": ">=22"
