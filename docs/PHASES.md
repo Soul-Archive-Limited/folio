@@ -48,6 +48,38 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - [x] Part 2 — Phase 13 motion & performance
 - [ ] Part 3 — Phase 14 compliance, App Review readiness, TestFlight for friends
 
+### Phase 14 — SPEC §12 / §13 checklist (2026-10-29)
+**App Review (§12)**
+- [x] 2.1 complete: no placeholder or beta text in the app; review account `review@devilsense.com` with a fixed code from the `REVIEW_CODE` Worker secret, rate-limited like any address, switchable with `REVIEW_ENABLED`; notes in `docs/APPSTORE.md`. Owner sets the 6 digits.
+- [x] 4.8 Sign in with Apple first, same size as Google and email (onboarding and Profile).
+- [x] 5.1.1 Privacy Policy linked in Profile → About and under the sign-in buttons; URL in APPSTORE.md; purpose strings (§7) only at use; everything works as a guest.
+- [x] 5.1.1(v) Delete account in the app and on the web, with Apple token revocation (Phases 9–10, live-tested).
+- [x] 5.1.2 Processors only: Cloudflare, Resend; Apple/Google only if chosen.
+- [x] `requestReview` only behind Profile → Rate Folio.
+
+**Privacy (§12)**
+- [x] `PrivacyInfo.xcprivacy`: no tracking, no domains, Email Address + User ID + Other Data (App Functionality, linked), UserDefaults `CA92.1` only (DECISIONS 209).
+- [x] Privacy label answers in APPSTORE.md; E2E diary content not "collected" per Apple's definition, recorded in DECISIONS 209.
+- [x] GPS/EXIF stripped (Phase 2); content hidden in the app switcher (now only in the tree while covering); no content in logs (Phase 10 /vibesec, re-checked).
+
+**Other (§12)**
+- [x] `ITSAppUsesNonExemptEncryption = NO`; Apple's table checked (OS encryption only → no documentation). US year-end self-classification stays with the owner's adviser (DECISIONS 143).
+- [x] Age rating answers → 4+ (APPSTORE.md).
+- [x] EU DSA: trader Soul Archive Ltd (owner step in App Store Connect).
+- [ ] Google OAuth consent screen verification — owner, before public release (APPSTORE.md list).
+- [x] Accessibility Inspector audit on 13 screens, default + AX5; fixes in DECISIONS 211; Reduce Motion / Transparency / Increase Contrast / AX5 screenshots.
+- [x] Works offline, signed out and after account deletion (guest mode; Phase 10 live tests; airplane-mode run from Batch E).
+- [x] "© 2026 Soul Archive Ltd" in Profile → About and on the website footer.
+
+**Secrets & security (§13)**
+- [x] 1–2 No secrets in the app or website (bundle re-checked); server secrets only via `wrangler secret put`.
+- [x] 3–4 `.dev.vars*`, `.env*`, `*.p8`, `*.pem`, `*.key` ignored in `.gitignore`, `.dockerignore`, `.cfignore`; none tracked.
+- [x] 5 gitleaks: 53 commits clean; working-tree hits only in git-ignored build output and the throwaway `api/.dev.vars`; pre-commit hook + CI job on.
+- [x] 6 Dependabot on; `npm audit` 0 vulnerabilities (api, web).
+- [x] 7 zod on every body, parameterised D1 (generated `?n` placeholders only), userId from the session, generic errors; rate-limit keys hold no raw IPs (DECISIONS 210).
+- [x] 8–9 HTTPS/HSTS, authenticated WebSocket; Keychain + file protection; ATS default.
+- [x] 10 /vibesec final pass (api, web, iOS): no new findings beyond 210.
+
 ## Log
 
 ### Batch G Part 2 — Phase 13 motion & performance (2026-10-29)
