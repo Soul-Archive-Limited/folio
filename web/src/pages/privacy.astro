@@ -2,7 +2,7 @@
 import Page from '../layouts/Page.astro';
 import { site } from '../config/site';
 ---
-<Page title="Privacy Policy" heading="Privacy" updated="27 October 2026"
+<Page title="Privacy Policy" heading="Privacy" updated="29 October 2026"
   description="How Folio handles your data: nothing leaves your iPhone without an account, and with one your diary is end-to-end encrypted so we can't read it."
   lede="Plain English, because it’s your diary. The short version: we can’t read it.">
   <h2>Who we are</h2>
@@ -15,7 +15,7 @@ import { site } from '../config/site';
   <p>Accounts and sync are coming soon. When you choose to turn them on, we store:</p>
   <ul>
     <li>your email address and the IDs of the sign-in providers you use (Apple, Google or email), so you can sign in;</li>
-    <li>the names of your signed-in devices and when each was last seen, so you can manage and sign them out;</li>
+    <li>the model and system version of each signed-in device (for example “iPhone 15 Pro · iOS 27.1” or “Chrome on macOS”), when it was added and when it was last seen, so you can manage and sign them out. A name you give a device is end-to-end encrypted like your diary;</li>
     <li>your diary — entries, photos, tasks, categories and settings — <strong>only in end-to-end encrypted form</strong>. It is encrypted on your device with a key only your devices hold. We can’t read it, and we can’t recover it without your devices or your recovery key.</li>
   </ul>
   <p>Our servers see only what they need to move encrypted data around: record IDs, sizes, version numbers and timestamps.</p>
@@ -38,6 +38,7 @@ import { site } from '../config/site';
   <ul>
     <li>Account data: until you delete your account. Deletion is immediate for you; server clean-up, including backups, finishes within 30 days at most.</li>
     <li>Items you delete in Folio go to <strong>Recently Deleted</strong> on your devices for 30 days, then they’re permanently deleted (sooner if you empty it).</li>
+    <li>To stop abuse, sign-in and code requests are counted per network address for up to two days. We store only a keyed hash of the address, never the address itself.</li>
     <li>Support emails: up to 24 months.</li>
   </ul>
 
