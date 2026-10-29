@@ -62,10 +62,10 @@ export function Phone({ dark, screen, input }: { dark: boolean; screen: string; 
     <>
       <group ref={group} rotation={[PHONE_POSE.rx, PHONE_POSE.ry, PHONE_POSE.rz]}>
         <mesh geometry={parts.body}>
-          <meshPhysicalMaterial color={frameColor} metalness={0.85} roughness={0.32} clearcoat={0.4} clearcoatRoughness={0.3} />
+          <meshStandardMaterial color={frameColor} metalness={0.85} roughness={0.32} />
         </mesh>
         <mesh geometry={parts.glass} position={[0, 0, D / 2 + 0.0006]}>
-          <meshPhysicalMaterial color="#09090b" metalness={0} roughness={0.08} clearcoat={1} clearcoatRoughness={0.05} />
+          <meshStandardMaterial color="#09090b" metalness={0} roughness={0.08} />
         </mesh>
         <mesh geometry={parts.screen} position={[0, 0, D / 2 + 0.0012]}>
           <meshBasicMaterial map={texture} toneMapped={false} />

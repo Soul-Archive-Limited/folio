@@ -26,12 +26,22 @@ export function canRun3D(): boolean {
 }
 
 let pageReady: Promise<void> | null = null;
-/** Resolves after `load` and an idle moment, so 3D never competes with the first paint. */
+/**
+ * Resolves after `load` and an idle moment, so 3D never competes with the first paint. On touch
+ * devices it also waits for the visitor's first scroll or touch: phones are where parsing and
+ * compiling the scene costs the most, and nobody who leaves straight away pays for it.
+ */
 function afterLoadAndIdle(): Promise<void> {
   pageReady ??= new Promise((resolve) => {
     const idle = () => ('requestIdleCallback' in window ? requestIdleCallback(() => resolve(), { timeout: 2500 }) : setTimeout(resolve, 600));
-    if (document.readyState === 'complete') idle();
-    else addEventListener('load', idle, { once: true });
+    const loaded = () => {
+      if (!matchMedia('(pointer: coarse)').matches) return idle();
+      const events = ['scroll', 'touchstart', 'pointerdown', 'keydown'] as const;
+      const go = () => { events.forEach((e) => removeEventListener(e, go)); idle(); };
+      events.forEach((e) => addEventListener(e, go, { passive: true, once: true }));
+    };
+    if (document.readyState === 'complete') loaded();
+    else addEventListener('load', loaded, { once: true });
   });
   return pageReady;
 }

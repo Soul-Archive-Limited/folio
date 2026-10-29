@@ -75,10 +75,10 @@ export function Lock({ dark, input }: { dark: boolean; input: SceneInput }) {
     <>
       <group ref={group}>
         <mesh geometry={parts.body}>
-          <meshPhysicalMaterial color={ember} roughness={0.42} metalness={0.05} clearcoat={0.6} clearcoatRoughness={0.3} envMapIntensity={0.55} />
+          <meshStandardMaterial color={ember} roughness={0.42} metalness={0.05} envMapIntensity={0.55} />
         </mesh>
         <mesh geometry={parts.plate} position={[0, 0, 0.2801]}>
-          <meshPhysicalMaterial color={ember} roughness={0.55} metalness={0} clearcoat={0.2} envMapIntensity={0.5} />
+          <meshStandardMaterial color={ember} roughness={0.55} metalness={0} envMapIntensity={0.5} />
         </mesh>
         {parts.keyhole.map((geometry, i) => (
           <mesh key={i} geometry={geometry} position={[0, 0, 0.2806]}>
@@ -88,7 +88,7 @@ export function Lock({ dark, input }: { dark: boolean; input: SceneInput }) {
         {/* The pivot sits on the left leg, so the shackle swings open the way a real one does. */}
         <group ref={shackle} position={[-LEG, BH / 2 - 0.08, 0]}>
           <mesh geometry={parts.tube} position={[LEG, 0, 0]}>
-            <meshPhysicalMaterial color={dark ? '#c9c7c3' : '#dcd9d4'} metalness={1} roughness={0.22} clearcoat={0.3} />
+            <meshStandardMaterial color={dark ? '#c9c7c3' : '#dcd9d4'} metalness={1} roughness={0.22} />
           </mesh>
         </group>
       </group>

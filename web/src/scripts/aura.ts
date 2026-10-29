@@ -55,7 +55,7 @@ export function startAura(canvas: HTMLCanvasElement) {
     gl.uniform3fv(u('c1'), rgb(css.getPropertyValue('--aura1')));
     gl.uniform3fv(u('c2'), rgb(css.getPropertyValue('--aura2')));
     gl.uniform3fv(u('c3'), rgb(css.getPropertyValue('--aura3')));
-    gl.uniform1f(u('strength'), scheme.matches ? 0.36 : 0.5);
+    gl.uniform1f(u('strength'), scheme.matches ? 0.2 : 0.5);
   };
   const size = () => {
     const scale = 0.16;

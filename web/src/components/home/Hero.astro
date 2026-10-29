@@ -35,14 +35,14 @@ const words = ['Your', 'days,'];
 
 <style>
   .hero { position: relative; padding: clamp(28px, 6vw, 72px) 0 clamp(48px, 8vw, 96px); isolation: isolate; }
-  .hero-aura { position: absolute; inset: -140px 0 -10%; z-index: -1; pointer-events: none; overflow: hidden; }
+  .hero-aura { position: absolute; inset: -140px 0 -10%; z-index: -1; pointer-events: none; overflow: hidden; -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent); mask-image: linear-gradient(to bottom, #000 62%, transparent); }
   .hero-aura i { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.7; }
   .hero-aura i:nth-child(1) { width: 46vw; height: 46vw; right: 6%; top: 8%; background: var(--aura1); }
   .hero-aura i:nth-child(2) { width: 34vw; height: 34vw; right: -6%; top: 40%; background: var(--aura2); }
   .hero-aura i:nth-child(3) { width: 38vw; height: 38vw; left: -10%; top: 50%; background: var(--aura3); opacity: 0.45; }
   .aura-gl { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 1.2s ease; }
   .aura-gl.is-on { opacity: 1; }
-  @media (prefers-color-scheme: dark) { .hero-aura i { opacity: 0.32; } .hero-aura i:nth-child(3) { opacity: 0.22; } }
+  @media (prefers-color-scheme: dark) { .hero-aura i { opacity: 0.22; } .hero-aura i:nth-child(3) { opacity: 0.16; } }
 
   .hero-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); align-items: center; gap: clamp(24px, 4vw, 56px); }
   .eyebrow { margin: 0 0 20px; }

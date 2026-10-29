@@ -50,7 +50,7 @@ export function mountScene(el: HTMLElement, kind: Kind, input: SceneInput, onRea
         dpr={[1, small ? 1.75 : 2]}
         gl={{ alpha: true, antialias: true, powerPreference: 'low-power' }}
         camera={{ fov: kind === 'phone' ? 22.5 : 30, position: kind === 'phone' ? [0, 0.35, 6.6] : [0, 0.45, 6.2] }}
-        onCreated={({ camera, gl }) => { camera.lookAt(0, 0, 0); gl.toneMapping = THREE.ACESFilmicToneMapping; gl.toneMappingExposure = 1.05; }}
+        onCreated={({ camera, gl }) => { camera.lookAt(0, 0, 0); gl.toneMapping = THREE.NeutralToneMapping; gl.toneMappingExposure = 1; }}
         style={{ pointerEvents: 'none' }}
       >
         <ambientLight intensity={0.35} />

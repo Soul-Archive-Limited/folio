@@ -86,5 +86,5 @@ const tasks = ['Book the dentist', 'Post the letter to Ana', 'Renew passport pho
     :global(.js-motion) .resolve { opacity: 0; will-change: opacity, transform; }
   }
   @media (max-width: 900px) { .fragments { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 520px) { .frag-art { height: 92px; } .frag { padding: 14px; } .frag p { font-size: 14px; } }
+  @media (max-width: 520px) { .frag-art { height: 92px; } .frag { padding: 14px; transform: rotate(calc(var(--r) * 0.4)); } .frag p { font-size: 14px; } .todo span:nth-child(n+3) { display: none; } .note .hand { font-size: 18px; } }
 </style>
