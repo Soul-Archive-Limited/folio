@@ -32,11 +32,20 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 
 ### Batch E checklist
 - [x] Part 1 — Batch D fixes (owner's iPhone test of 0.1.0 (1))
-- [ ] Part 2 — Phase 9 backend (code, tests, /vibesec done; deploy waits on owner setup)
-- [ ] Part 3 — Phase 10 iPhone sign-in, encryption, sync
+- [x] Step 0 — Release archive: 0 warnings; CI fails on any Release warning
+- [x] Part 2 — Phase 9 backend deployed on folio.devilsense.com/api, live smoke test passed
+- [x] Part 3 — Phase 10 iPhone sign-in, encryption, sync (live two-Simulator test passed, /vibesec done)
 - [ ] Part 4 — TestFlight build from this Mac + owner's test list
 
 ## Log
+
+### Batch E — Phase 9 deploy + Phase 10 (2026-10-29)
+- API live on `folio.devilsense.com/api/*` (D1 `folio-db`, R2 `folio-blobs`, UserHub DO); admin endpoint dropped (no Cloudflare Access); web email sign-in closed until Turnstile (Batch F); blob uploads 180/hour.
+- iPhone: Sign in with Apple (nonce), Google (ASWebAuthenticationSession, no SDK), email code (one-time-code autofill); session in Keychain (this device), Data Key + recovery key in iCloud Keychain.
+- Recovery key screen (copy / save / print / confirm last 4); unlock by iCloud Keychain, QR from another device (Face ID approval) or recovery key; Profile → Link a browser or device.
+- Sync engine: dirty tracking, 2 s debounced push, pull only when the live socket's cursor moved, WebSocket in the foreground, background refresh while unlocked, backoff + Retry-After, encrypted thumb/display/full blobs, guest → account upload with progress, last-writer-wins, tombstones, Recently Deleted across devices.
+- Profile signed in: status, last synced, Sync now, Devices, Recovery key, Link, Sign out (keep or remove), Delete account (re-auth + DELETE, keep or erase).
+- Live test on three Simulators against the deployed API; delete account leaves nothing in D1 or R2.
 
 ### Phase 0 — Setup (2026-10-25)
 - Repo created at `github.com/Soul-Archive-Limited/folio`.

@@ -55,6 +55,8 @@ struct SyncSignInButtons: View {
             }
         }
         .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
+        // The system button reads its style once; rebuild it when the appearance changes.
+        .id(colorScheme)
         .frame(height: Self.height)
         .clipShape(.capsule)
     }
