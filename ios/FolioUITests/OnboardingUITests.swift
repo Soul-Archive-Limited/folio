@@ -26,10 +26,14 @@ final class OnboardingUITests: XCTestCase {
 
         XCTAssertTrue(app.staticTexts["Keep your diary in sync?"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 3), "the keyboard never follows to the next page")
-        app.buttons["Continue with Apple"].firstMatch.tap()
-        XCTAssertTrue(app.staticTexts["Available after Phase 10"].waitForExistence(timeout: 10),
-                      "sign-in isn't wired yet, and says so")
+        XCTAssertTrue(app.buttons["Continue with Apple"].firstMatch.exists)
+        XCTAssertTrue(app.buttons["Continue with Google"].exists)
+        // Email opens its own step, and Cancel comes back here.
+        app.buttons["Continue with email"].tap()
+        XCTAssertTrue(app.textFields["Email address"].waitForExistence(timeout: 10), "email sign-in opens")
         Thread.sleep(forTimeInterval: pace)
+        app.buttons["Cancel"].tap()
+        XCTAssertTrue(app.staticTexts["Keep your diary in sync?"].waitForExistence(timeout: 10))
         app.buttons["Not now — keep it on this iPhone"].tap()
 
         // Greeting, then the tour's first step on the calendar, with its count.

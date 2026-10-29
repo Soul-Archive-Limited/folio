@@ -13,8 +13,15 @@ struct ProfileSignedInSection: View {
 
     var body: some View {
         Section("Account") {
-            ProfileRowLabel(title: LocalizedStringKey(account.session?.email ?? String(localized: "Signed in")),
-                            systemImage: providerSymbol)
+            // Verbatim: an address is data, never a localization key or format string.
+            Label {
+                if let email = account.session?.email { Text(verbatim: email) } else { Text("Signed in") }
+            } icon: {
+                Image(systemName: providerSymbol).foregroundStyle(.ember)
+            }
+            .foregroundStyle(.ink)
+            .folioFont(.body)
+            .frame(minHeight: Spacing.minHitTarget)
             if account.status == .ready {
                 SyncStatusRow()
                 Button { Task { await sync.syncNow() } } label: {

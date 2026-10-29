@@ -52,6 +52,7 @@ struct OnboardingSyncStep: View {
                 // Signed in (even if the key comes later from Profile): onboarding is done.
                 if account.isSignedIn { onGuest() }
             }
+            .privacyCovered()
         }
     }
 }

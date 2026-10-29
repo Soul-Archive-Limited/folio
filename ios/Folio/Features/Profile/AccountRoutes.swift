@@ -35,14 +35,17 @@ struct AccountPresentations: ViewModifier {
         content
             .fullScreenCover(item: $routes.flow) { start in
                 AccountFlowView(startsWithEmail: start == .email) { routes.flow = nil }
+                    .privacyCovered()
             }
             .sheet(item: $routes.shownRecoveryKey) { shown in
                 RecoveryKeyView(key: shown.key, confirming: false)
                     .background { AuraBackground() }
                     .presentationDragIndicator(.visible)
+                    .privacyCovered()
             }
-            .sheet(isPresented: $routes.showsLink) { LinkDeviceView() }
-            .sheet(isPresented: $routes.showsDelete) { DeleteAccountView() }
+            // Every presentation gets its own cover: sheets sit above the root's overlay.
+            .sheet(isPresented: $routes.showsLink) { LinkDeviceView().privacyCovered() }
+            .sheet(isPresented: $routes.showsDelete) { DeleteAccountView().privacyCovered() }
             .confirmationDialog("Sign out of Folio on this iPhone?", isPresented: $routes.confirmsSignOut, titleVisibility: .visible) {
                 Button("Sign out and keep my diary here") { signOut(keep: true) }
                 Button("Sign out and remove it from this iPhone", role: .destructive) { signOut(keep: false) }

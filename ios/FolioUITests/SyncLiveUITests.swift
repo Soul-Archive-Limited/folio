@@ -9,8 +9,9 @@ final class SyncLiveUITests: XCTestCase {
     private var code: String? { env["FOLIO_REVIEW_CODE"] }
     static let email = "review@devilsense.com"
 
-    override func setUp() {
+    override func setUpWithError() throws {
         continueAfterFailure = false
+        try XCTSkipIf(code == nil, "Live sync test: needs TEST_RUNNER_FOLIO_REVIEW_CODE")
     }
 
     // MARK: Steps
