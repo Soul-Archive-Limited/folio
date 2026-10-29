@@ -1,0 +1,63 @@
+---
+/** Privacy: a lock closes as you scroll and the page's words turn into the scrambled text our server stores. */
+const plain = 'Train to Edinburgh. Four hours of fields, rain and a very good book.';
+---
+<section class="priv" id="privacy" data-privacy aria-labelledby="priv-title">
+  <div class="wrap priv-grid">
+    <div>
+      <header class="section-head">
+        <p class="caption">Private by design, not by promise</p>
+        <h2 id="priv-title">We can’t read your diary. <em>That’s the point.</em></h2>
+        <p>Before anything leaves your phone, it’s locked with a key that only your devices hold. Our server stores scrambled data it has no way to open — so there’s nothing for us to read, sell or hand over.</p>
+      </header>
+      <ul class="facts">
+        <li><b>Encrypted on your device</b><span>Entries, photos, tasks, categories — and even their dates.</span></li>
+        <li><b>No ads, no tracking</b><span>No analytics or third-party code in the app. This site sets no cookies.</span></li>
+        <li><b>No account needed</b><span>On iPhone, Folio works fully without one. Sync is there when you want it.</span></li>
+      </ul>
+      <a class="link-arrow" href="/security">How encryption works, in plain English <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="vault">
+      <div class="lock-stage" data-lock3d>
+        <svg class="lock-poster" viewBox="0 0 200 220" aria-hidden="true">
+          <defs>
+            <linearGradient id="lk-body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8a57" /><stop offset="1" stop-color="#e2541f" /></linearGradient>
+            <linearGradient id="lk-steel" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9c9a96" /><stop offset="0.5" stop-color="#f1efec" /><stop offset="1" stop-color="#8f8d89" /></linearGradient>
+          </defs>
+          <path d="M62 104V72a38 38 0 0 1 76 0v32" fill="none" stroke="url(#lk-steel)" stroke-width="16" stroke-linecap="round" />
+          <rect x="30" y="96" width="140" height="112" rx="26" fill="url(#lk-body)" />
+          <circle cx="100" cy="145" r="10" fill="#1a0d08" /><rect x="96" y="148" width="8" height="24" rx="4" fill="#1a0d08" />
+        </svg>
+      </div>
+      <div class="cipher glass" aria-hidden="true">
+        <p class="caption" data-cipher-label>What you write</p>
+        <p class="cipher-text" data-cipher data-plain={plain}>{plain}</p>
+      </div>
+      <p class="sr-only">On your phone the entry reads “{plain}”. On our server it is stored only as scrambled, encrypted data.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .priv { margin-top: clamp(96px, 12vw, 160px); padding: clamp(72px, 10vw, 128px) 0; background: #121216; color: #f4f4f5; --text-2: rgb(244 244 245 / 0.68); --ember-text: #ff9a6e; --hairline: rgb(255 255 255 / 0.09); position: relative; overflow: clip; }
+  .priv::before { content: ''; position: absolute; inset: 0; background: radial-gradient(40% 50% at 78% 40%, rgb(255 122 69 / 0.22), transparent 70%), radial-gradient(40% 50% at 10% 90%, rgb(61 123 255 / 0.16), transparent 70%); pointer-events: none; }
+  .priv-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: clamp(32px, 6vw, 80px); align-items: center; }
+  .facts { list-style: none; margin: 0 0 24px; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--hairline); }
+  .facts li { display: grid; grid-template-columns: 220px 1fr; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--hairline); }
+  .facts b { font: 400 24px/1.1 var(--serif); font-weight: 400; }
+  .facts span { color: var(--text-2); font-size: 15px; }
+  .priv .link-arrow { color: #f4f4f5; }
+  .vault { position: relative; display: grid; justify-items: center; }
+  .lock-stage { position: relative; width: 100%; height: clamp(320px, 34vw, 440px); display: grid; place-items: center; }
+  .lock-poster { width: 46%; max-width: 220px; filter: drop-shadow(0 40px 40px rgb(0 0 0 / 0.45)); transition: opacity 600ms ease, filter 600ms ease; }
+  .lock-stage :global(canvas) { opacity: 0; transition: opacity 700ms ease; }
+  .lock-stage:global(.is-3d) :global(canvas) { opacity: 1; }
+  .lock-stage:global(.is-3d) .lock-poster { opacity: 0; }
+  .cipher { width: min(420px, 100%); margin-top: -8px; padding: 18px 20px; border-radius: 20px; background: rgb(255 255 255 / 0.06); border-color: rgb(255 255 255 / 0.1); }
+  .cipher .caption { margin: 0 0 8px; }
+  .cipher-text { margin: 0; font-family: var(--mono); font-size: 14px; line-height: 1.55; word-break: break-all; min-height: 4.65em; }
+  @media (max-width: 900px) {
+    .priv-grid { grid-template-columns: 1fr; }
+    .facts li { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>

@@ -1,0 +1,53 @@
+---
+import Faq from '../Faq.astro';
+import Mark from '../Mark.astro';
+import { faq } from '../../data/faq';
+import { account } from '../../config/site';
+const items = [faq.readDiary, faq.account, faq.lostPhone, faq.pastDays, faq.dictation];
+---
+<section class="wrap faq-preview" aria-labelledby="faq-title">
+  <header class="section-head">
+    <p class="caption">Questions</p>
+    <h2 id="faq-title">The short answers.</h2>
+  </header>
+  <Faq items={items} />
+  <a class="link-arrow" href="/faq">All questions <span aria-hidden="true">→</span></a>
+</section>
+
+<section class="wrap note-wrap" aria-labelledby="note-title">
+  <figure class="note" data-reveal>
+    <h2 id="note-title" class="caption">A note from the maker</h2>
+    <blockquote class="serif">Folio is made by Soul Archive Ltd, a small company in London, for people who want their days kept — privately. There’s no feed, no streak and nothing to share. Just your pages, on your calendar, for as long as you want them.</blockquote>
+    <figcaption><Mark /> Soul Archive Ltd · London</figcaption>
+  </figure>
+</section>
+
+<section class="closing" aria-labelledby="closing-title">
+  <div class="closing-aura" aria-hidden="true"></div>
+  <div class="wrap">
+    <h2 id="closing-title" class="serif">Start with <em>today.</em></h2>
+    <p>Get started in a minute with Apple, Google or your email. Or open Folio on your iPhone and skip the account entirely.</p>
+    <div class="ctas">
+      <a class="btn btn-primary" href={account.getStarted}>Get started <span class="arrow" aria-hidden="true">→</span></a>
+      {account.signIn && <a class="btn btn-glass" href={account.signIn}>Sign in</a>}
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-preview { padding-top: clamp(96px, 12vw, 160px); }
+  .faq-preview .link-arrow { margin-top: 16px; }
+  .note-wrap { padding-top: clamp(96px, 12vw, 160px); }
+  .note { margin: 0 auto; max-width: 860px; text-align: center; }
+  .note h2 { margin: 0 0 24px; }
+  .note blockquote { margin: 0; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.15; letter-spacing: -0.015em; }
+  .note figcaption { display: inline-flex; align-items: center; gap: 10px; margin-top: 28px; color: var(--text-2); font-size: 15px; }
+  .note figcaption :global(svg) { width: 22px; height: 22px; }
+  .closing { position: relative; margin-top: clamp(96px, 12vw, 160px); padding: clamp(72px, 10vw, 128px) 0; text-align: center; overflow: clip; isolation: isolate; }
+  .closing-aura { position: absolute; inset: 0; z-index: -1; background: radial-gradient(40% 60% at 50% 60%, color-mix(in srgb, var(--aura1) 60%, transparent), transparent 70%), radial-gradient(30% 50% at 70% 40%, color-mix(in srgb, var(--aura2) 40%, transparent), transparent 70%), radial-gradient(30% 50% at 30% 40%, color-mix(in srgb, var(--aura3) 35%, transparent), transparent 70%); }
+  @media (prefers-color-scheme: dark) { .closing-aura { opacity: 0.45; } }
+  .closing h2 { font-size: clamp(64px, 10vw, 136px); line-height: 0.9; letter-spacing: -0.035em; margin: 0 0 20px; }
+  .closing h2 em { color: var(--ember-text); }
+  .closing p { font-size: clamp(17px, 1.8vw, 20px); color: var(--text-2); max-width: 46ch; margin: 0 auto 32px; }
+  .closing .ctas { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+</style>

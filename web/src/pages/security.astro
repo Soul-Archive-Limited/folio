@@ -1,0 +1,77 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import CipherDiagram from '../components/CipherDiagram.astro';
+import { site } from '../config/site';
+
+const can = ['Your email address, so you can sign in', 'Which sign-in you use (Apple, Google or email)', 'Your devices’ model, system and when each was last seen, so you can sign them out', 'How many encrypted records you have, of which kind (entry, photo, task…), how big they are and when they last changed'];
+const cannot = ['Your entries, their titles and their text', 'Your photos', 'Your tasks and categories', 'Which days you wrote on — dates are encrypted too', 'Your name, theme and other settings', 'Your recovery key'];
+---
+<Base title="Privacy & security" og="security" description="How Folio keeps your diary private, in plain English: end-to-end encryption on your device, what our server can and can’t see, your recovery key, and no tracking.">
+  <PageHead eyebrow="Privacy & security" lede="Folio is built so that nobody but you can read your diary — including us. Here is how, without the jargon.">
+    Private, <em>explained plainly.</em>
+  </PageHead>
+
+  <section class="wrap">
+    <CipherDiagram />
+  </section>
+
+  <section class="wrap cols">
+    <div class="col" data-reveal>
+      <h2>What our server can see</h2>
+      <ul class="list">{can.map((c) => <li>{c}</li>)}</ul>
+    </div>
+    <div class="col no" data-reveal style="--d:80ms">
+      <h2>What it can’t</h2>
+      <ul class="list">{cannot.map((c) => <li>{c}</li>)}</ul>
+    </div>
+  </section>
+
+  <section class="wrap prose-sections">
+    <article data-reveal>
+      <h2>No account, nothing to see</h2>
+      <p>On iPhone, Folio works fully without an account. Your diary lives on the phone, protected by iOS’s own file encryption, and nothing is sent to us at all.</p>
+    </article>
+    <article data-reveal>
+      <h2>Your key</h2>
+      <p>When you turn on sync, your iPhone makes a random 256-bit key. Every entry, photo, task and setting is locked with it (AES-256-GCM) before it leaves the phone. iCloud Keychain carries the key to your other Apple devices; our server only ever holds copies that are themselves locked.</p>
+    </article>
+    <article data-reveal>
+      <h2>Your recovery key</h2>
+      <p>Folio also shows you a 26-character recovery key. It’s your spare: with it, a new device can unlock your diary even if every other device is gone. We never see it, so we can’t reset it — keep it somewhere safe.</p>
+    </article>
+    <article data-reveal>
+      <h2>On the web</h2>
+      <p>Sign in at folio.devilsense.com/app, then scan the code on screen with your iPhone. The phone hands the key to the browser through an end-to-end encrypted exchange (X25519), so it passes through our server only in a form we can’t read. Close the tab and the key is gone, unless you choose “Trust this browser for 30 days”.</p>
+    </article>
+    <article data-reveal>
+      <h2>No tracking, anywhere</h2>
+      <p>The app has no analytics, no ads and no third-party code. These pages set no cookies and load nothing from other companies. The web app sets one cookie, only to keep you signed in, and loads Cloudflare’s Turnstile check only when you ask for an email sign-in code.</p>
+    </article>
+    <article data-reveal>
+      <h2>Check it yourself</h2>
+      <p>All of Folio’s code — app, server and this site — is <a href={site.githubUrl} rel="noopener">open source</a>, including the encryption and the test vectors that prove the iPhone and the web agree byte for byte.</p>
+    </article>
+  </section>
+
+  <section class="wrap links">
+    <a class="btn btn-primary" href="/privacy">Read the privacy policy</a>
+    <a class="btn btn-quiet" href="/open-source">Open source</a>
+  </section>
+</Base>
+
+<style>
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding-top: clamp(48px, 6vw, 72px); }
+  .col { padding: 28px; border-radius: 28px; background: var(--bg-elevated); box-shadow: 0 0 0 1px var(--hairline); }
+  .col h2 { font: 400 32px/1.05 var(--serif); margin: 0 0 16px; }
+  .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .list li { display: flex; gap: 12px; align-items: baseline; }
+  .list li::before { content: ''; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-tertiary); translate: 0 -1px; }
+  .no .list li::before { background: var(--ember); }
+  .prose-sections { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 5vw, 64px) clamp(32px, 6vw, 80px); padding-top: clamp(64px, 8vw, 104px); }
+  .prose-sections h2 { font: 400 clamp(28px, 3vw, 36px)/1.05 var(--serif); margin: 0 0 10px; letter-spacing: -0.01em; }
+  .prose-sections p { color: var(--text-2); font-size: 17px; margin: 0; }
+  .prose-sections a { color: var(--ink); text-decoration-color: var(--ember); text-underline-offset: 3px; }
+  .links { display: flex; flex-wrap: wrap; gap: 10px; padding-top: clamp(56px, 7vw, 88px); }
+  @media (max-width: 760px) { .cols, .prose-sections { grid-template-columns: 1fr; } }
+</style>

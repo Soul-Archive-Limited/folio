@@ -1,0 +1,32 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import Faq from '../components/Faq.astro';
+import { faq } from '../data/faq';
+const groups = [
+  { title: 'Privacy', items: [faq.readDiary, faq.recoveryKey, faq.dictation, faq.lostPhone] },
+  { title: 'Using Folio', items: [faq.account, faq.pastDays, faq.timeZones, faq.streaks, faq.shared, faq.free] },
+  { title: 'Your data', items: [faq.recentlyDeleted, faq.export] },
+  { title: 'Web and devices', items: [faq.web, faq.android, faq.who] },
+];
+---
+<Base title="FAQ" og="faq" description="Answers about Folio: who can read your diary, accounts, the recovery key, writing for past days, time zones, dictation, the web app and exporting your data.">
+  <PageHead eyebrow="FAQ" lede="Short answers to the questions people ask most. Anything else: the Support page, or email us.">
+    Questions, <em>answered.</em>
+  </PageHead>
+  <div class="wrap"><div class="groups">
+    {groups.map((g) => (
+      <section aria-labelledby={`g-${g.title}`}>
+        <h2 id={`g-${g.title}`} class="caption">{g.title}</h2>
+        <Faq items={g.items} />
+      </section>
+    ))}
+    <p class="more">Something else? See <a href="/support">Support</a>.</p>
+  </div></div>
+</Base>
+<style>
+  .groups { display: grid; gap: 56px; max-width: 900px; }
+  .groups h2 { margin: 0 0 8px; }
+  .more { color: var(--text-2); }
+  .more a { color: var(--ink); }
+</style>

@@ -1,24 +1,59 @@
 ---
 import Mark from './Mark.astro';
-import { site } from '../config/site';
+import { account, navLinks } from '../config/site';
 
 const path = Astro.url.pathname.replace(/\.html$/, '');
-const links = [
-  { href: '/#features', label: 'Features' },
-  { href: '/privacy', label: 'Privacy' },
-  { href: '/open-source', label: 'Open source' },
-  { href: '/support', label: 'Support' },
-];
 ---
-<header class="nav glass">
-  <a class="brand" href="/" aria-label="Folio home"><Mark /> Folio</a>
-  <nav aria-label="Main">
-    <ul>
-      {links.map((l) => <li><a href={l.href} aria-current={path === l.href ? 'page' : undefined}>{l.label}</a></li>)}
-    </ul>
-  </nav>
-  {site.webAppLive && <a class="btn btn-primary" href="/app">Open web app</a>}
-  {!site.webAppLive && (site.appStoreUrl || site.testflightUrl) && (
-    <a class="btn btn-primary" href={site.appStoreUrl || site.testflightUrl} rel="noopener">Get Folio</a>
-  )}
-</header>
+<div class="nav-shell">
+  <header class="nav glass">
+    <a class="brand" href="/" aria-label="Folio home"><Mark /> Folio</a>
+    <nav aria-label="Main">
+      <ul>
+        {navLinks.map((l) => <li><a href={l.href} aria-current={path === l.href ? 'page' : undefined}>{l.label}</a></li>)}
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      {account.signIn && <a class="btn btn-quiet" href={account.signIn}>Sign in</a>}
+      <a class="btn btn-primary" href={account.getStarted}>Get started</a>
+    </div>
+    <button class="menu-btn" type="button" aria-haspopup="dialog" aria-controls="site-menu" data-menu-open>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+      <span class="sr-only">Open menu</span>
+    </button>
+  </header>
+</div>
+
+<dialog class="menu" id="site-menu" aria-label="Menu">
+  <div class="menu-inner">
+    <div class="menu-top">
+      <a class="brand" href="/" aria-label="Folio home"><Mark /> Folio</a>
+      <button class="menu-btn" type="button" data-menu-close style="display:inline-flex">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+        <span class="sr-only">Close menu</span>
+      </button>
+    </div>
+    <nav aria-label="Menu">
+      <ul>
+        <li><a href="/">Home <span aria-hidden="true">→</span></a></li>
+        {navLinks.map((l) => <li><a href={l.href} aria-current={path === l.href ? 'page' : undefined}>{l.label} <span aria-hidden="true">→</span></a></li>)}
+      </ul>
+    </nav>
+    <div class="menu-actions">
+      <a class="btn btn-primary" href={account.getStarted}>Get started</a>
+      {account.signIn && <a class="btn btn-glass" href={account.signIn}>Sign in</a>}
+    </div>
+  </div>
+</dialog>
+
+<script>
+  // Full-screen glass menu on phones: a modal <dialog>, so focus, Escape and the inert page come free.
+  const menu = document.getElementById('site-menu') as HTMLDialogElement | null;
+  document.querySelector('[data-menu-open]')?.addEventListener('click', () => {
+    menu?.showModal();
+    document.documentElement.style.overflow = 'hidden';
+  });
+  menu?.querySelector('[data-menu-close]')?.addEventListener('click', () => menu.close());
+  menu?.addEventListener('close', () => { document.documentElement.style.overflow = ''; });
+  menu?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => menu.close()));
+  matchMedia('(min-width: 921px)').addEventListener('change', (e) => { if (e.matches) menu?.close(); });
+</script>

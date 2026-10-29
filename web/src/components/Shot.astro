@@ -1,0 +1,12 @@
+---
+/** A real Folio screenshot (Simulator, sample data) in our own simple phone frame, light and dark. */
+interface Props { name: string; alt: string; width?: number; eager?: boolean; class?: string }
+const { name, alt, width = 280, eager = false, class: extra = '' } = Astro.props;
+---
+<figure class={`phone ${extra}`} style={`--phone-w:${width}px`}>
+  <picture>
+    <source srcset={`/img/app/${name}-dark.webp`} media="(prefers-color-scheme: dark)" />
+    <img src={`/img/app/${name}-light.webp`} alt={alt} width="720" height="1565"
+      loading={eager ? 'eager' : 'lazy'} decoding={eager ? 'sync' : 'async'} fetchpriority={eager ? 'high' : undefined} />
+  </picture>
+</figure>

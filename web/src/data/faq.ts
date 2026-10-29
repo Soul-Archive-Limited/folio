@@ -4,11 +4,11 @@ import { site } from '../config/site';
 export const faq = {
   readDiary: {
     q: 'Can you read my diary?',
-    a: 'No. Without an account your diary never leaves your iPhone. When sync arrives, everything you write — entries, photos, tasks and categories — is encrypted on your device before it’s uploaded, with a key only your devices hold. Our servers store data they can’t read, so Soul Archive Ltd can’t read your diary, and can’t hand it to anyone else either.',
+    a: 'No. Without an account your diary never leaves your iPhone. With sync on, everything you write — entries, photos, tasks and categories — is encrypted on your device before it’s uploaded, with a key only your devices hold. Our servers store data they can’t read, so Soul Archive Ltd can’t read your diary, and can’t hand it to anyone else either.',
   },
   account: {
     q: 'Do I need an account?',
-    a: 'No. Folio works fully on your iPhone without an account, offline too. An account will only be needed for syncing with the web and a second device, and you can add one any time.',
+    a: 'Not on iPhone: Folio works fully without one, offline too. An account is only for syncing with the web and other devices, and you can add one any time. On the web, Get started creates one with Apple, Google or an email code.',
   },
   lostPhone: {
     q: 'What if I lose my iPhone?',
@@ -28,7 +28,7 @@ export const faq = {
   },
   web: {
     q: 'Can I use Folio on the web?',
-    a: 'A web version is on the way. You’ll unlock it by scanning a code with your iPhone, so your encryption key never touches our servers.',
+    a: 'Yes, at <a href="/app">folio.devilsense.com/app</a>. Sign in, then unlock your diary by scanning a code with Folio on your iPhone (or with your recovery key). The key travels from phone to browser end-to-end encrypted, so it never reaches us in a form we can read.',
   },
   export: {
     q: 'Can I get my diary out?',
@@ -36,7 +36,27 @@ export const faq = {
   },
   android: {
     q: 'Is there an Android app?',
-    a: 'Not yet. Folio is for iPhone, with a web version coming.',
+    a: 'Not yet. Folio is for iPhone and iPad, and works in any modern browser on the web.',
+  },
+  recoveryKey: {
+    q: 'What is the recovery key?',
+    a: 'When you turn on sync, Folio shows a 26-character code. It’s the only way to unlock your diary on a new device if your other devices are gone. Save it somewhere safe — a password manager, or printed in a drawer. We never see it and can’t send it to you.',
+  },
+  timeZones: {
+    q: 'What happens when I travel across time zones?',
+    a: 'Nothing moves. A Folio day is a calendar date, not a moment in time, so Tuesday’s page stays on Tuesday whether you wrote it in Lisbon or Singapore.',
+  },
+  free: {
+    q: 'What does Folio cost?',
+    a: 'Nothing. Folio is free, with no ads, no in-app purchases and no tracking.',
+  },
+  streaks: {
+    q: 'Will Folio nag me to write?',
+    a: 'No. There are no streaks, badges or reminders to keep up. Write when you want to; quiet weeks are fine.',
+  },
+  shared: {
+    q: 'Can two people share a diary?',
+    a: 'Not at the moment: every Folio diary is private to one person. Two people can each keep their own — same trip, two diaries — and neither can read the other’s.',
   },
   who: {
     q: 'Who makes Folio?',

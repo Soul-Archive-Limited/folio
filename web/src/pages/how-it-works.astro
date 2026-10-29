@@ -1,0 +1,62 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import Shot from '../components/Shot.astro';
+import CipherDiagram from '../components/CipherDiagram.astro';
+import { account } from '../config/site';
+---
+<Base title="How it works" og="how-it-works" description="Folio in three steps: write about any day, it lands on your calendar, and — if you want — it syncs end-to-end encrypted to your other devices.">
+  <PageHead eyebrow="How it works" lede="Folio is a diary built around a calendar. Here is the whole idea.">
+    Three steps. <em>Then it keeps your days.</em>
+  </PageHead>
+
+  <ol class="wrap steps">
+    <li class="step" data-reveal>
+      <div class="copy">
+        <p class="num serif" aria-hidden="true">1</p>
+        <h2>Write.</h2>
+        <p>Tap + and a half sheet opens over the calendar. Type or talk, add up to ten photos, pick a category. Any date works — today, or a day in 1987 from an old paper diary.</p>
+      </div>
+      <Shot name="composer" width={260} alt="The composer: “Train to Edinburgh” with three photos and the Travel category, dated Sunday 25 October." />
+    </li>
+    <li class="step" data-reveal>
+      <div class="copy">
+        <p class="num serif" aria-hidden="true">2</p>
+        <h2>It lands on your calendar.</h2>
+        <p>Save, and the day fills with your photo, or a dot in your category’s colour. Tasks ring their day, then tick it once they’re done. Your month becomes a picture you can read at a glance.</p>
+      </div>
+      <Shot name="calendar" width={260} alt="October 2026 with photos and dots on the days written about; Sunday 25 is selected and its page shows below." />
+    </li>
+    <li class="step wide" data-reveal>
+      <div class="copy">
+        <p class="num serif" aria-hidden="true">3</p>
+        <h2>It syncs, encrypted — if you want it to.</h2>
+        <p>Turn on sync with Apple, Google or an email code. Every page is locked on your phone before it’s uploaded, with a key only your devices hold. Your iPhone, iPad and browser can open it; we can’t.</p>
+        <p class="note">Without an account, step 3 never happens: your diary stays on your iPhone and we receive nothing.</p>
+      </div>
+      <CipherDiagram />
+    </li>
+  </ol>
+
+  <section class="wrap end">
+    <h2 class="serif">Ready when you are.</h2>
+    <div class="ctas">
+      <a class="btn btn-primary" href={account.getStarted}>Get started <span class="arrow" aria-hidden="true">→</span></a>
+      <a class="btn btn-quiet" href="/security">Privacy, explained</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .steps { list-style: none; margin: 0 auto; display: grid; gap: clamp(64px, 9vw, 112px); padding-top: 24px; }
+  .step { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(32px, 6vw, 96px); align-items: center; }
+  .step.wide { grid-template-columns: 1fr; }
+  .num { font-size: clamp(110px, 14vw, 180px); line-height: 0.75; margin: 0 0 12px; color: var(--ember-text); letter-spacing: -0.04em; }
+  .step h2 { font: 400 clamp(36px, 4.6vw, 56px)/1.02 var(--serif); letter-spacing: -0.02em; margin: 0 0 14px; }
+  .step .copy > p:not(.num) { font-size: 18px; color: var(--text-2); max-width: 48ch; }
+  .note { padding: 14px 18px; border-radius: 16px; background: var(--bg-elevated); box-shadow: 0 0 0 1px var(--hairline); font-size: 16px !important; }
+  .end { padding-top: clamp(80px, 10vw, 128px); text-align: center; }
+  .end h2 { font-size: clamp(48px, 7vw, 88px); line-height: 0.95; margin: 0 0 24px; letter-spacing: -0.03em; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  @media (max-width: 800px) { .step { grid-template-columns: 1fr; } .step :global(.phone) { justify-self: center; } }
+</style>

@@ -1,0 +1,116 @@
+---
+/**
+ * "Everything lands on your calendar": a live HTML month (October 2026, Monday first). With
+ * motion, the tiles fly in from depth and settle, photo tiles flip in, and Sunday 25's page lifts
+ * off the grid and opens into its entry. Without motion it is simply the finished month.
+ */
+type Cell = { day: number; out?: boolean; photo?: string; dots?: string[]; ring?: 'open' | 'done'; today?: boolean; lift?: boolean };
+const photos: Record<number, string> = { 6: 'dunes', 12: 'dawn', 17: 'dusk', 20: 'coast', 22: 'dunes', 25: 'hills', 27: 'lake' };
+const dots: Record<number, string[]> = { 3: ['sage'], 9: ['violet'], 14: ['rose'], 15: ['graphite'], 26: ['sand', 'ocean'] };
+const rings: Record<number, 'open' | 'done'> = { 16: 'done', 19: 'done', 21: 'done', 23: 'done', 24: 'done', 28: 'open', 29: 'open', 30: 'open' };
+const cells: Cell[] = [28, 29, 30].map((d) => ({ day: d, out: true }));
+for (let d = 1; d <= 31; d += 1) cells.push({ day: d, photo: photos[d], dots: dots[d], ring: rings[d], today: d === 27, lift: d === 25 });
+cells.push({ day: 1, out: true });
+const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+const features = [
+  { title: 'Your month at a glance', text: 'Days you wrote on show a tiny photo or a coloured dot. Days with tasks get a ring, and a tick once they’re all done.', cat: 'ember' },
+  { title: 'Write for any day', text: 'Pick a date back to 1900 and write in a half sheet while the calendar stays in view.', cat: 'ocean' },
+  { title: 'Read it back like a book', text: 'The Journal lays your pages out by month, with covers from your photos — or as one wall of every picture.', cat: 'violet' },
+  { title: 'Your own categories', text: 'Twelve colours, your names. Filter the calendar to just Travel, or just Family.', cat: 'rose' },
+  { title: 'Nothing vanishes by accident', text: 'Deleted pages wait 30 days in Recently Deleted, ready to go back to the same day.', cat: 'sage' },
+  { title: 'A light hand with words', text: '✦ suggests a title or tidies grammar, on your iPhone, and changes nothing until you say so.', cat: 'sand' },
+];
+---
+<section class="cal-story wrap" id="features" aria-labelledby="cal-title">
+  <header class="section-head">
+    <p class="caption">Features</p>
+    <h2 id="cal-title">Everything lands on <em>your calendar.</em></h2>
+    <p>Pages, photos and tasks all belong to a day. So the calendar becomes the diary — a picture of your month you can read at a glance.</p>
+  </header>
+
+  <div class="cal-scene" data-cal>
+    <div class="cal glass" role="img" aria-label="October 2026 in Folio: photos on seven days, coloured dots on five, task rings on eight, today the 27th.">
+      <div class="cal-title"><span>October</span> 2026</div>
+      <div class="cal-week" aria-hidden="true">{weekdays.map((w) => <span>{w}</span>)}</div>
+      <div class="cal-grid" aria-hidden="true">
+        {cells.map((c) => (
+          <div class:list={['cell', { out: c.out, photo: c.photo, today: c.today && !c.photo, lift: c.lift, [`ring-${c.ring}`]: c.ring }]} data-cell>
+            {c.photo && <img src={`/img/photos/${c.photo}.webp`} alt="" width="160" height="160" loading="lazy" decoding="async" />}
+            <span class="n">{c.day}</span>
+            {c.dots && <span class="dots">{c.dots.map((d) => <i style={`background:var(--cat-${d})`}></i>)}</span>}
+          </div>
+        ))}
+      </div>
+    </div>
+    <article class="entry glass" data-entry aria-label="An entry: Train to Edinburgh, Sunday 25 October 2026">
+      <img class="cover" src="/img/photos/hills.webp" alt="" width="160" height="160" loading="lazy" decoding="async" />
+      <div class="entry-body">
+        <p class="mono">Sun 25 Oct 2026 · 08:20</p>
+        <h3>Train to Edinburgh</h3>
+        <p>Four hours of fields, rain and a very good book. Book seats, find the café.</p>
+        <span class="chip"><i></i>Travel</span>
+      </div>
+    </article>
+  </div>
+
+  <ul class="features">
+    {features.map((f) => (
+      <li class="feature tilt" data-tilt data-reveal>
+        <span class="dot" style={`background:var(--cat-${f.cat})`} aria-hidden="true"></span>
+        <h3>{f.title}</h3>
+        <p>{f.text}</p>
+      </li>
+    ))}
+  </ul>
+  <a class="link-arrow" href="/features">See every feature <span aria-hidden="true">→</span></a>
+</section>
+
+<style>
+  .cal-story { padding-top: clamp(96px, 12vw, 160px); }
+  .cal-scene { position: relative; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: clamp(20px, 4vw, 48px); align-items: center; }
+  .cal { border-radius: 28px; padding: clamp(14px, 2.2vw, 26px); box-shadow: var(--shadow-float); transform-style: preserve-3d; }
+  .cal-title { font: 700 clamp(24px, 3vw, 34px)/1 var(--sans); letter-spacing: -0.02em; margin: 4px 4px 16px; }
+  .cal-week, .cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: clamp(4px, 0.8vw, 8px); }
+  .cal-week span { text-align: center; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-tertiary); padding-bottom: 8px; }
+  .cal-grid { perspective: 1100px; }
+  .cell { position: relative; aspect-ratio: 1; border-radius: clamp(8px, 1.2vw, 14px); display: grid; place-items: center; font: 500 clamp(13px, 1.5vw, 17px)/1 var(--sans); backface-visibility: hidden; }
+  .cell.out { color: var(--ink-tertiary); }
+  .cell.photo { place-items: start; overflow: hidden; }
+  .cell.photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .cell.photo .n { position: relative; margin: 5px 6px; font-size: clamp(9px, 1vw, 11px); font-weight: 700; color: #fff; text-shadow: 0 1px 4px rgb(0 0 0 / 0.4); }
+  .cell.today { color: var(--ember-text); font-weight: 700; }
+  .cell.today::after { content: ''; position: absolute; bottom: 18%; width: 4px; height: 4px; border-radius: 50%; background: var(--ember); }
+  .cell.ring-open { box-shadow: 0 0 0 1.5px var(--ink-secondary) inset; }
+  .cell.ring-done { box-shadow: 0 0 0 1.5px var(--done) inset; }
+  .cell.photo.ring-done { box-shadow: 0 0 0 2px var(--done); }
+  .cell.lift { box-shadow: 0 0 0 2.5px var(--ember); }
+  .dots { position: absolute; bottom: 14%; display: flex; gap: 3px; }
+  .dots i { width: 4px; height: 4px; border-radius: 50%; }
+
+  .entry { border-radius: 26px; overflow: hidden; box-shadow: var(--shadow-float); transform-origin: top left; }
+  .cover { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; }
+  .entry-body { padding: 20px 22px 24px; }
+  .entry-body .mono { color: var(--text-2); margin: 0 0 6px; text-transform: uppercase; font-size: 12px; }
+  .entry-body h3 { font: 400 32px/1.05 var(--serif); margin: 0 0 8px; }
+  .entry-body p { color: var(--text-2); margin: 0 0 14px; font-family: var(--serif); font-size: 19px; line-height: 1.35; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; background: color-mix(in srgb, var(--ink) 6%, transparent); }
+  .chip i { width: 6px; height: 6px; border-radius: 50%; background: var(--cat-ocean); }
+
+  .features { list-style: none; padding: 0; margin: clamp(56px, 7vw, 88px) 0 24px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .feature { padding: 24px; border-radius: var(--radius-card); background: var(--bg-elevated); box-shadow: 0 0 0 1px var(--hairline); }
+  .feature .dot { display: block; width: 10px; height: 10px; border-radius: 50%; margin-bottom: 18px; }
+  .feature h3 { font: 400 26px/1.1 var(--serif); margin: 0 0 8px; letter-spacing: -0.01em; }
+  .feature p { margin: 0; color: var(--text-2); font-size: 16px; }
+
+  /* Motion: everything starts hidden only once the script has taken over (.cal-armed). */
+  .cal-scene:global(.cal-armed) .cell { opacity: 0; }
+  .cal-scene:global(.cal-armed) .entry { opacity: 0; }
+
+  @media (max-width: 900px) {
+    .cal-scene { grid-template-columns: 1fr; }
+    .entry { max-width: 420px; }
+    .features { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 560px) { .features { grid-template-columns: 1fr; } }
+</style>

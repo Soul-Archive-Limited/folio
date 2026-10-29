@@ -1,0 +1,52 @@
+---
+/** Five small stories of the people Folio is for. Illustrative, not testimonials. */
+const stories = [
+  { stamp: 'LIS → SIN · Tue 14 Oct', who: 'The traveller', title: 'Tuesday stays Tuesday.',
+    text: 'Mia flies Lisbon to Singapore overnight. Her Tuesday page stays on Tuesday — Folio days never shift when the time zone does — and each city becomes a photo on the day she was there.', photo: 'coast' },
+  { stamp: 'Term 1 · 12 weeks', who: 'The student', title: 'The term, as it really was.',
+    text: 'Theo keeps deadlines as tasks and his evenings as pages. In June he scrolls back through the term: what was due, and what it was actually like.', photo: 'lake' },
+  { stamp: 'Day 1 → Day 365', who: 'The new parent', title: 'A first year on twelve pages.',
+    text: 'Priya started on the day her daughter was born. A photo a day, a line when there’s time. The whole first year fits on twelve months of tiny pictures.', photo: 'dawn' },
+  { stamp: '1987 – 2009 · 22 notebooks', who: 'The paper diaries', title: 'The shoebox, moved in.',
+    text: 'Jo has 22 notebooks. One entry at a time, dated to the day it was written, with a photo of the page — or dictated aloud. The shoebox becomes a decade on a calendar.', photo: 'dunes' },
+  { stamp: 'Kyoto · 2 diaries', who: 'Two friends', title: 'Same trip, two private versions.',
+    text: 'Sam and Alex went to Kyoto together, and each kept their own Folio. Neither can read the other’s — and neither can we.', photo: 'dusk' },
+];
+---
+<section class="cases wrap" aria-labelledby="cases-title">
+  <header class="section-head">
+    <p class="caption">Made for how you actually live</p>
+    <h2 id="cases-title">Whose days <em>are these?</em></h2>
+    <p>Five people, five ways to keep a diary. The people are made up; the way Folio works for them isn’t.</p>
+  </header>
+  <ul class="case-list">
+    {stories.map((s, i) => (
+      <li class:list={['case tilt', { wide: i === 0 }]} data-tilt data-reveal style={`--d:${i * 60}ms`}>
+        <img src={`/img/photos/${s.photo}.webp`} alt="" width="160" height="160" loading="lazy" decoding="async" />
+        <p class="mono">{s.stamp}</p>
+        <p class="caption who">{s.who}</p>
+        <h3>{s.title}</h3>
+        <p class="text">{s.text}</p>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .cases { padding-top: clamp(96px, 12vw, 160px); }
+  .case-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; }
+  .case { grid-column: span 2; position: relative; padding: 24px; border-radius: var(--radius-card); background: var(--bg-elevated); box-shadow: 0 0 0 1px var(--hairline); overflow: hidden; }
+  .case:nth-child(4), .case:nth-child(5) { grid-column: span 3; }
+  .case.wide { grid-column: span 2; }
+  .case img { width: 52px; height: 52px; border-radius: 14px; margin-bottom: 18px; }
+  .case .mono { position: absolute; top: 28px; right: 24px; margin: 0; color: var(--text-2); font-size: 12px; text-align: right; max-width: 55%; }
+  .case .who { margin: 0 0 8px; color: var(--ember-text); }
+  .case h3 { font: 400 28px/1.08 var(--serif); margin: 0 0 10px; letter-spacing: -0.01em; }
+  .case .text { margin: 0; color: var(--text-2); font-size: 16px; }
+  @media (max-width: 900px) {
+    .case-list { grid-template-columns: 1fr 1fr; }
+    .case, .case:nth-child(4), .case:nth-child(5), .case.wide { grid-column: span 1; }
+    .case:last-child { grid-column: 1 / -1; }
+  }
+  @media (max-width: 560px) { .case-list { grid-template-columns: 1fr; } .case:last-child { grid-column: auto; } }
+</style>

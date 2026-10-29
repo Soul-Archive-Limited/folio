@@ -1,0 +1,11 @@
+---
+/** The head of an inner page: eyebrow, a serif headline (slot), a lede and the soft aura. */
+interface Props { eyebrow: string; lede?: string }
+const { eyebrow, lede } = Astro.props;
+---
+<header class="page-head wrap">
+  <div class="page-aura" aria-hidden="true"></div>
+  <p class="caption">{eyebrow}</p>
+  <h1><slot /></h1>
+  {lede && <p class="lede">{lede}</p>}
+</header>

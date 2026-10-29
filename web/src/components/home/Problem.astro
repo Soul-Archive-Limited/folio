@@ -1,0 +1,90 @@
+---
+/** "Your days are scattered": four fragments drift together into one calendar day as you scroll. */
+const tasks = ['Book the dentist', 'Post the letter to Ana', 'Renew passport photo'];
+---
+<section class="problem" id="problem" data-problem aria-labelledby="problem-title">
+  <div class="problem-stage">
+    <div class="wrap">
+      <header class="section-head problem-head">
+        <p class="caption">Where did last spring go?</p>
+        <h2 id="problem-title">Your days are <em>scattered.</em></h2>
+        <p>Across a camera roll, three apps and a shoebox of notebooks — and none of them is a diary.</p>
+      </header>
+      <div class="fragments">
+        <article class="frag" data-frag style="--r:-5deg">
+          <div class="frag-art photos" aria-hidden="true">
+            <img src="/img/photos/dawn.webp" alt="" width="160" height="160" loading="lazy" />
+            <img src="/img/photos/lake.webp" alt="" width="160" height="160" loading="lazy" />
+            <img src="/img/photos/dunes.webp" alt="" width="160" height="160" loading="lazy" />
+          </div>
+          <h3>The camera roll</h3>
+          <p>Thousands of photos, and still no idea which day you moved in.</p>
+        </article>
+        <article class="frag" data-frag style="--r:4deg">
+          <div class="frag-art note" aria-hidden="true"><span class="mono">Mon 4 May 1987</span><span class="hand">First day at the new school. Rained.</span></div>
+          <h3>Old notebooks</h3>
+          <p>A line in a notes app here, a shoebox of paper diaries there.</p>
+        </article>
+        <article class="frag" data-frag style="--r:-3deg">
+          <div class="frag-art todo" aria-hidden="true">{tasks.map((t) => <span><i></i>{t}</span>)}</div>
+          <h3>To-dos, somewhere else</h3>
+          <p>Ticked off and gone, with no trace of the day you did them.</p>
+        </article>
+        <article class="frag" data-frag style="--r:6deg">
+          <div class="frag-art nag" aria-hidden="true"><b>Don’t lose your 41-day streak!</b><span>You haven’t written today.</span></div>
+          <h3>Apps that nag</h3>
+          <p>Streaks, badges and a red dot because you had a quiet week.</p>
+        </article>
+        <div class="frag-day" data-frag-day aria-hidden="true">
+          <img src="/img/photos/hills.webp" alt="" width="160" height="160" loading="lazy" />
+          <span>25</span>
+        </div>
+      </div>
+      <p class="resolve" data-resolve>Folio puts them on the one thing you already think in: <em>days.</em></p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .problem { padding-top: clamp(56px, 8vw, 96px); }
+  .problem-head { margin-bottom: clamp(32px, 4vw, 48px); }
+  .fragments { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .frag {
+    padding: 18px; border-radius: var(--radius-card); background: var(--bg-elevated); box-shadow: var(--shadow-float);
+    transform: rotate(var(--r)); transform-origin: center;
+  }
+  .frag h3 { font-size: 17px; margin: 14px 0 6px; }
+  .frag p { margin: 0; font-size: 15px; color: var(--text-2); }
+  .frag-art { height: 112px; border-radius: 14px; overflow: hidden; position: relative; }
+  .photos { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
+  .photos img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+  .note { background: #fbf6e9; color: #3b3326; padding: 14px; display: grid; align-content: start; gap: 10px; background-image: repeating-linear-gradient(transparent 0 23px, rgb(59 51 38 / 0.12) 23px 24px); }
+  .note .hand { font: italic 400 22px/1.1 var(--serif); }
+  .todo { display: grid; align-content: center; gap: 10px; padding: 0 14px; background: color-mix(in srgb, var(--ink) 5%, transparent); }
+  .todo span { display: flex; gap: 10px; align-items: center; font-size: 14px; text-decoration: line-through; color: var(--text-2); }
+  .todo i { width: 16px; height: 16px; border-radius: 50%; background: var(--done); flex: none; }
+  .nag { display: grid; align-content: center; gap: 4px; padding: 14px 16px; background: color-mix(in srgb, var(--danger) 10%, var(--bg-elevated)); font-size: 14px; }
+  .nag b { font-weight: 650; }
+  .nag::after { content: '3'; position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; background: var(--danger); color: #fff; font: 700 12px/22px var(--sans); text-align: center; }
+  .nag span { color: var(--text-2); }
+  .frag-day { display: none; }
+  .resolve { margin: clamp(40px, 5vw, 64px) 0 0; font: 400 clamp(30px, 4vw, 52px)/1.05 var(--serif); letter-spacing: -0.02em; max-width: 22ch; }
+  .resolve em { color: var(--ember-text); }
+
+  /* With motion: the stage pins while the four fragments gather into one day. */
+  @media (min-width: 760px) and (min-height: 640px) {
+    :global(.js-motion) .problem { height: 240vh; }
+    :global(.js-motion) .problem-stage { position: sticky; top: 0; height: 100vh; display: grid; align-items: center; overflow: clip; }
+    :global(.js-motion) .fragments { min-height: 360px; align-items: center; }
+    :global(.js-motion) .frag { will-change: transform, opacity; }
+    :global(.js-motion) .frag-day {
+      display: grid; place-items: start; position: absolute; left: 50%; top: 50%; width: 132px; height: 132px; margin: -66px 0 0 -66px;
+      border-radius: 30px; overflow: hidden; opacity: 0; box-shadow: 0 0 0 4px var(--ember), var(--shadow-float); will-change: transform, opacity;
+    }
+    :global(.js-motion) .frag-day img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    :global(.js-motion) .frag-day span { position: relative; margin: 12px 14px; color: #fff; font: 700 24px/1 var(--sans); text-shadow: 0 1px 6px rgb(0 0 0 / 0.35); }
+    :global(.js-motion) .resolve { opacity: 0; will-change: opacity, transform; }
+  }
+  @media (max-width: 900px) { .fragments { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .frag-art { height: 92px; } .frag { padding: 14px; } .frag p { font-size: 14px; } }
+</style>

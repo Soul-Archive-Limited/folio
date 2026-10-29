@@ -1,0 +1,45 @@
+---
+import Shot from '../Shot.astro';
+import { site, storeCta } from '../../config/site';
+const store = storeCta();
+---
+<section class="everywhere wrap" aria-labelledby="ev-title">
+  <header class="section-head">
+    <p class="caption">iPhone and the web</p>
+    <h2 id="ev-title">On your iPhone. <em>In your browser.</em></h2>
+    <p>Write on the train, read it back on your laptop. Open Folio on the web, scan a code with your iPhone, and your diary unlocks — the key goes from phone to browser, encrypted end to end.</p>
+  </header>
+  <div class="devices" data-reveal>
+    <figure class="browser">
+      <div class="bar" aria-hidden="true"><i></i><i></i><i></i><span>folio.devilsense.com/app</span></div>
+      <picture>
+        <source srcset="/img/app/web-entry-dark.webp" media="(prefers-color-scheme: dark)" />
+        <img src="/img/app/web-entry-light.webp" width="1200" height="750" loading="lazy" decoding="async"
+          alt="Folio in a browser: the October calendar on the left and an open entry, “Morning swim at the lido”, on the right." />
+      </picture>
+    </figure>
+    <div class="device-phone"><Shot name="entry" width={200} alt="The same diary on iPhone: the entry “Train to Edinburgh” with its photo." /></div>
+  </div>
+  <div class="ev-actions">
+    {site.webAppLive && <a class="btn btn-primary" href="/app">Open the web app <span class="arrow" aria-hidden="true">→</span></a>}
+    {store && <a class="btn btn-glass" href={store.href} rel="noopener">{store.label}</a>}
+    <p>Dictation and ✦ stay on iPhone, where they run privately.</p>
+  </div>
+</section>
+
+<style>
+  .everywhere { padding-top: clamp(96px, 12vw, 160px); }
+  .devices { position: relative; padding-right: clamp(40px, 8vw, 120px); }
+  .browser { margin: 0; border-radius: 18px; overflow: hidden; background: var(--bg-elevated); box-shadow: 0 0 0 1px var(--hairline), var(--shadow-float); }
+  .bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--hairline); font-size: 12px; color: var(--text-2); }
+  .bar i { width: 10px; height: 10px; border-radius: 50%; background: color-mix(in srgb, var(--ink) 14%, transparent); }
+  .bar span { margin: 0 auto; padding: 3px 14px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 5%, transparent); font-family: var(--mono); }
+  .device-phone { position: absolute; right: 0; bottom: -40px; }
+  .ev-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-top: 72px; }
+  .ev-actions p { margin: 0; color: var(--text-2); font-size: 15px; }
+  @media (max-width: 700px) {
+    .devices { padding-right: 0; padding-bottom: 120px; }
+    .device-phone { right: 4%; bottom: 0; }
+    .device-phone :global(.phone) { --phone-w: 130px !important; }
+  }
+</style>

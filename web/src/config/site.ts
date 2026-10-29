@@ -1,6 +1,6 @@
 /**
- * Every call to action on the site comes from here (Batch D). A button only renders when its
- * value is set, so nothing dead ships. Fill these in as each one goes live.
+ * Every call to action on the site comes from here (Batch D, Batch H). A button only renders
+ * when its value is set, so nothing dead ships. Fill these in as each one goes live.
  */
 export const site = {
   name: 'Folio',
@@ -23,15 +23,23 @@ export const site = {
 
 export type Cta = { label: string; href: string; primary?: boolean; external?: boolean };
 
-/** The hero's buttons: store links when they exist, otherwise source + privacy. */
-export function heroCtas(): Cta[] {
-  const ctas: Cta[] = [];
-  if (site.appStoreUrl) ctas.push({ label: 'Download on the App Store', href: site.appStoreUrl, primary: true, external: true });
-  else if (site.testflightUrl) ctas.push({ label: 'Join the TestFlight', href: site.testflightUrl, primary: true, external: true });
-  if (site.webAppLive) ctas.push({ label: 'Open in browser', href: '/app', primary: ctas.length === 0 });
-  if (ctas.length === 0) {
-    ctas.push({ label: 'View the source on GitHub', href: site.githubUrl, primary: true, external: true });
-    ctas.push({ label: 'How your privacy works', href: '/#privacy' });
-  }
-  return ctas;
+/** The main navigation (Batch H). */
+export const navLinks = [
+  { href: '/features', label: 'Features' },
+  { href: '/how-it-works', label: 'How it works' },
+  { href: '/security', label: 'Privacy' },
+  { href: '/about', label: 'About' },
+  { href: '/faq', label: 'FAQ' },
+] as const;
+
+/** Sign in and Get started both open the web app: the same Apple / Google / email flow creates the account. */
+export const account = site.webAppLive
+  ? { signIn: '/app', getStarted: '/app' }
+  : { signIn: '', getStarted: '/download' };
+
+/** The store button, when there is one: App Store first, then TestFlight. */
+export function storeCta(): Cta | null {
+  if (site.appStoreUrl) return { label: 'Download on the App Store', href: site.appStoreUrl, external: true };
+  if (site.testflightUrl) return { label: 'Join the TestFlight', href: site.testflightUrl, external: true };
+  return null;
 }

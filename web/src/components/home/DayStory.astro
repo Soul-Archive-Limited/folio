@@ -1,0 +1,105 @@
+---
+import Shot from '../Shot.astro';
+/** "A day with Folio": the phone stays put while the sky behind it goes from dawn to night. */
+const steps = [
+  { time: '08:10', part: 'Morning', title: 'A greeting, not a guilt trip.', shot: 'greeting',
+    text: 'Open Folio and it says good morning, with what’s on today: two tasks, six pages this week. No streak to protect.',
+    alt: 'Folio’s morning greeting: “Morning light, Sam.” with “2 tasks today · 2 overdue · 6 pages this week”.' },
+  { time: '15:20', part: 'Afternoon', title: 'Tasks that stay where they happened.', shot: 'todo',
+    text: 'Tick “Post the letter to Ana” and it stays on today, done. Next year you’ll still see the afternoon you finally sent it.',
+    alt: 'Folio’s To-do list with dated tasks in category colours.' },
+  { time: '21:40', part: 'Night', title: 'Say it on the walk home.', shot: 'dictation',
+    text: 'Dictate tonight’s page as you walk; the words appear while you talk, on your iPhone, and go nowhere else. Save, and today’s square becomes a little picture.',
+    alt: 'Dictation in Folio’s composer: a glass capsule with a live waveform and the words “Walked along the river after work”.' },
+];
+---
+<section class="day" id="day" data-day aria-labelledby="day-title">
+  <div class="day-stage">
+    <div class="day-sky" aria-hidden="true"><i class="dawn"></i><i class="noon"></i><i class="night"></i></div>
+    <div class="wrap day-grid">
+      <div class="day-copy">
+        <header class="section-head">
+          <p class="caption">A day with Folio</p>
+          <h2 id="day-title">One day, <em>three moments.</em></h2>
+        </header>
+        <ol class="day-steps">
+          {steps.map((s, i) => (
+            <li data-step={i} class={i === 0 ? 'is-active' : undefined}>
+              <p class="time"><span class="serif">{s.time}</span><span class="caption">{s.part}</span></p>
+              <h3>{s.title}</h3>
+              <p class="text">{s.text}</p>
+              <div class="step-shot"><Shot name={s.shot} alt={s.alt} width={240} /></div>
+            </li>
+          ))}
+        </ol>
+        <div class="day-dots" aria-hidden="true"><i class="is-active"></i><i></i><i></i></div>
+      </div>
+      <div class="day-phone" aria-hidden="true">
+        <figure class="phone" style="--phone-w:290px">
+          {steps.map((s, i) => (
+            <picture data-shot={i} class={i === 0 ? 'is-active' : undefined}>
+              <source srcset={`/img/app/${s.shot}-dark.webp`} media="(prefers-color-scheme: dark)" />
+              <img src={`/img/app/${s.shot}-light.webp`} alt="" width="720" height="1565" loading="lazy" decoding="async" />
+            </picture>
+          ))}
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .day { position: relative; margin-top: clamp(80px, 10vw, 140px); }
+  .day-stage { position: relative; padding: clamp(64px, 8vw, 96px) 0; overflow: clip; isolation: isolate; }
+  .day-sky { position: absolute; inset: 0; z-index: -1; }
+  .day-sky i { position: absolute; inset: 0; opacity: 0; transition: opacity 900ms ease; }
+  .day-sky .dawn { opacity: 1; background: radial-gradient(50% 60% at 75% 40%, color-mix(in srgb, #ffb38f 55%, transparent), transparent 70%), radial-gradient(40% 50% at 15% 80%, color-mix(in srgb, #d9b8ff 40%, transparent), transparent 70%); }
+  .day-sky .noon { background: radial-gradient(55% 60% at 70% 30%, color-mix(in srgb, #ffe2a8 60%, transparent), transparent 70%), radial-gradient(45% 50% at 10% 70%, color-mix(in srgb, #a9c6ff 45%, transparent), transparent 70%); }
+  .day-sky .night { background: radial-gradient(40% 45% at 75% 45%, rgb(255 122 69 / 0.28), transparent 70%), radial-gradient(50% 60% at 15% 75%, rgb(61 123 255 / 0.3), transparent 70%), #0e0f18; }
+  @media (prefers-color-scheme: dark) { .day-sky .dawn, .day-sky .noon { filter: saturate(0.9); opacity: 0.35; } .day-sky .noon { opacity: 0; } }
+
+  .day-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(32px, 6vw, 96px); align-items: center; }
+  .day-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 56px; }
+  .time { display: flex; align-items: baseline; gap: 14px; margin: 0 0 10px; }
+  .time .serif { font-size: clamp(72px, 9vw, 128px); line-height: 0.82; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+  .day-steps h3 { font: 400 clamp(28px, 3vw, 38px)/1.08 var(--serif); margin: 0 0 12px; letter-spacing: -0.015em; }
+  .day-steps .text { font-size: 18px; color: var(--text-2); max-width: 40ch; }
+  .step-shot { margin-top: 20px; }
+  .day-phone, .day-dots { display: none; }
+
+  /* With motion: the stage pins; scroll moves the day from morning to night. */
+  :global(.js-motion) .day { height: 330vh; }
+  :global(.js-motion) .day-stage { position: sticky; top: 0; height: 100vh; padding: 0; display: grid; align-items: center; transition: background-color 900ms ease, color 900ms ease; }
+  :global(.js-motion) .day-steps { position: relative; display: block; min-height: 300px; }
+  :global(.js-motion) .day-steps li { position: absolute; inset: 0 0 auto; opacity: 0; transform: translateY(24px); filter: blur(6px); transition: opacity 500ms ease, transform 700ms var(--ease), filter 500ms ease; pointer-events: none; }
+  :global(.js-motion) .day-steps li.is-active { opacity: 1; transform: none; filter: none; pointer-events: auto; }
+  :global(.js-motion) .day-steps .text { transition: color 900ms ease; }
+  :global(.js-motion) .step-shot { display: none; }
+  :global(.js-motion) .day-phone { display: block; }
+  :global(.js-motion) .day-dots { display: flex; gap: 8px; margin-top: 24px; }
+  .day-dots i { width: 28px; height: 3px; border-radius: 2px; background: currentColor; opacity: 0.18; transition: opacity 400ms ease; }
+  .day-dots i.is-active { opacity: 0.8; }
+  .day-phone .phone { display: grid; }
+  .day-phone picture { grid-area: 1 / 1; opacity: 0; transition: opacity 600ms ease; }
+  .day-phone picture.is-active { opacity: 1; }
+  .day-phone img { width: 100%; height: 100%; object-fit: cover; border-radius: calc(var(--phone-w) * 0.13); }
+
+  :global(.js-motion) .day.is-noon .day-sky .noon { opacity: 1; }
+  :global(.js-motion) .day.is-noon .day-sky .dawn { opacity: 0; }
+  :global(.js-motion) .day.is-night .day-sky .night { opacity: 1; }
+  :global(.js-motion) .day.is-night .day-stage { color: #f4f4f5; --text-2: rgb(244 244 245 / 0.68); --ember-text: #ff9a6e; }
+
+  @media (max-width: 900px) {
+    .day-grid { grid-template-columns: 1fr; }
+    :global(.js-motion) .day-grid { grid-template-rows: auto auto; align-content: center; gap: 20px; }
+    :global(.js-motion) .day-phone { order: -1; justify-self: center; }
+    :global(.js-motion) .day-phone .phone { --phone-w: min(180px, 22vh) !important; }
+    :global(.js-motion) .day .section-head { margin-bottom: 14px; }
+    :global(.js-motion) .day .section-head h2 { font-size: 30px; margin: 6px 0 0; }
+    :global(.js-motion) .day-steps { min-height: 210px; }
+    :global(.js-motion) .time .serif { font-size: 56px; }
+    :global(.js-motion) .day-steps h3 { font-size: 26px; }
+    :global(.js-motion) .day-steps .text { font-size: 16px; }
+    :global(.js-motion) .day-dots { justify-content: flex-start; margin-top: 12px; }
+  }
+</style>

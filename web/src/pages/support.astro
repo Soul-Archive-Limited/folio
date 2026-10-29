@@ -6,10 +6,10 @@ import { site } from '../config/site';
 
 const items = [
   faq.readDiary,
-  { q: 'What is the recovery key?', a: 'When you turn on sync, Folio shows a 26-character code. It’s the only way to unlock your diary on a new device if your other devices are gone. Save it somewhere safe — a password manager, or printed in a drawer. We never see it and can’t send it to you.' },
+  faq.recoveryKey,
   faq.lostPhone,
   faq.recentlyDeleted,
-  { q: 'Using Folio on the web', a: 'When the web app launches, you’ll sign in at folio.devilsense.com and unlock your diary by scanning a QR code with Folio on your iPhone, or with your recovery key.' },
+  { q: 'Using Folio on the web', a: 'Sign in at <a href="/app">folio.devilsense.com/app</a> with the same Apple, Google or email account, then unlock your diary by scanning the QR code with Folio on your iPhone (Profile → Link a browser), or with your recovery key.' },
   { q: 'Sync isn’t working', a: 'Your diary is always safe on your iPhone, and Folio catches up by itself when you’re back online. Check you’re signed in under Profile → Account. If it still says there’s a problem, email us and say what the screen shows.' },
   { q: 'Dictation or ✦ isn’t showing', a: 'Dictation needs a language Apple’s on-device speech supports; Profile → Dictation & Intelligence shows which one Folio is using. ✦ needs Apple Intelligence turned on, on an iPhone that supports it. Profile explains what’s missing on yours.' },
   { q: 'My sign-in code hasn’t arrived', a: 'Codes arrive within a minute. Check your spam folder, then ask for a new code after 30 seconds. Codes expire after 10 minutes.' },

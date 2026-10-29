@@ -1,0 +1,84 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import Shot from '../components/Shot.astro';
+import { account } from '../config/site';
+
+const groups = [
+  { id: 'keep', title: 'Keep your days', items: [
+    { shot: 'calendar', title: 'The calendar is the diary', text: 'Days you wrote on show the latest photo, or up to three category dots. Open tasks ring a day; a green tick means they’re all done. Today is ember.', alt: 'Folio’s October calendar with photo tiles, dots and rings, and Sunday 25 October’s page below.' },
+    { shot: 'collapsed', title: 'Day panel and week strip', text: 'Tap a day and its pages and tasks slide up underneath. Scroll the panel and the month folds into a week you can swipe.', alt: 'The calendar folded to one week, with Sunday 25 October’s page and two ticked tasks below.' },
+    { shot: 'jump', title: 'Jump to any year', text: 'Tap the month’s name to pick any year from 1900 and any month in it. “Go to today” brings you back.', alt: 'The Jump sheet with 2026 selected and a grid of months.' },
+  ] },
+  { id: 'write', title: 'Write', items: [
+    { shot: 'composer', title: 'A half sheet that keeps the calendar', text: 'Writing opens in the bottom half, so the month stays in view. Pick any date back to 1900, add up to 10 photos, a category and a time. Drafts save themselves.', alt: 'The composer open over the calendar with a title, three photos and category chips.' },
+    { shot: 'dictation', title: 'Dictation, on your iPhone', text: 'Talk and watch the words appear. Speech is recognised on the device; audio isn’t stored and nothing is sent anywhere.', alt: 'Dictation: a glass capsule with a live waveform and the words appearing in the composer.' },
+    { shot: 'intelligence', title: '✦ A light hand with words', text: 'Suggest a title, polish grammar while keeping your words, or find tasks in what you wrote. Runs on Apple’s on-device model on iPhones with Apple Intelligence. Nothing changes until you accept it.', alt: 'The ✦ menu showing three suggested titles for an entry.' },
+  ] },
+  { id: 'do', title: 'Get things done', items: [
+    { shot: 'todo', title: 'To-do on the same calendar', text: 'Tasks with dates and categories, overdue first. Tick one and it stays on its day, done — with Undo for a few seconds, and Completed below.', alt: 'The To-do list with dated tasks, category colours and a quick-add bar.' },
+  ] },
+  { id: 'read', title: 'Read it back', items: [
+    { shot: 'journal', title: 'Journal timeline', text: 'Your pages by month, newest first, with covers from your photos. Filter by category, or write for a past day from here.', alt: 'The Journal timeline: October 2026 with a cover photo for “Morning swim”.' },
+    { shot: 'photos', title: 'A wall of every photo', text: 'Switch to Photos and see every picture you’ve kept, in one calm grid.', alt: 'The Journal’s photo wall: a three-column grid of landscape photos.' },
+    { shot: 'entry', title: 'Entry detail', text: 'Photos in a carousel, your words in the writing font, and “Same day in other years” when there are any.', alt: 'An entry, “Train to Edinburgh”, with its photo, date, category and text.' },
+  ] },
+  { id: 'control', title: 'Stay in control', items: [
+    { shot: 'profile', title: 'Your archive and your data', text: 'Entries, photos, days written on and tasks done at a glance. Export everything as JSON plus your photos; deleted things wait 30 days in Recently Deleted.', alt: 'Profile: Sam, writing since January 2024, with archive tiles and the sync card.' },
+    { shot: 'categories', title: 'Categories, your way', text: 'Up to 30, in twelve colours with your own names and symbols. Filter the calendar, Journal and To-do by them.', alt: 'The Categories list: Travel, Family, Work, Health, Ideas and Food with their counts.' },
+  ] },
+];
+---
+<Base title="Features" og="features" description="Everything Folio does: a calendar diary with photo tiles, any-day writing, on-device dictation, tasks on the same calendar, a Journal, export and end-to-end encrypted sync.">
+  <PageHead eyebrow="Features" lede="A short list, on purpose. Every screen on this page is the real iPhone app, with sample data.">
+    Everything <em>Folio does.</em>
+  </PageHead>
+  <nav class="wrap jump" aria-label="Feature groups">
+    {groups.map((g) => <a href={`#${g.id}`}>{g.title}</a>)}
+  </nav>
+  {groups.map((g) => (
+    <section class="wrap group" id={g.id} aria-labelledby={`${g.id}-h`}>
+      <h2 id={`${g.id}-h`}>{g.title}</h2>
+      <ul class="items">
+        {g.items.map((it, i) => (
+          <li class="item tilt" data-tilt data-reveal style={`--d:${i * 60}ms`}>
+            <Shot name={it.shot} alt={it.alt} width={220} />
+            <h3>{it.title}</h3>
+            <p>{it.text}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+  <section class="wrap group everywhere" aria-labelledby="ev-h">
+    <h2 id="ev-h">Everywhere you are</h2>
+    <ul class="places">
+      <li><b>iPhone</b><span>iOS 26 or later. Works offline and without an account.</span></li>
+      <li><b>iPad</b><span>The calendar and the day side by side.</span></li>
+      <li><b>Web</b><span>Any modern browser at folio.devilsense.com/app, unlocked from your iPhone.</span></li>
+    </ul>
+    <div class="ctas"><a class="btn btn-primary" href={account.getStarted}>Get started <span class="arrow" aria-hidden="true">→</span></a><a class="btn btn-quiet" href="/how-it-works">How it works</a></div>
+  </section>
+</Base>
+
+<style>
+  .jump { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+  .jump a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border-radius: 999px; background: var(--bg-elevated); box-shadow: 0 0 0 1px var(--hairline); text-decoration: none; font-size: 15px; font-weight: 500; }
+  .group { padding-top: clamp(56px, 8vw, 96px); }
+  .group h2 { font: 400 clamp(36px, 5vw, 56px)/1 var(--serif); letter-spacing: -0.02em; margin: 0 0 28px; }
+  .items { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .item { padding: 28px 24px 26px; border-radius: 28px; background: var(--bg-elevated); box-shadow: 0 0 0 1px var(--hairline); }
+  .item :global(.phone) { margin: 0 auto 24px; box-shadow: 0 0 0 1.5px #3a3a40 inset, 0 30px 40px -30px rgb(40 20 10 / 0.4); }
+  .item h3 { font: 400 26px/1.1 var(--serif); margin: 0 0 8px; }
+  .item p { margin: 0; color: var(--text-2); font-size: 16px; }
+  .items:has(> :only-child) { grid-template-columns: 1fr; }
+  .items:has(> :only-child) .item { display: grid; grid-template-columns: auto minmax(0, 40ch); align-items: center; gap: clamp(24px, 5vw, 64px); }
+  .items:has(> :only-child) .item :global(.phone) { margin: 0; }
+  .places { list-style: none; margin: 0 0 32px; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--hairline); }
+  .places li { padding: 20px 20px 20px 0; display: grid; gap: 4px; }
+  .places b { font: 400 28px/1 var(--serif); }
+  .places span { color: var(--text-2); }
+  .ctas { display: flex; flex-wrap: wrap; gap: 10px; }
+  @media (max-width: 900px) { .items { grid-template-columns: 1fr 1fr; } .places { grid-template-columns: 1fr; } }
+  @media (max-width: 600px) { .items { grid-template-columns: 1fr; } .items:has(> :only-child) .item { grid-template-columns: 1fr; } .items:has(> :only-child) .item :global(.phone) { margin: 0 auto; } }
+</style>

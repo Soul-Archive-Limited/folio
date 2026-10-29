@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const dist = (p) => new URL(`../dist/${p}`, import.meta.url);
 const read = (p) => readFileSync(dist(p), 'utf8');
-const pages = ['index', 'privacy', 'terms', 'support', 'open-source', 'changelog', 'delete-account', '404'];
+const pages = ['index', 'features', 'how-it-works', 'security', 'about', 'faq', 'download', 'privacy', 'terms', 'support', 'open-source', 'changelog', 'delete-account', '404'];
 let checks = 0;
 const check = (fn, label) => { fn(); checks += 1; process.stdout.write(`✓ ${label}\n`); };
 
@@ -40,25 +40,34 @@ for (const page of pages) {
 check(() => {
   const config = readFileSync(new URL('../src/config/site.ts', import.meta.url), 'utf8');
   const empty = (key) => new RegExp(`${key}: ''`).test(config);
-  const home = read('index.html');
-  if (empty('testflightUrl')) assert.ok(!/Join the TestFlight/.test(home), 'no TestFlight button without a URL');
-  if (empty('appStoreUrl')) assert.ok(!/App Store/.test(home.replace(/<title>.*<\/title>/, '')) || !/apps\.apple\.com/.test(home));
-  if (/webAppLive: false/.test(config)) assert.ok(!/href="\/app"/.test(home), 'no web app link before it is live');
-  if (/webAppLive: true/.test(config)) {
-    assert.match(home, /href="\/app"[^>]*>Open in browser/, 'hero opens the web app');
-    assert.match(home, /href="\/app">Open web app/, 'nav opens the web app');
-  } else if (empty('testflightUrl') && empty('appStoreUrl')) {
-    assert.match(home, /View the source on GitHub/);
-    assert.match(home, /How your privacy works/);
+  for (const page of ['index', 'download']) {
+    const html = read(`${page}.html`);
+    if (empty('testflightUrl')) assert.ok(!/Join the TestFlight|testflight\.apple\.com/.test(html), `no TestFlight button without a URL (${page})`);
+    if (empty('appStoreUrl')) assert.ok(!/apps\.apple\.com/.test(html), `no App Store link without a URL (${page})`);
+    if (/webAppLive: false/.test(config)) assert.ok(!/href="\/app"/.test(html), 'no web app link before it is live');
   }
+  const home = read('index.html');
+  if (/webAppLive: true/.test(config)) {
+    assert.match(home, /href="\/app">Sign in</, 'nav: Sign in opens the web app');
+    assert.match(home, /href="\/app">Get started/, 'Get started opens the web app');
+  }
+  if (empty('testflightUrl') && empty('appStoreUrl')) assert.match(read('download.html'), /Coming to the App Store soon/);
 }, 'CTAs render only when configured');
+
+check(() => {
+  for (const page of pages) {
+    const og = read(`${page}.html`).match(/property="og:image" content="https:\/\/folio\.devilsense\.com\/(og\/[a-z-]+\.png)"/);
+    assert.ok(og && existsSync(dist(og[1])), `${page} has an OG image that exists`);
+  }
+  const nav = read('index.html');
+  for (const href of ['/features', '/how-it-works', '/security', '/about', '/faq']) assert.ok(nav.includes(`href="${href}"`), `nav links ${href}`);
+}, 'every page has its own OG image; nav has all sections')
 
 check(() => {
   const robots = read('robots.txt');
   assert.match(robots, /Disallow: \/app/);
   assert.match(robots, /Disallow: \/api/);
   assert.ok(existsSync(dist('sitemap-index.xml')));
-  assert.ok(existsSync(dist('og.png')), 'OG image');
 }, 'robots.txt, sitemap and OG image');
 
 check(() => {

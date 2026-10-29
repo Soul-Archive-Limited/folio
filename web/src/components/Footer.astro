@@ -1,24 +1,38 @@
 ---
+import Mark from './Mark.astro';
 import { site } from '../config/site';
 const year = 2026;
+const columns = [
+  { title: 'Product', links: [
+    { href: '/features', label: 'Features' }, { href: '/how-it-works', label: 'How it works' },
+    { href: '/security', label: 'Privacy & security' }, { href: '/download', label: 'Download' }, { href: '/changelog', label: 'Changelog' },
+  ] },
+  { title: 'Company', links: [
+    { href: '/about', label: 'About' }, { href: '/support', label: 'Support' }, { href: '/faq', label: 'FAQ' },
+    { href: '/open-source', label: 'Open source' }, { href: site.githubUrl, label: 'GitHub' },
+  ] },
+  { title: 'Legal', links: [
+    { href: '/privacy', label: 'Privacy policy' }, { href: '/terms', label: 'Terms' }, { href: '/delete-account', label: 'Delete account' },
+  ] },
+];
 ---
 <footer class="footer">
   <div class="wrap">
-    <div class="row">
-      <nav aria-label="Footer">
-        <ul>
-          <li><a href="/privacy">Privacy</a></li>
-          <li><a href="/terms">Terms</a></li>
-          <li><a href="/support">Support</a></li>
-          <li><a href="/changelog">Changelog</a></li>
-          <li><a href="/delete-account">Delete account</a></li>
-          <li><a href={site.githubUrl} rel="noopener">GitHub</a></li>
-        </ul>
-      </nav>
+    <div class="footer-grid">
+      <div>
+        <a class="brand" href="/" aria-label="Folio home"><Mark /> Folio</a>
+        <p>A private calendar diary for iPhone and the web. Made by {site.company.name}.</p>
+      </div>
+      {columns.map((c) => (
+        <nav aria-label={c.title}>
+          <h2>{c.title}</h2>
+          <ul>{c.links.map((l) => <li><a href={l.href} rel={l.href.startsWith('http') ? 'noopener' : undefined}>{l.label}</a></li>)}</ul>
+        </nav>
+      ))}
+    </div>
+    <div class="legal">
+      <p>{site.company.name} · Registered in England and Wales · Company no. {site.company.number} · Registered office: {site.company.office}</p>
       <p>© {year} {site.company.name}</p>
     </div>
-    <p class="legal">
-      {site.company.name} · Registered in England and Wales · Company no. {site.company.number} · Registered office: {site.company.office}
-    </p>
   </div>
 </footer>

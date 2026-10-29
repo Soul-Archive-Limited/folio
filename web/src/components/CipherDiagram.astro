@@ -1,0 +1,73 @@
+---
+/** Plain-English end-to-end encryption: phone → lock → server (scrambled only) → your other device. */
+const plain = 'Train to Edinburgh';
+const scrambled = 'LxZDiQzY/bGmIsS6kD';
+---
+<figure class="cd" data-play>
+  <ol class="cd-row">
+    <li class="cd-node">
+      <span class="cd-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10.5 5h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+      <b>Your iPhone</b>
+      <span class="cd-pill plain">{plain}</span>
+      <small>You write. It’s readable here.</small>
+    </li>
+    <li class="cd-link" aria-hidden="true"><i class="cd-packet plain">{plain}</i></li>
+    <li class="cd-node lockn">
+      <span class="cd-icon ember" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="5" y="11" width="14" height="10" rx="3" fill="currentColor"/></svg></span>
+      <b>Locked on the phone</b>
+      <span class="cd-pill key">Key: on your devices only</span>
+      <small>AES-256-GCM, before upload.</small>
+    </li>
+    <li class="cd-link" aria-hidden="true"><i class="cd-packet cipher">{scrambled}</i></li>
+    <li class="cd-node">
+      <span class="cd-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="6.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="3.5" y="13.5" width="17" height="6.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="7.5" cy="7.25" r="1" fill="currentColor"/><circle cx="7.5" cy="16.75" r="1" fill="currentColor"/></svg></span>
+      <b>Our server</b>
+      <span class="cd-pill cipher">{scrambled}</span>
+      <small>Stores it. Can’t open it.</small>
+    </li>
+    <li class="cd-link" aria-hidden="true"><i class="cd-packet cipher">{scrambled}</i></li>
+    <li class="cd-node">
+      <span class="cd-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="19" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 20.5h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+      <b>Your other device</b>
+      <span class="cd-pill plain">{plain}</span>
+      <small>Unlocks with your key.</small>
+    </li>
+  </ol>
+  <figcaption class="sr-only">Your entry is readable on your iPhone, is encrypted there with a key only your devices hold, travels to and is stored on our server only as scrambled data, and becomes readable again on your other device, which has the same key.</figcaption>
+</figure>
+
+<style>
+  .cd { margin: 0; padding: clamp(20px, 3vw, 36px); border-radius: 28px; background: var(--bg-elevated); box-shadow: 0 0 0 1px var(--hairline), var(--shadow-float); }
+  .cd-row { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 0.6fr 1fr 0.6fr 1fr 0.6fr 1fr; align-items: center; }
+  .cd-node { display: grid; justify-items: center; text-align: center; gap: 8px; }
+  .cd-node b { font: 400 22px/1.1 var(--serif); }
+  .cd-node small { color: var(--text-2); font-size: 13px; }
+  .cd-icon { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 16px; background: color-mix(in srgb, var(--ink) 6%, transparent); color: var(--ink); }
+  .cd-icon svg { width: 26px; height: 26px; }
+  .cd-icon.ember { color: var(--ember); background: color-mix(in srgb, var(--ember) 14%, transparent); }
+  .cd-pill { font-family: var(--mono); font-size: 12px; padding: 5px 10px; border-radius: 999px; white-space: nowrap; }
+  .cd-pill.plain { background: color-mix(in srgb, var(--done) 16%, transparent); }
+  .cd-pill.cipher { background: color-mix(in srgb, var(--ink) 8%, transparent); color: var(--text-2); }
+  .cd-pill.key { background: color-mix(in srgb, var(--ember) 14%, transparent); }
+  .cd-link { position: relative; height: 2px; background: repeating-linear-gradient(90deg, var(--ink-tertiary) 0 4px, transparent 4px 9px); overflow: visible; }
+  .cd-packet { position: absolute; top: 50%; left: 0; translate: 0 -50%; font-style: normal; font-family: var(--mono); font-size: 10px; padding: 3px 7px; border-radius: 999px; white-space: nowrap; opacity: 0; }
+  .cd-packet.plain { background: var(--done); color: #fff; }
+  .cd-packet.cipher { background: var(--ink); color: var(--bg); }
+  @media (prefers-reduced-motion: no-preference) {
+    .cd-packet { animation: travel 3.6s var(--ease-in-out) infinite paused; }
+    .cd-link:nth-child(4) .cd-packet { animation-delay: 1.2s; }
+    .cd-link:nth-child(6) .cd-packet { animation-delay: 2.4s; }
+    .cd:global(.is-playing) .cd-packet { animation-play-state: running; }
+  }
+  @keyframes travel {
+    0% { left: 0; opacity: 0; transform: scale(0.9); }
+    10% { opacity: 1; transform: none; }
+    30% { left: 100%; opacity: 1; translate: -100% -50%; }
+    36%, 100% { left: 100%; opacity: 0; translate: -100% -50%; }
+  }
+  @media (max-width: 860px) {
+    .cd-row { grid-template-columns: 1fr; gap: 0; }
+    .cd-link { width: 2px; height: 44px; margin: 8px auto; background: repeating-linear-gradient(180deg, var(--ink-tertiary) 0 4px, transparent 4px 9px); }
+    .cd-packet { display: none; }
+  }
+</style>

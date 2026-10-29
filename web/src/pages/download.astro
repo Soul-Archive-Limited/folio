@@ -1,0 +1,42 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import Shot from '../components/Shot.astro';
+import { site, storeCta } from '../config/site';
+const store = storeCta();
+---
+<Base title="Download" og="download" description="Get Folio for iPhone, or open it in your browser. Free, with no ads and no tracking.">
+  <PageHead eyebrow="Download" lede="Free, with no ads, no in-app purchases and no tracking.">Get <em>Folio.</em></PageHead>
+  <div class="wrap cards">
+    <section class="card" aria-labelledby="ios-h">
+      <Shot name="calendar-today" width={200} alt="Folio’s calendar on iPhone." />
+      <div>
+        <h2 id="ios-h">iPhone and iPad</h2>
+        <p>iOS 26 or later. Works offline and without an account.</p>
+        {store
+          ? <a class="btn btn-primary" href={store.href} rel="noopener">{store.label} <span class="arrow" aria-hidden="true">→</span></a>
+          : <p class="soon">Coming to the App Store soon.</p>}
+      </div>
+    </section>
+    <section class="card" aria-labelledby="web-h">
+      <figure class="mini-browser" aria-hidden="true">
+        <picture><source srcset="/img/app/web-entry-dark.webp" media="(prefers-color-scheme: dark)" /><img src="/img/app/web-entry-light.webp" alt="" width="1200" height="750" loading="lazy" /></picture>
+      </figure>
+      <div>
+        <h2 id="web-h">Web</h2>
+        <p>Any modern browser. Sign in, then unlock your diary with your iPhone or your recovery key.</p>
+        {site.webAppLive && <a class="btn btn-primary" href="/app">Open the web app <span class="arrow" aria-hidden="true">→</span></a>}
+      </div>
+    </section>
+  </div>
+</Base>
+<style>
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .card { display: grid; gap: 24px; align-content: start; padding: 32px; border-radius: 30px; background: var(--bg-elevated); box-shadow: 0 0 0 1px var(--hairline), var(--shadow-float); }
+  .card h2 { font: 400 40px/1 var(--serif); margin: 0 0 10px; letter-spacing: -0.02em; }
+  .card p { color: var(--text-2); }
+  .soon { font-weight: 600; color: var(--ink) !important; }
+  .card :global(.phone) { justify-self: center; }
+  .mini-browser { margin: 0; border-radius: 14px; overflow: hidden; box-shadow: 0 0 0 1px var(--hairline); align-self: center; }
+  @media (max-width: 760px) { .cards { grid-template-columns: 1fr; } }
+</style>
