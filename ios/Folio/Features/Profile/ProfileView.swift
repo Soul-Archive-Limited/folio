@@ -6,6 +6,7 @@ import SwiftUI
 struct ProfileView: View {
     @Environment(DiaryStore.self) private var store
     @Environment(TourModel.self) private var tour: TourModel?
+    @Environment(AccountModel.self) private var account
     @Environment(\.tabRouter) private var router
     @Environment(\.requestReview) private var requestReview
     @State private var showsCategories = false
@@ -98,6 +99,7 @@ struct ProfileView: View {
                 #endif
             }
             .listStyle(.insetGrouped)
+            .animation(FolioMotion.standard(), value: account.isSignedIn)
             .scrollContentBackground(.hidden)
             .tint(.emberStrong)
             .background { AuraBackground() }

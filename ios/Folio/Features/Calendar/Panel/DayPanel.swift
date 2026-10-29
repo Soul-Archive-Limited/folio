@@ -9,6 +9,7 @@ struct DayPanel: View {
 
     @Environment(DiaryStore.self) private var store
     @Environment(\.newItemRequest) private var request
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         let day = model.selectedDay
@@ -23,6 +24,9 @@ struct DayPanel: View {
                         .folioFont(.title2)
                         .foregroundStyle(.ink)
                         .multilineTextAlignment(.leading)
+                        // The title stays put and cross-fades; only the rows below re-enter.
+                        .contentTransition(.opacity)
+                        .animation(FolioMotion.standard(reduceMotion: reduceMotion), value: day)
                 }
                 .buttonStyle(.plain)
                 .accessibilityAddTraits(.isHeader)
@@ -30,37 +34,39 @@ struct DayPanel: View {
                 GlassIconButton(title: "New entry for this day", systemImage: "plus") { request?.send(.entry(day)) }
             }
 
-            if entries.isEmpty && tasks.isEmpty {
-                DayPanelEmptyState(day: day)
-            } else {
-                if !entries.isEmpty {
-                    PanelSectionTitle(title: "Pages")
-                    ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
-                        NavigationLink(value: entry.id) {
-                            EntryCard(entry: entry, category: entry.categoryID.flatMap { categories[$0] }, calendar: store.calendar)
-                                .zoomSource(id: entry.id, in: zoomNamespace)
-                        }
-                        .buttonStyle(.pressable)
-                        .entryActions(entry)
-                        .staggeredAppear(index: index)
-                    }
-                }
-                if !tasks.isEmpty {
-                    PanelSectionTitle(title: "Tasks")
-                    VStack(spacing: 0) {
-                        ForEach(Array(tasks.enumerated()), id: \.element.id) { index, task in
-                            DayTaskRow(task: task, tint: task.categoryID.flatMap { categories[$0]?.color.color } ?? .ink) {
-                                store.setCompleted(task, !task.isCompleted)
+            VStack(alignment: .leading, spacing: Spacing.m) {
+                if entries.isEmpty && tasks.isEmpty {
+                    DayPanelEmptyState(day: day)
+                } else {
+                    if !entries.isEmpty {
+                        PanelSectionTitle(title: "Pages")
+                        ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
+                            NavigationLink(value: entry.id) {
+                                EntryCard(entry: entry, category: entry.categoryID.flatMap { categories[$0] }, calendar: store.calendar)
+                                    .zoomSource(id: entry.id, in: zoomNamespace)
                             }
-                            .staggeredAppear(index: entries.count + index)
+                            .buttonStyle(.pressable)
+                            .entryActions(entry)
+                            .staggeredAppear(index: index)
                         }
                     }
-                    .padding(.horizontal, Spacing.xs)
-                    .folioGlass(in: .rect(cornerRadius: Radius.card))
+                    if !tasks.isEmpty {
+                        PanelSectionTitle(title: "Tasks")
+                        VStack(spacing: 0) {
+                            ForEach(Array(tasks.enumerated()), id: \.element.id) { index, task in
+                                DayTaskRow(task: task, tint: task.categoryID.flatMap { categories[$0]?.color.color } ?? .ink) {
+                                    store.setCompleted(task, !task.isCompleted)
+                                }
+                                .staggeredAppear(index: entries.count + index)
+                            }
+                        }
+                        .padding(.horizontal, Spacing.xs)
+                        .folioGlass(in: .rect(cornerRadius: Radius.card))
+                    }
                 }
             }
+            .id(day)
         }
-        .id(day)
     }
 }
 

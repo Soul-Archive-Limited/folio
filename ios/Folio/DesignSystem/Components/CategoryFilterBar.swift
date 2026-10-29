@@ -4,6 +4,7 @@ import SwiftUI
 struct CategoryFilterBar: View {
     @Binding var selection: Set<UUID>
     @Environment(DiaryStore.self) private var store
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         let categories = store.categories()
@@ -11,7 +12,7 @@ struct CategoryFilterBar: View {
             ScrollView(.horizontal) {
                 GlassEffectContainer(spacing: 0) {
                     HStack(spacing: Spacing.xs) {
-                        Chip(title: String(localized: "All"), isSelected: selection.isEmpty) { selection.removeAll() }
+                        Chip(title: String(localized: "All"), isSelected: selection.isEmpty) { change { selection.removeAll() } }
                         ForEach(categories) { category in
                             Chip(title: category.name, systemImage: category.symbol, category: category.color,
                                  isSelected: selection.contains(category.id)) { toggle(category.id) }
@@ -29,6 +30,11 @@ struct CategoryFilterBar: View {
     }
 
     private func toggle(_ id: UUID) {
-        if selection.contains(id) { selection.remove(id) } else { selection.insert(id) }
+        change { if selection.contains(id) { selection.remove(id) } else { selection.insert(id) } }
+    }
+
+    /// Rows leave and arrive with the filter instead of jumping (Phase 13).
+    private func change(_ update: () -> Void) {
+        withAnimation(FolioMotion.interactive(reduceMotion: reduceMotion), update)
     }
 }

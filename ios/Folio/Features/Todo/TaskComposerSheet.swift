@@ -77,7 +77,7 @@ struct TaskComposerSheet: View {
             .onChange(of: minutes == nil) { _, noTime in if !noTime { revealDatePicker() } }
             // When a date is already on at open, picking a day or scrolling also puts the
             // keyboard away.
-            .onChange(of: day) { withAnimation(.smooth(duration: 0.35)) { focus = nil } }
+            .onChange(of: day) { withAnimation(FolioMotion.standard()) { focus = nil } }
             .scrollDismissesKeyboard(.immediately)
             .navigationTitle(task == nil ? "New task" : "Edit task")
             .navigationBarTitleDisplayMode(.inline)
@@ -101,13 +101,13 @@ struct TaskComposerSheet: View {
 
 
     private func revealDatePicker() {
-        withAnimation(.smooth(duration: 0.35)) {
+        withAnimation(FolioMotion.standard()) {
             focus = nil
             detent = .large
         }
         Task {
             try? await Task.sleep(for: .milliseconds(350))
-            withAnimation(.smooth(duration: 0.35)) { scroll.scrollTo(edge: .top) }
+            withAnimation(FolioMotion.standard()) { scroll.scrollTo(edge: .top) }
         }
     }
 

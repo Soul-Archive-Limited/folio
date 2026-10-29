@@ -13,9 +13,11 @@ struct SyncStatusRow: View {
                     .foregroundStyle(sync.status == .error ? .danger : .ember)
                     .frame(width: 26)
                     .symbolEffect(.rotate, isActive: sync.status == .syncing)
+                    .contentTransition(.symbolEffect(.replace))
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title).foregroundStyle(.ink)
+                        .contentTransition(.opacity)
                     if let lastSynced = sync.lastSynced {
                         Text("Last synced \(lastSynced, format: .relative(presentation: .named))")
                             .folioFont(.caption)
@@ -25,6 +27,7 @@ struct SyncStatusRow: View {
                 Spacer(minLength: 0)
             }
             .folioFont(.body)
+            .animation(FolioMotion.standard(), value: sync.status)
             .frame(minHeight: Spacing.minHitTarget)
             .contentShape(.rect)
         }

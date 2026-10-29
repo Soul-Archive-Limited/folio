@@ -1,29 +1,31 @@
 import SwiftUI
+import UIKit
 
 /// Spring motion tokens (SPEC §3.6). Every animation in the app comes from here.
 ///
-/// Pass `reduceMotion` from `@Environment(\.accessibilityReduceMotion)`. Under Reduce
+/// Pass `reduceMotion` from `@Environment(\.accessibilityReduceMotion)`; models and other
+/// callers without the environment get the system setting. Under Reduce
 /// Motion every token becomes a short cross-fade-friendly ease (≤ 0.2 s); pair it with
 /// `FolioMotion.transition(_:reduceMotion:)` so movement is replaced by opacity.
 enum FolioMotion {
     /// Default for state changes and most transitions.
-    static func standard(reduceMotion: Bool = false) -> Animation {
+    static func standard(reduceMotion: Bool = UIAccessibility.isReduceMotionEnabled) -> Animation {
         reduceMotion ? reduced : .smooth(duration: 0.35)
     }
 
     /// For anything driven by or answering a gesture.
-    static func interactive(reduceMotion: Bool = false) -> Animation {
+    static func interactive(reduceMotion: Bool = UIAccessibility.isReduceMotionEnabled) -> Animation {
         reduceMotion ? reduced : .snappy
     }
 
     /// For confirmations: task ticked, entry saved.
-    static func confirm(reduceMotion: Bool = false) -> Animation {
+    static func confirm(reduceMotion: Bool = UIAccessibility.isReduceMotionEnabled) -> Animation {
         reduceMotion ? reduced : .bouncy(duration: 0.4, extraBounce: 0.1)
     }
 
     /// The Reduce Motion substitute: short, no overshoot.
     /// Toasts slide in and out on a light spring (owner review, Batch B).
-    static func toast(reduceMotion: Bool = false) -> Animation {
+    static func toast(reduceMotion: Bool = UIAccessibility.isReduceMotionEnabled) -> Animation {
         reduceMotion ? reduced : .spring(duration: 0.45, bounce: 0.25)
     }
 

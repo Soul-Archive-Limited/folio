@@ -48,7 +48,7 @@ private struct EntryActionsModifier: ViewModifier {
     /// To Recently Deleted; no "Are you sure?" (SPEC §5.2).
     private func delete() {
         let entry = entry
-        withAnimation(.smooth) { store.trash(entry) }
+        withAnimation(FolioMotion.standard()) { store.trash(entry) }
         toasts.show(.movedToTrash { [store] in store.restoreFromTrash(entry) })
     }
 }

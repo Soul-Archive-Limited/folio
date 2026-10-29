@@ -19,7 +19,7 @@ Status key: ✅ done · 🟡 in progress · ⬜ not started
 | 10 | iPhone sign-in + sync | Sign-in flows, recovery key + unlock screens (§6.1 steps 6–7, §6.13), Keychain, DK + recovery key, sync engine, live socket, background refresh, QR device linking, delete account in-app (§10.2–10.6) | ✅ |
 | 11 | Website | Astro marketing site, legal pages, support/FAQ, headers, SEO (§11.1, §11.2, §14) | ✅ |
 | 12 | Web app | `/app` sign-in + unlock, calendar, entries, tasks, Tiptap editor, live sync, delete account (§11.3) | ✅ |
-| 13 | Motion polish | Hitch audit with Instruments, 120 fps pass, Reduce Motion pass, web motion, iPad split view (§3.6, §6.16, §15.1) | ⬜ |
+| 13 | Motion polish | Hitch audit with Instruments, 120 fps pass, Reduce Motion pass, web motion, iPad split view (§3.6, §6.16, §15.1) | ✅ |
 | 14 | Release | Privacy manifest, App Store checklist, accessibility audit, review account, TestFlight (§12) | ⬜ |
 
 Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1–3 run as **Batch A**, 4–6 as **Batch B**, the Batch B fixes plus 7–8 as **Batch C**, and the Batch C fixes, Recently Deleted, Phase 11 and Xcode Cloud TestFlight builds as **Batch D**.
@@ -43,7 +43,19 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - [x] Part 3 — Phase 12 web app at /app (+ Turnstile), tested on the local stack with a Simulator; deploy in Part 4
 - [x] Part 4 — API deployed, web live via Pages (every push to main), TestFlight 0.1.0 (49), owner checklist in the Batch F report
 
+### Batch G checklist
+- [x] Part 1 — owner's test of 0.1.0 (49) + web app (not tested yet; notes go to the next batch)
+- [x] Part 2 — Phase 13 motion & performance
+- [ ] Part 3 — Phase 14 compliance, App Review readiness, TestFlight for friends
+
 ## Log
+
+### Batch G Part 2 — Phase 13 motion & performance (2026-10-29)
+- iPad: sidebar-adaptable tabs; Calendar as a resizable split (month column · day panel / entry detail); pagers rebuild on width change (fixes two half months on iPad).
+- Motion: filters animate (calendar markers fade, Journal/To-do rows move), day title cross-fades, sync status and guest ↔ signed-in animate, all curves from `FolioMotion`, Reduce Motion honoured by models too.
+- Performance on 10,000 entries (Simulator; DEBUG `HitchMonitor` + in-app `PerfDriver` + Time Profiler): Journal tab switch 444 → ~250 ms worst frame; composer no longer makes a synchronous model-availability XPC call per redraw; cached day-cell labels; Journal scroll 0 late frames.
+- Web: hover only on mouse devices, no tap flash/delay, reduced motion cross-fades, lazy chunks preload when idle (first composer 158 → 9 ms); CLS 0 and no frame over 17 ms on every flow.
+- Before/after clips `docs/screenshots/batch-g/rec-0[1-5]-*.mp4`.
 
 ### Batch F Part 3 — Phase 12 web app (2026-10-29)
 - `/app`: Apple / Google / email + Turnstile sign-in; unlock by QR from the iPhone (default) or recovery key; Trust this browser for 30 days; recovery-key setup for accounts that start on the web.

@@ -10,12 +10,23 @@ import { type ComposerRequest, type Diary, DiaryContext, type Tab, type TaskRequ
 import { Icon, Mark } from './Icons.tsx';
 import CalendarView from './calendar/CalendarView.tsx';
 
-const Composer = lazy(() => import('./Composer.tsx'));
+const loadComposer = () => import('./Composer.tsx');
+const loadJournal = () => import('./journal/JournalView.tsx');
+const loadTodo = () => import('./todo/TodoView.tsx');
+const Composer = lazy(loadComposer);
 const EntryDetail = lazy(() => import('./EntryDetail.tsx'));
 const TaskComposer = lazy(() => import('./todo/TaskComposer.tsx'));
-const JournalView = lazy(() => import('./journal/JournalView.tsx'));
-const TodoView = lazy(() => import('./todo/TodoView.tsx'));
+const JournalView = lazy(loadJournal);
+const TodoView = lazy(loadTodo);
 const ProfileView = lazy(() => import('./profile/ProfileView.tsx'));
+
+/** Fetches the composer (Tiptap) and the other tabs once the browser is idle, so the first
+ *  "New entry" doesn't stall while its code downloads and parses (Phase 13: 158 ms). */
+function preloadWhenIdle() {
+  const run = () => { void loadComposer(); void loadJournal(); void loadTodo(); };
+  if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 4000 });
+  else setTimeout(run, 1500);
+}
 
 const TABS: { tab: Tab; label: string; icon: string; path: string }[] = [
   { tab: 'calendar', label: 'Calendar', icon: 'calendar', path: '/app' },
@@ -38,6 +49,7 @@ export default function Shell({ me, dataKey, onSignOut, onSessionEnded }: { me: 
   const [composer, setComposer] = useState<ComposerRequest | null>(null);
   const [task, setTask] = useState<TaskRequest | null>(null);
   const [entry, setEntry] = useState<string | null>(null);
+  useEffect(preloadWhenIdle, []);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [selectedDay, setSelectedDay] = useState(todayKey());
   const [, setLoaded] = useState(false);

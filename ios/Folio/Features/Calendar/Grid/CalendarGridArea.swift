@@ -16,10 +16,14 @@ struct CalendarGridArea: View {
         ZStack(alignment: .top) {
             if model.isCollapsed {
                 WeekPager(model: model, layout: layout, firstWeekday: firstWeekday)
+                    .id(layout.panelWidth)
             } else {
                 // Full height, pinned to the top: the panel clips it as it shrinks. (A shorter
                 // horizontal scroll view would centre the grid and double the movement.)
+                // A new width rebuilds the pager at the visible month: a paging scroll view
+                // keeps its old offset when its pages resize, which showed two half months.
                 MonthPager(model: model, layout: layout, firstWeekday: firstWeekday)
+                    .id(layout.panelWidth)
                     .frame(height: layout.fullGridHeight, alignment: .top)
                     .scaleEffect(jumpScale)
                     .opacity(jumpOpacity)

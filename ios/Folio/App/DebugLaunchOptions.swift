@@ -11,6 +11,7 @@ import Foundation
 /// - `-FolioResetData YES` erases the local store first.
 /// - `-FolioSampleData YES` loads sample data into an empty store.
 /// - `-FolioStressData YES` loads 10,000 entries for performance checks.
+/// - `-FolioHitchLog YES` counts late frames into `Documents/hitches.log` (Phase 13 audit).
 /// - `-FolioSelectDay 2026-10-25` selects a day on the calendar.
 /// - `-FolioFilter Travel` turns on the category filter for that category name.
 /// - `-FolioJumpSheet YES` opens the Jump sheet.
@@ -66,6 +67,7 @@ enum DebugLaunchOptions {
         if defaults.bool(forKey: "FolioSampleData") { PreviewData.loadIfEmpty(into: store) }
         if defaults.bool(forKey: "FolioStressData"), store.isEmpty { PreviewData.loadStressData(into: store) }
         if defaults.bool(forKey: "FolioTrashSamples") { PreviewData.trashSamples(in: store) }
+        if defaults.bool(forKey: "FolioHitchLog") { HitchMonitor.shared.start() }
         if let title = defaults.string(forKey: "FolioSeedTask") { _ = try? store.createTask(title: title, day: store.today) }
         if let title = defaults.string(forKey: "FolioSeedEntry") {
             _ = try? store.createEntry(title: title, body: "Seeded for a UI test.", day: store.today)

@@ -79,6 +79,14 @@ final class DiaryStore {
         return fetch(descriptor)
     }
 
+    /// Whether there's any live entry, without loading them all (the Journal's empty state).
+    var hasEntries: Bool {
+        _ = revision
+        var descriptor = FetchDescriptor<Entry>(predicate: #Predicate { !$0.isTombstone && $0.trashedAt == nil })
+        descriptor.fetchLimit = 1
+        return fetchCount(descriptor) > 0
+    }
+
     /// Every live photo, newest day first, for the Journal's Photos view (SPEC §6.6).
     func allPhotos() -> [EntryPhoto] {
         _ = revision

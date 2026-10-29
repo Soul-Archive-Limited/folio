@@ -32,17 +32,21 @@ final class JournalModel {
         let entries = store.allEntries().filter(matches)
         var sections: [MonthSection] = []
         var current: [Entry] = []
-        var currentMonth: MonthKey?
+        var currentPrefix: Substring?
+        // Group on the "YYYY-MM" prefix: parsing a DayKey per entry showed in the 10,000-entry profile.
+        func close() {
+            if let first = current.first, let month = first.day?.monthKey { sections.append(MonthSection(month: month, entries: current)) }
+        }
         for entry in entries {
-            guard let month = entry.day?.monthKey else { continue }
-            if month != currentMonth, let previous = currentMonth {
-                sections.append(MonthSection(month: previous, entries: current))
+            let prefix = entry.dayKey.prefix(7)
+            if prefix != currentPrefix {
+                close()
                 current = []
+                currentPrefix = prefix
             }
-            currentMonth = month
             current.append(entry)
         }
-        if let currentMonth, !current.isEmpty { sections.append(MonthSection(month: currentMonth, entries: current)) }
+        close()
         cache = (revision, filter, sections)
         return sections
     }

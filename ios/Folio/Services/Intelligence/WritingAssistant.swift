@@ -51,6 +51,18 @@ final class WritingAssistant {
         }
         if DemoOutput.isOn { return .available }
         #endif
+        // Asking the model is a synchronous XPC round trip, and the composer reads this in its
+        // body on every redraw (a main-thread stall in the Phase 13 profile): reuse the answer
+        // for a short while. Turning Apple Intelligence on in Settings is seen within 30 s.
+        if let cached = Self.cached, Date.now.timeIntervalSince(cached.at) < 30 { return cached.value }
+        let value = Self.checkModel()
+        Self.cached = (value, Date.now)
+        return value
+    }
+
+    private static var cached: (value: Availability, at: Date)?
+
+    private static func checkModel() -> Availability {
         let model = SystemLanguageModel.default
         switch model.availability {
         case .available:

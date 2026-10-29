@@ -12,7 +12,7 @@ struct JournalScreen: View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: Spacing.m, pinnedViews: .sectionHeaders) {
                     JournalControls(model: model) { request?.send(.pastEntry) }
-                    if store.allEntries().isEmpty {
+                    if !store.hasEntries {
                         EmptyStateView(systemImage: "book.pages", message: "Your journal is empty. Tap + to write your first page.")
                             .frame(maxWidth: .infinity)
                             .padding(.top, 80)

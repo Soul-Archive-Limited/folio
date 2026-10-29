@@ -63,7 +63,7 @@ struct AppRootView: View {
 
     /// SPEC §6.1 step 8: onboarding → greeting → tour.
     private func finishOnboarding() {
-        withAnimation(.smooth(duration: 0.3)) { hasOnboarded = true }
+        withAnimation(FolioMotion.standard()) { hasOnboarded = true }
         startsTourAfterGreeting = true
         greeting = GreetingFactory(defaults: .standard)
             .makeIfNeeded(now: AppClock.now, name: store.settings().displayName, summary: store.greetingSummary(), force: true)

@@ -9,12 +9,21 @@ struct CalendarScreen: View {
     @Environment(DiaryStore.self) private var store
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var width: Double = 402
     @State private var scrollPosition = ScrollPosition(edge: .top)
     @State private var viewportHeight: Double = 600
     @Namespace private var entryZoom
 
     var body: some View {
+        if sizeClass == .regular && !dynamicTypeSize.isAccessibilitySize {
+            CalendarSplitView(model: model)
+        } else {
+            compactBody
+        }
+    }
+
+    private var compactBody: some View {
         NavigationStack(path: $model.path) {
             Group {
                 if dynamicTypeSize.isAccessibilitySize {

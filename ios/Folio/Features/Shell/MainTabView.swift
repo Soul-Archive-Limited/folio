@@ -39,6 +39,8 @@ struct MainTabView: View {
                     .toastHost(toasts)
             }
         }
+        // iPad: the tabs become a sidebar (SPEC §6.16); iPhone keeps the tab bar.
+        .tabViewStyle(.sidebarAdaptable)
         .tabBarMinimizeBehavior(selection.minimisesTabBar ? .onScrollDown : .never)
         .tourHost(.main, tour)
         .onAppear {
@@ -67,6 +69,11 @@ struct MainTabView: View {
             openDebugScreen(calendar: model)
             #endif
             calendar = model
+            #if DEBUG
+            if PerfDriver.isEnabled {
+                await PerfDriver.run(calendar: model, requester: requester) { selection = $0 }
+            }
+            #endif
         }
     }
 

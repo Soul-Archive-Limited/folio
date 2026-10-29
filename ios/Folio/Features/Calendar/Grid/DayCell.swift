@@ -29,6 +29,7 @@ struct DayCell: View {
             .contentShape(.rect(cornerRadius: Radius.dayCell))
         }
         .buttonStyle(.pressable)
+        .animation(FolioMotion.standard(reduceMotion: reduceMotion), value: state.matchesFilter)
         .accessibilityLabel(DayCellAccessibility.label(for: state))
         .accessibilityAddTraits(state.isSelected ? .isSelected : [])
     }

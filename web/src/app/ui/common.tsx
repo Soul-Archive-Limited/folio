@@ -23,7 +23,8 @@ export function Sheet({ label, onClose, children, wide, tall, scrim, bar, canClo
   const close = () => {
     if (closing || (canClose && !canClose())) return;
     setClosing(true);
-    setTimeout(onClose, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 220);
+    // The exit is a slide, or a 0.2 s fade under reduced motion (app.css): unmount after it.
+    setTimeout(onClose, 220);
   };
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
