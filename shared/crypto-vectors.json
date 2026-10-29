@@ -34,7 +34,7 @@
   "recovery": {
     "keyBytes": "5a17c3e9028b4df6a1307e5c9b2d8f41",
     "keyString": "B8BW7T82HD6ZD89GFSE9PBCF84",
-    "keyDisplay": "B8BW-7T82-HD6Z-D89G-FSE9-PBCF-84",
+    "keyDisplay": "B8BW-7T82H-D6ZD-89GF-SE9PB-CF84",
     "kekSalt": "c0ffee00112233445566778899aabbccddeeff00112233445566778899aabbcc",
     "kekInfo": "folio/recovery-kek/v1",
     "kek": "6b4fb8aeb092268ead0887e04215cb69d849dd0230f3660db7d1d78bf6699a5b",

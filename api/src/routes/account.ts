@@ -4,7 +4,7 @@ import type { AppEnv } from '../env';
 import { fail } from '../lib/errors';
 import { limit } from '../lib/ratelimit';
 import { clearSessionCookie, requireSession } from '../lib/session';
-import { body, uuid } from '../lib/validate';
+import { base64Text, body, deviceName, uuid } from '../lib/validate';
 
 export const account = new Hono<AppEnv>();
 account.use(requireSession);
@@ -27,17 +27,45 @@ account.get('/me', async (c) => {
   });
 });
 
-/** Devices = sessions (SPEC §6.9): name, platform, last seen, and which one is this. */
+/**
+ * Devices = sessions (SPEC §6.9): model + OS, when it was added and last seen, which one is
+ * this, and the name the person gave it — sealed with their Data Key, so only their devices
+ * can read it (Batch F).
+ */
 account.get('/devices', async (c) => {
   const { userId, sessionId } = c.var.session;
   const rows = await c.env.DB.prepare(
-    'SELECT id, device_name, platform, created_at, last_seen_at FROM sessions WHERE user_id = ?1 AND expires_at > ?2 ORDER BY last_seen_at DESC',
-  ).bind(userId, Date.now()).all<{ id: string; device_name: string; platform: string; created_at: number; last_seen_at: number }>();
+    `SELECT id, device_name, platform, created_at, last_seen_at, label_ciphertext, label_nonce
+     FROM sessions WHERE user_id = ?1 AND expires_at > ?2 ORDER BY last_seen_at DESC`,
+  ).bind(userId, Date.now()).all<{
+    id: string; device_name: string; platform: string; created_at: number; last_seen_at: number; label_ciphertext: string | null; label_nonce: string | null;
+  }>();
   return c.json({
     devices: rows.results.map((r) => ({
       id: r.id, name: r.device_name, platform: r.platform, createdAt: r.created_at, lastSeenAt: r.last_seen_at, current: r.id === sessionId,
+      label: r.label_ciphertext && r.label_nonce ? { ciphertext: r.label_ciphertext, nonce: r.label_nonce } : null,
     })),
   });
+});
+
+/** This device's model and OS ("iPhone 15 Pro · iOS 27.1"), sent after sign-in and OS updates. */
+account.put('/device', async (c) => {
+  const input = await body(c, z.object({ name: deviceName }));
+  await c.env.DB.prepare('UPDATE sessions SET device_name = ?2 WHERE id = ?1').bind(c.var.session.sessionId, input.name).run();
+  return c.json({ ok: true });
+});
+
+/** Renames any of the person's devices; `null` goes back to the model name. */
+account.put('/devices/:id/label', async (c) => {
+  const id = c.req.param('id');
+  if (!uuid.safeParse(id).success) fail(404, 'not_found');
+  const input = await body(c, z.object({
+    label: z.object({ ciphertext: base64Text(400).min(1), nonce: base64Text(24).min(16) }).nullable(),
+  }));
+  const result = await c.env.DB.prepare('UPDATE sessions SET label_ciphertext = ?3, label_nonce = ?4 WHERE id = ?1 AND user_id = ?2')
+    .bind(id, c.var.session.userId, input.label?.ciphertext ?? null, input.label?.nonce ?? null).run();
+  if (result.meta.changes === 0) fail(404, 'not_found');
+  return c.json({ ok: true });
 });
 
 account.delete('/devices/:id', async (c) => {

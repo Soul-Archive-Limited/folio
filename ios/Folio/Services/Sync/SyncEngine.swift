@@ -57,6 +57,7 @@ final class SyncEngine {
         lastSynced = account.userID.flatMap(SyncState.lastSynced(for:))
         requestSync(pull: true)
         if isForeground { openSocket() }
+        Task { await account.reportDeviceNameIfNeeded() }
     }
 
     /// App came to the foreground: open the live socket (its first message says whether
@@ -65,6 +66,7 @@ final class SyncEngine {
         isForeground = true
         guard isActive else { return }
         openSocket()
+        Task { await account.reportDeviceNameIfNeeded() }
         if store.hasDirtyRecords || !store.photosNeedingUpload().isEmpty { requestSync(pull: false) }
     }
 

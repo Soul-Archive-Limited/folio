@@ -20,10 +20,9 @@ nonisolated enum SignInSecrets {
         Data(SHA256.hash(data: Data(verifier.utf8))).base64URLEncoded
     }
 
-    /// The name shown in Profile → Devices. iOS doesn't share the person's device name with
-    /// apps, so this is the model: "iPhone" or "iPad".
+    /// The name shown in Profile → Devices: model and OS (`DeviceInfo`).
     @MainActor static var deviceName: String {
-        UIDevice.current.model
+        DeviceInfo.name
     }
 }
 

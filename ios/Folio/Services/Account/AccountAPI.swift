@@ -59,6 +59,22 @@ nonisolated enum AccountAPI {
         let createdAt: Double
         let lastSeenAt: Double
         let current: Bool
+        /// The person's own name for it, sealed with the Data Key; nil = the model name.
+        let label: SealedText?
+    }
+
+    /// Base64 of AES-GCM ciphertext ‖ tag, and of the 12-byte nonce.
+    struct SealedText: Codable, Sendable, Equatable {
+        let ciphertext: String
+        let nonce: String
+    }
+
+    struct DeviceLabel: Encodable, Sendable {
+        let label: SealedText?
+    }
+
+    struct DeviceName: Encodable, Sendable {
+        let name: String
     }
 
     struct Devices: Decodable, Sendable {

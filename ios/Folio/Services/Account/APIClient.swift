@@ -64,12 +64,26 @@ nonisolated final class APIClient: Sendable {
 
     // MARK: Blobs
 
-    func uploadBlob(_ id: String, data body: Data) async throws(APIError) {
-        var request = request("PUT", "blobs/\(id)")
+    /// A photo's three sealed renditions in one request (Batch F): three big-endian uint32
+    /// lengths, then thumb, display and full.
+    func uploadPhoto(_ photoID: UUID, thumb: Data, display: Data, full: Data) async throws(APIError) {
+        let body = Self.photoBody(thumb: thumb, display: display, full: full)
+        var request = request("PUT", "blobs/photo/\(photoID.uuidString.lowercased())")
         request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
         request.setValue(String(body.count), forHTTPHeaderField: "Content-Length")
         request.httpBody = body
         _ = try await data(for: request)
+    }
+
+    static func photoBody(thumb: Data, display: Data, full: Data) -> Data {
+        var body = Data(capacity: 12 + thumb.count + display.count + full.count)
+        for part in [thumb, display, full] {
+            withUnsafeBytes(of: UInt32(part.count).bigEndian) { body.append(contentsOf: $0) }
+        }
+        body.append(thumb)
+        body.append(display)
+        body.append(full)
+        return body
     }
 
     func downloadBlob(_ id: String) async throws(APIError) -> Data {

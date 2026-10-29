@@ -256,7 +256,7 @@ Inset-grouped glass sections:
 - **Your archive** 2×2 tiles: Entries · Photos · Days written on · Tasks done (tap → filtered tab).
 - **Account:**
   - Guest: "Sync & web access" card with the three sign-in buttons (same as onboarding step 5).
-  - Signed in: email / provider icon · Sync status (Up to date · Syncing… · Offline — will sync later · Error, tap for detail) · last synced · "Sync now" · **Devices** (list of signed-in devices/browsers with "Sign out" each, "Sign out other devices") · **Recovery key** (Face ID/passcode gated "Show recovery key") · **Link a browser or device** (shows QR, §10.4) · **Sign out** (asks: keep diary on this iPhone or remove it) · **Delete account** (§10.6, `danger`).
+  - Signed in: email / provider icon · Sync status (Up to date · Syncing… · Offline — will sync later · Error, tap for detail) · last synced · "Sync now" · **Devices** (model + OS such as "iPhone 15 Pro · iOS 27.1" or "Chrome on macOS", date added, last seen, "This device"; rename any device — the name is encrypted with the Data Key; "Sign out" each, "Sign out other devices"; DECISIONS 189) · **Recovery key** (Face ID/passcode gated "Show recovery key") · **Link a browser or device** (shows QR, §10.4) · **Sign out** (asks: keep diary on this iPhone or remove it) · **Delete account** (§10.6, `danger`).
 - **Categories** → manager (§6.10).
 - **Appearance:** Theme, Writing font, First day of week.
 - **Writing:** Default category · Show photo tiles on calendar.
@@ -276,7 +276,7 @@ Glass capsule above keyboard: live waveform from mic level, volatile words `inkT
 Glass popover: Suggest a title · Polish grammar (keeps my words) · Find tasks in this entry. Preview → Accept/Discard; nothing applied without acceptance.
 
 ### 6.13 Recovery key screen
-Large monospaced key in 4-character groups on a [G] card (e.g. `K7QM-4XT2-…`, 128-bit, Crockford base32). Copy · Save to Files (a `.txt` "Folio Recovery Key") · Print. Clear warning: "This key is the only way to read your diary on a new device if your iPhone is lost. We can't recover it for you." Confirm by typing the last 4 characters. Continue enabled only after confirming.
+Large monospaced key on two balanced lines of 13, each grouped 4-5-4, on a [G] card (e.g. `K7QM-4XT2A-…`, 128-bit, Crockford base32; DECISIONS 191). Copy · Save to Files (a `.txt` "Folio Recovery Key") · Print. Clear warning: "This key is the only way to read your diary on a new device if your iPhone is lost. We can't recover it for you." Confirm by typing the last 4 characters. Continue enabled only after confirming.
 
 ### 6.14 States & feedback
 Glass toasts for saved / deleted (Undo, 4 s) / sync issues. Human error copy ("Couldn't sync right now. Your diary is safe on this iPhone — we'll try again."). Never show raw codes (log with `Logger`, no content in logs). Skeleton shimmer only for photo thumbnails.
@@ -359,7 +359,7 @@ Speech framework **`SpeechAnalyzer` + `DictationTranscriber`** (verify with Cont
 - **Recently Deleted:** `trashedAt` (and a category's `unassignedIDs`) travel **inside the encrypted payload** like any other field, so the server can't tell a trashed item from a live one. Trash and restore are ordinary updates (last-writer-wins). The 30-day purge is a permanent delete: `deleted: true` tombstone, R2 blobs removed. A device that sees a tombstone never recreates the record.
 - **Push:** `POST /api/sync/push` `{changes:[{id,type,ciphertext,nonce,clientUpdatedAt,baseVersion,deleted}]}` ≤ 200 changes / ≤ 1 MB per request. Server assigns a per-user monotonic `version`. Conflict (baseVersion behind server): **last-writer-wins by `clientUpdatedAt`**; loser returned so the client can update.
 - **Pull:** `GET /api/sync/pull?since=<cursor>&limit=500` → changes after cursor + next cursor.
-- **Blobs:** `PUT /api/blobs/:id` (≤ 4 MB, streamed to R2 via binding), `GET /api/blobs/:id` (streamed, `Cache-Control: private, max-age=31536000, immutable` — content is encrypted and immutable). Uploads max 2 concurrent; thumbnails first.
+- **Blobs:** `PUT /api/blobs/photo/:photoId` (a photo's three renditions in one request, DECISIONS 190; the single `PUT /api/blobs/:id` remains, ≤ 4 MB, streamed to R2 via binding), `GET /api/blobs/:id` (streamed, `Cache-Control: private, max-age=31536000, immutable` — content is encrypted and immutable). Uploads max 2 concurrent; thumbnails first.
 - **Real-time:** while the app is in the foreground (or web tab visible), it opens one WebSocket to `UserHub` (`/api/live`). After any accepted push, the Worker pings the user's `UserHub`, which broadcasts `{"cursor": N}` to that user's other connections; they pull. Uses Hibernation so idle sockets cost nothing. Socket closes in background.
 - **When the iOS app syncs:** on launch/foreground (one pull), 2 s after the last local edit (debounced push), on WebSocket ping, and on `BGAppRefreshTask`. Exponential backoff with jitter on errors; honour `Retry-After`.
 - **Request budget target:** ≤ 10 Worker requests per active user per day on average (log a DEBUG counter to verify).
@@ -380,7 +380,7 @@ Use the Workers **rate-limiting binding** if available on the current plan (veri
 | email/verify | 5 attempts per code; 20 per IP per hour |
 | OAuth start/callback | 30 per IP per hour |
 | sync push/pull | 120 per user per minute |
-| blobs PUT | 180 per user per hour (60 photos × 3 renditions, DECISIONS 186); 4 MB each |
+| blobs PUT | one request per photo (3 renditions): 600 per user per hour, 3,000 per day (DECISIONS 190); 4 MB per rendition |
 | link requests | 10 per user per hour |
 | delete account | 3 per user per day |
 Per-user storage quota: **1 GB of photos, 50,000 records** (friendly message when near). 429 responses include `Retry-After`.

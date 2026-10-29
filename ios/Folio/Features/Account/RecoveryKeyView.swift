@@ -21,8 +21,12 @@ struct RecoveryKeyView: View {
                           subtitle: "This key is the only way to read your diary on a new device if your iPhone is lost. We can't recover it for you.") {
             VStack(spacing: Spacing.m) {
                 GlassCard(padding: Spacing.l) {
-                    Text(key.displayString)
+                    // Two balanced lines (4-5-4 each); scales down rather than wrap a group.
+                    Text(key.displayLines.joined(separator: "\n"))
                         .font(.system(size: 24, weight: .semibold, design: .monospaced))
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.6)
+                        .lineSpacing(6)
                         .foregroundStyle(.ink)
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)

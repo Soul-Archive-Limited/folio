@@ -35,9 +35,21 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - [x] Step 0 — Release archive: 0 warnings; CI fails on any Release warning
 - [x] Part 2 — Phase 9 backend deployed on folio.devilsense.com/api, live smoke test passed
 - [x] Part 3 — Phase 10 iPhone sign-in, encryption, sync (live two-Simulator test passed, /vibesec done)
-- [ ] Part 4 — TestFlight build from this Mac + owner's test list
+- [x] Part 4 — TestFlight build from this Mac + owner's test list (0.1.0 (43))
+
+### Batch F checklist
+- [ ] Part 1 — owner's iPhone test of 0.1.0 (43) (owner tests after this batch; fixes go in the next one)
+- [x] Part 2 — Devices (model + OS, dates, encrypted rename), one request per photo, two-line recovery key, gitleaks full scan
+- [ ] Part 3 — Phase 12 web app at /app (+ Turnstile)
+- [ ] Part 4 — TestFlight build, web deploy, owner checklist
 
 ## Log
+
+### Batch F Part 2 — improvements (2026-10-29)
+- Devices: "iPhone 15 Pro · iOS 27.1" / "Chrome on macOS" / "Simulator", added + last seen (hourly), "This device" badge, rename any device (sealed with the Data Key on the session row).
+- Photos upload in one request each (three renditions); 600 photos/hour, 3,000/day; old per-rendition route kept for build 43.
+- Recovery key on two balanced lines (4-5-4 + 4-5-4).
+- gitleaks: history and tracked files clean; live D1 had no leftover test sessions.
 
 ### Batch E — Phase 9 deploy + Phase 10 (2026-10-29)
 - API live on `folio.devilsense.com/api/*` (D1 `folio-db`, R2 `folio-blobs`, UserHub DO); admin endpoint dropped (no Cloudflare Access); web email sign-in closed until Turnstile (Batch F); blob uploads 180/hour.

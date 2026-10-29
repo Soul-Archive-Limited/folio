@@ -137,7 +137,7 @@ async function finishWeb(c: Context<AppEnv>, userId: string, reauth: boolean) {
 
 function browserName(agent = ''): string {
   const browser = /Edg\//.test(agent) ? 'Edge' : /Firefox\//.test(agent) ? 'Firefox' : /Chrome\//.test(agent) ? 'Chrome' : /Safari\//.test(agent) ? 'Safari' : 'Browser';
-  const os = /Mac OS X/.test(agent) && !/iPhone|iPad/.test(agent) ? 'Mac' : /iPhone/.test(agent) ? 'iPhone' : /iPad/.test(agent) ? 'iPad'
+  const os = /Mac OS X/.test(agent) && !/iPhone|iPad/.test(agent) ? 'macOS' : /iPhone/.test(agent) ? 'iOS' : /iPad/.test(agent) ? 'iPadOS'
     : /Android/.test(agent) ? 'Android' : /Windows/.test(agent) ? 'Windows' : /Linux/.test(agent) ? 'Linux' : '';
   return os ? `${browser} on ${os}` : browser;
 }

@@ -22,7 +22,8 @@ function crockford(bytes) {
   if (bits > 0) out += CROCKFORD[(value << (5 - bits)) & 31];
   return out;
 }
-const grouped = (s) => s.match(/.{1,4}/g).join('-');
+// Two balanced lines of 13, each 4-5-4, so the last group is the 4 characters typed to confirm.
+const grouped = (s) => [0, 4, 9, 13, 17, 22].map((at, i, all) => s.slice(at, all[i + 1] ?? s.length)).join('-');
 
 async function aesGcm(keyBytes, nonce, plaintext, aad) {
   const key = await subtle.importKey('raw', keyBytes, 'AES-GCM', false, ['encrypt']);

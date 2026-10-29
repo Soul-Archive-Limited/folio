@@ -8,6 +8,7 @@ import { fail } from './errors';
 export const SESSION_COOKIE = 'folio_session';
 export const SESSION_DAYS = 30;
 const DAY = 86_400_000;
+const HOUR = 3_600_000;
 
 export interface NewSession {
   token: string;
@@ -42,8 +43,9 @@ export async function lookupSession(env: Env, token: string, now = Date.now()): 
      FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ?1`,
   ).bind(await sha256Hex(token)).first<{ id: string; user_id: string; platform: 'ios' | 'web'; last_seen_at: number; expires_at: number; reauth_at: number | null; deleting: number }>();
   if (!row || row.expires_at <= now || row.deleting) return null;
-  // Sliding 30-day expiry, written at most once a day to spare D1 writes.
-  if (now - row.last_seen_at > DAY) {
+  // Sliding 30-day expiry and "last seen" for Devices, written at most once an hour to spare
+  // D1 writes (DECISIONS 189).
+  if (now - row.last_seen_at > HOUR) {
     await env.DB.prepare('UPDATE sessions SET last_seen_at = ?2, expires_at = ?3 WHERE id = ?1')
       .bind(row.id, now, now + SESSION_DAYS * DAY).run();
   }

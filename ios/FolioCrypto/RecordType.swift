@@ -12,4 +12,6 @@ public enum RecordType: String, CaseIterable, Codable, Sendable {
     case thumbnailBlob = "thumb"
     /// Encrypted 1080 px display rendition in R2 (Phase 10).
     case displayBlob = "display"
+    /// A name the person gave one of their devices, stored on its session (Batch F).
+    case deviceLabel
 }

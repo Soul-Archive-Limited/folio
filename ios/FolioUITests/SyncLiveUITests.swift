@@ -187,7 +187,7 @@ final class SyncLiveUITests: XCTestCase {
         let devices = app.buttons["Devices"]
         try scrollTo(devices, in: app)
         devices.tap()
-        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] 'this device'")).firstMatch.waitForExistence(timeout: 20))
+        XCTAssertTrue(app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS[c] 'this device'")).firstMatch.waitForExistence(timeout: 20))
         shot("p10-19-devices")
         app.navigationBars.buttons["BackButton"].tap()
         let delete = app.buttons["Delete account"]
@@ -217,6 +217,28 @@ final class SyncLiveUITests: XCTestCase {
         shot("p10-22-after-delete-guest")
     }
 
+    /// Batch F: Devices shows model + OS, dates and "This device"; renames another device
+    /// (`FOLIO_RENAME_TARGET`, part of its name) to `FOLIO_RENAME_TO`.
+    @MainActor func testF1DevicesAndRename() throws {
+        let app = try launch(["-FolioTab", "profile"])
+        let devices = app.buttons["Devices"]
+        try scrollTo(devices, in: app)
+        devices.tap()
+        XCTAssertTrue(app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS[c] 'this device'")).firstMatch.waitForExistence(timeout: 20))
+        shot(env["FOLIO_SHOT"] ?? "devices")
+        guard let target = env["FOLIO_RENAME_TARGET"], let name = env["FOLIO_RENAME_TO"] else { return }
+        let row = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", target)).firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 10))
+        row.tap()
+        let field = app.alerts.textFields.firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        field.typeText(name)
+        shot((env["FOLIO_SHOT"] ?? "devices") + "-rename")
+        app.alerts.buttons["Save"].tap()
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS %@", name)).firstMatch.waitForExistence(timeout: 10))
+        shot((env["FOLIO_SHOT"] ?? "devices") + "-renamed")
+    }
+
     // MARK: Helpers
 
     @MainActor private func launch(_ extra: [String]) throws -> XCUIApplication {
@@ -225,6 +247,8 @@ final class SyncLiveUITests: XCTestCase {
         app.launchArguments = ["-hasOnboarded", "YES", "-com.apple.TipKit.HideAllTips", "1", "-FolioSkipGreeting", "YES",
                                "-FolioNoTour", "YES", "-FolioToastSeconds", "20", "-AppleLocale", "en_GB",
                                "-AppleLanguages", "(en-GB)", "-FolioSkipOwnerAuth", "YES"] + extra
+        // A local `wrangler dev` instead of the deployed API (Batch F), e.g. http://127.0.0.1:8787/api/
+        if let base = env["FOLIO_API_BASE"] { app.launchArguments += ["-FolioAPIBase", base] }
         app.launch()
         return app
     }

@@ -30,20 +30,17 @@ public struct RecoveryKey: Equatable, Sendable {
     /// 26 characters, no separators.
     public var string: String { CrockfordBase32.encode(bytes) }
 
-    /// Groups of four separated by hyphens, e.g. `B8BW-7T82-HD6Z-D89G-FSE9-PBCF-84`.
-    public var displayString: String {
-        var groups: [String] = []
-        var current = ""
-        for character in string {
-            current.append(character)
-            if current.count == 4 {
-                groups.append(current)
-                current = ""
-            }
+    /// Two balanced lines of 13 characters, each grouped 4-5-4, e.g. `B8BW-7T82H-D6ZD` and
+    /// `89GF-SE9PB-CF84` — the last group is the 4 characters typed to confirm (Batch F).
+    public var displayLines: [String] {
+        let characters = Array(string)
+        return [characters[..<13], characters[13...]].map { line in
+            [line.prefix(4), line.dropFirst(4).prefix(5), line.dropFirst(9)].map { String($0) }.joined(separator: "-")
         }
-        if !current.isEmpty { groups.append(current) }
-        return groups.joined(separator: "-")
     }
+
+    /// Both lines joined with hyphens, e.g. `B8BW-7T82H-D6ZD-89GF-SE9PB-CF84`.
+    public var displayString: String { displayLines.joined(separator: "-") }
 
     /// The last four characters, which the person types to confirm they saved the key.
     public var confirmationSuffix: String { String(string.suffix(4)) }

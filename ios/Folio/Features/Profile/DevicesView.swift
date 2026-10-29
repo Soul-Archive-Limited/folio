@@ -7,26 +7,36 @@ struct DevicesView: View {
     @State private var devices: [AccountAPI.Device]?
     @State private var problem: SignInProblem?
     @State private var confirmsOthers = false
+    @State private var renaming: AccountAPI.Device?
+    @State private var newName = ""
 
     var body: some View {
         List {
             if let devices {
                 Section {
                     ForEach(devices) { device in
-                        DeviceRow(device: device)
-                            .swipeActions {
-                                if !device.current {
-                                    Button("Sign out", role: .destructive) { signOut(device) }
-                                }
+                        Button { startRenaming(device) } label: {
+                            DeviceRow(device: device, label: account.label(of: device))
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityHint("Renames this device")
+                        .swipeActions(edge: .leading) {
+                            Button("Rename") { startRenaming(device) }.tint(.ember)
+                        }
+                        .swipeActions {
+                            if !device.current {
+                                Button("Sign out", role: .destructive) { signOut(device) }
                             }
-                            .contextMenu {
-                                if !device.current {
-                                    Button("Sign out", systemImage: "rectangle.portrait.and.arrow.right", role: .destructive) { signOut(device) }
-                                }
+                        }
+                        .contextMenu {
+                            Button("Rename", systemImage: "pencil") { startRenaming(device) }
+                            if !device.current {
+                                Button("Sign out", systemImage: "rectangle.portrait.and.arrow.right", role: .destructive) { signOut(device) }
                             }
+                        }
                     }
                 } footer: {
-                    Text("Swipe a device to sign it out. Its copy of your diary stays on it until it's signed out there too.")
+                    Text("Tap a device to rename it; the name is encrypted like your diary. Swipe to sign it out — its copy of your diary stays on it until it's signed out there too.")
                 }
                 .listRowBackground(ProfileRowBackground())
                 if devices.count > 1 {
@@ -49,6 +59,16 @@ struct DevicesView: View {
         .navigationTitle("Devices")
         .refreshable { await load() }
         .task { await load() }
+        .alert("Rename device", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
+            TextField(renaming?.name ?? "Name", text: $newName)
+                .onChange(of: newName) { _, value in
+                    if value.count > AccountModel.deviceLabelLimit { newName = String(value.prefix(AccountModel.deviceLabelLimit)) }
+                }
+            Button("Save") { rename() }
+            Button("Cancel", role: .cancel) { renaming = nil }
+        } message: {
+            Text("Leave it empty to show the model again.")
+        }
         .confirmationDialog("Sign out every other device and browser?", isPresented: $confirmsOthers, titleVisibility: .visible) {
             Button("Sign out other devices", role: .destructive) {
                 Task {
@@ -68,39 +88,29 @@ struct DevicesView: View {
         }
     }
 
+    private func startRenaming(_ device: AccountAPI.Device) {
+        newName = account.label(of: device) ?? ""
+        renaming = device
+    }
+
+    private func rename() {
+        guard let device = renaming else { return }
+        renaming = nil
+        let name = newName
+        Task {
+            do throws(APIError) {
+                try await account.renameDevice(device.id, to: name)
+                await load()
+            } catch {
+                problem = error.signInProblem
+            }
+        }
+    }
+
     private func signOut(_ device: AccountAPI.Device) {
         Task {
             let _: Void? = try? await account.signOutDevice(device.id)
             await load()
         }
-    }
-}
-
-/// One device: name, "This iPhone" or when it was last seen.
-struct DeviceRow: View {
-    let device: AccountAPI.Device
-
-    var body: some View {
-        HStack(spacing: Spacing.s) {
-            Image(systemName: device.platform == "web" ? "globe" : "iphone")
-                .foregroundStyle(.ember)
-                .frame(width: 26)
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(device.name).foregroundStyle(.ink)
-                Group {
-                    if device.current {
-                        Text("This device")
-                    } else {
-                        Text("Last seen \(Date(timeIntervalSince1970: device.lastSeenAt / 1000), format: .relative(presentation: .named))")
-                    }
-                }
-                .folioFont(.caption)
-                .foregroundStyle(.inkTertiary)
-            }
-        }
-        .folioFont(.body)
-        .frame(minHeight: Spacing.minHitTarget)
-        .accessibilityElement(children: .combine)
     }
 }

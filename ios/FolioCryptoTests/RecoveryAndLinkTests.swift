@@ -10,8 +10,10 @@ struct RecoveryAndLinkTests {
     func format() {
         let key = RecoveryKey.generate()
         #expect(key.string.count == 26)
-        #expect(key.displayString.count == 26 + 6)
-        #expect(key.displayString.split(separator: "-").map(\.count) == [4, 4, 4, 4, 4, 4, 2])
+        #expect(key.displayString.count == 26 + 5)
+        #expect(key.displayString.split(separator: "-").map(\.count) == [4, 5, 4, 4, 5, 4])
+        #expect(key.displayLines.count == 2 && key.displayLines.allSatisfy { $0.count == 15 })
+        #expect(key.displayLines[1].hasSuffix(key.confirmationSuffix))
         #expect(key.confirmationSuffix == String(key.string.suffix(4)))
         #expect(RecoveryKey.generate() != key)
     }

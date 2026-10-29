@@ -4,7 +4,8 @@ import Foundation
 /// Photos travel as three encrypted blobs in R2 — thumbnail, 1080 px display and full —
 /// sealed with the Data Key, associated data `photoId|rendition|userId` (SPEC §10.3, §10.5).
 /// One transfer at a time (SPEC allows two; one keeps the main actor's SwiftData objects
-/// simple and is fast enough for photos of ≤ 600 KB). Downloads fetch every thumbnail first.
+/// simple and is fast enough for photos of ≤ 600 KB); an upload sends all three renditions in
+/// one request. Downloads fetch every thumbnail first.
 extension SyncEngine {
     enum Rendition: String, CaseIterable {
         case thumb, display, full
@@ -20,19 +21,22 @@ extension SyncEngine {
         func blobID(_ photoID: UUID) -> String { "\(photoID.uuidString.lowercased()).\(rawValue)" }
     }
 
-    /// One photo at a time — thumbnail, display, full — each marked uploaded as soon as its
-    /// three blobs are in R2, so a rate limit part-way loses nothing already sent.
+    /// One photo per request — thumbnail, display and full together (Batch F, DECISIONS 190) —
+    /// each marked uploaded as soon as it's in R2, so a rate limit part-way loses nothing sent.
     func uploadPendingBlobs(userID: UUID, key: DataKey) async throws(APIError) {
         for photo in store.photosNeedingUpload() {
+            var sealed: [Data] = []
             for rendition in Rendition.allCases {
                 let bytes: Data = switch rendition {
                 case .thumb: photo.thumbData
                 case .display: photo.displayOrFullData
                 case .full: photo.imageData
                 }
-                guard let sealed = try? RecordCipher.seal(bytes, recordID: photo.id, type: rendition.recordType, userID: userID, using: key) else { continue }
-                try await account.api.uploadBlob(rendition.blobID(photo.id), data: sealed.combined)
+                guard let part = try? RecordCipher.seal(bytes, recordID: photo.id, type: rendition.recordType, userID: userID, using: key) else { break }
+                sealed.append(part.combined)
             }
+            guard sealed.count == 3 else { continue }
+            try await account.api.uploadPhoto(photo.id, thumb: sealed[0], display: sealed[1], full: sealed[2])
             photo.blobUploaded = true
             store.isApplyingRemote = true
             store.commit()
