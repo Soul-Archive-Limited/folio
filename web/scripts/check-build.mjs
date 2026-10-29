@@ -44,7 +44,10 @@ check(() => {
   if (empty('testflightUrl')) assert.ok(!/Join the TestFlight/.test(home), 'no TestFlight button without a URL');
   if (empty('appStoreUrl')) assert.ok(!/App Store/.test(home.replace(/<title>.*<\/title>/, '')) || !/apps\.apple\.com/.test(home));
   if (/webAppLive: false/.test(config)) assert.ok(!/href="\/app"/.test(home), 'no web app link before it is live');
-  if (empty('testflightUrl') && empty('appStoreUrl')) {
+  if (/webAppLive: true/.test(config)) {
+    assert.match(home, /href="\/app"[^>]*>Open in browser/, 'hero opens the web app');
+    assert.match(home, /href="\/app">Open web app/, 'nav opens the web app');
+  } else if (empty('testflightUrl') && empty('appStoreUrl')) {
     assert.match(home, /View the source on GitHub/);
     assert.match(home, /How your privacy works/);
   }
