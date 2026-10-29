@@ -124,6 +124,7 @@ final class SyncLiveUITests: XCTestCase {
         print("SYNCTIME seen \(Date().timeIntervalSince1970) after \(Date().timeIntervalSince(start)) s")
         XCTAssertEqual(result, .completed, "Entry \(title) never \(gone ? "left" : "arrived")")
         if let name = env["FOLIO_SHOT"] { sleep(1); shot(name) }
+        sleep(UInt32(env["FOLIO_STAY_SECONDS"].flatMap(UInt32.init) ?? 0))
     }
 
     /// Profile with the sync status row on screen (for the status screenshots).

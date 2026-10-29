@@ -26,7 +26,6 @@ struct RecoveryKeyView: View {
                         .foregroundStyle(.ink)
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
-                        .textSelection(.enabled)
                         .accessibilityLabel(Text(key.displayString.map { String($0) }.joined(separator: " ")))
                         .accessibilityIdentifier("recoveryKey")
                 }
