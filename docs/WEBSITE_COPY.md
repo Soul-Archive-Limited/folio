@@ -24,8 +24,8 @@ Mobile: a full-screen glass sheet with the same links, large, plus the two butto
 - Visual: a 3D phone floating over the drifting aura, showing Folio's real calendar; it tilts toward the cursor and turns as you scroll.
 
 ### Problem — "Where did last spring go?"
-- Heading: **Your life is kept in six different places.**
-- Intro: And none of them is a diary.
+- Heading: **Your days are *scattered.***
+- Intro: Across a camera roll, three apps and a shoebox of notebooks — and none of them is a diary.
 - Four scattered cards that drift together on scroll and settle into one calendar:
   1. **The camera roll** — 14,000 photos, and you still can't find the day you moved in.
   2. **Notes and old notebooks** — a line here, a shoebox of paper diaries there.
@@ -70,6 +70,9 @@ The month grid assembles itself: day tiles fly in from depth, photo tiles flip i
 
 ### FAQ preview
 Can you read my diary? · Do I need an account? · What if I lose my iPhone? · Can I write for days in the past? · Does dictation send my voice anywhere? — *All questions →*
+
+### Whose days are these? (use-case heading on the page)
+Lede: Five people, five ways to keep a diary. The people are made up; the way Folio works for them isn't.
 
 ### A note from the maker (replaces reviews)
 > Folio is made by Soul Archive Ltd, a small company in London, for people who want their days kept — privately. There's no feed, no streak and nothing to share. Just your pages, on your calendar, for as long as you want them.

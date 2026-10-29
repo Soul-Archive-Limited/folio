@@ -21,6 +21,7 @@ export const PHONE_POSE = { rx: 0.09, ry: -0.3, rz: 0.035 };
 
 export function Phone({ dark, screen, input }: { dark: boolean; screen: string; input: SceneInput }) {
   const group = useRef<THREE.Group>(null);
+  const shadow = useRef<THREE.MeshBasicMaterial>(null);
   const { gl, scene } = useThree();
   const texture = useLoader(THREE.TextureLoader, screen);
 
@@ -56,6 +57,7 @@ export function Phone({ dark, screen, input }: { dark: boolean; screen: string; 
     g.rotation.x = damp(g.rotation.x, PHONE_POSE.rx + py * 0.16 + scroll * 0.22, 3.5, dt);
     g.rotation.z = PHONE_POSE.rz + Math.sin(t * 0.55) * 0.012;
     g.position.y = damp(g.position.y, Math.sin(t * 0.8) * 0.045 + scroll * 0.55, 6, dt);
+    if (shadow.current) shadow.current.opacity = (dark ? 0.9 : 0.7) * (1 - Math.min(scroll * 1.6, 0.9));
   });
 
   return (
@@ -86,7 +88,7 @@ export function Phone({ dark, screen, input }: { dark: boolean; screen: string; 
       </group>
       <mesh position={[0, -H / 2 - 0.2, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={[1.7, 0.7, 1]}>
         <planeGeometry args={[1, 1]} />
-        <meshBasicMaterial map={parts.shadow} transparent depthWrite={false} opacity={dark ? 0.9 : 0.7} />
+        <meshBasicMaterial ref={shadow} map={parts.shadow} transparent depthWrite={false} opacity={dark ? 0.9 : 0.7} />
       </mesh>
     </>
   );

@@ -94,10 +94,12 @@ export function Gate({ children }: { children: React.ReactNode }) {
   return (
     <main className="gate">
       <div className="aura" aria-hidden="true"><i /><i /><i /></div>
+      <a className="gate-home" href="/"><Mark />Folio</a>
       <section className="gate-card glass" style={{ position: 'relative' }}>
         <Mark className="mark" />
         {children}
       </section>
+      <p className="gate-foot"><a href="/security">How your privacy works</a> · <a href="/support">Help</a></p>
     </main>
   );
 }

@@ -194,7 +194,7 @@ p { text-wrap: pretty; }
 .page-head h1 em { font-style: italic; color: var(--ember-text); }
 .page-head .lede { font-size: clamp(18px, 2vw, 21px); color: var(--text-2); max-width: 48ch; }
 .page-aura {
-  position: absolute; inset: -40% -20% auto; height: 150%; z-index: -1; pointer-events: none;
+  position: absolute; top: -240px; left: -20%; right: -20%; height: 820px; z-index: -1; pointer-events: none;
   background:
     radial-gradient(30% 40% at 78% 30%, color-mix(in srgb, var(--aura1) 55%, transparent), transparent 70%),
     radial-gradient(26% 34% at 92% 60%, color-mix(in srgb, var(--aura2) 45%, transparent), transparent 70%),

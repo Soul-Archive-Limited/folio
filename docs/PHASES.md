@@ -195,3 +195,10 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - One explainer for microphone + speech recognition; "Past day" pill in Journal; onboarding keyboard always dismissed.
 - Tour rebuilt without TipKit: "n of 6", Back/Next/Skip, moves between screens itself, waits for transitions, auto-advances look-only steps.
 - Photos clipped to their containers (incl. zoom sources); photo tiles get a scrim; swipe + long-press actions on entry cards; drafts only for real changes; Share menu (text / text + photos / image card); `emberStrong`/`emberText` tokens (website home accessibility 100).
+
+### Batch H — Website rebuild (2026-10-30)
+- Story and copy in `docs/WEBSITE_COPY.md`; new Features, How it works, Privacy & security, About, FAQ and Download pages; glass nav with Sign in / Get started and a full-screen phone menu; updated Support, Delete account, Changelog, Open source, 404; per-page OG images.
+- 3D hero phone and privacy lock (React Three Fiber, lazy, visible-only), shader aura, scroll stories (problem → one day → calendar → lock) with Motion, calendar fly-in and page lift, card tilt; static, elegant fallbacks for Reduced Motion and low-power devices.
+- `/app` sign-in and unlock screens restyled to the site's look (no logic changes).
+- Lighthouse (mobile, home): 99 / 100 / 100 / 100; desktop 100 / 100 / 100 / 100; CLS 0 everywhere; home first-view JS 26 KB gzip.
+
