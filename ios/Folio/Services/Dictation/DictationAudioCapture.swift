@@ -51,6 +51,9 @@ nonisolated final class DictationAudioCapture: @unchecked Sendable {
         let ratio = format.sampleRate / buffer.format.sampleRate
         let capacity = AVAudioFrameCount((Double(buffer.frameLength) * ratio).rounded(.up)) + 16
         guard let output = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: capacity) else { return nil }
+        // The converter calls back synchronously on this thread. Older SDKs don't mark the
+        // buffer Sendable, so it travels in a box rather than being captured directly.
+        let source = BufferBox(buffer: buffer)
         nonisolated(unsafe) var supplied = false
         var error: NSError?
         let status = converter.convert(to: output, error: &error) { _, inputStatus in
@@ -60,9 +63,13 @@ nonisolated final class DictationAudioCapture: @unchecked Sendable {
             }
             supplied = true
             inputStatus.pointee = .haveData
-            return buffer
+            return source.buffer
         }
         guard status != .error, error == nil, output.frameLength > 0 else { return nil }
         return output
+    }
+
+    private struct BufferBox: @unchecked Sendable {
+        let buffer: AVAudioPCMBuffer
     }
 }
