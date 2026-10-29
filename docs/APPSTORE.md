@@ -68,19 +68,21 @@ journal,private,photo,memories,tasks,to-do,daily,writing,notes,offline,dictation
 
 ## App Privacy (the "nutrition label")
 
-Answer **Yes, we collect data**, then exactly these three types. For each: used for **App Functionality** only; **linked to the user: Yes**; **used for tracking: No**.
+Privacy Policy URL: https://folio.devilsense.com/privacy. Answer **Yes, we collect data**, then exactly these five types. For each: used for **App Functionality** only; **linked to the user: Yes**; **used for tracking: No**.
 
 | Category → type | Why |
 |---|---|
 | Contact Info → **Email Address** | Signing in (account email; Resend delivers sign-in codes). |
+| User Content → **Photos or Videos** | Photos in entries, synced end-to-end encrypted. |
+| User Content → **Other User Content** | Entries, tasks and categories, synced end-to-end encrypted. |
 | Identifiers → **User ID** | The account id and the Apple/Google account ids that let you sign in. |
 | Other Data → **Other Data Types** | Each signed-in device's model and system version, shown in Profile → Devices. |
 
-**Not declared — diary content** (entries, photos, tasks, categories, settings, device names you choose). Apple defines "collect" as sending data off the device "in a way that allows you and/or your third-party partners to access it". Folio encrypts all of it on the device with a key Soul Archive Ltd never holds, so we can't access it (DECISIONS 209). Apple's page has no explicit end-to-end-encryption clause; this follows the definition, and the privacy policy says plainly what we store.
+The diary content is declared even though it reaches the server only end-to-end encrypted and Soul Archive Ltd can't read it: Apple's App Privacy page has no exemption for encrypted data, so we declare it, as Day One and Ente do (owner decision, DECISIONS 212). The privacy policy explains that the label lists it while we still can't read it.
 
-**Not collected:** location, contacts, health, financial info, browsing/search history, usage data, diagnostics, purchases, sensitive info. Network addresses are only counted, as keyed hashes, for up to two days to stop abuse — a security measure, not a data type Apple asks about.
+**Not collected:** location, contacts, health, financial info, browsing/search history, usage data, diagnostics, purchases, sensitive info. Network addresses are only counted, as keyed hashes, for up to two days to stop abuse.
 
-`PrivacyInfo.xcprivacy` matches: no tracking, no tracking domains, the same three types, UserDefaults reason `CA92.1`.
+`PrivacyInfo.xcprivacy` matches: no tracking, no tracking domains, the same five types, UserDefaults reason `CA92.1`.
 
 ## Export compliance
 
@@ -97,7 +99,7 @@ Expected result: **4+**.
 
 ## EU Digital Services Act
 
-Declare **trader: Soul Archive Ltd** (a company selling to the public is a trader). App Store Connect shows the D-U-N-S address automatically; enter phone and **support@devilsense.com**; both are verified by code. Apple may ask for a document showing the business name and address (e.g. the Companies House certificate for company 16186654), and you certify you only offer products that comply with EU law. This is an account-level step for the Account Holder or Admin.
+**Not done for TestFlight** — the owner does it for the public App Store launch. Then declare **trader: Soul Archive Ltd** (a company selling to the public is a trader). App Store Connect shows the D-U-N-S address automatically; enter phone and **support@devilsense.com**; both are verified by code. Apple may ask for a document showing the business name and address (e.g. the Companies House certificate for company 16186654), and you certify you only offer products that comply with EU law. This is an account-level step for the Account Holder or Admin.
 
 ## App Review information (used by both App Review and TestFlight App Review)
 
