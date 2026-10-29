@@ -52,7 +52,11 @@ export default function SetupKey({ me, onDone, onExists, onSignOut }: Props) {
       <p className="sub">This key is the only way to read your diary on a new device if your iPhone is lost. We can't recover it for you.</p>
       <div className="recovery glass" aria-label={`Recovery key: ${key.split('').join(' ')}`}>{lines[0]}<br />{lines[1]}</div>
       <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-        <button className="btn small" onClick={() => void navigator.clipboard.writeText(lines.join('-'))}>Copy</button>
+        <button className="btn small" onClick={() => {
+          // Best effort, like the iPhone's 2-minute local copy: clear it again if we still can.
+          void navigator.clipboard.writeText(lines.join('-'));
+          setTimeout(() => void navigator.clipboard.writeText('').catch(() => {}), 120_000);
+        }}>Copy</button>
         <button className="btn small" onClick={download}>Save as file</button>
         <button className="btn small" onClick={() => window.print()}>Print</button>
       </div>

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { newId, sameId } from '../lib/bytes.ts';
 import { formatLongYear, formatTime } from '../lib/days.ts';
-import { photoURL, type PreparedPhoto, type Rendition } from '../lib/photos.ts';
+import { photoBytes, type PreparedPhoto, type Rendition } from '../lib/photos.ts';
 import { CategoryChip, PhotoImg, Sheet, useCloseSheet } from './common.tsx';
 import { useDiary } from './context.tsx';
 import { EntryCard } from './EntryCard.tsx';
@@ -41,10 +41,8 @@ function Detail({ id }: { id: string }) {
     setMenu(false);
     const copyId = store.put('entry', { ...entry!.data, createdAt: Date.now(), trashedAt: undefined });
     for (const [sortIndex, photo] of photos.entries()) {
-      const bytes = async (r: Rendition) => {
-        const url = await photoURL(key, me.userId, photo.id, r);
-        return url ? new Uint8Array(await (await fetch(url)).arrayBuffer()) : null;
-      };
+      // Not fetch(blob:): the CSP's connect-src is 'self' only.
+      const bytes = (r: Rendition) => photoBytes(key, me.userId, photo.id, r);
       const [thumb, display, full] = await Promise.all([bytes('thumb'), bytes('display'), bytes('full')]);
       if (!thumb || !display || !full) continue;
       const copy: PreparedPhoto = { thumb, display, full, width: photo.data.pixelWidth, height: photo.data.pixelHeight, previewURL: URL.createObjectURL(new Blob([display as BlobPart])) };

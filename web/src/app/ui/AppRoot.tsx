@@ -8,6 +8,7 @@ import { SignIn } from './SignIn.tsx';
 const Unlock = lazy(() => import('./Unlock.tsx'));
 const SetupKey = lazy(() => import('./SetupKey.tsx'));
 const Shell = lazy(() => import('./Shell.tsx'));
+const DeleteAccount = lazy(() => import('./profile/DeleteAccount.tsx'));
 
 type Phase =
   | { kind: 'loading' }
@@ -15,6 +16,7 @@ type Phase =
   | { kind: 'offline' }
   | { kind: 'setupKey'; me: Me }
   | { kind: 'locked'; me: Me }
+  | { kind: 'deleting'; me: Me }
   | { kind: 'ready'; me: Me; key: DataKey };
 
 const SIGN_IN_ERRORS: Record<string, string> = {
@@ -46,6 +48,8 @@ export default function AppRoot() {
 
   async function signedIn(me: Me) {
     void reportBrowserName(me.sessionId);
+    // Deleting the account needs no key, so that page never unlocks the diary.
+    if (location.pathname.startsWith('/app/settings/account')) return setPhase({ kind: 'deleting', me });
     const key = await trustedKey(me.userId);
     if (key) setPhase({ kind: 'ready', me, key });
     else setPhase(me.hasRecoveryKey ? { kind: 'locked', me } : { kind: 'setupKey', me });
@@ -78,8 +82,9 @@ export default function AppRoot() {
           <button className="btn primary wide" onClick={() => { setPhase({ kind: 'loading' }); void boot(); }}>Try again</button>
         </Gate>
       );
-    case 'signedOut': return <SignIn error={phase.error} onSignedIn={boot} />;
+    case 'signedOut': return <SignIn error={phase.error} />;
     case 'setupKey': return <Suspense fallback={fallback}><SetupKey me={phase.me} onDone={(raw, trust) => unlocked(phase.me, raw, trust)} onExists={() => setPhase({ kind: 'locked', me: phase.me })} onSignOut={signOut} /></Suspense>;
+    case 'deleting': return <Suspense fallback={fallback}><DeleteAccount me={phase.me} onSignOut={signOut} /></Suspense>;
     case 'locked': return <Suspense fallback={fallback}><Unlock me={phase.me} onUnlocked={(raw, trust) => unlocked(phase.me, raw, trust)} onSignOut={signOut} /></Suspense>;
     case 'ready': return <Suspense fallback={fallback}><Shell me={phase.me} dataKey={phase.key} onSignOut={signOut} onSessionEnded={() => setPhase({ kind: 'signedOut', error: 'You were signed out.' })} /></Suspense>;
   }

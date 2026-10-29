@@ -248,7 +248,11 @@ svg.i.sm { width: 18px; height: 18px; }
   .calendar { padding: 0 10px calc(var(--tab-h) + 120px); }
   .cal-main { padding-top: 14px; }
   .cal-head { margin: 0 6px 10px; }
-  .month-title .title1 { font-size: 30px; }
+  .month-title .title1 { font-size: 28px; }
+  .month-title .y { font-size: 19px; }
+  .cal-head { flex-wrap: nowrap; }
+  /* Swipe the grid to change month, as on the iPhone. */
+  .cal-tools .step { display: none; }
   .weekdays { padding: 0 8px 6px; gap: 4px; }
   .grid-panel { padding: 6px; }
   .grid { gap: 4px; }
@@ -272,6 +276,8 @@ svg.i.sm { width: 18px; height: 18px; }
 
 .task { display: flex; align-items: center; gap: 12px; min-height: 50px; padding: 6px 8px; border-radius: 14px; animation: rise 0.35s var(--smooth) both; }
 .task:hover { background: color-mix(in srgb, var(--ink) 4%, transparent); }
+/* Each row's entrance animation makes a stacking context; the row with an open menu goes on top. */
+.task:has(.menu), .card:has(.menu) { z-index: 6; }
 .tick {
   width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--c, var(--ink-tertiary)); background: none; flex: none;
   display: grid; place-items: center; padding: 0; position: relative; transition: background 0.25s var(--smooth);
@@ -408,6 +414,13 @@ button.row:hover { background: color-mix(in srgb, var(--ink) 4%, transparent); }
 .row select { border: 0; background: none; color: var(--ink-secondary); font-size: 15px; text-align: right; }
 .row .badge { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: color-mix(in srgb, var(--ember) 14%, transparent); color: var(--ember-text); white-space: nowrap; }
 .row.danger { color: var(--danger); }
+/* Phones: a device's buttons go under its name. */
+@media (max-width: 767px) {
+  .device-row { flex-wrap: wrap; }
+  .device-row .grow { flex: 1 1 calc(100% - 40px); }
+  .device-row .actions-line { display: flex; gap: 8px; margin-left: 34px; }
+}
+.device-row .actions-line { display: contents; }
 .toggle { appearance: none; width: 51px; height: 31px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 16%, transparent); position: relative; cursor: pointer; flex: none; transition: background 0.2s; }
 .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgb(0 0 0 / 0.2); transition: transform 0.3s var(--spring); }
 .toggle:checked { background: var(--done); }
@@ -441,7 +454,7 @@ body:has(.gate) { overflow: auto; }
 .provider { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 50px; border-radius: 14px; border: 1px solid var(--glass-edge); font-size: 17px; font-weight: 600; text-decoration: none; color: var(--ink); background: var(--bg-elevated); }
 .provider.apple { background: var(--ink); color: var(--bg); border-color: transparent; }
 .provider svg { width: 20px; height: 20px; }
-.or { display: flex; align-items: center; gap: 12px; color: var(--ink-tertiary); font-size: 13px; }
+.or { display: flex; align-items: center; gap: 12px; color: var(--ink-secondary); font-size: 13px; }
 .or::before, .or::after { content: ''; height: 1px; flex: 1; background: var(--hairline); }
 .fine { font-size: 13px; color: var(--ink-secondary); }
 .fine a { color: inherit; }

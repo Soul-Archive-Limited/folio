@@ -10,7 +10,7 @@ export const site = {
   /** App Store listing. Empty = hidden. */
   appStoreUrl: '',
   /** True once the web app at /app is live (Phase 12). */
-  webAppLive: false,
+  webAppLive: true,
   githubUrl: 'https://github.com/Soul-Archive-Limited/folio',
   supportEmail: 'support@devilsense.com',
   privacyEmail: 'privacy@devilsense.com',

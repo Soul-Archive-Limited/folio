@@ -9,7 +9,6 @@ import { SYNC_TEXT } from '../Shell.tsx';
 const Devices = lazy(() => import('./Devices.tsx'));
 const Categories = lazy(() => import('./Categories.tsx'));
 const RecentlyDeleted = lazy(() => import('./RecentlyDeleted.tsx'));
-const DeleteAccount = lazy(() => import('./DeleteAccount.tsx'));
 
 /** Profile (SPEC §6.9) and its screens, by route. */
 export default function ProfileView() {
@@ -20,7 +19,7 @@ export default function ProfileView() {
       <div className="page" style={{ maxWidth: 720 }}>
         <Suspense fallback={null}>
           {path === '/app/profile/devices' ? <Devices /> : path === '/app/profile/categories' ? <Categories />
-            : path === '/app/profile/deleted' ? <RecentlyDeleted /> : path === '/app/settings/account' ? <DeleteAccount /> : <Main />}
+            : path === '/app/profile/deleted' ? <RecentlyDeleted /> : <Main />}
         </Suspense>
       </div>
     </div>
@@ -105,7 +104,7 @@ function Main() {
           {trusted && <button className="btn small" onClick={() => void forgetBrowser().then(() => setTrusted(null))}>Forget</button>}
         </div>
         <button className="row" onClick={() => setConfirmSignOut(true)}><Icon name="signout" /><span className="grow">Sign out</span></button>
-        <button className="row danger" onClick={() => navigate('/app/settings/account')}><Icon name="trash" /><span className="grow">Delete account</span><Icon name="chevronRight" small /></button>
+        <button className="row danger" onClick={() => location.assign('/app/settings/account')}><Icon name="trash" /><span className="grow">Delete account</span><Icon name="chevronRight" small /></button>
       </div>
 
       <h2 className="caption ink3 group-label">Categories</h2>

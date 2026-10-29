@@ -62,16 +62,18 @@ export default function Devices() {
         <>
           <div className="group glass">
             {devices.map((d) => (
-              <div key={d.id} className="row">
+              <div key={d.id} className="row device-row">
                 <Icon name={d.platform === 'web' ? 'globe' : 'iphone'} />
                 <span className="grow">
                   <span style={{ display: 'block' }}>{d.nickname ?? d.name}</span>
                   {d.nickname && <span className="callout ink2" style={{ display: 'block' }}>{d.name}</span>}
                   <span className="callout ink3" style={{ display: 'block' }}>Added {fmtDate.format(d.createdAt)}{d.current ? '' : ` · ${lastSeen(d.lastSeenAt)}`}</span>
                 </span>
-                {d.current && <span className="badge">This device</span>}
-                <button className="btn small" onClick={() => { setName(d.nickname ?? ''); setRenaming(d); }}>Rename</button>
-                {!d.current && <button className="btn small danger" onClick={() => void signOut(d.id)}>Sign out</button>}
+                <span className="actions-line">
+                  {d.current && <span className="badge">This device</span>}
+                  <button className="btn small" onClick={() => { setName(d.nickname ?? ''); setRenaming(d); }}>Rename</button>
+                  {!d.current && <button className="btn small danger" onClick={() => void signOut(d.id)}>Sign out</button>}
+                </span>
               </div>
             ))}
           </div>

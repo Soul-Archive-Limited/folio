@@ -61,8 +61,8 @@ export default function CalendarView({ selected, onSelect, composing }: { select
               onToday={() => { setJumpOpen(false); setDirection(''); setMonth(monthOf(today)); onSelect(today); }} onClose={() => setJumpOpen(false)} />}
           </div>
           <div className="cal-tools glass">
-            <button className="icon-btn plain" aria-label="Previous month" onClick={() => go(-1)}><Icon name="chevronLeft" /></button>
-            <button className="icon-btn plain" aria-label="Next month" onClick={() => go(1)}><Icon name="chevronRight" /></button>
+            <button className="icon-btn plain step" aria-label="Previous month" onClick={() => go(-1)}><Icon name="chevronLeft" /></button>
+            <button className="icon-btn plain step" aria-label="Next month" onClick={() => go(1)}><Icon name="chevronRight" /></button>
             <div style={{ position: 'relative' }}>
               <button className="icon-btn plain" aria-label={filterCategory ? `Filter: ${filterCategory.data.name}` : 'Filter by category'} aria-expanded={filterOpen}
                 onClick={() => setFilterOpen(!filterOpen)} style={filterCategory ? { color: categoryColor(filterCategory.data.colorKey) } : undefined}>

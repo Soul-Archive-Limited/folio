@@ -128,7 +128,7 @@ export default function Shell({ me, dataKey, onSignOut, onSessionEnded }: { me: 
           </button>
         ))}
       </nav>
-      {tab !== 'profile' && (
+      {tab !== 'profile' && !composer && !entry && !task && (
         <button className="fab icon-btn ember" aria-label={tab === 'todo' ? 'New task' : 'New entry'}
           onClick={() => tab === 'todo' ? diary.openTask({}) : diary.openComposer({ dayKey: tab === 'calendar' ? selectedDay : undefined })}>
           <Icon name="plus" />

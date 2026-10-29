@@ -15,10 +15,10 @@ Status key: ✅ done · 🟡 in progress · ⬜ not started
 | 6 | Journal + Categories | Journal tab (Timeline / Photos), categories manager (§6.6, §6.10) | ✅ |
 | 7 | Onboarding + tour + Profile | Welcome pages, name, sync choice UI, TipKit tour, Profile tab in guest mode (§6.1 steps 1–5 and 8, §6.9, §6.15) | ✅ |
 | 8 | Dictation + AI | SpeechAnalyzer dictation overlay, Foundation Models ✦ menu, permission explainers (§6.11, §6.12, §7, §8, §9) | ✅ |
-| 9 | Backend | Worker, D1 schema, R2, `UserHub`, Better Auth (Apple/Google/email OTP via Resend), sync, blobs, linking, delete account, rate limits, admin usage (§10, §13, §15.2) | ⬜ |
-| 10 | iPhone sign-in + sync | Sign-in flows, recovery key + unlock screens (§6.1 steps 6–7, §6.13), Keychain, DK + recovery key, sync engine, live socket, background refresh, QR device linking, delete account in-app (§10.2–10.6) | ⬜ |
+| 9 | Backend | Worker, D1 schema, R2, `UserHub`, Better Auth (Apple/Google/email OTP via Resend), sync, blobs, linking, delete account, rate limits, admin usage (§10, §13, §15.2) | ✅ |
+| 10 | iPhone sign-in + sync | Sign-in flows, recovery key + unlock screens (§6.1 steps 6–7, §6.13), Keychain, DK + recovery key, sync engine, live socket, background refresh, QR device linking, delete account in-app (§10.2–10.6) | ✅ |
 | 11 | Website | Astro marketing site, legal pages, support/FAQ, headers, SEO (§11.1, §11.2, §14) | ✅ |
-| 12 | Web app | `/app` sign-in + unlock, calendar, entries, tasks, Tiptap editor, live sync, delete account (§11.3) | ⬜ |
+| 12 | Web app | `/app` sign-in + unlock, calendar, entries, tasks, Tiptap editor, live sync, delete account (§11.3) | 🟡 built and tested locally; deploy pending |
 | 13 | Motion polish | Hitch audit with Instruments, 120 fps pass, Reduce Motion pass, web motion, iPad split view (§3.6, §6.16, §15.1) | ⬜ |
 | 14 | Release | Privacy manifest, App Store checklist, accessibility audit, review account, TestFlight (§12) | ⬜ |
 
@@ -40,10 +40,17 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 ### Batch F checklist
 - [ ] Part 1 — owner's iPhone test of 0.1.0 (43) (owner tests after this batch; fixes go in the next one)
 - [x] Part 2 — Devices (model + OS, dates, encrypted rename), one request per photo, two-line recovery key, gitleaks full scan
-- [ ] Part 3 — Phase 12 web app at /app (+ Turnstile)
+- [x] Part 3 — Phase 12 web app at /app (+ Turnstile), tested on the local stack with a Simulator; deploy in Part 4
 - [ ] Part 4 — TestFlight build, web deploy, owner checklist
 
 ## Log
+
+### Batch F Part 3 — Phase 12 web app (2026-10-29)
+- `/app`: Apple / Google / email + Turnstile sign-in; unlock by QR from the iPhone (default) or recovery key; Trust this browser for 30 days; recovery-key setup for accounts that start on the web.
+- ≥ 1024 px glass sidebar, square month grid with every cell state and photo tiles, day panel, right-side composer; < 768 px floating tab bar and bottom drawer.
+- Calendar, day panel, entries with encrypted photos (upload, view all three renditions), Tiptap editor on the shared Markdown fixtures, WebCrypto on the shared vectors, To-do with 1.2 s + Undo, categories, filters, Recently Deleted, theme, writing font, devices with encrypted names, sign out, delete account.
+- Live socket while visible, pull on focus, optimistic edits with rollback; diary only in memory (or the trusted key in IndexedDB); one session cookie; own CSP.
+- Tested against wrangler dev with Simulator A: QR and recovery-key unlock, edits both ways in ~1–3 s, photos both ways, trash/restore, delete account → D1/R2 empty. Lighthouse 99–100 (SEO 63: not indexed by design). /vibesec findings fixed.
 
 ### Batch F Part 2 — improvements (2026-10-29)
 - Devices: "iPhone 15 Pro · iOS 27.1" / "Chrome on macOS" / "Simulator", added + last seen (hourly), "This device" badge, rename any device (sealed with the Data Key on the session row).

@@ -404,6 +404,7 @@ Every page: title, meta description, OG image, favicons, sitemap.xml, robots.txt
 - **Features:** calendar, day panel, entries (create/edit/delete, photos upload/view, all encrypted client-side), tasks (same 1.2 s + undo rules), categories, filters, theme, writing font, devices list, sign out, delete account. Dictation and ✦ are iPhone-only ("Available in the iPhone app").
 - **Editor:** Tiptap restricted to §5.1 styles, serialising via the shared Markdown fixtures.
 - **Real-time:** WebSocket to `/api/live` while the tab is visible; pull on focus; optimistic updates with rollback.
+- **Photos:** synced display and full renditions are JPEG so every browser can show them (DECISIONS 193). Delete account (`/app/settings/account`) runs as its own page without unlocking the diary (DECISIONS 199).
 - **Storage:** session cookie (strictly necessary); diary content only in memory (or encrypted IndexedDB if "Trust this browser"); UI prefs in localStorage. No other cookies → **no cookie banner needed** (cookie use explained in the privacy policy).
 - **Security headers** (`web/public/_headers` and Worker responses): strict CSP (`default-src 'self'`; scripts self + `challenges.cloudflare.com` for Turnstile; connect-src self + `wss://folio.devilsense.com`; img-src self blob: data:; fonts Google Fonts; `frame-ancestors 'none'`), HSTS (preload), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: camera=(), microphone=(), geolocation=()`, `Cross-Origin-Opener-Policy: same-origin`.
 

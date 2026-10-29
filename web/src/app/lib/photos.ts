@@ -108,6 +108,16 @@ export function photoURL(key: DataKey, userId: string, photoId: string, renditio
   return entry;
 }
 
+/** A rendition's decrypted bytes (Duplicate re-uploads them under a new id). */
+export async function photoBytes(key: DataKey, userId: string, photoId: string, rendition: Rendition): Promise<Uint8Array | null> {
+  try {
+    const sealed = await api<Uint8Array>('GET', `blobs/${photoId.toLowerCase()}.${rendition}`);
+    return await openBlob(key, sealed, photoId, AAD_TYPE[rendition], userId);
+  } catch {
+    return null;
+  }
+}
+
 /** JPEG from the web and new iPhone builds; HEIC from photos synced by build 43 (DECISIONS 193). */
 function sniff(bytes: Uint8Array): string {
   if (bytes[0] === 0xff && bytes[1] === 0xd8) return 'image/jpeg';

@@ -15,7 +15,7 @@ declare global {
 }
 
 /** Sign in (SPEC §11.3): Apple, Google, or an email code behind Turnstile. */
-export function SignIn({ error, onSignedIn }: { error?: string; onSignedIn: () => void }) {
+export function SignIn({ error }: { error?: string }) {
   const [step, setStep] = useState<'choose' | 'email' | 'code'>('choose');
   const [email, setEmail] = useState('');
 
@@ -36,7 +36,8 @@ export function SignIn({ error, onSignedIn }: { error?: string; onSignedIn: () =
         </>
       )}
       {step === 'email' && <EmailStep email={email} setEmail={setEmail} onSent={() => setStep('code')} onBack={() => setStep('choose')} />}
-      {step === 'code' && <CodeStep email={email} onDone={onSignedIn} onBack={() => setStep('email')} />}
+      {/* A fresh page load after sign-in: Turnstile's script never shares a page with the diary. */}
+      {step === 'code' && <CodeStep email={email} onDone={() => location.replace(location.pathname)} onBack={() => setStep('email')} />}
     </Gate>
   );
 }
