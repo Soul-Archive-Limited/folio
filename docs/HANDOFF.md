@@ -9,7 +9,7 @@ _Last updated: 2026-10-29, end of Batch E (Phase 9 deployed, Phase 10 done, Test
 - ✅ Step 0 (resume): Release archive 0 warnings; CI fails on any Release warning (5bcae89).
 - ✅ Part 2 Phase 9 **deployed** on `folio.devilsense.com/api/*` (Worker `folio-api`, account 8a423f60…, D1 `folio-db` WEUR, R2 `folio-blobs` WEUR). Secrets set: OTP_PEPPER, TOKEN_ENCRYPTION_KEY (generated into wrangler), APPLE_PRIVATE_KEY (from the .p8), RESEND_API_KEY, GOOGLE_CLIENT_SECRET (owner pasted). Live smoke test passed 2026-10-28 (DECISIONS 179). No admin endpoint, no Cloudflare Access (DECISIONS 176). **`REVIEW_CODE` is a temporary test value** Claude generated into wrangler with the owner's permission for the Simulator tests (DECISIONS 187) — **the owner replaces it before App Review (Phase 14)** with `npx wrangler secret put REVIEW_CODE` and puts the new code in App Store Connect's review notes. **Not set yet:** `TURNSTILE_SECRET` (Batch F — web email sign-in answers 503 until then, DECISIONS 177). Blob uploads are 180/hour (DECISIONS 186, deployed). Wrangler commands need `CLOUDFLARE_ACCOUNT_ID=8a423f60aa5b78df5763a9877746b80e` for anything not reading `wrangler.jsonc` (the login sees two accounts).
 - ✅ Step 3 = Part 3 Phase 10 done: services `ios/Folio/Services/{Account,Sync}`, screens `Features/Account` + Profile (signed-in section, Devices, Link a device, Delete account, `AccountRoutes` presents them). DECISIONS 180–188. Live two-Simulator test passed on the deployed API (`ios/FolioUITests/SyncLiveUITests.swift`, run one step at a time with `FOLIO_REVIEW_CODE=… scripts/sync-live-test.sh <udid> <test>`; Simulators `Folio Sync A/B/C`). The test account was deleted at the end: D1 and R2 are empty except 3 hashed rows in `deletions_log`.
-- ✅ Step 4: TestFlight build uploaded from this Mac (see the Batch E report in `docs/reports/batch-e.md` for the build number and the owner's iPhone checklist). Waiting on the owner's iPhone test.
+- ✅ Step 4: **TestFlight 0.1.0 (43)** uploaded from this Mac with `scripts/testflight.sh` on 2026-10-29 after CI went green (e7daeb5). No tag pushed, Xcode Cloud not used. The owner's iPhone checklist is in `docs/reports/batch-e.md` (Part 4). **Next session:** the owner's results → Batch F (fixes + Phase 12 web app with Turnstile).
 
 ## Where things stand
 
@@ -19,7 +19,7 @@ _Last updated: 2026-10-29, end of Batch E (Phase 9 deployed, Phase 10 done, Test
 | Batch C fixes | ✅ Batch D Part 1. |
 | Recently Deleted (SPEC §5.2) | ✅ Batch D Part 2 (schema v3). |
 | 11 Website | ✅ Batch D Part 3 (`/web`). Not deployed until the owner connects Cloudflare Pages. |
-| Xcode Cloud → TestFlight | ✅ Workflow "TestFlight"; build 1 (0.1.0 (1)) installed on the owner's iPhone. One build left in the budget. |
+| Xcode Cloud → TestFlight | ✅ Workflow "TestFlight"; build 1 (0.1.0 (1)) installed on the owner's iPhone. One Xcode Cloud build left in the budget. Builds now come from this Mac (`scripts/testflight.sh`): 0.1.0 (43) is Batch E's. |
 | 9 Backend | ✅ Batch E (deployed). |
 | 10 Sign-in + sync | ✅ Batch E (owner's iPhone test pending). |
 | 12 Web app (+ Turnstile), 13 Motion polish, 14 Release | ⬜ Not started. Next: Batch F = owner's Batch E iPhone feedback + Phase 12. |

@@ -83,10 +83,10 @@ Not captured: the "Error" status (needs a server fault; it's covered by unit tes
 
 ## Part 4 — TestFlight
 
-**Built:** archived and uploaded from this Mac with `scripts/testflight.sh` — **0.1.0 (BUILD)**. No tag pushed; Xcode Cloud untouched.
+**Built:** archived and uploaded from this Mac with `scripts/testflight.sh` — **0.1.0 (43)**. No tag pushed; Xcode Cloud untouched.
 
 ### Owner's iPhone checklist (one action per line)
-1. Install 0.1.0 (BUILD) from TestFlight when it says "Ready to Test".
+1. Install 0.1.0 (43) from TestFlight when it says "Ready to Test".
 2. Re-test the Part 1 fixes: dictate (mic explainer), Journal → Past day, the onboarding name field, the tour, a photo in a card and opening it, swipe a card left and right, long-press a card, open and close an entry without changes (no draft prompt), Share → each of the three, and the orange buttons.
 3. Profile → Continue with Apple → choose your Apple Account.
 4. Save the recovery key (Save → Files), then type its last 4 characters → Continue.
