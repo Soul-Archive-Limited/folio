@@ -39,11 +39,9 @@ final class OnboardingUITests: XCTestCase {
         // Greeting, then the tour's first step on the calendar, with its count.
         XCTAssertTrue(app.staticTexts["Your month"].waitForExistence(timeout: 30), "tour starts after the greeting")
         XCTAssertEqual(app.staticTexts["tour.count"].label.lowercased(), "step 1 of 6")
-        Thread.sleep(forTimeInterval: pace)
-        // A tap, not a press: on a slow runner a held press outlives step 1 and lands on today's
-        // cell under the moving card, which completes step 2 too.
-        app.buttons["Next"].firstMatch.tap()
-        XCTAssertTrue(app.staticTexts["Tap a day"].waitForExistence(timeout: 10))
+        // Step 1 is look-only and moves on by itself after 4 s. Tapping Next would race it on a
+        // slow runner (the tap lands on step 2's Next and skips to step 3), so wait for it.
+        XCTAssertTrue(app.staticTexts["Tap a day"].waitForExistence(timeout: 15), "step 1 advances by itself")
         XCTAssertEqual(app.staticTexts["tour.count"].label.lowercased(), "step 2 of 6")
         Thread.sleep(forTimeInterval: pace * 2)
     }
