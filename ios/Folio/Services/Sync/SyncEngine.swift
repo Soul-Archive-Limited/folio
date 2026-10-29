@@ -218,7 +218,14 @@ final class SyncEngine {
 
     private func remoteCursor(_ cursor: Int64) {
         guard let userID = account.userID else { return }
-        if cursor != SyncState.cursor(for: userID) { requestSync(pull: true) }
+        if cursor != SyncState.cursor(for: userID) {
+            requestSync(pull: true)
+        } else if running == nil && !store.hasDirtyRecords {
+            // The server has nothing newer: this device is in sync as of now.
+            status = .upToDate
+            lastSynced = .now
+            SyncState.setLastSynced(.now, for: userID)
+        }
     }
 
     private func socketClosed() {

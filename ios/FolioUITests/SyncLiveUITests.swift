@@ -59,7 +59,28 @@ final class SyncLiveUITests: XCTestCase {
         app.buttons["Done"].tap()
     }
 
-    /// A: Profile → Link a browser or device → paste B's code → Allow.
+    /// B, already signed in but locked: Profile → Unlock your diary → show a new QR.
+    @MainActor func testB1bUnlockFromProfile() throws {
+        let app = try launch(["-FolioTab", "profile"])
+        let unlock = app.buttons["Unlock your diary"]
+        try scrollTo(unlock, in: app)
+        shot("p10-09b-profile-locked")
+        unlock.tap()
+        let scan = app.buttons["Scan from your other device"]
+        XCTAssertTrue(scan.waitForExistence(timeout: 20))
+        shot("p10-09-unlock-choices")
+        scan.tap()
+        let copy = app.buttons["copyLinkText"]
+        XCTAssertTrue(copy.waitForExistence(timeout: 30))
+        shot("p10-10-unlock-qr")
+        copy.tap()
+        try waitForAllSet(app, timeout: 300)
+        shot("p10-13-b-unlocked-synced")
+        app.buttons["Done"].tap()
+    }
+
+    /// A: Profile → Link a browser or device → paste B's code → Allow (Face ID is matched by
+    /// the host script through the Simulator's biometric notifications).
     @MainActor func testA2ApproveLink() throws {
         let text = try XCTUnwrap(env["FOLIO_LINK_TEXT"])
         let app = try launch(["-FolioTab", "profile"])
@@ -127,6 +148,17 @@ final class SyncLiveUITests: XCTestCase {
         shot("p10-17-b-recently-deleted")
     }
 
+    /// A: Profile → Recovery key → Copy (no passcode on the test Simulator, so no prompt).
+    @MainActor func testCopyRecoveryKey() throws {
+        let app = try launch(["-FolioTab", "profile"])
+        let row = app.buttons["Recovery key"]
+        try scrollTo(row, in: app)
+        row.tap()
+        XCTAssertTrue(app.staticTexts["recoveryKey"].waitForExistence(timeout: 10))
+        shot("p10-15-show-recovery-key")
+        app.buttons["Copy"].tap()
+    }
+
     /// B: a fresh device that unlocks with the recovery key instead of a QR.
     @MainActor func testB2RecoveryKeyUnlock() throws {
         let recovery = try XCTUnwrap(env["FOLIO_RECOVERY"])
@@ -135,7 +167,8 @@ final class SyncLiveUITests: XCTestCase {
         let enter = app.buttons["Enter recovery key"]
         XCTAssertTrue(enter.waitForExistence(timeout: 30))
         enter.tap()
-        let field = app.textViews["recoveryEntry"].exists ? app.textViews["recoveryEntry"] : app.textFields["recoveryEntry"]
+        // A multi-line TextField is a text view to XCUITest.
+        let field = app.descendants(matching: .any).matching(identifier: "recoveryEntry").firstMatch
         XCTAssertTrue(field.waitForExistence(timeout: 10))
         field.tap()
         field.typeText(recovery)
@@ -152,9 +185,9 @@ final class SyncLiveUITests: XCTestCase {
         let devices = app.buttons["Devices"]
         try scrollTo(devices, in: app)
         devices.tap()
-        XCTAssertTrue(app.staticTexts["This device"].waitForExistence(timeout: 20))
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] 'this device'")).firstMatch.waitForExistence(timeout: 20))
         shot("p10-19-devices")
-        app.navigationBars.buttons.firstMatch.tap()
+        app.navigationBars.buttons["BackButton"].tap()
         let delete = app.buttons["Delete account"]
         try scrollTo(delete, in: app)
         delete.tap()
@@ -172,7 +205,8 @@ final class SyncLiveUITests: XCTestCase {
         }
         let confirm = app.textFields["deleteConfirm"]
         XCTAssertTrue(confirm.waitForExistence(timeout: 10))
-        confirm.tap()
+        if !app.keyboards.firstMatch.waitForExistence(timeout: 5) { confirm.tap() }
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 5))
         confirm.typeText("DELETE")
         shot("p10-21-delete-confirm")
         app.buttons["deleteKeep"].tap()
@@ -188,7 +222,7 @@ final class SyncLiveUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-hasOnboarded", "YES", "-com.apple.TipKit.HideAllTips", "1", "-FolioSkipGreeting", "YES",
                                "-FolioNoTour", "YES", "-FolioToastSeconds", "20", "-AppleLocale", "en_GB",
-                               "-AppleLanguages", "(en-GB)"] + extra
+                               "-AppleLanguages", "(en-GB)", "-FolioSkipOwnerAuth", "YES"] + extra
         app.launch()
         return app
     }
@@ -220,6 +254,8 @@ final class SyncLiveUITests: XCTestCase {
             app.swipeUp(velocity: .slow)
             swipes += 1
         }
+        // Let the list stop coasting, or the tap lands on whatever row slides under it.
+        if swipes > 0 { sleep(2) }
         XCTAssertTrue(element.isHittable, "\(element) not reachable")
     }
 

@@ -11,6 +11,7 @@ struct DeleteAccountView: View {
     @State private var problem: SignInProblem?
     @State private var working = false
     @State private var toasts = ToastCenter()
+    @FocusState private var confirmFocused: Bool
 
     enum Step { case explain, reauth, email, confirm }
 
@@ -65,6 +66,7 @@ struct DeleteAccountView: View {
                     .font(.system(size: 22, weight: .semibold, design: .monospaced))
                     .frame(width: 200, height: 50)
                     .folioGlass(in: .capsule)
+                    .focused($confirmFocused)
                     .accessibilityIdentifier("deleteConfirm")
                 if let problem {
                     Text(problem.message).folioFont(.caption).foregroundStyle(.danger).multilineTextAlignment(.center)
@@ -84,9 +86,15 @@ struct DeleteAccountView: View {
             .buttonStyle(.glass)
             .foregroundStyle(.danger)
             .disabled(typed != "DELETE" || working)
+            .opacity(typed == "DELETE" ? 1 : 0.5)
             Button("Cancel") { dismiss() }.foregroundStyle(.emberText).frame(minHeight: Spacing.minHitTarget)
         }
         .overlay { if working { ProgressView().controlSize(.large) } }
+        .task {
+            // After the code screen's keyboard leaves, bring it back for this field.
+            try? await Task.sleep(for: .milliseconds(400))
+            confirmFocused = true
+        }
     }
 
     private func delete(keep: Bool) {

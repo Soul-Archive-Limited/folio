@@ -45,12 +45,20 @@ extension AccountModel {
     /// Face ID, Touch ID or the passcode. A device with no passcode can't do any of these;
     /// the confirmation sheet is then the only check (DECISIONS 183).
     func authenticateOwner(reason: String) async throws(LinkApprovalError) {
+        #if DEBUG
+        // Simulator sync tests only: its passcode sheet can't be driven by UI tests.
+        if UserDefaults.standard.bool(forKey: "FolioSkipOwnerAuth") { return }
+        #endif
         let context = LAContext()
         var error: NSError?
-        guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else { return }
+        guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else {
+            logger.notice("Owner authentication unavailable (\(error?.code ?? 0, privacy: .public)); confirmation only")
+            return
+        }
         do {
             _ = try await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason)
         } catch {
+            logger.notice("Owner authentication declined or failed")
             throw .notAuthenticated
         }
     }

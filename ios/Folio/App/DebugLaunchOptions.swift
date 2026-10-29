@@ -33,6 +33,8 @@ import Foundation
 /// - `-FolioOpen recentlyDeleted` (with `-FolioTab profile`) opens Recently Deleted.
 /// - `-FolioResetAccount YES` signs this Simulator out and forgets every Folio Keychain item
 ///   (session, Data Keys, recovery keys) — a "new device" for the sync tests.
+/// - `-FolioSkipOwnerAuth YES` skips the Face ID / passcode check before showing the recovery
+///   key or approving a link (the Simulator's passcode sheet can't be driven by UI tests).
 /// - `-FolioAPIBase http://127.0.0.1:9/api/` points the API somewhere unreachable (offline tests).
 /// - `-FolioRenameEntry "Old=>New"`, `-FolioTrashEntry Title`, `-FolioRestoreEntry Title` edit
 ///   an entry by title at launch, as local edits that sync (two-Simulator tests).
