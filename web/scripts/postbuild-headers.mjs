@@ -26,6 +26,6 @@ for (const file of htmlFiles(dist)) {
 
 const headersPath = join(dist, '_headers');
 const headers = readFileSync(headersPath, 'utf8');
-if (headers.split(placeholder).length !== 2) throw new Error('dist/_headers needs exactly one script-hash placeholder');
-writeFileSync(headersPath, headers.replace(placeholder, [...hashes].sort().join(' ')));
+if (headers.split(placeholder).length < 2) throw new Error('dist/_headers needs a script-hash placeholder');
+writeFileSync(headersPath, headers.replaceAll(placeholder, [...hashes].sort().join(' ')));
 console.log(`_headers: ${hashes.size} inline script hash(es)`);

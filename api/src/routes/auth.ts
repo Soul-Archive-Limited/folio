@@ -96,11 +96,22 @@ function oauthCookie(c: Context<AppEnv>, state: string) {
 
 async function saveState(c: Context<AppEnv>, provider: 'apple' | 'google', query: z.infer<typeof startQuery>, verifier: string | null, nonce: string) {
   if (query.platform === 'ios' && !query.challenge) fail(400, 'invalid_request');
+  // Web re-authentication remembers which session asked: Apple comes back with a cross-site
+  // POST, which doesn't carry the SameSite=Lax session cookie (Batch F, DECISIONS 194).
+  let reauthSession: string | null = null;
+  if (query.reauth && query.platform === 'web') {
+    const presented = presentedToken(c);
+    const current = presented ? await lookupSession(c.env, presented.token) : null;
+    if (!current) fail(401, 'unauthorized');
+    reauthSession = current.sessionId;
+  } else if (query.reauth) {
+    reauthSession = 'yes';
+  }
   const state = randomToken(24);
   await c.env.DB.prepare(
     `INSERT INTO oauth_states (state_hash, provider, platform, code_verifier, nonce, app_challenge, reauth_session, expires_at)
      VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)`,
-  ).bind(await sha256Hex(state), provider, query.platform, verifier, nonce, query.challenge ?? null, query.reauth ? 'yes' : null, Date.now() + OAUTH_TTL).run();
+  ).bind(await sha256Hex(state), provider, query.platform, verifier, nonce, query.challenge ?? null, reauthSession, Date.now() + OAUTH_TTL).run();
   if (query.platform === 'web') oauthCookie(c, state);
   return state;
 }
@@ -121,13 +132,12 @@ async function takeState(c: Context<AppEnv>, provider: 'apple' | 'google', state
   return row;
 }
 
-/** Ends a web OAuth round trip on the web app. */
-async function finishWeb(c: Context<AppEnv>, userId: string, reauth: boolean) {
-  if (reauth) {
-    const presented = presentedToken(c);
-    const current = presented ? await lookupSession(c.env, presented.token) : null;
-    if (!current || current.userId !== userId) return c.redirect('/app/settings/account?error=reauth', 303);
-    await c.env.DB.prepare('UPDATE sessions SET reauth_at = ?2 WHERE id = ?1').bind(current.sessionId, Date.now()).run();
+/** Ends a web OAuth round trip on the web app; `reauthSession` is the session that asked. */
+async function finishWeb(c: Context<AppEnv>, userId: string, reauthSession: string | null) {
+  if (reauthSession) {
+    const current = await c.env.DB.prepare('SELECT user_id, expires_at FROM sessions WHERE id = ?1').bind(reauthSession).first<{ user_id: string; expires_at: number }>();
+    if (!current || current.user_id !== userId || current.expires_at <= Date.now()) return c.redirect('/app/settings/account?error=reauth', 303);
+    await c.env.DB.prepare('UPDATE sessions SET reauth_at = ?2 WHERE id = ?1').bind(reauthSession, Date.now()).run();
     return c.redirect('/app/settings/account?reauth=1', 303);
   }
   const session = await createSession(c.env, userId, 'web', browserName(c.req.header('user-agent')));
@@ -167,7 +177,7 @@ auth.get('/callback/google', async (c) => {
     return row.platform === 'ios' ? toApp('error=failed') : c.redirect('/app?error=failed', 303);
   }
   const { userId, isNew } = await resolveUser(c.env, { provider: 'google', providerUserId: claims.sub, email: claims.email, emailVerified: claims.emailVerified });
-  if (row.platform === 'web') return finishWeb(c, userId, row.reauth_session !== null);
+  if (row.platform === 'web') return finishWeb(c, userId, row.reauth_session);
   // iOS: a 60-second, single-use code the app trades for a session, bound to the app's own
   // verifier so another app claiming the folio:// scheme can't use it.
   const handoff = randomToken(32);
@@ -225,7 +235,7 @@ auth.post('/callback/apple', async (c) => {
   const { userId } = await resolveUser(c.env, {
     provider: 'apple', providerUserId: claims.sub, email: claims.email, emailVerified: claims.emailVerified, refreshTokenSealed: sealed,
   });
-  return finishWeb(c, userId, row.reauth_session !== null);
+  return finishWeb(c, userId, row.reauth_session);
 });
 
 // MARK: Email code
@@ -298,6 +308,13 @@ auth.post('/email/verify', async (c) => {
 });
 
 // MARK: Session
+
+/** Whether this browser is signed in, without an error status (the web app's first call). */
+auth.get('/session', async (c) => {
+  const presented = presentedToken(c);
+  const session = presented ? await lookupSession(c.env, presented.token) : null;
+  return c.json({ signedIn: session !== null });
+});
 
 auth.post('/sign-out', requireSession, async (c) => {
   await c.env.DB.prepare('DELETE FROM sessions WHERE id = ?1').bind(c.var.session.sessionId).run();

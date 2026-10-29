@@ -63,6 +63,25 @@ nonisolated struct PhotoProcessor: Sendable {
         return try encodeOrThrow(image, as: .jpeg, quality: displayQuality)
     }
 
+    /// The copy that goes to the account (Batch F, DECISIONS 193): browsers other than Safari
+    /// can't show HEIC, so a HEIC rendition is re-encoded as JPEG (same pixels, no metadata)
+    /// before it's sealed and uploaded. JPEG and anything unreadable pass through unchanged.
+    @concurrent
+    func syncCopy(of data: Data, quality: Double) async -> Data {
+        guard Self.isHEIF(data),
+              let source = CGImageSourceCreateWithData(data as CFData, [kCGImageSourceShouldCache: false] as CFDictionary),
+              let image = CGImageSourceCreateImageAtIndex(source, 0, nil),
+              let jpeg = encode(image, as: .jpeg, quality: quality) else { return data }
+        return jpeg
+    }
+
+    /// An ISO-BMFF `ftyp` box with a HEIF brand.
+    static func isHEIF(_ data: Data) -> Bool {
+        guard data.count >= 12, data[data.startIndex + 4 ..< data.startIndex + 8] == Data("ftyp".utf8) else { return false }
+        let brand = String(decoding: data[data.startIndex + 8 ..< data.startIndex + 12], as: UTF8.self)
+        return ["heic", "heix", "hevc", "heim", "heis", "mif1", "msf1"].contains(brand)
+    }
+
     /// Decodes straight to the target size (never the full-resolution bitmap) and applies
     /// the EXIF orientation so the stored pixels are upright.
     private func downsample(_ source: CGImageSource, to maxPixel: Int) throws -> CGImage {

@@ -1,0 +1,28 @@
+---
+// The web app (SPEC §11.3). One page; /app/* is rewritten here (public/_redirects) and the
+// React app routes itself. Not indexed (robots.txt, X-Robots-Tag).
+import '../app/app.css';
+import AppRoot from '../app/ui/AppRoot.tsx';
+---
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Folio</title>
+    <meta name="description" content="Your Folio diary in the browser, encrypted so only you can read it." />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#f5f3ef" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0a0c" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <script is:inline>try{var t=localStorage.getItem('folio.theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+  </head>
+  <body>
+    <AppRoot client:only="react">
+      <main class="gate" slot="fallback" aria-busy="true">
+        <svg class="mark" width="64" height="64" viewBox="0 0 64 64" aria-label="Folio" role="img"><rect x="6" y="6" width="52" height="52" rx="16" fill="#16161a"/><rect x="19" y="16" width="26" height="32" rx="5" fill="#f5f3ef"/><circle cx="40" cy="21" r="4.5" fill="#ff7a45"/></svg>
+      </main>
+    </AppRoot>
+  </body>
+</html>

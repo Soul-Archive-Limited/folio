@@ -42,3 +42,23 @@ struct BatchFDeviceTests {
         }
     }
 }
+
+@Suite("Photos sync as JPEG (Batch F)")
+struct PhotoSyncCopyTests {
+    @Test("A HEIC rendition goes up as JPEG; a JPEG passes through")
+    func syncCopy() async throws {
+        let processed = try await PhotoProcessor().process(Self.samplePNG())
+        #expect(PhotoProcessor.isHEIF(processed.imageData))
+        let full = await PhotoProcessor().syncCopy(of: processed.imageData, quality: 0.82)
+        #expect(Array(full.prefix(3)) == [0xFF, 0xD8, 0xFF])
+        #expect(await PhotoProcessor().syncCopy(of: processed.thumbnailData, quality: 0.82) == processed.thumbnailData)
+    }
+
+    static func samplePNG() -> Data {
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 400, height: 300))
+        return renderer.pngData { context in
+            UIColor.orange.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 400, height: 300))
+        }
+    }
+}

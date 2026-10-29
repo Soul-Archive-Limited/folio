@@ -1,0 +1,2 @@
+# The web app routes itself under /app (SPEC §11.3).
+/app/* /app 200

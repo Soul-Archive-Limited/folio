@@ -90,3 +90,54 @@ describe('device names (Batch F)', () => {
     expect((await api('/account/device', { method: 'PUT', token: alice.token, json: { name: '' } })).status).toBe(400);
   });
 });
+
+describe('web re-authentication with Apple (Batch F, DECISIONS 194)', () => {
+  it('marks the session that asked, although Apple\'s POST carries no session cookie', async () => {
+    const { SignJWT, generateKeyPair, exportJWK } = await import('jose');
+    const { vi } = await import('vitest');
+    const { publicKey, privateKey } = await generateKeyPair('RS256');
+    const jwk = { ...(await exportJWK(publicKey)), kid: 'web', alg: 'RS256', use: 'sig' };
+    let idToken = '';
+    vi.stubGlobal('fetch', async (input: RequestInfo | URL) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+      if (url.startsWith('https://appleid.apple.com/auth/keys')) return Response.json({ keys: [jwk] });
+      if (url.startsWith('https://appleid.apple.com/auth/token')) return Response.json({ id_token: idToken });
+      throw new Error(`unexpected fetch ${url}`);
+    });
+    const user = await makeUser();
+    const web = await secondSession(user, 'Brave on macOS');
+    await env.DB.prepare(`INSERT INTO accounts (id, user_id, provider, provider_user_id, created_at) VALUES (?1, ?2, 'apple', 'apple-web-1', ?3)`)
+      .bind(crypto.randomUUID(), user.userId, Date.now()).run();
+    await env.DB.prepare('UPDATE sessions SET reauth_at = 0 WHERE id = ?1').bind(web.sessionId).run();
+
+    const start = await api('/auth/apple/start?reauth=1', { headers: { cookie: `__Host-folio_session=${web.token}` } });
+    expect(start.status).toBe(302);
+    const authorize = new URL(start.headers.get('location')!);
+    const state = authorize.searchParams.get('state')!;
+    const nonce = authorize.searchParams.get('nonce')!;
+    idToken = await new SignJWT({ sub: 'apple-web-1', nonce }).setProtectedHeader({ alg: 'RS256', kid: 'web' })
+      .setIssuer('https://appleid.apple.com').setAudience('com.devilsense.folio.web').setIssuedAt().setExpirationTime('5m').sign(privateKey);
+
+    const callback = await api('/auth/callback/apple', {
+      method: 'POST', body: new URLSearchParams({ state, code: 'web-code' }),
+      headers: { cookie: `__Host-folio_oauth=${state}`, 'content-type': 'application/x-www-form-urlencoded', origin: 'https://appleid.apple.com' },
+    });
+    expect(callback.status).toBe(303);
+    expect(callback.headers.get('location')).toBe('/app/settings/account?reauth=1');
+    const row = await env.DB.prepare('SELECT reauth_at FROM sessions WHERE id = ?1').bind(web.sessionId).first<{ reauth_at: number }>();
+    expect(row!.reauth_at).toBeGreaterThan(0);
+    vi.unstubAllGlobals();
+  });
+
+  it('needs a signed-in browser to start', async () => {
+    expect((await api('/auth/apple/start?reauth=1')).status).toBe(401);
+  });
+});
+
+describe('GET /api/auth/session', () => {
+  it('answers 200 either way', async () => {
+    const user = await makeUser();
+    expect(await (await api('/auth/session')).json()).toEqual({ signedIn: false });
+    expect(await (await api('/auth/session', { token: user.token })).json()).toEqual({ signedIn: true });
+  });
+});

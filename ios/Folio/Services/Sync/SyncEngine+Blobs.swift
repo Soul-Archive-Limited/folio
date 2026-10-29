@@ -24,13 +24,15 @@ extension SyncEngine {
     /// One photo per request — thumbnail, display and full together (Batch F, DECISIONS 190) —
     /// each marked uploaded as soon as it's in R2, so a rate limit part-way loses nothing sent.
     func uploadPendingBlobs(userID: UUID, key: DataKey) async throws(APIError) {
+        let processor = PhotoProcessor()
         for photo in store.photosNeedingUpload() {
             var sealed: [Data] = []
             for rendition in Rendition.allCases {
+                // Display and full go up as JPEG so every browser can show them (DECISIONS 193).
                 let bytes: Data = switch rendition {
                 case .thumb: photo.thumbData
-                case .display: photo.displayOrFullData
-                case .full: photo.imageData
+                case .display: await processor.syncCopy(of: photo.displayOrFullData, quality: 0.72)
+                case .full: await processor.syncCopy(of: photo.imageData, quality: 0.82)
                 }
                 guard let part = try? RecordCipher.seal(bytes, recordID: photo.id, type: rendition.recordType, userID: userID, using: key) else { break }
                 sealed.append(part.combined)

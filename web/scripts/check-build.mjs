@@ -91,4 +91,24 @@ check(() => {
   }
 }, 'ember text and fills pass WCAG AA (4.5:1)');
 
+// Phase 12 (Batch F): the web app's page, routing and policy.
+check(() => {
+  const html = read('app.html');
+  assert.match(html, /<meta name="robots" content="noindex"/);
+  assert.doesNotMatch(html, /google-analytics|gtag|plausible|document\.cookie/);
+  assert.match(readFileSync(new URL('../dist/_redirects', import.meta.url), 'utf8'), /^\/app\/\* \/app 200$/m);
+  const headers = readFileSync(new URL('../dist/_headers', import.meta.url), 'utf8');
+  for (const path of ['/app', '/app/*']) {
+    const block = headers.split(/\n(?=\S)/).find((b) => b.startsWith(`${path}\n`));
+    assert.ok(block, `${path} rule`);
+    assert.match(block, /^\s+! Content-Security-Policy$/m, `${path} detaches the site CSP`);
+    assert.match(block, /script-src 'self' 'sha256-[^']+'.* https:\/\/challenges\.cloudflare\.com;/, `${path} script-src`);
+    assert.match(block, /frame-src https:\/\/challenges\.cloudflare\.com;/);
+    assert.match(block, /frame-ancestors 'none'/);
+    assert.match(block, /Cache-Control: no-store/);
+    assert.doesNotMatch(block, /unsafe-eval|__INLINE_SCRIPT_HASHES__/);
+  }
+  assert.doesNotMatch(readFileSync(new URL('../dist/sitemap-0.xml', import.meta.url), 'utf8'), /\/app/);
+}, 'web app: noindex, rewrite, its own CSP with Turnstile, not in the sitemap, no tracking');
+
 console.log(`\n${checks} checks passed`);

@@ -9,5 +9,5 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'never',
   build: { format: 'file', inlineStylesheets: 'never' },
-  integrations: [react(), sitemap({ filter: (page) => !page.includes('/404') })],
+  integrations: [react(), sitemap({ filter: (page) => !page.includes('/404') && !page.includes('/app') })],
 });

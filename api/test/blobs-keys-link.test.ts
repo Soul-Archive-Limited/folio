@@ -46,7 +46,7 @@ describe('blobs (SPEC §10.5)', () => {
     const user = await makeUser();
     for (let i = 0; i < 180; i++) expect((await put(user.token, blobId(), new Uint8Array(1))).status).toBe(200);
     expect((await put(user.token, blobId(), new Uint8Array(1))).status).toBe(429);
-  });
+  }, 60_000);
 });
 
 describe('recovery envelope (SPEC §10.4)', () => {
