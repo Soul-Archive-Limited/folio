@@ -22,6 +22,8 @@ final class DiaryStore {
     var photoBytesRevision = 0
     /// Called after every local write, so sync can schedule a push (Phase 10).
     @ObservationIgnored var onLocalChange: (() -> Void)?
+    /// Called after "Erase data on this iPhone", so sync pulls the account's copy again.
+    @ObservationIgnored var onErase: (() -> Void)?
     /// True while sync applies remote changes, which aren't local edits.
     @ObservationIgnored var isApplyingRemote = false
 
@@ -502,6 +504,7 @@ final class DiaryStore {
         DisplayImageCache.shared.removeAll()
         // A draft (and its photos) is diary content too.
         drafts.clear()
+        onErase?()
     }
 
     // MARK: - Helpers

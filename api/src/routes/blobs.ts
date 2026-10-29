@@ -25,7 +25,8 @@ function blobId(raw: string): string {
 blobs.put('/:id', async (c) => {
   const { userId } = c.var.session;
   const id = blobId(c.req.param('id'));
-  await limit(c.env, `blob-put:${userId}`, 60, 3600);
+  // 60 photos an hour, each three renditions (DECISIONS 186).
+  await limit(c.env, `blob-put:${userId}`, 180, 3600);
   const length = Number(c.req.header('content-length'));
   if (!Number.isInteger(length) || length <= 0) fail(411, 'length_required');
   if (length > BLOB_MAX) fail(413, 'too_large');

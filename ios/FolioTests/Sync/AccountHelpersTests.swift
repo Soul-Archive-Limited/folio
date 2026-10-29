@@ -57,4 +57,11 @@ struct AccountHelpersTests {
         #expect(APIError.server(status: 500, code: nil).isTransient)
         #expect(!APIError.unauthorized.isTransient)
     }
+
+    @Test("A new record's push sends baseVersion as null, not missing (the API requires the key)")
+    func pushEncoding() throws {
+        let change = SyncWire.Change(id: UUID(), type: "entry", ciphertext: "AA==", nonce: "AA==", clientUpdatedAt: 1, baseVersion: nil, deleted: false)
+        let json = try #require(String(data: JSONEncoder.api.encode(change), encoding: .utf8))
+        #expect(json.contains("\"baseVersion\":null"))
+    }
 }

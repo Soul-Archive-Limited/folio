@@ -42,9 +42,9 @@ describe('blobs (SPEC §10.5)', () => {
     expect((await put(user.token, blobId(), new Uint8Array(10))).status).toBe(413);
   });
 
-  it('limits uploads to 60 per hour', async () => {
+  it('limits uploads to 180 per hour (60 photos × 3 renditions)', async () => {
     const user = await makeUser();
-    for (let i = 0; i < 60; i++) expect((await put(user.token, blobId(), new Uint8Array(1))).status).toBe(200);
+    for (let i = 0; i < 180; i++) expect((await put(user.token, blobId(), new Uint8Array(1))).status).toBe(200);
     expect((await put(user.token, blobId(), new Uint8Array(1))).status).toBe(429);
   });
 });

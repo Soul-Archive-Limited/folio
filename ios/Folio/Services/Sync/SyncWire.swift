@@ -17,6 +17,23 @@ nonisolated enum SyncWire {
 
         /// Approximate JSON size, for batching under the body limit.
         var approximateBytes: Int { ciphertext.utf8.count + nonce.utf8.count + 160 }
+
+        enum CodingKeys: String, CodingKey {
+            case id, type, ciphertext, nonce, clientUpdatedAt, baseVersion, deleted
+        }
+
+        /// Written by hand so a new record sends `"baseVersion": null`: the synthesized encoder
+        /// leaves nil out, and the API requires the key.
+        func encode(to encoder: any Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(id, forKey: .id)
+            try container.encode(type, forKey: .type)
+            try container.encode(ciphertext, forKey: .ciphertext)
+            try container.encode(nonce, forKey: .nonce)
+            try container.encode(clientUpdatedAt, forKey: .clientUpdatedAt)
+            try container.encode(baseVersion, forKey: .baseVersion)
+            try container.encode(deleted, forKey: .deleted)
+        }
     }
 
     struct Push: Encodable, Sendable {

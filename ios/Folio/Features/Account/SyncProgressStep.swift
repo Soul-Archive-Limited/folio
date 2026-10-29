@@ -18,7 +18,7 @@ struct SyncProgressStep: View {
                 VStack(spacing: Spacing.xs) {
                     ProgressView(value: Double(progress.done), total: Double(max(progress.total, 1)))
                         .tint(.emberStrong)
-                    Text("Encrypting and syncing \(progress.total) pages…")
+                    Text("Encrypting and syncing \(sync.migratingPages ?? progress.total) pages…")
                         .folioFont(.caption)
                         .foregroundStyle(.inkSecondary)
                         .monospacedDigit()

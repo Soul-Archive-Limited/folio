@@ -69,4 +69,12 @@ nonisolated enum Keychain {
     static func delete(_ item: Item) {
         SecItemDelete(query(item) as CFDictionary)
     }
+
+    #if DEBUG
+    /// Sync tests only (`-FolioResetAccount`): every Folio item, synchronizable or not.
+    static func deleteEverything() {
+        SecItemDelete([kSecClass: kSecClassGenericPassword, kSecAttrService: service,
+                       kSecAttrSynchronizable: kSecAttrSynchronizableAny] as CFDictionary)
+    }
+    #endif
 }

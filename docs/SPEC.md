@@ -380,7 +380,7 @@ Use the Workers **rate-limiting binding** if available on the current plan (veri
 | email/verify | 5 attempts per code; 20 per IP per hour |
 | OAuth start/callback | 30 per IP per hour |
 | sync push/pull | 120 per user per minute |
-| blobs PUT | 60 per user per hour; 4 MB each |
+| blobs PUT | 180 per user per hour (60 photos × 3 renditions, DECISIONS 186); 4 MB each |
 | link requests | 10 per user per hour |
 | delete account | 3 per user per day |
 Per-user storage quota: **1 GB of photos, 50,000 records** (friendly message when near). 429 responses include `Retry-After`.

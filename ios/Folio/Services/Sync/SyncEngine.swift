@@ -18,6 +18,8 @@ final class SyncEngine {
     private(set) var lastSynced: Date?
     /// Records pushed / to push while a big first upload runs (guest → account).
     private(set) var progress: (done: Int, total: Int)?
+    /// Entries in that first upload ("Encrypting and syncing 412 pages…").
+    private(set) var migratingPages: Int?
 
     @ObservationIgnored let store: DiaryStore
     @ObservationIgnored unowned let account: AccountModel
@@ -42,6 +44,7 @@ final class SyncEngine {
         self.account = account
         account.sync = self
         store.onLocalChange = { [weak self] in self?.localChange() }
+        store.onErase = { [weak self] in self?.storeErased() }
         if let userID = account.userID { lastSynced = SyncState.lastSynced(for: userID) }
     }
 
@@ -82,8 +85,17 @@ final class SyncEngine {
         socket = nil
         status = .upToDate
         progress = nil
+        migratingPages = nil
         lastSynced = nil
         failedDownloads = []
+    }
+
+    /// The local copy was erased while signed in: start again from the account's copy.
+    func storeErased() {
+        guard let userID = account.userID else { return }
+        SyncState.setCursor(0, for: userID)
+        failedDownloads = []
+        requestSync(pull: true)
     }
 
     // MARK: Triggers
@@ -137,8 +149,11 @@ final class SyncEngine {
     private func runPass(pull: Bool) async {
         guard let userID = account.userID, let key = account.dataKey else { return }
         status = .syncing
+        startProgressIfLarge()
         do throws(APIError) {
             if pull { try await self.pull(userID: userID, key: key) }
+            // Records first, so a photo upload that hits a limit never holds back the text.
+            try await push(userID: userID, key: key)
             try await uploadPendingBlobs(userID: userID, key: key)
             try await push(userID: userID, key: key)
             try await downloadPendingBlobs(userID: userID, key: key)
@@ -146,14 +161,36 @@ final class SyncEngine {
             status = .upToDate
             lastSynced = .now
             SyncState.setLastSynced(.now, for: userID)
+            progress = nil
+            migratingPages = nil
         } catch .unauthorized {
             account.sessionEnded()
         } catch {
-            status = error == .offline ? .offline : (error.isTransient ? .offline : .error)
-            if error.isTransient { scheduleRetry(after: error, pull: pull) }
+            // Waiting out a rate limit is still syncing; no connection is offline.
+            if case .rateLimited = error { status = .syncing } else { status = error.isTransient ? .offline : .error }
+            if error.isTransient {
+                scheduleRetry(after: error, pull: pull)
+            } else {
+                progress = nil
+                migratingPages = nil
+            }
             logger.notice("Sync pass failed: \(String(describing: error), privacy: .public)")
         }
-        progress = nil
+    }
+
+    /// A big first upload (a guest diary joining an account) shows progress: records plus photos.
+    private func startProgressIfLarge() {
+        guard progress == nil else { return }
+        let records = store.dirtyRecords()
+        let photos = store.photosNeedingUpload().count
+        guard records.count + photos > 50 else { return }
+        progress = (0, records.count + photos)
+        migratingPages = records.count { $0 is Entry }
+    }
+
+    func advanceProgress(by count: Int) {
+        guard let current = progress else { return }
+        progress = (min(current.done + count, current.total), current.total)
     }
 
     private func scheduleRetry(after error: APIError, pull: Bool) {
@@ -166,10 +203,6 @@ final class SyncEngine {
             guard !Task.isCancelled else { return }
             self?.requestSync(pull: pull)
         }
-    }
-
-    func setProgress(_ value: (done: Int, total: Int)?) {
-        progress = value
     }
 
     // MARK: Live socket

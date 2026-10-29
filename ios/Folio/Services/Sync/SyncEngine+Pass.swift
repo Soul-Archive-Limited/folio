@@ -29,9 +29,6 @@ extension SyncEngine {
             return photo.isTombstone || photo.blobUploaded
         }
         guard !records.isEmpty else { return }
-        let total = records.count
-        if total > 50 { setProgress((0, total)) }
-        var done = 0
         for batch in batches(of: records, userID: userID, key: key) {
             let result: SyncWire.PushResult = try await account.api.send("POST", "sync/push", json: SyncWire.Push(changes: batch.map(\.change)))
             store.isApplyingRemote = true
@@ -45,8 +42,7 @@ extension SyncEngine {
             for conflict in result.conflicts { apply(conflict, userID: userID, key: key) }
             store.commit()
             store.isApplyingRemote = false
-            done += batch.count
-            if total > 50 { setProgress((done, total)) }
+            advanceProgress(by: batch.count)
         }
     }
 

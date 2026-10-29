@@ -31,6 +31,11 @@ import Foundation
 /// - `-FolioToastSeconds 15` keeps toasts up longer (UI tests on slow CI).
 /// - `-FolioTrashSamples YES` puts a few sample items in Recently Deleted.
 /// - `-FolioOpen recentlyDeleted` (with `-FolioTab profile`) opens Recently Deleted.
+/// - `-FolioResetAccount YES` signs this Simulator out and forgets every Folio Keychain item
+///   (session, Data Keys, recovery keys) — a "new device" for the sync tests.
+/// - `-FolioAPIBase http://127.0.0.1:9/api/` points the API somewhere unreachable (offline tests).
+/// - `-FolioRenameEntry "Old=>New"`, `-FolioTrashEntry Title`, `-FolioRestoreEntry Title` edit
+///   an entry by title at launch, as local edits that sync (two-Simulator tests).
 enum DebugLaunchOptions {
     enum Screen: String {
         case gallery, cover, greeting
@@ -51,6 +56,10 @@ enum DebugLaunchOptions {
     @MainActor
     static func apply(to store: DiaryStore) {
         let defaults = UserDefaults.standard
+        if defaults.bool(forKey: "FolioResetAccount") {
+            Keychain.deleteEverything()
+            for key in defaults.dictionaryRepresentation().keys where key.hasPrefix("sync.") { defaults.removeObject(forKey: key) }
+        }
         if defaults.bool(forKey: "FolioResetData") { store.eraseAll() }
         if defaults.bool(forKey: "FolioSampleData") { PreviewData.loadIfEmpty(into: store) }
         if defaults.bool(forKey: "FolioStressData"), store.isEmpty { PreviewData.loadStressData(into: store) }
@@ -58,6 +67,18 @@ enum DebugLaunchOptions {
         if let title = defaults.string(forKey: "FolioSeedTask") { _ = try? store.createTask(title: title, day: store.today) }
         if let title = defaults.string(forKey: "FolioSeedEntry") {
             _ = try? store.createEntry(title: title, body: "Seeded for a UI test.", day: store.today)
+        }
+        if let rename = defaults.string(forKey: "FolioRenameEntry"), let arrow = rename.range(of: "=>") {
+            let old = String(rename[..<arrow.lowerBound]), new = String(rename[arrow.upperBound...])
+            if let entry = store.allEntries().first(where: { $0.title == old }) {
+                try? store.updateEntry(entry, title: new, body: entry.bodyMarkdown, categoryID: entry.categoryID)
+            }
+        }
+        if let title = defaults.string(forKey: "FolioTrashEntry"), let entry = store.allEntries().first(where: { $0.title == title }) {
+            store.trash(entry)
+        }
+        if let title = defaults.string(forKey: "FolioRestoreEntry"), let entry = store.trashedEntries().first(where: { $0.title == title }) {
+            store.restoreFromTrash(entry)
         }
         if let name = defaults.string(forKey: "displayName"), store.settings().displayName != name {
             store.updateSettings { $0.displayName = name }

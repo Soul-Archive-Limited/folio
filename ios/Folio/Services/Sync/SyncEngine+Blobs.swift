@@ -3,8 +3,8 @@ import Foundation
 
 /// Photos travel as three encrypted blobs in R2 — thumbnail, 1080 px display and full —
 /// sealed with the Data Key, associated data `photoId|rendition|userId` (SPEC §10.3, §10.5).
-/// Thumbnails first, one transfer at a time (SPEC allows two; one keeps the main actor's
-/// SwiftData objects simple and is fast enough for photos of ≤ 600 KB).
+/// One transfer at a time (SPEC allows two; one keeps the main actor's SwiftData objects
+/// simple and is fast enough for photos of ≤ 600 KB). Downloads fetch every thumbnail first.
 extension SyncEngine {
     enum Rendition: String, CaseIterable {
         case thumb, display, full
@@ -20,26 +20,25 @@ extension SyncEngine {
         func blobID(_ photoID: UUID) -> String { "\(photoID.uuidString.lowercased()).\(rawValue)" }
     }
 
+    /// One photo at a time — thumbnail, display, full — each marked uploaded as soon as its
+    /// three blobs are in R2, so a rate limit part-way loses nothing already sent.
     func uploadPendingBlobs(userID: UUID, key: DataKey) async throws(APIError) {
-        let photos = store.photosNeedingUpload()
-        guard !photos.isEmpty else { return }
-        for rendition in Rendition.allCases {
-            var jobs: [(String, Data)] = []
-            for photo in photos {
+        for photo in store.photosNeedingUpload() {
+            for rendition in Rendition.allCases {
                 let bytes: Data = switch rendition {
                 case .thumb: photo.thumbData
                 case .display: photo.displayOrFullData
                 case .full: photo.imageData
                 }
                 guard let sealed = try? RecordCipher.seal(bytes, recordID: photo.id, type: rendition.recordType, userID: userID, using: key) else { continue }
-                jobs.append((rendition.blobID(photo.id), sealed.combined))
+                try await account.api.uploadBlob(rendition.blobID(photo.id), data: sealed.combined)
             }
-            for (id, body) in jobs { try await account.api.uploadBlob(id, data: body) }
+            photo.blobUploaded = true
+            store.isApplyingRemote = true
+            store.commit()
+            store.isApplyingRemote = false
+            advanceProgress(by: 1)
         }
-        for photo in photos { photo.blobUploaded = true }
-        store.isApplyingRemote = true
-        store.commit()
-        store.isApplyingRemote = false
     }
 
     func downloadPendingBlobs(userID: UUID, key: DataKey) async throws(APIError) {

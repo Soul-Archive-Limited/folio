@@ -1,8 +1,8 @@
 import StoreKit
 import SwiftUI
 
-/// The Profile tab in guest mode (SPEC §6.9). Rows for features that don't exist yet
-/// (Face ID lock, PDF export, signed-in account) are left out rather than shown disabled.
+/// The Profile tab (SPEC §6.9). Rows for features that don't exist yet (Face ID lock, PDF
+/// export) are left out rather than shown disabled.
 struct ProfileView: View {
     @Environment(DiaryStore.self) private var store
     @Environment(TourModel.self) private var tour: TourModel?
@@ -10,6 +10,7 @@ struct ProfileView: View {
     @Environment(\.requestReview) private var requestReview
     @State private var showsCategories = false
     @State private var showsRecentlyDeleted = false
+    @State private var accountRoutes = AccountRoutes()
     #if DEBUG
     @State private var showsGallery = false
     #endif
@@ -29,7 +30,7 @@ struct ProfileView: View {
                     .padding(.bottom, Spacing.s)
                 }
 
-                ProfileAccountSection()
+                ProfileAccountSection(routes: accountRoutes)
 
                 Section {
                     Button { showsCategories = true } label: {
@@ -103,6 +104,7 @@ struct ProfileView: View {
             .navigationTitle("Profile")
             .navigationDestination(isPresented: $showsCategories) { CategoriesManagerView() }
             .navigationDestination(isPresented: $showsRecentlyDeleted) { RecentlyDeletedView() }
+            .modifier(AccountPresentations(routes: accountRoutes))
             // Leave the toast room above the tab bar.
             .contentMargins(.bottom, Spacing.xxl, for: .scrollContent)
         }
