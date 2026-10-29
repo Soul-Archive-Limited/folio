@@ -20,7 +20,7 @@ Status key: ✅ done · 🟡 in progress · ⬜ not started
 | 11 | Website | Astro marketing site, legal pages, support/FAQ, headers, SEO (§11.1, §11.2, §14) | ✅ |
 | 12 | Web app | `/app` sign-in + unlock, calendar, entries, tasks, Tiptap editor, live sync, delete account (§11.3) | ✅ |
 | 13 | Motion polish | Hitch audit with Instruments, 120 fps pass, Reduce Motion pass, web motion, iPad split view (§3.6, §6.16, §15.1) | ✅ |
-| 14 | Release | Privacy manifest, App Store checklist, accessibility audit, review account, TestFlight (§12) | ⬜ |
+| 14 | Release | Privacy manifest, App Store checklist, accessibility audit, review account, TestFlight (§12) | ✅ |
 
 Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1–3 run as **Batch A**, 4–6 as **Batch B**, the Batch B fixes plus 7–8 as **Batch C**, and the Batch C fixes, Recently Deleted, Phase 11 and Xcode Cloud TestFlight builds as **Batch D**.
 
@@ -46,7 +46,7 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 ### Batch G checklist
 - [x] Part 1 — owner's test of 0.1.0 (49) + web app (not tested yet; notes go to the next batch)
 - [x] Part 2 — Phase 13 motion & performance
-- [ ] Part 3 — Phase 14 compliance, App Review readiness, TestFlight for friends
+- [x] Part 3 — Phase 14 compliance, App Review readiness, TestFlight 0.1.0 (54) for friends
 
 ### Phase 14 — SPEC §12 / §13 checklist (2026-10-29)
 **App Review (§12)**

@@ -2,14 +2,19 @@
 
 The next session starts here. Read this, then `CLAUDE.md`, `docs/SPEC.md`, `docs/PHASES.md` and the last entries of `docs/DECISIONS.md`. Updated at the end of every batch.
 
-_Last updated: 2026-10-29, end of Batch F (Phase 12 web app live, TestFlight build uploaded)._
+_Last updated: 2026-10-29, end of Batch G (Phases 13 and 14 done; TestFlight build for the external group "Friends")._
 
-## Batch F status (resume here)
-- Part 1: skipped — the owner hadn't tested 0.1.0 (43); they test the Batch F build next. Their notes → Batch G Part 1.
-- ✅ Part 2: Devices (model + OS, added, last seen hourly, This device, rename sealed with the Data Key on the session row, migration 0002), one request per photo (`PUT /api/blobs/photo/:id`, 600/h, 3,000/day), recovery key on two 4-5-4 lines, gitleaks history + tree clean (DECISIONS 189–192).
-- ✅ Part 3: Phase 12 web app at `/app` (DECISIONS 193–201). Code: `web/src/app/lib/*` (crypto, markdown, store, sync, photos, trust) and `web/src/app/ui/*`; page `web/src/pages/app.astro`; `/app` CSP in `web/public/_headers`; `public/_redirects`. Tests: `cd web && npm test` (typecheck + 35 unit tests on the shared vectors/fixtures + build + 15 checks).
-- ✅ Part 4: API deployed with the owner's OK (migration 0002 + Worker version 236d92ae…). **Cloudflare Pages project `folio` is connected to GitHub: every push to main publishes folio.devilsense.com (site + `/app`).** So deploy the API *before* pushing web changes that need new endpoints. **TestFlight 0.1.0 (49)** uploaded from this Mac with `scripts/testflight.sh` on 2026-10-29 after CI went green. Turnstile: secret set by the owner; site key in `web/src/config/app.ts`.
-- **Next session:** the owner's results from the Batch F checklist (iPhone + Brave) → Batch G fixes, then Phase 13 (motion polish).
+## Batch G status (resume here)
+- Part 1: skipped — the owner hadn't tested 0.1.0 (49) yet. Their notes → next batch's Part 1.
+- ✅ Part 2: Phase 13 (DECISIONS 202–208): iPad split view, motion fixes, main-thread fixes on 10k entries, web motion + idle preload; before/after clips `docs/screenshots/batch-g/rec-0*.mp4`.
+- ✅ Part 3: Phase 14 (DECISIONS 209–211): privacy manifest + label answers, hashed IPs in rate limits (API version 0cd68092), accessibility audit + fixes, §12/§13 checklist in PHASES.md, `docs/APPSTORE.md`, App Store screenshots `docs/appstore/`, TestFlight **0.1.0 (54)** uploaded from this Mac; App Store Connect filled from APPSTORE.md with the owner (external group "Friends", public link).
+- **Next session:** the owner's test notes for the Friends build; then the public-release list at the end of `docs/reports/batch-g.md` (final name, icon, legal review, …).
+
+### Phase 13/14 tools
+- Hitch audit (Simulator): `-FolioHitchLog YES -FolioPerfScript YES` on a 10k diary (`-FolioStressData YES` once), then read `Documents/hitches.log` from the app container; marks split the flows. Instruments' Animation Hitches refuses the Simulator — use a device.
+- Accessibility audit: `TEST_RUNNER_FOLIO_A11Y_AUDIT=1 xcodebuild test … -only-testing:FolioUITests/AccessibilityAuditUITests` (~10 min). Contrast/clipping on Liquid Glass are printed but don't fail (false positives; measure pixels instead).
+- Recordings: `TEST_RUNNER_FOLIO_RECORDING=1 … -only-testing:FolioUITests/MotionRecordingUITests/<test>` while `simctl io recordVideo` runs.
+- App Store screenshots: Simulator status bar `xcrun simctl status_bar <udid> override --time 9:41 …`, full-size `simctl io screenshot`, then `sips -s format jpeg` (App Store Connect rejects PNG alpha). iPad landscape via the Simulator tool's rotate.
 
 ### Local web + API testing (Batch F)
 - `cd api && npx wrangler dev --ip 127.0.0.1 --port 8787` (local D1/R2; `api/.dev.vars` holds generated throwaway values: OTP_PEPPER, TOKEN_ENCRYPTION_KEY, REVIEW_CODE, Cloudflare's test TURNSTILE_SECRET — never real secrets; regenerate if missing). Apply local migrations with `npx wrangler d1 migrations apply folio-db --local`.
@@ -30,9 +35,10 @@ _Last updated: 2026-10-29, end of Batch F (Phase 12 web app live, TestFlight bui
 | 9 Backend | ✅ Batch E (deployed). |
 | 10 Sign-in + sync | ✅ Batch E. |
 | 12 Web app (+ Turnstile) | ✅ Batch F (live at /app; owner's Brave test pending). |
-| 13 Motion polish, 14 Release | ⬜ Not started. Next: Batch G = owner's Batch F feedback, then Phase 13. |
+| 13 Motion polish | ✅ Batch G Part 2. |
+| 14 Release | ✅ Batch G Part 3 (TestFlight external beta; public-release list in the Batch G report). |
 
-Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8, Batch D = C fixes + Recently Deleted + 11 + Xcode Cloud, Batch E = D fixes + 9 + 10 + TestFlight, Batch F = improvements + 12 + TestFlight.
+Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8, Batch D = C fixes + Recently Deleted + 11 + Xcode Cloud, Batch E = D fixes + 9 + 10 + TestFlight, Batch F = improvements + 12 + TestFlight, Batch G = 13 + 14 + external TestFlight.
 
 ## Repo map
 
@@ -115,6 +121,10 @@ CI (GitHub Actions): `ios.yml` (test + Release build on macos-26), `node.yml` (a
 15. **Live queries must filter `trashedAt == nil`** (Recently Deleted). Permanent deletes are `deletePermanently(_:)`; everyday Delete is `trash(_:)`.
 16. **Pin npm packages to releases ≥ 2 weeks old** (`npm view <pkg> time --json`), and run `npm audit`.
 17. **Xcode Cloud warns "scheme may only exist locally"** — expected, because the project is generated in `ci_post_clone.sh`.
+18. **XCUITest accessibility snapshots run on the app's main thread** — never measure hitches while a UI test drives the app; use the in-app `PerfDriver`.
+19. **Paging scroll views keep their pixel offset when the page width changes** — key them by width (`.id(layout.panelWidth)`), or iPad shows two half months.
+20. **Every flow reading `SystemLanguageModel.default.availability` makes a synchronous XPC call** — it's cached for 30 s in `WritingAssistant`.
+21. **Local email codes: 3 per address per 15 min** — clear `rate_limits` in the local D1 between web script runs.
 
 ## Open issues
 
@@ -132,10 +142,10 @@ CI (GitHub Actions): `ios.yml` (test + Release build on macos-26), `node.yml` (a
   10. Share: unclear what is shared. Make it explicit (e.g. text vs text + photos, with a preview).
   Recently Deleted (delete, Undo, restore) worked on device.
 - Legal pages need the owner's legal review; US year-end encryption self-classification is an open question for their adviser (DECISIONS 143).
-- iPad split view (§6.16) deferred to Phase 13.
-- Apple web sign-in needs the Services ID's domain + return URL configured (owner step 1 in the Batch F report) — unverified until the owner tries it.
-- `REVIEW_CODE` is a temporary test value; the owner replaces it before App Review (Phase 14).
+- Apple web sign-in: the owner configured the Services ID domain + return URL; a real browser sign-in is still untested.
+- Phase 13's 120 fps target is unverified on a device (Simulator numbers in DECISIONS 206).
+- `REVIEW_CODE` set by the owner (Batch G); `REVIEW_ENABLED` stays `"true"` until the app is approved for the App Store.
 
 ## What's next
 
-Batch G: the owner's results from the Batch F checklist (iPhone + Brave), then Phase 13 (motion polish). Batches end with a push to main once CI is green; TestFlight builds come from `scripts/testflight.sh` when the owner asks (Xcode Cloud budget rule above).
+The owner tests the Friends build (iPhone + web) and sends notes → next batch's Part 1. Before a public App Store release: the list at the end of `docs/reports/batch-g.md`. TestFlight builds come from `scripts/testflight.sh` (Xcode Cloud budget rule above).
