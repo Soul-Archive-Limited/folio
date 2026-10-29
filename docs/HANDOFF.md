@@ -2,9 +2,23 @@
 
 The next session starts here. Read this, then `CLAUDE.md`, `docs/SPEC.md`, `docs/PHASES.md` and the last entries of `docs/DECISIONS.md`. Updated at the end of every batch.
 
-_Last updated: 2026-10-29, end of Batch G (Phases 13 and 14 done; TestFlight build for the external group "Friends")._
+_Last updated: 2026-10-30, end of Batch H (website rebuilt as a story-driven 3D site; live)._
 
-## Batch G status (resume here)
+## Batch H status (resume here)
+- ✅ Part 1: story and copy — `docs/WEBSITE_COPY.md` (every page's words come from it).
+- ✅ Part 2: new pages (Features, How it works, Privacy & security `/security`, About, FAQ, Download), new nav (Sign in / Get started → `/app`, full-screen phone menu), per-page OG images in `web/public/og/`, stale pages updated.
+- ✅ Part 3: 3D hero phone + privacy lock (React Three Fiber, `web/src/three/`), shader aura, scroll stories (Motion), calendar fly-in, card tilt. Loading rules in `web/src/scripts/three-gate.ts` (DECISIONS 215–218).
+- ✅ Part 4: `/app` gate restyle (CSS + home link in `Gate`), Lighthouse home mobile 99–100 / 100 / 100 / 100, CLS 0 everywhere, /vibesec clean, screenshots + recordings in `docs/screenshots/batch-h/`, report `docs/reports/batch-h.md`.
+- **Next session:** the owner's look at desktop Safari; set `testflightUrl` in `web/src/config/site.ts` once build 56 is approved (link in Batch G below); then Batch G's "Next session" list (Beta App Review result, test notes, public-release list).
+
+### Website tools (Batch H)
+- Screens for the site: `scripts/sim-shot.sh`-style launches without the 1200 px resize, then `cwebp -q 80 -resize 720 0` into `web/public/img/app/<screen>-<light|dark>.webp` (names are used by `Shot.astro` and the 3D phone).
+- The 3D only loads with a GPU: headless Brave needs `--use-angle=metal --enable-gpu --ignore-gpu-blocklist`, or `canRun3D()` sees SwiftShader and keeps the poster. On touch emulation it waits for a scroll.
+- Don't take Playwright `fullPage` shots of the home page with motion on: the pinned sections are sized in `vh` and grow with the capture. Full pages are shot with `reducedMotion: 'reduce'`; motion states as viewport shots.
+- Recordings: CDP `Page.startScreencast` frames → ffmpeg concat with frame timestamps, then `setpts` to real-feel speed (headless runs the scroll script slower than real time).
+- OG images: an HTML template rendered by Playwright from a `file://` page (fonts and screenshots load from `web/public`).
+
+## Batch G status
 - Part 1: skipped — the owner hadn't tested 0.1.0 (49) yet. Their notes → next batch's Part 1.
 - ✅ Part 2: Phase 13 (DECISIONS 202–208): iPad split view, motion fixes, main-thread fixes on 10k entries, web motion + idle preload; before/after clips `docs/screenshots/batch-g/rec-0*.mp4`.
 - ✅ Part 3: Phase 14 (DECISIONS 209–211): privacy manifest + label answers, hashed IPs in rate limits (API version 0cd68092), accessibility audit + fixes, §12/§13 checklist in PHASES.md, `docs/APPSTORE.md`, App Store screenshots `docs/appstore/`, TestFlight **0.1.0 (56)** uploaded from this Mac; App Store Connect filled from APPSTORE.md in the browser (App Privacy published, listing, age rating 4+, Test Information); external group "Friends" with build 56 **submitted for Beta App Review**; public link https://testflight.apple.com/join/88BuzSRc (works once approved). EU trader declaration and App Store screenshots upload are left for the public launch.
@@ -37,8 +51,9 @@ _Last updated: 2026-10-29, end of Batch G (Phases 13 and 14 done; TestFlight bui
 | 12 Web app (+ Turnstile) | ✅ Batch F (live at /app; owner's Brave test pending). |
 | 13 Motion polish | ✅ Batch G Part 2. |
 | 14 Release | ✅ Batch G Part 3 (TestFlight external beta; public-release list in the Batch G report). |
+| Website rebuild | ✅ Batch H (story + 3D; live). |
 
-Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8, Batch D = C fixes + Recently Deleted + 11 + Xcode Cloud, Batch E = D fixes + 9 + 10 + TestFlight, Batch F = improvements + 12 + TestFlight, Batch G = 13 + 14 + external TestFlight.
+Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8, Batch D = C fixes + Recently Deleted + 11 + Xcode Cloud, Batch E = D fixes + 9 + 10 + TestFlight, Batch F = improvements + 12 + TestFlight, Batch G = 13 + 14 + external TestFlight, Batch H = website rebuild.
 
 ## Repo map
 
@@ -46,7 +61,7 @@ Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8
 - `ios/Folio/{App,DesignSystem,Models,Features/*,Services/*}`; tests in `ios/FolioTests` (Swift Testing), `ios/FolioUITests` (XCTest), `ios/FolioCryptoTests`.
 - `ios/Folio/Services/Store/DiaryStore.swift` is the single `@Observable` store (all queries, CRUD, markers, export inputs).
 - `shared/` design tokens + Markdown/crypto fixtures (used by iOS and later the web app).
-- `web/` Astro site: `src/config/site.ts` (all CTAs), `src/data/faq.ts`, `src/components/HeroCalendar.tsx` (hero island), `public/_headers`. Web app: `src/app/{lib,ui}`, `src/pages/app.astro`, `src/config/app.ts` (Turnstile site key).
+- `web/` Astro site: `src/config/site.ts` (all CTAs + nav), `src/data/faq.ts`, `src/components/home/*` (home sections), `src/three/*` (3D phone + lock, lazy), `src/scripts/*` (motion, 3D gate, aura), `public/_headers`. Copy source: `docs/WEBSITE_COPY.md`. Web app: `src/app/{lib,ui}`, `src/pages/app.astro`, `src/config/app.ts` (Turnstile site key).
 - `api/` Worker (Hono, D1, R2, UserHub). `cd api && npm test`.
 - `scripts/`: `sim-shot.sh` (screenshot), `contact-sheet.swift`, `setup-hooks.sh` (gitleaks hook, run once per clone), `write-build-number.sh` (XcodeGen preGenCommand), `testflight.sh` (fallback upload only).
 - `ios/ci_scripts/ci_post_clone.sh`: Xcode Cloud installs XcodeGen and generates the project.
