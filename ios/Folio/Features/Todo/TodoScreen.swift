@@ -81,11 +81,13 @@ struct TodoScreen: View {
             // The inset holds the toast and the quick-add bar, so the last row always scrolls
             // clear of both and of the tab bar; the margin adds a little air under it.
             .contentMargins(.bottom, Spacing.m, for: .scrollContent)
-            .safeAreaInset(edge: .bottom, spacing: 0) { bottomBar }
-            .onScrollPhaseChange { _, phase in isScrolling = phase.isScrolling }
-            // Scrolling or tapping anywhere outside the quick-add bar puts the keyboard away (Batch I).
+            // Scrolling or tapping the list puts the keyboard away (Batch I). Attached before the
+            // bottom inset, so taps on the quick-add bar itself are never caught.
             .scrollDismissesKeyboard(.immediately)
             .simultaneousGesture(TapGesture().onEnded { KeyboardDismissal.dismiss() }, including: isTyping ? .all : .subviews)
+            .safeAreaInset(edge: .bottom, spacing: 0) { bottomBar }
+            .onScrollPhaseChange { _, phase in isScrolling = phase.isScrolling }
+
             .background {
                 TabBarShapeReader(isTracking: isScrolling) { tabBar = $0 }
                     .accessibilityHidden(true)
