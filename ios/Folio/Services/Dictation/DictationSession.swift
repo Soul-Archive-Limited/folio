@@ -20,6 +20,10 @@ final class DictationSession {
     private(set) var state: State = .idle
     private(set) var volatileText = ""
     private(set) var lastCommitted = ""
+    /// When listening began, for the capsule's elapsed time.
+    private(set) var startDate: Date?
+    /// Everything committed in this session, so the composer can offer to tidy it.
+    private(set) var sessionText = ""
     /// Recent mic levels, newest last, for the waveform.
     private(set) var levels: [Float] = Array(repeating: 0, count: 28)
 
@@ -51,7 +55,7 @@ final class DictationSession {
         return now - lastTap >= DictationRules.repeatTapWindow
     }
 
-    func start(locale preferred: Locale) async {
+    func start(locale preferred: Locale, hints: [String] = []) async {
         guard !isRunning else { return }
         if let other = Self.active, other !== self { await other.finish() }
         Self.active = self
@@ -61,7 +65,11 @@ final class DictationSession {
                 state = .unavailable(String(localized: "Dictation isn't available in this language yet. You can use the keyboard's mic instead."))
                 return
             }
-            let transcriber = DictationTranscriber(locale: locale, preset: .progressiveLongDictation)
+            // Long-form dictation with punctuation, live (volatile) words, and frequent
+            // finalisation so committed text lands sooner (Speech, iOS 26 SDK; Batch I).
+            let transcriber = DictationTranscriber(locale: locale, contentHints: [], transcriptionOptions: [.punctuation],
+                                                   reportingOptions: [.volatileResults, .frequentFinalization],
+                                                   attributeOptions: [])
             try await installAssets(for: transcriber)
             guard let format = await SpeechAnalyzer.bestAvailableAudioFormat(compatibleWith: [transcriber]) else {
                 state = .unavailable(String(localized: "Dictation couldn't start on this iPhone."))
@@ -71,6 +79,12 @@ final class DictationSession {
             input = continuation
             let analyzer = SpeechAnalyzer(modules: [transcriber])
             self.analyzer = analyzer
+            if !hints.isEmpty {
+                let context = AnalysisContext()
+                context.contextualStrings[.general] = hints
+                try? await analyzer.setContext(context)
+            }
+            sessionText = ""
             resultsTask = Task { [weak self] in
                 do {
                     for try await result in transcriber.results {
@@ -88,6 +102,7 @@ final class DictationSession {
                 Task { @MainActor in self?.record(level) }
             })
             startedAt = .now
+            startDate = .now
             lastSpeech = .now
             state = .listening
             startWatchdog()
@@ -157,6 +172,7 @@ final class DictationSession {
             let clean = text.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !clean.isEmpty else { return }
             lastCommitted = clean
+            sessionText += DictationRules.insertion(clean, after: sessionText.last)
             onCommit?(clean)
         } else {
             volatileText = text
@@ -198,6 +214,7 @@ final class DictationSession {
         resultsTask?.cancel()
         resultsTask = nil
         volatileText = ""
+        startDate = nil
         levels = Array(repeating: 0, count: levels.count)
         if Self.active === self { Self.active = nil }
     }
@@ -207,6 +224,7 @@ final class DictationSession {
     /// the same states and text the capsule shows when someone speaks.
     func startDemo(words: [String] = ["Walked", "along", "the", "river", "after", "work", "and", "the", "herons", "were", "back"]) {
         state = .listening
+        startDate = Date.now.addingTimeInterval(-247)
         Task { [weak self] in
             var heard: [String] = []
             for word in words {

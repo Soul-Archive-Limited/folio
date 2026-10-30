@@ -12,6 +12,8 @@ struct MainTabView: View {
     @State private var toasts = ToastCenter()
     @State private var router = TabRouter()
     @Namespace private var composerNamespace
+    /// A draft left from before a full close (cold launch); cleared once resumed or discarded.
+    @State private var launchDraft: ComposerDraft?
 
     var body: some View {
         TabView(selection: $selection) {
@@ -19,6 +21,19 @@ struct MainTabView: View {
                 if let calendar {
                     let isRoot = calendar.path.isEmpty
                     CalendarScreen(model: calendar)
+                        .overlay(alignment: .bottom) {
+                            if let launchDraft, isRoot, requester.pending == nil {
+                                DraftResumePill(draft: launchDraft,
+                                                onResume: { requester.send(.resumeDraft); self.launchDraft = nil },
+                                                onDiscard: discardLaunchDraft)
+                                    .padding(.trailing, FloatingButtonMetrics.clearance)
+                                    .padding(.horizontal, Spacing.sideMargin)
+                                    .padding(.bottom, Spacing.m + 4)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                            }
+                        }
+                        .animation(FolioMotion.standard(), value: launchDraft == nil)
                         .floatingAddButton(day: calendar.selectedDay, isVisible: isRoot, namespace: composerNamespace, onRequest: present)
                         .toastHost(toasts, trailingClearance: isRoot ? FloatingButtonMetrics.toastTrailingClearance : 0)
                 }
@@ -42,6 +57,7 @@ struct MainTabView: View {
         // iPad: the tabs become a sidebar (SPEC §6.16); iPhone keeps the tab bar.
         .tabViewStyle(.sidebarAdaptable)
         .tabBarMinimizeBehavior(selection.minimisesTabBar ? .onScrollDown : .never)
+        .overlay { SheetBackdropDim(isVisible: requester.pending != nil) }
         .tourHost(.main, tour)
         .onAppear {
             connectTour()
@@ -63,6 +79,7 @@ struct MainTabView: View {
         }
         .task {
             guard calendar == nil else { return }
+            if let draft = store.drafts.load(), !draft.isEmpty { launchDraft = draft }
             let model = CalendarModel(today: store.today)
             #if DEBUG
             DebugLaunchOptions.apply(to: model, store: store)
@@ -118,7 +135,15 @@ struct MainTabView: View {
     }
 
     private func present(_ request: NewItemRequest) {
+        // "+" offers the same draft itself; the pill isn't needed once a composer opens.
+        launchDraft = nil
         requester.send(request)
+    }
+
+    private func discardLaunchDraft() {
+        store.drafts.clear()
+        launchDraft = nil
+        toasts.show(ToastMessage(text: "Draft discarded", systemImage: "trash"))
     }
 
     /// Lets the tour move between tabs and open or close the composer (SPEC §6.15).

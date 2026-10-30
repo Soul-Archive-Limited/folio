@@ -7,6 +7,9 @@ struct ComposerBodyEditor: View {
     let placeholder: LocalizedStringKey
 
     @Environment(\.fontResolutionContext) private var fontContext
+    /// The text when the caret last moved: a caret that moves while the text stays the same was
+    /// placed by a tap (or the arrow keys), not by typing.
+    @State private var textAtLastCaret = ""
 
     var body: some View {
         TextEditor(text: $model.body, selection: $model.selection)
@@ -29,6 +32,18 @@ struct ComposerBodyEditor: View {
             .onChange(of: model.body) { old, new in
                 continueList(old: old, new: new)
             }
+            .onChange(of: model.selection) { tapCheckbox() }
+            .onAppear { textAtLastCaret = String(model.body.characters) }
+    }
+
+    /// A tap on a checklist box ticks or unticks it straight away — no Aa needed (Batch I).
+    private func tapCheckbox() {
+        let text = String(model.body.characters)
+        defer { textAtLastCaret = String(model.body.characters) }
+        guard text == textAtLastCaret,
+              let line = RichTextEditing.checkboxLine(in: model.body, selection: model.selection) else { return }
+        RichTextEditing.toggleChecked(line: line, in: &model.body, selection: &model.selection,
+                                      context: fontContext, writingFont: model.writingFont)
     }
 
     private func continueList(old: AttributedString, new: AttributedString) {

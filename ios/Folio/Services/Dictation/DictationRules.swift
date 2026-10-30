@@ -10,6 +10,43 @@ nonisolated enum DictationRules {
     /// Below this level (0…1) the mic is treated as silence.
     static let silenceLevel: Float = 0.04
 
+    /// The English (or other) variant for the person's region (Batch I): an iPhone set to
+    /// English in India dictates with en-IN, in the UK en-GB — the model for the accent the
+    /// person most likely has. Falls back to the locale as it is.
+    static func regionalLocale(for locale: Locale) -> Locale {
+        guard let language = locale.language.languageCode?.identifier,
+              let region = locale.region?.identifier, !region.isEmpty else { return locale }
+        return Locale(identifier: "\(language)_\(region)")
+    }
+
+    /// Words the transcriber should expect: the person's name, their category names and the
+    /// entry's title (deduplicated, short phrases only).
+    static func contextualStrings(name: String, categories: [String], title: String) -> [String] {
+        var seen = Set<String>()
+        return ([name] + categories + [title])
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty && $0.count <= 40 && seen.insert($0.lowercased()).inserted }
+            .prefix(40)
+            .map { $0 }
+    }
+
+    /// Whether a tidied version only changed punctuation, capitals and spacing — never words.
+    static func onlyPunctuationChanged(from original: String, to tidied: String) -> Bool {
+        func words(_ text: String) -> [String] {
+            text.lowercased()
+                .components(separatedBy: CharacterSet.alphanumerics.union(.init(charactersIn: "'’")).inverted)
+                .map { $0.replacingOccurrences(of: "’", with: "'") }
+                .filter { !$0.isEmpty }
+        }
+        let before = words(original)
+        return !before.isEmpty && before == words(tidied) && original != tidied
+    }
+
+    /// "4:07" — the capsule's elapsed time.
+    static func elapsedText(_ seconds: Int) -> String {
+        String(format: "%d:%02d", seconds / 60, seconds % 60)
+    }
+
     static func shouldStop(silentFor silence: Duration, runningFor total: Duration) -> Bool {
         silence >= silenceLimit || total >= sessionLimit
     }

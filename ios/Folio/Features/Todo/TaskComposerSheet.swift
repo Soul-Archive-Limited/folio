@@ -21,13 +21,13 @@ struct TaskComposerSheet: View {
 
     private enum Field { case title, notes }
 
-    init(task: TaskItem?, day: DayKey?, title: String = "", categoryID: UUID? = nil) {
+    init(task: TaskItem?, day: DayKey?, title: String = "", minutes: Int? = nil, categoryID: UUID? = nil) {
         self.task = task
         _title = State(initialValue: task?.title ?? title)
         _notes = State(initialValue: task?.notes ?? "")
         _hasDate = State(initialValue: task?.dayKey != nil || day != nil)
         _day = State(initialValue: task?.day ?? day ?? DayKey(date: AppClock.now, calendar: .current))
-        _minutes = State(initialValue: task?.minutesFromMidnight)
+        _minutes = State(initialValue: task?.minutesFromMidnight ?? minutes)
         _categoryID = State(initialValue: task?.categoryID ?? categoryID)
     }
 

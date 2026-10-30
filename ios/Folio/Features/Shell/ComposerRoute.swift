@@ -25,9 +25,28 @@ struct ComposerRoute: View {
             ComposerSheet(model: ComposerModel(day: store.today.adding(days: -1), categoryID: store.settings().defaultCategoryID,
                                                writingFont: writingFont),
                           calendar: calendar, opensDatePicker: true, onSaved: saved)
-        case .task(let day, let title):
-            TaskComposerSheet(task: nil, day: day, title: title, categoryID: store.settings().defaultCategoryID)
+        case .resumeDraft:
+            if let model = resumedDraftModel {
+                ComposerSheet(model: model, calendar: calendar, startsLarge: model.entryID != nil, onSaved: saved)
+            }
+        case .task(let day, let title, let minutes):
+            TaskComposerSheet(task: nil, day: day, title: title, minutes: minutes, categoryID: store.settings().defaultCategoryID)
         }
+    }
+
+    /// The composer for the draft on disk — a new entry or an edit — already restored.
+    private var resumedDraftModel: ComposerModel? {
+        guard let draft = store.drafts.load(), !draft.isEmpty else { return nil }
+        let model: ComposerModel
+        if let id = draft.entryID {
+            guard let entry = store.entry(id: id) else { return nil }
+            model = ComposerModel(entry: entry, writingFont: writingFont)
+        } else {
+            model = ComposerModel(day: DayKey(rawValue: draft.dayKey) ?? store.today, categoryID: draft.categoryID,
+                                  writingFont: writingFont)
+        }
+        model.restoreDraft()
+        return model
     }
 
     private var writingFont: WritingFont {

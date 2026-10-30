@@ -1,20 +1,42 @@
 import SwiftUI
 
-/// The full-width glass quick-add bar above the tab bar (SPEC §6.7). "Call Mum tomorrow" is
-/// dated tomorrow; Return adds and keeps the keyboard up for the next one. The expand button
-/// opens the full task composer with whatever has been typed so far.
+/// The full-width glass quick-add bar above the tab bar (SPEC §6.7). It reads natural dates
+/// and times ("Call Mum tomorrow 6pm", "Pay rent on 5 Nov", `QuickAddParser`) and shows what
+/// it understood in a chip above the bar before saving (Batch I); Return adds and keeps the
+/// keyboard up for the next one. The expand button opens the full task composer with it.
 struct TodoQuickAddBar: View {
     /// Space before the bar: the side margin, or room for the minimised tab bar beside it.
     var leadingInset: Double = Spacing.sideMargin
     var onFocusChange: (Bool) -> Void = { _ in }
-    let onExpand: (_ title: String, _ day: DayKey?) -> Void
+    let onExpand: (QuickAddParser.Result) -> Void
 
     @Environment(DiaryStore.self) private var store
     @State private var text = ""
     @State private var addedCount = 0
     @FocusState private var isFocused: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
+        let parsed = parse()
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            if let summary = parsed.summary(today: store.today) {
+                Label(summary, systemImage: parsed.minutesFromMidnight == nil ? "calendar" : "clock")
+                    .folioFont(.caption)
+                    .foregroundStyle(.emberText)
+                    .padding(.horizontal, Spacing.s)
+                    .frame(minHeight: 28)
+                    .folioGlass(in: .capsule)
+                    .padding(.leading, leadingInset)
+                    .transition(FolioMotion.transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .bottomLeading)), reduceMotion: reduceMotion))
+                    .accessibilityLabel(Text("Will be added for \(summary)"))
+                    .id(summary)
+            }
+            bar
+        }
+        .animation(FolioMotion.standard(reduceMotion: reduceMotion), value: parsed.summary(today: store.today))
+    }
+
+    private var bar: some View {
         HStack(spacing: Spacing.xs) {
             Image(systemName: "plus.circle.fill")
                 .foregroundStyle(.ember)
@@ -42,18 +64,23 @@ struct TodoQuickAddBar: View {
         .folioHaptic(.success, trigger: addedCount)
     }
 
+    private func parse() -> QuickAddParser.Result {
+        QuickAddParser.parse(text, now: store.now(), calendar: store.calendar)
+    }
+
     private func add() {
-        let parsed = QuickAddParser.parse(text, today: store.today)
-        guard !parsed.title.isEmpty, (try? store.createTask(title: parsed.title, day: parsed.day)) != nil else { return }
+        let parsed = parse()
+        guard !parsed.title.isEmpty,
+              (try? store.createTask(title: parsed.title, day: parsed.day, minutesFromMidnight: parsed.minutesFromMidnight)) != nil else { return }
         text = ""
         addedCount += 1
         isFocused = true
     }
 
     private func expand() {
-        let parsed = QuickAddParser.parse(text, today: store.today)
+        let parsed = parse()
         isFocused = false
         text = ""
-        onExpand(parsed.title, parsed.day)
+        onExpand(parsed)
     }
 }

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PreferenceSpecifiers</key>
+	<array>
+		<dict>
+			<key>FooterText</key>
+			<string>These match Profile → Appearance in Folio and sync to your other devices.</string>
+			<key>Title</key>
+			<string>Appearance</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>DefaultValue</key>
+			<string>system</string>
+			<key>Key</key>
+			<string>settings.theme</string>
+			<key>Title</key>
+			<string>Theme</string>
+			<key>Titles</key>
+			<array>
+				<string>System</string>
+				<string>Light</string>
+				<string>Dark</string>
+			</array>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Values</key>
+			<array>
+				<string>system</string>
+				<string>light</string>
+				<string>dark</string>
+			</array>
+		</dict>
+		<dict>
+			<key>DefaultValue</key>
+			<string>newYork</string>
+			<key>Key</key>
+			<string>settings.writingFont</string>
+			<key>Title</key>
+			<string>Writing font</string>
+			<key>Titles</key>
+			<array>
+				<string>New York</string>
+				<string>SF Pro</string>
+			</array>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Values</key>
+			<array>
+				<string>newYork</string>
+				<string>sfPro</string>
+			</array>
+		</dict>
+		<dict>
+			<key>DefaultValue</key>
+			<integer>0</integer>
+			<key>Key</key>
+			<string>settings.firstWeekday</string>
+			<key>Title</key>
+			<string>First day of week</string>
+			<key>Titles</key>
+			<array>
+				<string>Automatic</string>
+				<string>Monday</string>
+				<string>Sunday</string>
+				<string>Saturday</string>
+			</array>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Values</key>
+			<array>
+				<integer>0</integer>
+				<integer>2</integer>
+				<integer>1</integer>
+				<integer>7</integer>
+			</array>
+		</dict>
+	</array>
+	<key>StringsTable</key>
+	<string>Root</string>
+</dict>
+</plist>

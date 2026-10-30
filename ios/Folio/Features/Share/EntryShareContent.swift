@@ -38,6 +38,9 @@ struct EntryShareContent {
         title.isEmpty ? String(localized: "A page from \(dateLine)") : title
     }
 
+    /// Whether the single card leaves some of the text out.
+    var isCutOnCard: Bool { plainText.trimmingCharacters(in: .whitespacesAndNewlines).count > 280 }
+
     /// The first few lines for the image card, cut at a word near 280 characters.
     var openingLines: String {
         let flat = plainText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -45,18 +48,6 @@ struct EntryShareContent {
         let cut = flat.prefix(280)
         let end = cut.lastIndex(of: " ") ?? cut.endIndex
         return String(cut[..<end]) + "…"
-    }
-}
-
-/// The image card (date, title, first photo, first lines) rendered on demand as a PNG.
-struct EntryShareCardImage: Transferable {
-    let render: @MainActor @Sendable () -> Data?
-
-    static var transferRepresentation: some TransferRepresentation {
-        DataRepresentation(exportedContentType: .png) { card in
-            await MainActor.run { card.render() } ?? Data()
-        }
-        .suggestedFileName("Folio page.png")
     }
 }
 

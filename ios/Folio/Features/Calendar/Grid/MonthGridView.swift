@@ -18,7 +18,6 @@ struct MonthGridView: View {
         let markers = store.markers(for: month, firstWeekday: firstWeekday)
         let today = store.today
         let selectedRow = month == model.selectedDay.monthKey ? model.selectedRow(firstWeekday: firstWeekday) : 0
-        let progress = model.collapseProgress
         let categoryColors = Dictionary(uniqueKeysWithValues: store.categories().map { ($0.id, $0.color.color) })
 
         VStack(spacing: CalendarLayout.gap) {
@@ -43,10 +42,10 @@ struct MonthGridView: View {
                         .modifier(TodayTourAnchor(isToday: inMonth && day == today, tour: tour))
                     }
                 }
-                .opacity(row == selectedRow ? 1 : 1 - progress)
+                .modifier(CollapseFade(model: model, isSelectedRow: row == selectedRow))
             }
         }
-        .offset(y: -Double(selectedRow) * layout.rowHeight * progress)
+        .modifier(CollapseSlide(model: model, distance: Double(selectedRow) * layout.rowHeight))
         .padding(CalendarLayout.panelPadding)
         .frame(width: layout.panelWidth, alignment: .top)
     }
@@ -54,6 +53,27 @@ struct MonthGridView: View {
     private func tap(_ day: DayKey) {
         model.select(day, reduceMotion: reduceMotion)
         tour?.didSelectDay()
+    }
+}
+
+/// The collapse reads the progress only in these two modifiers, so a drag frame changes an
+/// opacity and an offset instead of re-running the grid (42 cells and a category fetch) —
+/// the cause of the drag's dropped frames (Batch I, Time Profiler).
+private struct CollapseFade: ViewModifier {
+    let model: CalendarModel
+    let isSelectedRow: Bool
+
+    func body(content: Content) -> some View {
+        content.opacity(isSelectedRow ? 1 : 1 - model.collapseProgress)
+    }
+}
+
+private struct CollapseSlide: ViewModifier {
+    let model: CalendarModel
+    let distance: Double
+
+    func body(content: Content) -> some View {
+        content.offset(y: -distance * model.collapseProgress)
     }
 }
 

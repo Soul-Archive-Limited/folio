@@ -1,43 +1,44 @@
 import SwiftUI
 
-/// The three ways to share an entry, as menu items (entry detail's Share menu and the cards'
-/// long-press menu): text only, text and photos, or one image card. Every option shows a
-/// proper preview (title + thumbnail) in the share sheet.
+/// What the Share menu can send (owner's iPhone tests, Batches E and I).
+enum EntryShareKind: String, Identifiable {
+    /// Plain text (a `String`), which every app accepts — Messages, WhatsApp, Notes, Mail.
+    case text
+    case textAndPhotos
+    /// One image card: date, first photo, title and opening lines.
+    case singleCard
+    /// The whole entry as numbered story-sized images (1/N…), so nothing is cut.
+    case allPages
+
+    var id: String { rawValue }
+}
+
+/// The ways to share an entry, as menu items (entry detail's Share menu and the cards'
+/// long-press menu). The caller presents the share sheet with `.entryShare(_:entry:)`.
 struct EntryShareMenu: View {
     let entry: Entry
-    /// Opens the text-and-photos share sheet (`textAndPhotosShare`), owned by the caller.
-    let onShareTextAndPhotos: () -> Void
+    let onShare: (EntryShareKind) -> Void
 
     @Environment(DiaryStore.self) private var store
 
     var body: some View {
         let content = EntryShareContent(entry: entry)
-        let preview = sharePreview(content)
-        ShareLink(item: content.text, subject: Text(content.previewTitle), preview: preview) {
-            Label("Share as text", systemImage: "text.alignleft")
-        }
+        Button("Share as text", systemImage: "text.alignleft") { onShare(.text) }
         if !content.photoIDs.isEmpty {
-            Button("Share text and photos", systemImage: "photo.on.rectangle", action: onShareTextAndPhotos)
+            Button("Share text and photos", systemImage: "photo.on.rectangle") { onShare(.textAndPhotos) }
         }
-        ShareLink(item: cardImage(content), preview: preview) {
-            Label("Share as image", systemImage: "rectangle.portrait.on.rectangle.portrait")
+        let pages = EntryStoryPages.pageCount(content: content, hasPhoto: !content.photoIDs.isEmpty, writingFont: writingFont)
+        if pages > 1 || content.isCutOnCard {
+            Menu("Share as image", systemImage: "rectangle.portrait.on.rectangle.portrait") {
+                Button("Single card", systemImage: "rectangle.portrait") { onShare(.singleCard) }
+                Button("All pages (\(pages))", systemImage: "rectangle.portrait.on.rectangle.portrait") { onShare(.allPages) }
+            }
+        } else {
+            Button("Share as image", systemImage: "rectangle.portrait.on.rectangle.portrait") { onShare(.singleCard) }
         }
     }
 
-    private func sharePreview(_ content: EntryShareContent) -> SharePreview<Image, Never> {
-        SharePreview(content.previewTitle, image: thumbnail(content).map(Image.init(uiImage:)) ?? Image(.appMark))
-    }
-
-    private func thumbnail(_ content: EntryShareContent) -> UIImage? {
-        content.photoIDs.first.flatMap(store.photo(id:)).flatMap { UIImage(data: $0.thumbData) }
-    }
-
-    private func cardImage(_ content: EntryShareContent) -> EntryShareCardImage {
-        let photoData = content.photoIDs.first.flatMap(store.photo(id:))?.displayOrFullData
-        let writingFont = WritingFont(rawValue: store.settings().writingFont) ?? .newYork
-        return EntryShareCardImage {
-            EntryShareCard.png(content: content, photo: photoData.flatMap { EntryShareImages.uiImage($0, maxPixel: 1200) },
-                               writingFont: writingFont)
-        }
+    private var writingFont: WritingFont {
+        WritingFont(rawValue: store.settings().writingFont) ?? .newYork
     }
 }

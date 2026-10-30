@@ -21,7 +21,8 @@ struct DayCell: View {
                 } else {
                     DayNumberStack(state: state, categoryColor: categoryColor, markerOpacity: markerOpacity)
                 }
-                TaskRing(marker: state.marker, isPhoto: state.thumbnailPhotoID != nil)
+                todayOutline
+                TaskCornerMark(marker: state.marker, isPhoto: state.thumbnailPhotoID != nil, isSelected: state.isSelected)
                     .opacity(markerOpacity)
                 selectionStroke
             }
@@ -41,6 +42,16 @@ struct DayCell: View {
             .scaleEffect(state.isSelected || reduceMotion ? 1 : 0.6)
             .opacity(state.isSelected && state.thumbnailPhotoID == nil ? 1 : 0)
             .animation(FolioMotion.confirm(reduceMotion: reduceMotion), value: state.isSelected)
+    }
+
+    /// Today without a photo and not selected: ember number plus a thin ember outline. (On a
+    /// photo tile today is an ember pill behind the number, `PhotoTileOverlay`.)
+    @ViewBuilder private var todayOutline: some View {
+        if state.isToday, !state.isSelected, state.thumbnailPhotoID == nil {
+            RoundedRectangle(cornerRadius: Radius.dayCell)
+                .strokeBorder(.ember.opacity(0.85), lineWidth: 1.5)
+                .allowsHitTesting(false)
+        }
     }
 
     /// Selected photo day: an ember frame drawn above the photo and task ring.

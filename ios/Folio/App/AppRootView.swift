@@ -1,3 +1,4 @@
+import Combine
 import SwiftUI
 
 /// The window root: onboarding on first launch, then the app, the greeting on cold launch,
@@ -26,9 +27,20 @@ struct AppRootView: View {
             }
         }
         .environment(tour)
-        .preferredColorScheme(AppearancePreference(rawValue: store.settings().appearance)?.colorScheme)
+        .onChange(of: store.settings().appearance, initial: true) { _, raw in
+            WindowAppearance.apply(AppearancePreference(rawValue: raw) ?? .system)
+            SystemSettingsBridge().reconcile(with: store)
+        }
+        .onChange(of: store.settings().writingFont) { SystemSettingsBridge().reconcile(with: store) }
+        .onChange(of: store.settings().firstWeekday) { SystemSettingsBridge().reconcile(with: store) }
+        .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)) { _ in
+            SystemSettingsBridge().reconcile(with: store)
+        }
         .privacyCovered()
-        .onChange(of: scenePhase) { _, phase in
+        .onChange(of: scenePhase) { old, phase in
+            // Every cover (root and sheets) reads the same stored line, so it's picked here, once.
+            if old == .active { PrivacyCoverLines.advance() }
             if phase == .background {
                 UserDefaults.standard.set(AppClock.now, forKey: PreferenceKeys.lastBackgroundAt)
                 TrashMaintenance.scheduleRefresh(signedIn: account.isSignedIn)
@@ -36,6 +48,9 @@ struct AppRootView: View {
             }
             // Launch reaches `.active` too, so this covers launch and every foreground.
             if phase == .active {
+                // Theme, writing font or first weekday may have changed in the Settings app.
+                SystemSettingsBridge().reconcile(with: store)
+                WindowAppearance.apply(AppearancePreference(rawValue: store.settings().appearance) ?? .system)
                 TrashMaintenance.purgeIfPossible(store)
                 sync.enterForeground()
             }

@@ -88,6 +88,14 @@ final class WritingAssistant {
         return result.text
     }
 
+    /// After dictation (Batch I): punctuation and capital letters only — the words stay exactly
+    /// as heard. The caller checks the result with `DictationRules.onlyPunctuationChanged`.
+    func tidyDictation(_ text: String) async throws(AssistantError) -> String {
+        let result: PolishedEntry = try await run(
+            "This text was dictated. Add punctuation and capital letters where they belong. Do not add, remove, reorder or change any word.", text)
+        return result.text
+    }
+
     func findTasks(in text: String) async throws(AssistantError) -> [String] {
         let result: FoundTasks = try await run(
             "List the things the writer says they need or plan to do, as short to-do items. If there are none, return an empty list.", text)

@@ -71,7 +71,7 @@ Rules distilled from the 7 reference pins:
 5. **The sheet keeps context.** Lists and composers live in bottom sheets over the calendar.
 6. **Glass sits on light.** Glass floats over a soft, slowly drifting colour "aura" at 10–18% opacity — never a rainbow.
 7. **A greeting with a summary** with inline SF Symbols.
-8. **Floating pill controls** with depth.
+8. **Floating pill controls** with depth — for primary actions and chips only. Headers stay compact: a smaller in-content title that becomes a slim glass pill in the top bar on scroll; no extra full-width containers (Batch I).
 
 ### 3.2 Colour tokens (asset catalog light/dark + Swift `Color` tokens; never raw hex in views)
 | Token | Dark | Light | Use |
@@ -88,7 +88,7 @@ Rules distilled from the 7 reference pins:
 | `aura1/2/3` | `#FF7A45` / `#B65CFF` / `#3D7BFF` | `#FFB38F` / `#D9B8FF` / `#A9C6FF` | Aura blobs |
 
 **Category palette** (12, tuned light/dark): Ember, Coral, Rose, Plum, Violet, Indigo, Ocean, Teal, Sage, Olive, Sand, Graphite. Labels on category colours auto-switch dark/light to pass WCAG AA.
-Appearance follows system; Profile can force Light/Dark.
+Appearance follows system; Profile can force Light/Dark. Theme, Writing font and First day of week apply at once everywhere (the theme is set on every window, sheets included) and also appear on Folio's page in the iPhone Settings app (Settings.bundle), kept in sync both ways: a value changed in Settings wins over the last value Folio wrote there; anything else follows the synced setting (Batch I).
 
 ### 3.3 Typography
 SF Pro for UI (`.monospacedDigit()` where numbers animate). Writing font: **New York** (default) or SF Pro. All styles use Dynamic Type (`relativeTo:`).
@@ -154,7 +154,7 @@ Static: `bg` + centred app mark (72 pt), via Info.plist `UILaunchScreen`.
 Strings in `Greetings.swift`, localisable.
 
 ### 4.3 App-switcher privacy cover
-On `.inactive`/`.background`, instantly overlay `bg` + static aura + app mark + short line ("See you soon, {name}." / "Your pages are safe."), so diary content never appears in the app switcher. Fade out 0.2 s on `.active`. On by default; toggle in Profile → Privacy.
+On `.inactive`/`.background`, instantly overlay `bg` + static aura + app mark + short line, so diary content never appears in the app switcher. The line is picked fresh each time the app leaves the foreground from a pool of eight ("See you soon, {name}.", "Your pages are safe, {name}.", "Back whenever you're ready, {name}.", "Your days are kept, {name}.", "Locked away safely, {name}.", "Until next time, {name}.", "The page will wait for you, {name}.", "Only you can read this, {name}."; each also without the name) and never repeats the last one (Batch I). Fade out 0.2 s on `.active`. On by default; toggle in Profile → Privacy.
 
 ---
 
@@ -220,10 +220,13 @@ Over `AuraBackground`:
 - **Header:** month `title1` + year `title2` `inkSecondary`; tapping opens Jump sheet (chevron glyph). Right [G] group: Filter (category menu) and **Today** pill (morphs in only when off today/current month). Small sync indicator dot (only shown while syncing or on error).
 - **Weekday row** `caption` `inkTertiary`, locale first weekday (Profile override).
 - **Month grid [G panel, r22]:** infinite horizontal paging (`.scrollTargetBehavior(.paging)`, `scrollPosition(id:)`, lazily extended ±240 months, extend near edges). 6×7, gap 6.
-  - Cell states: default · out-of-month (`inkTertiary`, tap jumps month) · today (ember bold + dot) · selected (ember rounded square, white number, spring) · **entry with photo → latest photo thumbnail fills the cell**, `micro` white number top-left, "+2" badge if more · entry without photo → up to 3 category dots · open tasks → 1.5 pt `inkSecondary` ring · all tasks done → `done` ring + micro check · filter active → non-matching markers at 15%.
+  - Cell states (one zone per meaning, so marks never overlap — Batch I): default · out-of-month (`inkTertiary`, tap jumps month) · today (ember bold number + 1.5 pt ember outline; on a photo tile, an ember pill behind the number) · selected (ember rounded square, white number, spring; on a photo, a 3 pt ember frame) · **entry with photo → latest photo thumbnail fills the cell**, `micro` white number top-left, "+2" badge bottom-right if more · entry without photo → up to 3 category dots under the number · tasks → one small mark in the top-right corner, inside the cell: a hollow ring while any is open, a green check once all are done · filter active → non-matching markers at 15%.
+  - "What do the marks mean?" key: Profile → Help, and a long-press on the weekday row (VoiceOver action too).
   - Long-press day → New entry / New task for this day.
 - **Day panel:** "Saturday, 25 October" `title2` + [G] mini "+". Entries section (cards: 64 pt photo, title, 2-line preview, category chip, time) → detail via zoom. Tasks section (checkbox toggles in place; completed shown checked, struck, 50% — they stay). Empty: "Nothing here yet." + Write · Add task.
-  - Scrolling the panel up collapses the grid to the selected week (swipeable week strip); scroll to top or tap title to expand. Fully interactive (tracks finger).
+  - Scrolling the panel up collapses the grid to the selected week (swipeable week strip); scroll to top or tap title to expand. Fully interactive (tracks finger). It always comes to rest fully open or fully collapsed: the release uses the system's projected (velocity-aware) target, and any scroll that stops in between (an interrupted deceleration, content changing height) settles to the nearer end. Only the grid's height, offset and fades read the drag progress (Batch I).
+  - The day panel runs down to the tab bar: only the round "+" floats over it, and the panel's last row can scroll fully clear of the button.
+  - After a full close with unsaved writing, a "Continue your draft" pill floats beside the "+": tap to reopen the draft's composer with it restored; swipe it away to discard the draft (Batch I).
 
 ### 6.3 Jump sheet
 `.medium` glass sheet: horizontal snapping year strip (1900 → current+10, selected in `display`), 4×3 month capsules (dot if month has entries), [G] "Go to today". Jump = quick fade+scale.
@@ -234,18 +237,20 @@ Over `AuraBackground`:
 - Title (`title2`, "Title"); rich body (writing font; "What happened today?" / past date: "What do you remember about this day?").
 - Keyboard toolbar [G]: Aa (format popover) · Photo (`PhotosPicker`, up to 10, no permission) · Camera (asks at use) · Category · Mic (§8) · ✦ (§9, only if available).
 - Photo strip (reorder by long-press, × remove). Category chips with inline "+".
-- Draft autosave every 2 s locally; "Continue your draft?" on reopen. Cancel with changes → "Discard this entry?".
+- Draft autosave every 2 s locally; "Continue your draft?" on reopen. Cancel with changes → "Discard this entry?" / Keep writing for a new entry, "Discard changes?" / Keep editing for an existing one; the sheet closes only after the dialog has gone (Batch I).
+- The sheet reads as its own layer: the screen behind dims slightly (more toward the sheet), a stronger material with a fine highlight along the top edge, in light and dark.
+- Checklists: tapping a box ticks or unticks it directly; Return continues the list; Return on an empty item ends it. Same in the web editor.
 
 ### 6.5 Entry detail
-Zoom-in from the card. Photo carousel (4:3, paging, pinch to full-screen) · date line `caption` · category chip · title · rendered body (line height 1.45). Toolbar: Edit (composer `.large`) · Share (system share sheet) · ••• Change date / Duplicate / Delete (to Recently Deleted, §5.2). Footer strip "Same day in other years" when applicable.
+Zoom-in from the card. Photo carousel (4:3, paging, pinch to full-screen) · date line `caption` · category chip · title · rendered body (line height 1.45). Toolbar: Edit (composer `.large`) · Share · ••• Change date / Duplicate / Delete (to Recently Deleted, §5.2). Share offers: **Share as text** (a plain `String` with a subject and preview, which every app accepts — Messages, WhatsApp, Notes, Mail), **Share text and photos**, and **Share as image** — one card, or for entries too long for a card a choice of "Single card" / "All pages (N)": numbered 1/N story-sized images (1080 × 1920) with the text flowing across them so nothing is cut (Batch I). Footer strip **"On this day"** with the subtitle "You wrote on 29 October in 2025" when applicable.
 
 ### 6.6 Journal tab
-Large title "Journal"; category chips [G]; view toggle [G] *Timeline* / *Photos*. Timeline: sticky month headers, cards with cover photo (16:9, title over gradient) or text cards. Photos: 3-column masonry of all photos. "Write for a past day" button opens composer with date picker. Empty: "Your journal is empty. Tap + to write your first page." Search is not shown until built.
+Compact title "Journal" with the *Timeline* / *Photos* toggle beside it; category chips [G]; "Past day" in the top bar. Timeline: month headers in a lighter style than the cards (small-caps month, count, hairline, chevron — no card), cards with cover photo (16:9, title over gradient) or text cards. Months fold: this month and last month open by default, older months closed; tap to open or close; the choice is remembered (Batch I). Photos: 3-column masonry of all photos. "Write for a past day" button opens composer with date picker. Empty: "Your journal is empty. Tap + to write your first page." Search is not shown until built.
 
 ### 6.7 To-do tab
-Large title, category chips. **Active**: overdue first (ember chip) → dated ascending → undated by drag order. **Completed** (collapsible "Completed · 12", state persisted) by `completedAt` desc. Row: 26 pt circular checkbox in category colour · title · 1-line notes · date/time chip.
+Compact title, category chips, and a date button in the top bar that shows one date's tasks only. **Active** in collapsible groups (state persisted): Overdue (ember) · Today · Tomorrow · This week (the next five days) · Later · No date; within a group by date, then time, then drag order. Tasks can be dragged to reorder among tasks of the same date (a drop onto another date springs back). Tapping a task opens it for editing; long-press keeps the menu. Scrolling or tapping outside the quick-add bar puts the keyboard away (Batch I). **Completed** (collapsible "Completed · 12", state persisted) by `completedAt` desc. Row: 26 pt circular checkbox in category colour · title · 1-line notes · date/time chip.
 **Complete flow:** tap → fill + check + strike + haptic → stays **1.2 s** → moves to Completed; undo toast [G] 4 s; tapping again during 1.2 s cancels. Untick in Completed → back instantly.
-Swipes: leading Complete/Uncomplete; trailing Delete (to Recently Deleted, §5.2) · Edit · Date (Today / Tomorrow / Next week / Pick / Remove). Quick-add bar [G] above tab bar ("Add a task…", recognises "today"/"tomorrow"). Empty Active → "All clear." with `checkmark.seal`.
+Swipes: leading Complete/Uncomplete; trailing Delete (to Recently Deleted, §5.2) · Edit · Date (Today / Tomorrow / Next week / Pick / Remove). Quick-add bar [G] above tab bar ("Add a task…") that understands natural dates and times at the start or end of the line — today, tonight, tomorrow, day after tomorrow, in/after N days|weeks|months, next week/month, (this) weekend, [on|this|next] Monday, on 5 Nov / 5th of November / November 5 / 5/11 (day first; month first in the US), times like 6pm, 6:30 pm, 18:30, at 7, noon, morning/afternoon/evening — with a live chip ("Tomorrow · 18:00") above the bar before saving (Batch I). "Today's papers" stays as typed. A bare "at 7" is the next 7 o'clock that hasn't passed; a time alone is today, or tomorrow once passed. Empty Active → "All clear." with `checkmark.seal`.
 
 ### 6.8 Task composer (`.medium` sheet)
 Title (required) · Notes · Date toggle → graphical DatePicker · Time toggle (if date) · Category chips · Save. Existing task: Delete at bottom (to Recently Deleted, §5.2).
@@ -263,7 +268,7 @@ Inset-grouped glass sections:
 - **Dictation & Intelligence** (§8–9) with availability explanation.
 - **Privacy & Security:** Hide content in app switcher · Face ID lock (later; hidden until built).
 - **Your data:** **Recently Deleted · N** (§5.2) · Export as JSON + photos zip (decrypted, local; "Include Recently Deleted" toggle, off by default) · Export PDF (later; hidden) · Erase data on this iPhone (also empties Recently Deleted).
-- **Help:** "Show the tour again" · Support & FAQ · Contact support (mailto).
+- **Help:** "Show the tour again" · "What do the marks mean?" · Support & FAQ · Contact support (mailto).
 - **About:** Website · Privacy Policy · Terms · Open Source (GitHub) · Acknowledgements · Rate Folio (`requestReview` only here) · Version · "Made by Soul Archive Ltd".
 
 ### 6.10 Categories manager
@@ -309,7 +314,7 @@ Before each system prompt: a one-line glass explainer with Continue / Not now. D
 ---
 
 ## 8. Dictation — on-device, free
-Speech framework **`SpeechAnalyzer` + `DictationTranscriber`** (verify with Context7). `AVAudioEngine` tap → convert to `SpeechAnalyzer.bestAvailableAudioFormat` → `AsyncStream<AnalyzerInput>`. Locale from Profile (default device; check `supportedLocales`; download model via `AssetInventory` with progress row). Unsupported locale → hide Mic, mention the keyboard mic. Volatile results dimmed, finals committed. On-device only; audio never written to disk. Auto-stop after 2 min silence / 30 min total. One session at a time; ignore repeat taps within 600 ms.
+Speech framework **`SpeechAnalyzer` + `DictationTranscriber`** (verify with Context7). `AVAudioEngine` tap → convert to `SpeechAnalyzer.bestAvailableAudioFormat` → `AsyncStream<AnalyzerInput>`. Locale from Profile (default: the device language in the device's region, e.g. en-IN, en-GB, en-US — Batch I; check `supportedLocales`; download model via `AssetInventory` with progress row). Transcriber options: punctuation, volatile results, frequent finalisation. Contextual hints via `AnalysisContext.contextualStrings[.general]`: the person's name, category names and the entry's title. The capsule shows the elapsed time. After Done, when Apple's on-device model is available and at least three words were dictated, a small offer "Tidy punctuation and capitals?" — the result is applied only if every word is unchanged. Unsupported locale → hide Mic, mention the keyboard mic. Volatile results dimmed, finals committed. On-device only; audio never written to disk. Auto-stop after 2 min silence / 30 min total. One session at a time; ignore repeat taps within 600 ms.
 
 ## 9. Intelligence — Apple's on-device model, free
 **Foundation Models** (`SystemLanguageModel.default`, `LanguageModelSession`, `@Generable`) — verify with Context7. ✦ shown only when `availability == .available`. **On-device model only — never Private Cloud Compute or cloud providers.** Features: Suggest a title (3 options), Polish grammar (diff preview), Find tasks (tick to add). Instructions: never add facts or change meaning; reply in the entry's language. One request at a time, cancel previous, ≥ 1.5 s apart, input ≤ ~6,000 chars, friendly handling of context/guardrail/availability errors.

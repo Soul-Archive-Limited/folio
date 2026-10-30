@@ -220,6 +220,20 @@ final class ComposerModel {
         body.replaceSelection(&selection, with: styled)
     }
 
+    /// Swaps the most recent copy of `original` in the text for `replacement` (the dictation
+    /// tidy-up), keeping that run's style. Returns false when it's no longer there.
+    @discardableResult
+    func replaceLast(_ original: String, with replacement: String) -> Bool {
+        let characters = String(body.characters)
+        guard let range = characters.range(of: original, options: .backwards) else { return false }
+        let start = body.characters.index(body.startIndex, offsetBy: characters.distance(from: characters.startIndex, to: range.lowerBound))
+        let end = body.characters.index(start, offsetBy: original.count)
+        var styled = AttributedString(replacement)
+        styled.mergeAttributes(body[start..<end].runs.first?.attributes ?? AttributeContainer())
+        body.replaceSubrange(start..<end, with: styled)
+        return true
+    }
+
     // MARK: Save
 
     /// Saves to the store (local-first) and clears the draft.

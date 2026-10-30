@@ -13,10 +13,12 @@ final class DictationController {
     var showsDenied = false
     /// Whether dictation exists for the chosen language; the mic is hidden when it doesn't.
     private(set) var isSupported = true
+    /// Words to expect (name, categories, title), set by the composer before starting.
+    var hints: () -> [String] = { [] }
 
     static var preferredLocale: Locale {
         let identifier = UserDefaults.standard.string(forKey: PreferenceKeys.dictationLocale) ?? ""
-        return identifier.isEmpty ? .current : Locale(identifier: identifier)
+        return identifier.isEmpty ? DictationRules.regionalLocale(for: .current) : Locale(identifier: identifier)
     }
 
     func checkSupport() async {
@@ -34,7 +36,7 @@ final class DictationController {
             return
         }
         switch DictationAccess.current {
-        case .granted: Task { await session.start(locale: Self.preferredLocale) }
+        case .granted: Task { await session.start(locale: Self.preferredLocale, hints: hints()) }
         case .needsPrompt: showsExplainer = true
         case .denied: showsDenied = true
         }
@@ -45,7 +47,7 @@ final class DictationController {
         showsExplainer = false
         Task {
             if await DictationAccess.request() {
-                await session.start(locale: Self.preferredLocale)
+                await session.start(locale: Self.preferredLocale, hints: hints())
             } else {
                 showsDenied = true
             }

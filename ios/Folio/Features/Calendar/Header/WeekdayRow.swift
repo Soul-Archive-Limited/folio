@@ -4,6 +4,7 @@ import SwiftUI
 struct WeekdayRow: View {
     let firstWeekday: Int
     let layout: CalendarLayout
+    @State private var showsKey = false
 
     var body: some View {
         HStack(spacing: CalendarLayout.gap) {
@@ -18,6 +19,14 @@ struct WeekdayRow: View {
         }
         .padding(.horizontal, CalendarLayout.panelPadding)
         .frame(maxWidth: .infinity)
+        // Long-press the weekdays for the key to the marks (Batch I).
+        .contentShape(.rect)
+        .onLongPressGesture(minimumDuration: 0.4) { showsKey = true }
+        .accessibilityElement()
+        .accessibilityLabel("Weekdays")
+        .accessibilityAction(named: "What do the marks mean?") { showsKey = true }
+        .sheet(isPresented: $showsKey) { MarkersKeyView() }
+        .folioHaptic(.selection, trigger: showsKey)
     }
 
     static var symbols: [String] {

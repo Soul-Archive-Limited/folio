@@ -9,7 +9,7 @@ struct ProfileHeaderCard: View {
 
     var body: some View {
         let name = store.settings().displayName
-        let stats = store.profileStats()
+        let stats = store.profileStatsValue
         GlassCard {
             HStack(spacing: Spacing.m) {
                 Monogram(name: name)
@@ -48,6 +48,7 @@ struct ProfileHeaderCard: View {
         } message: {
             Text("Used to greet you.")
         }
+        .task(id: store.revision) { await store.refreshProfileStats() }
     }
 
     private func summary(_ stats: ProfileStats) -> String {

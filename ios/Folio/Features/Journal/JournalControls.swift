@@ -1,17 +1,18 @@
 import SwiftUI
 
-/// Category chips, the Timeline / Photos toggle and "Write for a past day".
+/// The compact title with the Timeline / Photos toggle beside it, then the category chips.
+/// "Write for a past day" lives in the top bar (Batch I: one row less, one pill less).
 struct JournalControls: View {
     @Bindable var model: JournalModel
-    let onWritePast: () -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Namespace private var toggle
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.s) {
-            CategoryFilterBar(selection: $model.filter)
-            HStack {
+            HStack(alignment: .center) {
+                CompactTitleText(title: "Journal")
+                Spacer()
                 GlassEffectContainer(spacing: Spacing.xs) {
                     HStack(spacing: 4) {
                         ForEach(JournalModel.Mode.allCases) { mode in
@@ -20,8 +21,9 @@ struct JournalControls: View {
                             } label: {
                                 Label(mode == .timeline ? "Timeline" : "Photos",
                                       systemImage: mode == .timeline ? "list.bullet.below.rectangle" : "square.grid.3x3")
+                                    .labelStyle(.iconOnly)
                                     .padding(.horizontal, Spacing.s)
-                                    .frame(minHeight: Spacing.minHitTarget)
+                                    .frame(minWidth: Spacing.minHitTarget, minHeight: 36)
                                     .contentShape(.capsule)
                             }
                             .font(.subheadline.weight(.semibold))
@@ -37,20 +39,9 @@ struct JournalControls: View {
                     .padding(2)
                     .glassEffect(.regular, in: .capsule)
                 }
-                Spacer()
-                // A labelled pill, not an icon: the calendar glyph alone didn't say what it does
-                // (owner's iPhone test, Batch E).
-                Button(action: onWritePast) {
-                    Label("Past day", systemImage: "calendar.badge.plus")
-                        .font(.subheadline.weight(.semibold))
-                        .frame(minHeight: Spacing.minHitTarget - 8)
-                }
-                .buttonStyle(.glass)
-                .buttonBorderShape(.capsule)
-                .accessibilityLabel("Write for a past day")
-                .accessibilityIdentifier("journal.pastDay")
             }
             .padding(.horizontal, Spacing.sideMargin)
+            CategoryFilterBar(selection: $model.filter)
         }
     }
 }

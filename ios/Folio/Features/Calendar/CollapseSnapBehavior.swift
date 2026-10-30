@@ -11,6 +11,12 @@ nonisolated struct CollapseSnapBehavior: ScrollTargetBehavior {
     func updateTarget(_ target: inout ScrollTarget, context: TargetContext) {
         let progress = target.rect.origin.y + topInset
         guard distance > 0, progress > 0, progress < distance else { return }
-        target.rect.origin.y = (progress < distance / 2 ? 0 : distance) - topInset
+        target.rect.origin.y = Self.restingProgress(progress, distance: distance) - topInset
+    }
+
+    /// Where a scroll that ends at `progress` (0…distance from the top) should rest.
+    static func restingProgress(_ progress: Double, distance: Double) -> Double {
+        guard distance > 0, progress > 0, progress < distance else { return progress }
+        return progress < distance / 2 ? 0 : distance
     }
 }

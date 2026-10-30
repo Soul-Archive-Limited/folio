@@ -4,6 +4,7 @@ import SwiftUI
 /// switcher (SPEC §4.3).
 struct PrivacyCoverView: View {
     let name: String
+    @AppStorage(PrivacyCoverLines.key) private var lineIndex = 0
 
     var body: some View {
         ZStack {
@@ -20,10 +21,7 @@ struct PrivacyCoverView: View {
         .accessibilityElement(children: .combine)
     }
 
-    private var line: String {
-        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? String(localized: "Your pages are safe.") : String(localized: "See you soon, \(trimmed).")
-    }
+    private var line: String { PrivacyCoverLines.line(lineIndex, name: name) }
 }
 
 #Preview("Named") {

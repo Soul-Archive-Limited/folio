@@ -14,6 +14,7 @@ struct TodoScreen: View {
     @State private var isScrolling = false
     @State private var isTyping = false
     @State private var quickAddHeight: Double = 48
+    @State private var rejectedMoves = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -22,26 +23,39 @@ struct TodoScreen: View {
         let colors = Dictionary(uniqueKeysWithValues: store.categories().map { ($0.id, $0.color.color) })
         NavigationStack {
             List {
-                Section {
-                    if sections.active.isEmpty {
+                Section {} header: {
+                    // A header, not a row: rows sit on the section's panel, which showed as a
+                    // band behind the glass chips.
+                    VStack(alignment: .leading, spacing: Spacing.s) {
+                        CompactTitleText(title: "To-do")
+                        CategoryFilterBar(selection: $model.filter)
+                            .padding(.horizontal, -Spacing.sideMargin - Spacing.m)
+                    }
+                    .textCase(nil)
+                    .padding(.bottom, Spacing.xxs)
+                }
+                if sections.active.isEmpty {
+                    Section {
                         EmptyStateView(systemImage: "checkmark.seal", message: "All clear.")
                             .frame(maxWidth: .infinity)
                             .listRowBackground(Color.clear)
                     }
-                    ForEach(sections.overdue + sections.dated) { task in
-                        row(task, colors: colors, today: today)
+                }
+                ForEach(sections.visibleGroups) { group in
+                    let tasks = sections.groups[group] ?? []
+                    Section {
+                        if !model.foldedGroups.contains(group) {
+                            ForEach(tasks) { task in
+                                row(task, colors: colors, today: today)
+                            }
+                            .onMove { indices, offset in move(tasks, indices: indices, offset: offset) }
+                        }
+                    } header: {
+                        TodoGroupHeader(title: group.title, count: tasks.count, isOverdue: group == .overdue,
+                                        isExpanded: !model.foldedGroups.contains(group)) {
+                            withAnimation(FolioMotion.standard(reduceMotion: reduceMotion)) { model.toggleFold(group) }
+                        }
                     }
-                    ForEach(sections.undated) { task in
-                        row(task, colors: colors, today: today)
-                    }
-                    .onMove { indices, offset in move(sections.undated, indices: indices, offset: offset) }
-                } header: {
-                    // A header, not a row: rows sit on the section's panel, which showed as a
-                    // band behind the glass chips.
-                    CategoryFilterBar(selection: $model.filter)
-                        .textCase(nil)
-                        .padding(.horizontal, -Spacing.sideMargin - Spacing.m)
-                        .padding(.bottom, Spacing.s)
                 }
                 if !sections.completed.isEmpty {
                     Section {
@@ -69,13 +83,21 @@ struct TodoScreen: View {
             .contentMargins(.bottom, Spacing.m, for: .scrollContent)
             .safeAreaInset(edge: .bottom, spacing: 0) { bottomBar }
             .onScrollPhaseChange { _, phase in isScrolling = phase.isScrolling }
+            // Scrolling or tapping anywhere outside the quick-add bar puts the keyboard away (Batch I).
+            .scrollDismissesKeyboard(.immediately)
+            .simultaneousGesture(TapGesture().onEnded { KeyboardDismissal.dismiss() }, including: isTyping ? .all : .subviews)
             .background {
                 TabBarShapeReader(isTracking: isScrolling) { tabBar = $0 }
                     .accessibilityHidden(true)
             }
             .animation(FolioMotion.standard(), value: sections.active.map(\.id))
             .animation(FolioMotion.standard(), value: sections.completed.map(\.id))
-            .navigationTitle("To-do")
+            .compactTitle("To-do")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    TodoDateFilterButton(day: $model.dayFilter, today: today)
+                }
+            }
             // To-do's own toast slot lives in the root list's bottom bar, so the pushed screen
             // hosts its own.
             .navigationDestination(isPresented: $showsTrash) { RecentlyDeletedView().toastHost(toasts) }
@@ -87,6 +109,7 @@ struct TodoScreen: View {
         }
         #endif
         .sheet(item: $editing) { task in TaskComposerSheet(task: task, day: nil) }
+        .folioHaptic(.warning, trigger: rejectedMoves)
         .confirmationDialog("Move to", isPresented: isRescheduling, titleVisibility: .visible, presenting: rescheduling) { task in
             Button("Today") { store.reschedule(task, to: today, minutesFromMidnight: task.minutesFromMidnight) }
             Button("Tomorrow") { store.reschedule(task, to: today.adding(days: 1), minutesFromMidnight: task.minutesFromMidnight) }
@@ -107,8 +130,8 @@ struct TodoScreen: View {
             ToastSlot(center: toasts)
                 .padding(.horizontal, Spacing.sideMargin)
             TodoQuickAddBar(leadingInset: inline?.leading ?? Spacing.sideMargin,
-                            onFocusChange: { isTyping = $0 }) { title, day in
-                request?.send(.task(day, title: title))
+                            onFocusChange: { isTyping = $0 }) { parsed in
+                request?.send(.task(parsed.day, title: parsed.title, minutes: parsed.minutesFromMidnight))
             }
             .onGeometryChange(for: Double.self) { $0.size.height - barPadding } action: { quickAddHeight = $0 }
         }
@@ -152,6 +175,9 @@ struct TodoScreen: View {
     private func row(_ task: TaskItem, colors: [UUID: Color], today: DayKey) -> some View {
         TodoRow(task: task, isTicked: model.isTicked(task), tint: task.categoryID.flatMap { colors[$0] } ?? .ink,
                 today: today, calendar: store.calendar) { toggle(task) }
+            // A tap opens the task; a long press keeps the menu (Batch I).
+            .onTapGesture { editing = task }
+            .accessibilityAction(named: "Edit") { editing = task }
             .listRowBackground(Rectangle().fill(.bgElevated.opacity(0.55)))
             .swipeActions(edge: .leading, allowsFullSwipe: true) {
                 Button(task.isCompleted ? "Not done" : "Done", systemImage: task.isCompleted ? "arrow.uturn.backward" : "checkmark") {
@@ -186,9 +212,12 @@ struct TodoScreen: View {
         toasts.show(.movedToTrash { store.restoreFromTrash(task) })
     }
 
-    private func move(_ undated: [TaskItem], indices: IndexSet, offset: Int) {
-        var reordered = undated
-        reordered.move(fromOffsets: indices, toOffset: offset)
+    /// Drag to reorder among tasks on the same date; a drop onto another date springs back.
+    private func move(_ tasks: [TaskItem], indices: IndexSet, offset: Int) {
+        guard let reordered = TodoModel.reorder(tasks, from: indices, to: offset) else {
+            rejectedMoves += 1
+            return
+        }
         store.reorderTasks(reordered)
     }
 

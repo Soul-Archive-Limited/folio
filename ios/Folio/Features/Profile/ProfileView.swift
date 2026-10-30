@@ -11,6 +11,7 @@ struct ProfileView: View {
     @Environment(\.requestReview) private var requestReview
     @State private var showsCategories = false
     @State private var showsRecentlyDeleted = false
+    @State private var showsMarkersKey = false
     @State private var accountRoutes = AccountRoutes()
     #if DEBUG
     @State private var showsGallery = false
@@ -22,7 +23,9 @@ struct ProfileView: View {
                 // In a section header, not rows: an inset-grouped section draws its own
                 // panel behind rows, which showed as a band behind the glass cards.
                 Section {} header: {
-                    VStack(spacing: Spacing.m) {
+                    VStack(alignment: .leading, spacing: Spacing.m) {
+                        CompactTitleText(title: "Profile")
+                            .padding(.horizontal, Spacing.m)
                         ProfileHeaderCard()
                         ProfileArchiveTiles()
                     }
@@ -52,6 +55,9 @@ struct ProfileView: View {
                         tour?.replay()
                     } label: {
                         ProfileRowLabel(title: "Show the tour again", systemImage: "sparkles.rectangle.stack")
+                    }
+                    Button { showsMarkersKey = true } label: {
+                        ProfileRowLabel(title: "What do the marks mean?", systemImage: "circle.grid.3x3")
                     }
                     Link(destination: Self.url("support")) {
                         ProfileRowLabel(title: "Support & FAQ", systemImage: "questionmark.circle", external: true)
@@ -104,9 +110,10 @@ struct ProfileView: View {
             .scrollContentBackground(.hidden)
             .tint(.emberStrong)
             .background { AuraBackground() }
-            .navigationTitle("Profile")
+            .compactTitle("Profile")
             .navigationDestination(isPresented: $showsCategories) { CategoriesManagerView() }
             .navigationDestination(isPresented: $showsRecentlyDeleted) { RecentlyDeletedView() }
+            .sheet(isPresented: $showsMarkersKey) { MarkersKeyView() }
             .modifier(AccountPresentations(routes: accountRoutes))
             // Leave the toast room above the tab bar.
             .contentMargins(.bottom, Spacing.xxl, for: .scrollContent)

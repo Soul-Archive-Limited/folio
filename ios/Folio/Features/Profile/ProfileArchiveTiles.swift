@@ -7,7 +7,7 @@ struct ProfileArchiveTiles: View {
     @Environment(\.tabRouter) private var router
 
     var body: some View {
-        let stats = store.profileStats()
+        let stats = store.profileStatsValue
         VStack(alignment: .leading, spacing: Spacing.s) {
             Text("Your archive")
                 .folioFont(.caption)

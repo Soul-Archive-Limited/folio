@@ -72,7 +72,32 @@ enum RichTextEditing {
         }
     }
 
-    /// Ticks or unticks a checklist line (there's no tap target inside the editor).
+    /// The checklist line whose box a caret at `selection` sits on: a caret placed on the box
+    /// glyph or just after it, which is where a tap on the box puts it. Nil otherwise.
+    static func checkboxLine(in text: AttributedString, selection: AttributedTextSelection) -> Int? {
+        guard case .insertionPoint(let point) = selection.indices(in: text) else { return nil }
+        for (index, line) in RichTextBridge.lines(of: text).enumerated() where line.contains(point) || line.upperBound == point {
+            let plain = String(text[line].characters)
+            guard case .checklist = RichTextPrefix.parse(plain).kind else { return nil }
+            let offset = text.characters.distance(from: line.lowerBound, to: point)
+            return offset <= 1 ? index : nil
+        }
+        return nil
+    }
+
+    /// Ticks or unticks one checklist line and leaves the caret at its end, so the next tap on
+    /// the same box toggles it again.
+    static func toggleChecked(line lineIndex: Int, in text: inout AttributedString, selection: inout AttributedTextSelection,
+                              context: Font.Context, writingFont: WritingFont) {
+        var document = RichTextBridge.document(from: text, context: context, writingFont: writingFont)
+        guard document.blocks.indices.contains(lineIndex), case .checklist(let checked) = document.blocks[lineIndex].kind else { return }
+        document.blocks[lineIndex].kind = .checklist(checked: !checked)
+        text = RichTextBridge.attributedString(from: document, writingFont: writingFont)
+        let lines = RichTextBridge.lines(of: text)
+        if lines.indices.contains(lineIndex) { selection = AttributedTextSelection(insertionPoint: lines[lineIndex].upperBound) }
+    }
+
+    /// Ticks or unticks a checklist line from the Aa menu.
     static func toggleChecked(in text: inout AttributedString, selection: inout AttributedTextSelection,
                               context: Font.Context, writingFont: WritingFont) {
         let lineIndices = affectedLineIndices(in: text, selection: selection)

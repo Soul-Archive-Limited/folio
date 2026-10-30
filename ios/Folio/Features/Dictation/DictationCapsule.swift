@@ -62,7 +62,19 @@ struct DictationCapsule: View {
         default: "Listening…"
         }
         return VStack(alignment: .leading, spacing: 2) {
-            Text(status).folioFont(.caption).foregroundStyle(.inkSecondary)
+            HStack(spacing: Spacing.xs) {
+                Text(status).folioFont(.caption).foregroundStyle(.inkSecondary)
+                if let start = session.startDate {
+                    // Elapsed time (sessions stop at 30 minutes, or after 2 minutes of silence).
+                    TimelineView(.periodic(from: start, by: 1)) { context in
+                        Text(DictationRules.elapsedText(max(Int(context.date.timeIntervalSince(start)), 0)))
+                            .folioFont(.caption)
+                            .monospacedDigit()
+                            .foregroundStyle(.inkSecondary)
+                    }
+                    .accessibilityLabel("Elapsed time")
+                }
+            }
             let committed = Text(session.lastCommitted.isEmpty ? "" : session.lastCommitted + " ").foregroundStyle(.ink)
             let volatile = Text(session.volatileText).foregroundStyle(.inkTertiary)
             Text("\(committed)\(volatile)")

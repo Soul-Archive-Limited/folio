@@ -68,15 +68,23 @@ struct CalendarScreen: View {
                 .onScrollGeometryChange(for: Double.self) { geometry in
                     geometry.contentOffset.y + geometry.contentInsets.top
                 } action: { _, offset in
-                    model.collapseProgress = min(max(offset / layout.collapseDistance, 0), 1)
+                    let progress = min(max(offset / layout.collapseDistance, 0), 1)
+                    // Scrolling the panel past the collapse must not wake the grid each frame.
+                    if progress != model.collapseProgress { model.collapseProgress = progress }
+                }
+                // The target behaviour covers flicks and releases. A scroll that stops without
+                // one (a tap that catches a deceleration, the panel's content changing height
+                // under it) used to leave the month half-collapsed: settle it here.
+                .onScrollPhaseChange { _, phase in
+                    guard phase == .idle else { return }
+                    settleCollapse(layout: layout)
                 }
                 .onScrollGeometryChange(for: Double.self) { $0.containerSize.height } action: { _, height in
                     viewportHeight = height
                 }
-                // The panel stops above the "+" and the tab bar (tab bar + button + 16 pt), so
-                // the last row scrolls fully clear and the "+" never covers a row.
-                .scrollEdgeFade()
-                .padding(.bottom, FloatingButtonMetrics.clearance)
+                // The panel runs down to the tab bar — nothing full-width sits behind the "+"
+                // (owner's test, Batch I) — and its last row can scroll fully clear of it.
+                .contentMargins(.bottom, FloatingButtonMetrics.clearance + Spacing.s, for: .scrollContent)
                 CalendarGridArea(model: model, layout: layout, firstWeekday: firstWeekday)
             }
         }
@@ -95,8 +103,17 @@ struct CalendarScreen: View {
         store.settings().firstWeekday ?? store.calendar.firstWeekday
     }
 
+    private func settleCollapse(layout: CalendarLayout) {
+        let progress = model.collapseProgress * layout.collapseDistance
+        let rest = CollapseSnapBehavior.restingProgress(progress, distance: layout.collapseDistance)
+        guard rest != progress else { return }
+        withAnimation(FolioMotion.interactive(reduceMotion: reduceMotion)) {
+            scrollPosition.scrollTo(y: rest)
+        }
+    }
+
     private func titleTapped() {
-        if model.collapseProgress > 0 { expand() } else { model.showsJumpSheet = true }
+        if model.collapseProgress > 0.001 { expand() } else { model.showsJumpSheet = true }
     }
 
     /// Scroll to top re-expands the grid (SPEC §6.2).

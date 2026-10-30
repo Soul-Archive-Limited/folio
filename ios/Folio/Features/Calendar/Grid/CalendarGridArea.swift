@@ -29,8 +29,7 @@ struct CalendarGridArea: View {
                     .opacity(jumpOpacity)
             }
         }
-        .frame(width: layout.panelWidth, height: layout.gridHeight(progress: model.collapseProgress),
-               alignment: .top)
+        .modifier(CollapsingHeight(model: model, layout: layout))
         .clipShape(.rect(cornerRadius: Radius.card))
         .contentShape(.rect(cornerRadius: Radius.card))
         .folioGlass(in: .rect(cornerRadius: Radius.card))
@@ -50,5 +49,16 @@ struct CalendarGridArea: View {
             jumpOpacity = 1
             jumpScale = 1
         }
+    }
+}
+
+/// The panel's height follows the collapse 1:1; only this modifier reads the progress, so the
+/// grid area's body doesn't re-run on every drag frame.
+private struct CollapsingHeight: ViewModifier {
+    let model: CalendarModel
+    let layout: CalendarLayout
+
+    func body(content: Content) -> some View {
+        content.frame(width: layout.panelWidth, height: layout.gridHeight(progress: model.collapseProgress), alignment: .top)
     }
 }

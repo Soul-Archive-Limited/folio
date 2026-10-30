@@ -17,12 +17,16 @@ struct ComposerSheet: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var detent: PresentationDetent = .medium
     @State private var confirmsDiscard = false
+    /// Set by the dialog's Discard button; the sheet is dismissed once the dialog is gone.
+    @State private var discardsAfterDialog = false
     @State private var errorMessage: String?
     @State private var saveCount = 0
     @FocusState private var focus: Field?
     @State private var dictation = DictationController()
     @State private var assistant = WritingAssistant()
     @State private var writingTool: WritingTool?
+    /// What was just dictated, while the "Tidy punctuation" offer shows (Batch I).
+    @State private var tidyOffer: String?
     @Environment(TourModel.self) private var tour: TourModel?
 
     enum Field { case title, body }
@@ -64,14 +68,25 @@ struct ComposerSheet: View {
         .presentationDetents([.medium, .large], selection: $detent)
         .presentationBackgroundInteraction(.enabled(upThrough: .medium))
         .presentationDragIndicator(.visible)
-        // Thicker than the default sheet glass so the page under the half sheet doesn't
-        // show through the writing (owner-facing legibility; Batch B).
-        .presentationBackground(.thickMaterial)
+        // Clearly a layer: a solid-leaning material with a top highlight, and the screen behind
+        // dims (MainTabView) — before Batch I the sheet and the calendar looked the same.
+        .presentationBackground { SheetSurface() }
         .interactiveDismissDisabled(model.hasChanges)
         .privacyCovered()
-        .confirmationDialog("Discard this entry?", isPresented: $confirmsDiscard, titleVisibility: .visible) {
-            Button("Discard", role: .destructive, action: discard)
-            Button("Keep writing", role: .cancel) {}
+        // Editing a saved entry only throws away the changes; a new entry goes entirely.
+        .confirmationDialog(model.isNew ? "Discard this entry?" : "Discard changes?",
+                            isPresented: $confirmsDiscard, titleVisibility: .visible) {
+            Button(model.isNew ? "Discard" : "Discard changes", role: .destructive) { discardsAfterDialog = true }
+            Button(model.isNew ? "Keep writing" : "Keep editing", role: .cancel) {}
+        }
+        // Dismissing the sheet from inside the dialog's action ran two dismissals at once; UIKit
+        // then left the screen under a large sheet scaled away (blank) until the next touch
+        // (owner's test, Batch I). Dismiss after the dialog has finished closing.
+        .onChange(of: confirmsDiscard) { _, showing in
+            if !showing, discardsAfterDialog {
+                discardsAfterDialog = false
+                discard()
+            }
         }
         .alert("Continue your draft?", isPresented: hasPendingDraft) {
             Button("Continue", action: model.restoreDraft)
@@ -90,6 +105,12 @@ struct ComposerSheet: View {
             if let newDay, newDay != model.day { model.day = newDay }
         }
         .onAppear(perform: appear)
+        .onChange(of: dictation.isVisible) { _, visible in
+            let heard = dictation.session.sessionText
+            // Offer the on-device tidy-up only when Apple's model is here and there's a sentence's worth.
+            if !visible, assistant.availability == .available, heard.split(separator: " ").count >= 3 { tidyOffer = heard }
+            if visible { tidyOffer = nil }
+        }
         .task { await dictation.checkSupport() }
         .onChange(of: focus) { _, field in if field == .body { model.hasPlacedCursor = true } }
         .dictationPermissions(dictation)
@@ -105,6 +126,10 @@ struct ComposerSheet: View {
 
     /// The tool row, or the dictation capsule while listening (SPEC §6.11).
     @ViewBuilder private var bottomBar: some View {
+        if let tidyOffer, !dictation.isVisible {
+            DictationTidyOffer(text: tidyOffer, model: model, assistant: assistant) { self.tidyOffer = nil }
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+        }
         if dictation.isVisible {
             DictationCapsule(session: dictation.session,
                              onDone: { Task { await dictation.session.finish() } },
@@ -158,6 +183,10 @@ struct ComposerSheet: View {
         if startsLarge { detent = .large }
         model.startAutosave(context: fontContext)
         dictation.session.onCommit = { [model] phrase in model.insertDictation(phrase) }
+        dictation.hints = { [store, model] in
+            DictationRules.contextualStrings(name: store.settings().displayName, categories: store.categories().map(\.name),
+                                             title: model.title)
+        }
         if startsDictation { dictation.micTapped() }
         #if DEBUG
         switch DebugLaunchOptions.string("FolioOpenTool") {

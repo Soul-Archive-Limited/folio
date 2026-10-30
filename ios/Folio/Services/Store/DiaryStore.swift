@@ -27,6 +27,9 @@ final class DiaryStore {
     /// True while sync applies remote changes, which aren't local edits.
     @ObservationIgnored var isApplyingRemote = false
 
+    @ObservationIgnored var profileStatsCache: (revision: Int, stats: ProfileStats)?
+    /// The Profile numbers on screen; `refreshProfileStats()` keeps them current.
+    var profileStatsValue = ProfileStats()
     @ObservationIgnored private var markerCache: [MarkerCacheKey: [DayKey: DayMarker]] = [:]
     @ObservationIgnored private var markerCacheRevision = 0
     @ObservationIgnored private let logger = Logger(subsystem: "com.devilsense.folio", category: "store")
@@ -93,6 +96,13 @@ final class DiaryStore {
         return fetch(FetchDescriptor<EntryPhoto>(predicate: #Predicate { !$0.isTombstone }))
             .filter { $0.entry?.isTombstone == false && $0.entry?.trashedAt == nil }
             .sorted { ($0.entry?.dayKey ?? "", $1.sortIndex) > ($1.entry?.dayKey ?? "", $0.sortIndex) }
+    }
+
+    /// Any live photo, cheaply (the marks key's sample tile).
+    var latestPhotoID: UUID? {
+        var descriptor = FetchDescriptor<EntryPhoto>(predicate: #Predicate { !$0.isTombstone }, sortBy: [SortDescriptor(\.createdAt, order: .reverse)])
+        descriptor.fetchLimit = 1
+        return fetch(descriptor).first?.id
     }
 
     func categories() -> [Category] {
@@ -192,7 +202,10 @@ final class DiaryStore {
         return CategoryUsage(entries: entries, tasks: tasks)
     }
 
+    /// Synced settings. Touches `revision` like every other read, so views that show or apply
+    /// a setting (theme, writing font, first weekday) redraw the moment it changes.
     func settings() -> UserSettings {
+        _ = revision
         let id = UserSettings.singletonID
         var descriptor = FetchDescriptor<UserSettings>(predicate: #Predicate { $0.id == id })
         descriptor.fetchLimit = 1

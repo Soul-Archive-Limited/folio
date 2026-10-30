@@ -11,8 +11,16 @@ final class CalendarModel {
     var visibleWeekID: DayKey?
     /// Category ids; empty means no filter.
     var filter: Set<UUID> = []
-    /// 0 = full month grid, 1 = collapsed to the selected week. Tracks the finger.
-    var collapseProgress: Double = 0
+    /// 0 = full month grid, 1 = collapsed to the selected week. Tracks the finger. Only the
+    /// grid's size, offset and fades read it; everything else reads `isCollapsed`, which
+    /// changes once per collapse, so a drag frame doesn't re-run the header (Batch I profile).
+    var collapseProgress: Double = 0 {
+        didSet {
+            let collapsed = collapseProgress >= 0.999
+            if collapsed != isCollapsed { isCollapsed = collapsed }
+        }
+    }
+    private(set) var isCollapsed = false
     var showsJumpSheet = false
     /// The Calendar tab's navigation stack (entry detail).
     var path: [UUID] = []
@@ -39,7 +47,6 @@ final class CalendarModel {
         visibleMonthID.map { MonthKey(year: 0, month: $0 + 1) } ?? selectedDay.monthKey
     }
 
-    var isCollapsed: Bool { collapseProgress >= 0.999 }
     var isFiltering: Bool { !filter.isEmpty }
 
     /// Selects a day; days outside the visible month page to their month.

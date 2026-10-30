@@ -18,7 +18,7 @@ private struct EntryActionsModifier: ViewModifier {
     @Environment(ToastCenter.self) private var toasts
     @Environment(\.newItemRequest) private var request
     @State private var showsDateSheet = false
-    @State private var sharesTextAndPhotos = false
+    @State private var shareKind: EntryShareKind?
 
     func body(content: Content) -> some View {
         content
@@ -26,7 +26,7 @@ private struct EntryActionsModifier: ViewModifier {
                 Button("Edit", systemImage: "square.and.pencil", action: edit)
                 Button("Change date", systemImage: "calendar") { showsDateSheet = true }
                 Button("Duplicate", systemImage: "plus.square.on.square", action: duplicate)
-                Menu("Share", systemImage: "square.and.arrow.up") { EntryShareMenu(entry: entry) { sharesTextAndPhotos = true } }
+                Menu("Share", systemImage: "square.and.arrow.up") { EntryShareMenu(entry: entry) { shareKind = $0 } }
                 Divider()
                 Button("Delete", systemImage: "trash", role: .destructive, action: delete)
             }
@@ -34,7 +34,7 @@ private struct EntryActionsModifier: ViewModifier {
                                       leading: CardSwipeAction(title: "Edit", systemImage: "square.and.pencil", tint: .inkSecondary, perform: edit),
                                       trailing: CardSwipeAction(title: "Delete", systemImage: "trash", tint: .danger, perform: delete)))
             .sheet(isPresented: $showsDateSheet) { ChangeDateSheet(entry: entry) }
-            .textAndPhotosShare(isPresented: $sharesTextAndPhotos, entry: entry)
+            .entryShare($shareKind, entry: entry)
     }
 
     private func edit() { request?.send(.editEntry(entry.id)) }

@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Day number, today's dot and up to three category dots, for days without a photo tile.
+/// Day number and up to three category dots under it, for days without a photo tile.
+/// Today is the ember number (and the cell's outline, `DayCell`); no dot, so dots only ever mean entries.
 struct DayNumberStack: View {
     let state: DayCellState
     let categoryColor: (UUID?) -> Color
@@ -19,8 +20,6 @@ struct DayNumberStack: View {
                             .fill(state.isSelected ? AnyShapeStyle(.white) : AnyShapeStyle(categoryColor(categoryID)))
                             .frame(width: 5, height: 5)
                     }
-                } else if state.isToday && !state.isSelected {
-                    Circle().fill(.ember).frame(width: 5, height: 5)
                 }
             }
             .frame(height: 5)
