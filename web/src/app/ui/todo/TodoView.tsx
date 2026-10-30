@@ -38,7 +38,7 @@ export default function TodoView() {
     timers.current.set(id, setTimeout(() => {
       timers.current.delete(id);
       setTicking((s) => { const n = new Set(s); n.delete(id); return n; });
-      store.put('task', { isCompleted: true, completedAt: Date.now() }, id);
+      store.setTaskDone(id, true);
       toast('Done', { label: 'Undo', run: () => store.put('task', { isCompleted: false, completedAt: undefined }, id) });
     }, 1200));
   }

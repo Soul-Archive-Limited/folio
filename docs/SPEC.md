@@ -265,7 +265,10 @@ Compact title, category chips, and a date button in the top bar that shows one d
 Swipes: leading Complete/Uncomplete; trailing Delete (to Recently Deleted, §5.2) · Edit · Date (Today / Tomorrow / Next week / Pick / Remove). Quick-add bar [G] above tab bar ("Add a task…") that understands natural dates and times at the start or end of the line — today, tonight, tomorrow, day after tomorrow, in/after N days|weeks|months, next week/month, (this) weekend, [on|this|next] Monday, on 5 Nov / 5th of November / November 5 / 5/11 (day first; month first in the US), times like 6pm, 6:30 pm, 18:30, at 7, noon, morning/afternoon/evening — with a live chip ("Tomorrow · 18:00") above the bar before saving (Batch I). "Today's papers" stays as typed. A bare "at 7" is the next 7 o'clock that hasn't passed; a time alone is today, or tomorrow once passed. Empty Active → "All clear." with `checkmark.seal`.
 
 ### 6.8 Task composer (`.medium` sheet)
-Title (required) · Notes · Date toggle → graphical DatePicker · Time toggle (if date) · Category chips · Save. Existing task: Delete at bottom (to Recently Deleted, §5.2).
+Title (required) · Notes · Date toggle → graphical DatePicker · Time toggle (if date) · **Remind me** (Batch I) · **Repeat** · **Subtasks** · Category chips · Save. Existing task: Delete at bottom (to Recently Deleted, §5.2).
+- **Remind me:** a date and time (default the task's time, else 09:00), "At the task's time" shortcut. Local notifications only — nothing goes through the server. The first time it's turned on, a glass explainer comes before the system prompt; denied → "Open Settings". Stored as a floating local time (`remindAt`) that syncs; every device schedules its own (≤ 60 nearest, iOS allows 64), in its own time zone. Notification actions: **Done** (ticks; a repeating task adds its next), **Snooze 1 hour**, **Tomorrow** (same time) — snoozes sync too.
+- **Repeat:** Never · Every day · Every weekday · Every week · Every month (same day, or the month's last day) · Every year · Custom (every N days/weeks/months). Ticking a repeating task keeps it done on its day and adds the next one (with its subtasks, time and a reminder moved by the same days), once — a re-tick doesn't duplicate it. Same rule on the web.
+- **Subtasks:** tick in place, add with Return, swipe to remove. They show under their parent ("1/3" on the row), not as tasks of their own, and go to Recently Deleted and come back with it. Rows also show a bell (reminder) and repeat arrows. The web app keeps all three and repeats on tick; editing them is on the iPhone for now.
 
 ### 6.9 Profile tab
 Inset-grouped glass sections:
@@ -320,7 +323,7 @@ Resizable `NavigationSplitView` (sidebar tabs · calendar · day panel/detail). 
 | Microphone | First tap of Mic | "Folio uses the microphone only while you dictate. Audio is processed on your iPhone and never stored or sent anywhere." |
 | Speech recognition | Only if the Speech API requires it (verify) | "Folio turns your voice into text on your iPhone. Nothing is sent to a server." |
 | Face ID | Showing recovery key; app lock (later) | "Folio uses Face ID to protect your recovery key and diary." |
-| Notifications | Later, when user taps "Remind me" | system |
+| Notifications | The first time a task's "Remind me" is turned on (Batch I) | system |
 Before each system prompt: a one-line glass explainer with Continue / Not now. Denied → gentle "Open Settings" row.
 
 ---
@@ -518,7 +521,7 @@ folio/
 ---
 
 ## 17. Later (don't build until asked)
-Task notifications · Search (on-device, decrypted locally) · Widgets · Face ID app lock · PDF export · alternate icons · On-this-day · Year in Pixels · scan paper diaries (VisionKit + on-device text recognition) · Journaling Suggestions · App Intents/Shortcuts · Share extension · passkeys.
+Search (on-device, decrypted locally) · Widgets · Face ID app lock · PDF export · alternate icons · On-this-day · Year in Pixels · scan paper diaries (VisionKit + on-device text recognition) · Journaling Suggestions · App Intents/Shortcuts · Share extension · passkeys.
 
 ---
 

@@ -106,6 +106,9 @@ struct TodoScreen: View {
         .onAppear {
             if let name = DebugLaunchOptions.string("FolioTodoFilter"),
                let category = store.categories().first(where: { $0.name == name }) { model.filter = [category.id] }
+            if DebugLaunchOptions.string("FolioOpen") == "editTask" {
+                editing = store.allTasks().first { store.subtaskProgress(of: $0) != nil }
+            }
         }
         #endif
         .sheet(item: $editing) { task in TaskComposerSheet(task: task, day: nil) }

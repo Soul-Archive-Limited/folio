@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// New or edit task (SPEC §6.8): title (required), notes, optional date and time, category.
-/// Existing tasks get a Delete button at the bottom.
+/// New or edit task (SPEC §6.8): title (required), notes, optional date and time, reminder,
+/// repeat, subtasks (Batch I), category. Existing tasks get a Delete button at the bottom.
 struct TaskComposerSheet: View {
     let task: TaskItem?
 
@@ -14,6 +14,10 @@ struct TaskComposerSheet: View {
     @State private var day: DayKey
     @State private var minutes: Int?
     @State private var categoryID: UUID?
+    @State private var remindOn: Bool
+    @State private var remindTime: Date
+    @State private var repeatRule: RepeatRule?
+    @State private var subtasks: [TaskSubtasksSection.SubtaskDraft] = []
     @State private var saveCount = 0
     @State private var detent: PresentationDetent = .medium
     @State private var scroll = ScrollPosition(edge: .top)
@@ -29,6 +33,12 @@ struct TaskComposerSheet: View {
         _day = State(initialValue: task?.day ?? day ?? DayKey(date: AppClock.now, calendar: .current))
         _minutes = State(initialValue: task?.minutesFromMidnight ?? minutes)
         _categoryID = State(initialValue: task?.categoryID ?? categoryID)
+        let reminder = ReminderTime(rawValue: task?.remindAt)
+        _remindOn = State(initialValue: reminder != nil)
+        let startDay = task?.day ?? day ?? DayKey(date: AppClock.now, calendar: .current)
+        let defaultTime = ReminderTime(day: startDay, minutes: task?.minutesFromMidnight ?? minutes ?? 9 * 60)
+        _remindTime = State(initialValue: (reminder ?? defaultTime).date(in: .current) ?? AppClock.now)
+        _repeatRule = State(initialValue: RepeatRule.decode(task?.repeatRule))
     }
 
     var body: some View {
@@ -50,6 +60,9 @@ struct TaskComposerSheet: View {
                             .listRowInsets(EdgeInsets())
                     }
                 }
+                TaskReminderSection(isOn: $remindOn, time: $remindTime, taskMoment: taskMoment)
+                TaskRepeatSection(rule: $repeatRule)
+                TaskSubtasksSection(items: $subtasks)
                 // The chips live in the header, not a row: a row sits on the section's
                 // panel, which showed as a faint band behind the glass (owner review, Batch C).
                 Section {
@@ -95,7 +108,12 @@ struct TaskComposerSheet: View {
         .presentationDragIndicator(.visible)
         .presentationBackground(.thickMaterial)
         .privacyCovered()
-        .onAppear { if task == nil { focus = .title } }
+        .onAppear {
+            if task == nil { focus = .title }
+            if let task {
+                subtasks = store.subtasks(of: task).map { .init(id: $0.id, title: $0.title, isDone: $0.isCompleted, storedID: $0.id) }
+            }
+        }
         .folioHaptic(.success, trigger: saveCount)
     }
 
@@ -111,20 +129,51 @@ struct TaskComposerSheet: View {
         }
     }
 
+    /// The task's own date and time, offered as the reminder time.
+    private var taskMoment: Date? {
+        guard hasDate, let minutes else { return nil }
+        return ReminderTime(day: day, minutes: minutes).date(in: .current)
+    }
+
     private func save() {
         let cleanNotes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
         do {
+            let saved: TaskItem
             if let task {
                 try store.updateTask(task, title: title, notes: cleanNotes.isEmpty ? nil : cleanNotes,
                                      day: hasDate ? day : nil, minutesFromMidnight: minutes, categoryID: categoryID)
+                saved = task
             } else {
-                try store.createTask(title: title, notes: cleanNotes.isEmpty ? nil : cleanNotes,
-                                     day: hasDate ? day : nil, minutesFromMidnight: hasDate ? minutes : nil, categoryID: categoryID)
+                saved = try store.createTask(title: title, notes: cleanNotes.isEmpty ? nil : cleanNotes,
+                                             day: hasDate ? day : nil, minutesFromMidnight: hasDate ? minutes : nil, categoryID: categoryID)
             }
+            store.setReminder(saved, remindOn ? ReminderTime(date: remindTime, calendar: .current) : nil)
+            store.setRepeat(saved, repeatRule)
+            saveSubtasks(of: saved)
             saveCount += 1
             dismiss()
         } catch {
             // Validation is reflected in the disabled Save button; nothing else to show.
+        }
+    }
+
+    /// Adds new subtasks, renames and ticks existing ones, and sends removed ones to Recently Deleted.
+    private func saveSubtasks(of parent: TaskItem) {
+        let stored = store.subtasks(of: parent)
+        let kept = Set(subtasks.compactMap(\.storedID))
+        for old in stored where !kept.contains(old.id) { store.trash(old) }
+        for draft in subtasks {
+            let clean = draft.title.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !clean.isEmpty else { continue }
+            if let id = draft.storedID, let existing = stored.first(where: { $0.id == id }) {
+                if existing.title != clean {
+                    try? store.updateTask(existing, title: clean, notes: existing.notes, day: parent.day,
+                                          minutesFromMidnight: nil, categoryID: existing.categoryID)
+                }
+                if existing.isCompleted != draft.isDone { store.setCompleted(existing, draft.isDone) }
+            } else if let created = try? store.addSubtask(title: clean, to: parent), draft.isDone {
+                store.setCompleted(created, true)
+            }
         }
     }
 

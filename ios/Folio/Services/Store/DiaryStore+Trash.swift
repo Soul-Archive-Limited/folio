@@ -19,8 +19,10 @@ extension DiaryStore {
 
     func trashedTasks() -> [TaskItem] {
         _ = revision
+        // Subtasks deleted with their parent are listed (and restored) through the parent.
         return fetch(FetchDescriptor<TaskItem>(predicate: #Predicate { $0.trashedAt != nil && !$0.isTombstone },
                                                sortBy: [SortDescriptor(\.trashedAt, order: .reverse)]))
+            .filter { $0.parentID == nil || task(id: $0.parentID ?? UUID()) != nil }
     }
 
     func trashedCategories() -> [Category] {
@@ -59,8 +61,11 @@ extension DiaryStore {
         commit()
     }
 
+    /// A task goes with its subtasks (Batch I); they come back together.
     func trash(_ task: TaskItem) {
-        stampTrashed(task)
+        let stamp = trashClockNow()
+        stampTrashed(task, at: stamp)
+        for sub in subtasks(of: task) { stampTrashed(sub, at: stamp) }
         commit()
     }
 
@@ -87,6 +92,12 @@ extension DiaryStore {
     /// A completed task stays completed.
     func restoreFromTrash(_ task: TaskItem) {
         if category(id: task.categoryID) == nil { task.categoryID = nil }
+        let stamp = task.trashedAt
+        let id: UUID? = task.id
+        // Subtasks trashed with it (same moment) come back with it.
+        for sub in fetch(FetchDescriptor<TaskItem>(predicate: #Predicate { $0.parentID == id && !$0.isTombstone })) where sub.trashedAt == stamp {
+            clearTrashed(sub)
+        }
         clearTrashed(task)
         commit()
     }

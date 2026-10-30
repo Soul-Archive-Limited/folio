@@ -30,7 +30,7 @@ export function DayPanel({ day, index, hidden }: { day: string; index?: DayIndex
             {tasks.length > 0 && <h3 className="caption ink3 section-label">Tasks</h3>}
             {tasks.map((t, i) => (
               <TaskRow key={t.id} task={t} style={{ animationDelay: `${(entries.length + i) * 30}ms` }}
-                onToggle={() => store.put('task', { isCompleted: !t.data.isCompleted, completedAt: t.data.isCompleted ? undefined : Date.now() }, t.id)} />
+                onToggle={() => store.setTaskDone(t.id, !t.data.isCompleted)} />
             ))}
           </>
         )}

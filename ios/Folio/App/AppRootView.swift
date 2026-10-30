@@ -52,6 +52,7 @@ struct AppRootView: View {
                 SystemSettingsBridge().reconcile(with: store)
                 WindowAppearance.apply(AppearancePreference(rawValue: store.settings().appearance) ?? .system)
                 TrashMaintenance.purgeIfPossible(store)
+                ReminderScheduler.shared.reschedule()
                 sync.enterForeground()
             }
         }
@@ -61,6 +62,9 @@ struct AppRootView: View {
             if hasOnboarded, greeting == nil { tour.resumeIfNeeded() }
         }
         .task(priority: .utility) { await store.backfillDisplayRenditions() }
+        // Reminders: each device schedules its own from the synced tasks (Batch I).
+        .task { ReminderScheduler.shared.start(store: store) }
+        .onChange(of: store.revision) { ReminderScheduler.shared.reschedule() }
         .task { await account.checkAppleCredential() }
     }
 

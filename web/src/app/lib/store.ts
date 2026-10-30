@@ -5,6 +5,8 @@
  * (`sync.ts`) moves records in and out.
  */
 import { newId, sameId } from './bytes.ts';
+import { todayKey } from './days.ts';
+import { daysBetween, nextDay, parseRule, shiftReminder } from './repeat.ts';
 import { type CategoryData, type DataFor, type EntryData, type PhotoData, type SettingsData, SETTINGS_ID, type SyncType, type TaskData } from './payloads.ts';
 
 export interface Rec<T> { id: string; version: number | null; updatedAt: number; data: T }
@@ -155,7 +157,30 @@ export class DiaryStore {
     return c && !c.data.trashedAt ? c : undefined;
   }
   entries(): Rec<EntryData>[] { return [...this.maps.entry.values()].filter((e) => !e.data.trashedAt); }
-  tasks(): Rec<TaskData>[] { return [...this.maps.task.values()].filter((t) => !t.data.trashedAt); }
+  /** Live tasks; subtasks show under their parent, not on their own (Batch I). */
+  tasks(): Rec<TaskData>[] { return [...this.maps.task.values()].filter((t) => !t.data.trashedAt && !t.data.parentID); }
+  subtasksOf(id: string): Rec<TaskData>[] {
+    return [...this.maps.task.values()].filter((t) => !t.data.trashedAt && t.data.parentID && sameId(t.data.parentID, id))
+      .sort((a, b) => a.data.sortIndex - b.data.sortIndex);
+  }
+
+  /** Ticks or unticks a task; ticking a repeating one adds its next, once (as on the iPhone). */
+  setTaskDone(id: string, done: boolean) {
+    this.put('task', { isCompleted: done, completedAt: done ? Date.now() : undefined }, id);
+    const task = this.get('task', id)?.data;
+    const rule = done && task && !task.parentID ? parseRule(task.repeatRule) : undefined;
+    if (!task || !rule) return;
+    const base = task.dayKey ?? todayKey();
+    const next = nextDay(rule, base);
+    const exists = [...this.maps.task.values()].some((t) => !t.data.trashedAt && t.data.dayKey === next && t.data.title === task.title && t.data.repeatRule === task.repeatRule);
+    if (exists) return;
+    const sortIndex = Math.max(-1, ...[...this.maps.task.values()].map((t) => t.data.sortIndex)) + 1;
+    this.put('task', {
+      title: task.title, notes: task.notes, dayKey: next, minutesFromMidnight: task.minutesFromMidnight, categoryID: task.categoryID,
+      isCompleted: false, sortIndex, createdAt: Date.now(), repeatRule: task.repeatRule,
+      remindAt: shiftReminder(task.remindAt, daysBetween(base, next)),
+    });
+  }
   photosOf(entryId: string): Rec<PhotoData>[] {
     return [...this.maps.entryPhoto.values()].filter((p) => sameId(p.data.entryID, entryId)).sort((a, b) => a.data.sortIndex - b.data.sortIndex);
   }

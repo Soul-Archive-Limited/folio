@@ -126,6 +126,16 @@ enum PreviewData {
             ) else { continue }
             if done { store.setCompleted(task, true) }
         }
+        // Batch I: a weekly task with a reminder, and one with subtasks.
+        if let plants = try? store.createTask(title: "Water the plants", day: today.adding(days: 1), minutesFromMidnight: 8 * 60) {
+            store.setRepeat(plants, RepeatRule(frequency: .weekly))
+            store.setReminder(plants, ReminderTime(day: today.adding(days: 1), minutes: 8 * 60))
+        }
+        if let pack = try? store.createTask(title: "Pack for Lisbon", day: today.adding(days: 2)) {
+            for (item, done) in [("Passport", true), ("Charger", false), ("Sun cream", false)] {
+                if let sub = try? store.addSubtask(title: item, to: pack), done { store.setCompleted(sub, true) }
+            }
+        }
     }
 
     /// SPEC §15.1 performance check: 10,000 entries and 5,000 photos across ~30 years.

@@ -19,7 +19,10 @@ struct TodoRow: View {
                 if let notes = task.notes, !notes.isEmpty {
                     Text(notes).folioFont(.callout).foregroundStyle(.inkSecondary).lineLimit(1)
                 }
-                TaskDateChip(task: task, today: today, calendar: calendar)
+                HStack(spacing: Spacing.xs) {
+                    TaskDateChip(task: task, today: today, calendar: calendar)
+                    TaskExtrasLine(task: task)
+                }
             }
             .padding(.vertical, Spacing.xs)
             Spacer(minLength: 0)
@@ -30,5 +33,30 @@ struct TodoRow: View {
         .accessibilityValue(isTicked ? "Done" : "Not done")
         .accessibilityAction(named: isTicked ? "Mark as not done" : "Mark as done", onToggle)
         .accessibilityIdentifier("todo-row")
+    }
+}
+
+/// Small marks for a reminder, a repeat and subtask progress ("1/3") (Batch I).
+struct TaskExtrasLine: View {
+    let task: TaskItem
+    @Environment(DiaryStore.self) private var store
+
+    var body: some View {
+        let progress = store.subtaskProgress(of: task)
+        HStack(spacing: Spacing.xs) {
+            if task.remindAt != nil {
+                Image(systemName: "bell.fill").accessibilityLabel("Reminder")
+            }
+            if task.repeatRule != nil {
+                Image(systemName: "repeat").accessibilityLabel(Text(RepeatRule.decode(task.repeatRule)?.label ?? ""))
+            }
+            if let progress {
+                Label("\(progress.done)/\(progress.total)", systemImage: "checklist")
+                    .labelStyle(.titleAndIcon)
+                    .accessibilityLabel(Text("\(progress.done) of \(progress.total) subtasks done"))
+            }
+        }
+        .font(.caption2.weight(.semibold))
+        .foregroundStyle(.inkSecondary)
     }
 }

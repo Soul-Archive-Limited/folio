@@ -50,7 +50,7 @@ struct DataExporter {
                                trashedAt: $0.trashedAt)
             },
             entries: entries,
-            tasks: (store.allTasks() + (includesTrash ? store.trashedTasks() : [])).map {
+            tasks: (store.allTasks(includingSubtasks: true) + (includesTrash ? store.trashedTasks() : [])).map {
                 ExportTask(id: $0.id, title: $0.title, notes: $0.notes, day: $0.dayKey, minutesFromMidnight: $0.minutesFromMidnight,
                            categoryID: $0.categoryID, isCompleted: $0.isCompleted, completedAt: $0.completedAt,
                            trashedAt: $0.trashedAt)

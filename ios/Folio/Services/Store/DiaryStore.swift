@@ -61,16 +61,21 @@ final class DiaryStore {
         return fetch(descriptor).sorted(by: Self.entryOrder)
     }
 
+    /// A day's tasks; subtasks live under their parent, not on their own (Batch I).
     func tasks(on day: DayKey) -> [TaskItem] {
         _ = revision
         let raw: String? = day.rawValue
-        let descriptor = FetchDescriptor<TaskItem>(predicate: #Predicate { $0.dayKey == raw && !$0.isTombstone && $0.trashedAt == nil })
+        let descriptor = FetchDescriptor<TaskItem>(predicate: #Predicate {
+            $0.dayKey == raw && !$0.isTombstone && $0.trashedAt == nil && $0.parentID == nil
+        })
         return fetch(descriptor).sorted(by: Self.taskOrder)
     }
 
-    func allTasks() -> [TaskItem] {
+    /// Live tasks; subtasks only when asked for (export), since they show under their parent.
+    func allTasks(includingSubtasks: Bool = false) -> [TaskItem] {
         _ = revision
-        return fetch(FetchDescriptor<TaskItem>(predicate: #Predicate { !$0.isTombstone && $0.trashedAt == nil })).sorted(by: Self.taskOrder)
+        let all = fetch(FetchDescriptor<TaskItem>(predicate: #Predicate { !$0.isTombstone && $0.trashedAt == nil }))
+        return (includingSubtasks ? all : all.filter { $0.parentID == nil }).sorted(by: Self.taskOrder)
     }
 
     func allEntries() -> [Entry] {
@@ -141,7 +146,9 @@ final class DiaryStore {
         let entries = fetch(FetchDescriptor<Entry>(predicate: #Predicate { keys.contains($0.dayKey) && !$0.isTombstone && $0.trashedAt == nil }))
         // `??` inside #Predicate compiles but crashes in SQL generation; compare optionals instead.
         let optionalKeys: [String?] = keys
-        let tasks = fetch(FetchDescriptor<TaskItem>(predicate: #Predicate { optionalKeys.contains($0.dayKey) && !$0.isTombstone && $0.trashedAt == nil }))
+        let tasks = fetch(FetchDescriptor<TaskItem>(predicate: #Predicate {
+            optionalKeys.contains($0.dayKey) && !$0.isTombstone && $0.trashedAt == nil && $0.parentID == nil
+        }))
 
         var markers: [DayKey: DayMarker] = [:]
         for (raw, dayEntries) in Dictionary(grouping: entries, by: \.dayKey) {
@@ -366,7 +373,7 @@ final class DiaryStore {
         guard !trimmed.isEmpty else { throw .taskTitleEmpty }
         guard TaskItem.titleLengths.contains(trimmed.count) else { throw .titleTooLong }
         guard (notes?.count ?? 0) <= TaskItem.maximumNotesLength else { throw .notesTooLong }
-        let nextIndex = (allTasks().map(\.sortIndex).max() ?? -1) + 1
+        let nextIndex = (allTasks(includingSubtasks: true).map(\.sortIndex).max() ?? -1) + 1
         let task = TaskItem(title: trimmed, notes: notes, day: day, minutesFromMidnight: minutesFromMidnight,
                             categoryID: categoryID, sortIndex: nextIndex, now: now())
         context.insert(task)
@@ -375,11 +382,13 @@ final class DiaryStore {
     }
 
     /// Completing keeps the task on its day, shown as done (SPEC §5).
+    /// Ticking a repeating task also adds its next one (Batch I).
     func setCompleted(_ task: TaskItem, _ completed: Bool) {
         task.isCompleted = completed
         task.completedAt = completed ? now() : nil
         task.markChanged(at: now())
         commit()
+        if completed { addNextOccurrence(of: task) }
     }
 
     func reschedule(_ task: TaskItem, to day: DayKey?, minutesFromMidnight: Int? = nil) {
