@@ -2,7 +2,17 @@
 
 The next session starts here. Read this, then `CLAUDE.md`, `docs/SPEC.md`, `docs/PHASES.md` and the last entries of `docs/DECISIONS.md`. Updated at the end of every batch.
 
-_Last updated: 2026-10-30, end of Batch H (website rebuilt as a story-driven 3D site; live)._
+_Last updated: 2026-10-30, during Batch I (owner's iPhone test fixes, avatars, onboarding, seasons, smarter tasks)._
+
+## Batch I status (resume here)
+- ✅ Part 1: 21 fixes from the owner's test of 0.1.0 (56) — DECISIONS 224–237 (settings apply instantly + Settings.bundle, tour rings, calendar collapse snap + drag profile, discard, checklist tap, share text/pages, markers + key, cover lines, Journal folding, To-do groups/reorder/tap-to-edit, natural quick add, Recently Deleted button, On this day, draft pill, compact headers, dictation, Profile stats off main). Onboarding glitch (bug 2) fixed by Part 3.
+- ✅ Part 2: profile pictures + 24 Folio avatars (`scripts/avatars/generate.py` → shared/iOS/web), schema v4 — DECISIONS 238–241.
+- ✅ Part 3: `docs/ONBOARDING.md` + new onboarding (NavigationStack steps) — DECISIONS 243–245; UI test `OnboardingUITests`, recording `docs/screenshots/batch-i/rec-onboarding.mp4`.
+- ✅ Part 4: seasonal aura layer — DECISION 242, SPEC §3.5 table.
+- ✅ Part 5: reminders (local, per device), repeats (iOS + web), subtasks — DECISIONS 246–248.
+- ⬜ Part 6: run the owner's checklist on Simulators (Account/sync/security, Web app, Tricky cases) against a local API (`wrangler dev`) and the live API; fix failures; write the short "Only you can test" list.
+- ⬜ Part 7: /vibesec on everything touched (sync payload fields, web avatar rendering, notifications), Release build 0 warnings, CI green, testflightUrl if build 56 approved, `scripts/testflight.sh` upload + Friends group, report `docs/reports/batch-i.md` (screenshots in `docs/screenshots/batch-i/`: before/, after/, avatars/, onboarding/, seasons/, tasks/; still to make: calendar-drag recording, 00-contact-sheet.png), HANDOFF.
+- Device questions for the owner (Part 7 report): Animation Hitches needs the iPhone (paired, shows offline to xctrace; a dev build would replace TestFlight's).
 
 ## Batch H status (resume here)
 - ✅ Part 1: story and copy — `docs/WEBSITE_COPY.md` (every page's words come from it).
