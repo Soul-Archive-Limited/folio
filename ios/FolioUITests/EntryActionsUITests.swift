@@ -33,8 +33,9 @@ final class EntryActionsUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Moved to Recently Deleted"].waitForExistence(timeout: 3))
         XCTAssertFalse(app.sheets.firstMatch.exists, "no 'Are you sure?'")
         XCTAssertTrue(card.waitForNonExistence(timeout: 3), "gone from the day panel")
-        app.buttons["Undo"].tap()
-        XCTAssertTrue(card.waitForExistence(timeout: 3), "Undo brings it back")
+        // Glass buttons need a short press for synthetic taps (HANDOFF gotcha 3); CI is slow.
+        app.buttons["Undo"].press(forDuration: 0.15)
+        XCTAssertTrue(card.waitForExistence(timeout: 8), "Undo brings it back")
     }
 
     @MainActor
