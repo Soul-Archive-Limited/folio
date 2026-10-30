@@ -79,13 +79,36 @@ struct ProfileTests {
     }
 }
 
-@Suite("Onboarding (SPEC §6.1)")
+@MainActor
+@Suite("Onboarding (SPEC §6.1, Batch I)")
 struct OnboardingTests {
-    @Test("Pages run welcome × 3 → name → sync; Skip lands on the name step")
+    @Test("Steps run welcome → first line → uses → you → look → sync")
     func order() {
-        #expect(OnboardingPage.allCases == [.kept, .anyDay, .privacy, .name, .sync])
-        #expect(OnboardingPage.allCases.filter(\.isWelcome) == [.kept, .anyDay, .privacy])
-        #expect(OnboardingPage.privacy.next == .name)
-        #expect(OnboardingPage.sync.next == nil)
+        #expect(OnboardingStep.allCases == [.welcome, .firstLine, .uses, .you, .look, .sync])
+        #expect(OnboardingStep.look.next == .sync)
+        #expect(OnboardingStep.sync.next == nil)
+    }
+
+    @Test("Answers become the name, the picture and matching categories, once")
+    func apply() throws {
+        let container = try FolioPersistence.makeContainer(inMemory: true)
+        let store = DiaryStore(context: container.mainContext, calendar: TestCalendar.london, now: { TestCalendar.date(2026, 10, 27, 9) })
+        _ = try store.createCategory(name: "Travel", color: .ocean)
+        let model = OnboardingModel()
+        model.name = "  Sam "
+        model.avatar = FolioAvatar.key(7)
+        model.uses = [.travel, .tasks, .gratitude]
+        model.apply(to: store)
+        #expect(store.settings().displayName == "Sam")
+        #expect(store.settings().avatar == "folio:07")
+        #expect(store.categories().map(\.name).sorted() == ["Gratitude", "Travel"], "Tasks makes no category; Travel isn't duplicated")
+    }
+
+    @Test("Going to a step twice doesn't stack it")
+    func noDuplicates() {
+        let model = OnboardingModel()
+        model.go(to: .firstLine)
+        model.go(to: .firstLine)
+        #expect(model.path == [.firstLine])
     }
 }

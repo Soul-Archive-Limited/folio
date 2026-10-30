@@ -44,7 +44,7 @@ struct OnboardingSyncStep: View {
                 LegalFooter()
             }
             .padding(.horizontal, Spacing.xxl)
-            .padding(.bottom, OnboardingPageDots.clearance)
+            .padding(.bottom, Spacing.l)
         }
         .fullScreenCover(item: $flow) { start in
             AccountFlowView(startsWithEmail: start == .email) {

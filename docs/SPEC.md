@@ -47,7 +47,7 @@ Folio is a private diary built around a calendar. You open the app and see your 
 
 ```
 Launch (static) → Greeting intro (~1.4 s, skippable)
-  First launch only: Welcome (3 pages) → Name → Sync choice (Apple / Google / Email / Not now)
+  First launch only: Welcome → Start with today → What you'll keep → You (name + picture) → Your look → Sync choice (Apple / Google / Email / Not now)
                        → [if signed in, new account] Recovery key → Tour
                        → [if signed in, existing account on new device] Unlock → Tour
                        → [Not now] Tour
@@ -210,20 +210,21 @@ Only: bold, italic, underline, strikethrough, highlight, one heading level, bull
 **[G]** = Liquid Glass surface.
 
 ### 6.1 Onboarding + sign-in (first launch)
-Horizontal paging with parallax, page dots, Skip (top-right) jumps to step 4.
-1. **"Your days, kept."** — animated month grid assembling tile by tile with sample photo tiles.
-2. **"Write for any day."** — an old date flips into view; "Move your old diaries in."
-3. **"Private by design."** — lock glyph; "Encrypted on your iPhone before it syncs. Not even we can read it."
-4. **Name** — "What should we call you?" (optional; Continue / Skip).
-5. **Sync choice** — headline "Keep your diary in sync?" sub "Use Folio on the web and on a new iPhone. Encrypted end to end."
+Redesigned in Batch I after a study of Day One, Structured, Flighty, Stoic, Opal, Apple Journal and Apple's first-run screens (`docs/ONBOARDING.md`). A `NavigationStack` of steps — going back is the system's interactive back swipe, which can't rest between two steps — with a thin segmented progress bar in the top bar and one sentence per screen. Steps never resize for the keyboard; focus drops before every push and when a step disappears, so no keyboard is carried between steps. Reduce Motion: fades instead of the fly-in and tile assembly.
+1. **"Your days, kept."** — a month assembling tile by tile; "A private diary built around your calendar. Encrypted, so only you can read it."; **Get started**.
+2. **"Start with today"** — write one line or pick today's photo (PhotosPicker, no permission) and watch it fly into today's square on a mini calendar; it saves a real entry for today. **Not now** skips.
+3. **"What will you keep here?"** — Memories · Travel · Tasks · Old diaries · Gratitude · Work (any); each except Tasks creates a matching category.
+4. **You** — "What should we call you?" (optional; Return continues) and a picture: the monogram or a Folio avatar.
+5. **Look** — Light · Dark · Match iPhone, applied live; Season effect on/off.
+6. **Sync choice** — headline "Keep your diary in sync?" sub "Use Folio on the web and on a new iPhone. Encrypted end to end."
    - **Continue with Apple** (system `SignInWithAppleButton`, `.black`/`.white` style per appearance, placed first per Apple HIG)
    - **Continue with Google** (white button with the official Google "G" mark per Google's branding guidelines)
    - **Continue with email** → email field → 6-digit code screen (auto-fill from Mail via `.textContentType(.oneTimeCode)`, resend after 30 s, errors inline)
    - **Not now — keep it on this iPhone** (text button). Guest mode: everything works offline; Profile offers sign-in later.
    - Footer: "By continuing you agree to the Terms and Privacy Policy" (links).
-6. **Recovery key** (new account only) — §10.4. Must be saved before continuing.
-7. **Unlock** (existing account, new device) — automatic if the key is in iCloud Keychain; otherwise "Scan from your other device" (shows QR) or "Enter recovery key".
-8. → Greeting intro → **Tour** (§6.15).
+7. **Recovery key** (new account only) — §10.4. Must be saved before continuing.
+8. **Unlock** (existing account, new device) — automatic if the key is in iCloud Keychain; otherwise "Scan from your other device" (shows QR) or "Enter recovery key".
+9. → Greeting intro → **Tour** (§6.15).
 No permission prompts during onboarding.
 
 ### 6.2 Calendar tab (opening screen)

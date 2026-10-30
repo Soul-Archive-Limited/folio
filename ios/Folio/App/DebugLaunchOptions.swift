@@ -26,7 +26,7 @@ import Foundation
 /// - `-FolioOpen composer|composerLarge|taskComposer|entry|categories|categoryEdit` opens a screen
 ///   (composerLarge and entry use the selected day's first entry; categoryEdit edits the first category).
 /// - `-FolioTourStep N` starts the tour at step N (1–6); `-FolioNoTour YES` keeps it away.
-/// - `-FolioOnboardingPage N` opens onboarding at page N (0–4) when it shows.
+/// - `-FolioOnboardingPage N` opens onboarding at step N (0 welcome … 5 sync) when it shows.
 /// - `-FolioDemo dictation|intelligence` scripted dictation / canned ✦ results (screenshots).
 /// - `-FolioOpenTool mic|titles|polish|tasks` opens that tool in the composer.
 /// - `-FolioFakeIntelligenceUnavailable YES` pretends Apple's model is unavailable.

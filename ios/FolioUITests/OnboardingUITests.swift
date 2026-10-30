@@ -1,34 +1,81 @@
 import XCTest
 
-/// SPEC §6.1 steps 1–5 and 8: the first-launch journey ends on the calendar with the tour's
-/// first tip. Also checks that sign-in buttons explain they aren't ready yet (DEBUG).
+/// SPEC §6.1 (Batch I redesign): every step, the first line landing on today, the keyboard never
+/// following, a clean system back swipe, sign-in last, then the greeting and the tour.
 final class OnboardingUITests: XCTestCase {
     @MainActor
     func testFirstLaunchJourneyEndsInTheTour() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["-FolioToastSeconds", "15", "-hasOnboarded", "NO", "-FolioResetData", "YES", "-FolioTourStep", "0",
-                               "-com.apple.TipKit.ResetDatastore", "1",
+        app.launchArguments = ["-FolioNow", "2026-10-27T09:30", "-FolioToastSeconds", "15", "-hasOnboarded", "NO", "-FolioResetData", "YES", "-FolioTourStep", "0",
+                               "-com.apple.TipKit.ResetDatastore", "1", "-seasonEffect", "auto",
                                "-AppleLocale", "en_GB", "-AppleLanguages", "(en-GB)"]
         app.launch()
+        let pace = ProcessInfo.processInfo.environment["FOLIO_RECORDING"] == "1" ? 1.4 : 0.4
 
+        // 1 · Welcome
         XCTAssertTrue(app.staticTexts["Your days, kept."].waitForExistence(timeout: 20))
-        let pace = ProcessInfo.processInfo.environment["FOLIO_RECORDING"] == "1" ? 1.6 : 0.6
-        for _ in 0..<3 {
-            tapVisible(app.buttons.matching(identifier: "Continue"), in: app)
-            Thread.sleep(forTimeInterval: pace)
-        }
+        Thread.sleep(forTimeInterval: pace * 2)
+        app.buttons["Get started"].press(forDuration: 0.15)
 
+        // 2 · The interactive moment: a first line lands on today.
+        let line = app.textFields["onboarding.firstLine"]
+        XCTAssertTrue(line.waitForExistence(timeout: 10))
+        line.tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 3), "a tap on the field focuses it")
+        line.typeText("First page in my new diary")
+        app.staticTexts["October 2026"].tap()  // a tap outside (on the month): the keyboard goes
+        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 3))
+        app.buttons["Add to today"].press(forDuration: 0.15)
+        XCTAssertTrue(app.staticTexts["It's on your calendar."].waitForExistence(timeout: 5), "the line landed on today")
+        Thread.sleep(forTimeInterval: pace * 2)
+        app.buttons["Continue"].press(forDuration: 0.15)
+
+        // 3 · What you'll keep
+        XCTAssertTrue(app.staticTexts["What will you keep here?"].waitForExistence(timeout: 10))
+        app.buttons["Travel"].press(forDuration: 0.15)
+        Thread.sleep(forTimeInterval: pace)
+        app.buttons["Memories"].press(forDuration: 0.15)
+        Thread.sleep(forTimeInterval: pace)
+        app.buttons["Continue"].press(forDuration: 0.15)
+
+        // 4 · Name and picture
         let name = app.textFields["Your name"]
         XCTAssertTrue(name.waitForExistence(timeout: 10))
         name.tap()
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 3))
-        name.typeText("Sam\n")  // Return is Continue while the keyboard covers the buttons
+        name.typeText("Sam")
+        app.staticTexts["What should we call you?"].tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 3), "a tap outside dismisses")
+        app.buttons["Spark"].press(forDuration: 0.15)
+        Thread.sleep(forTimeInterval: pace)
+        name.tap()
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 3))
+        name.typeText("\n")  // Return continues while the keyboard covers the button
+        XCTAssertTrue(app.staticTexts["Your look"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 3), "the keyboard never follows to the next step")
 
+        // Back with the system swipe: a clean landing on the name step, nothing lost (bug 2).
+        let edge = app.coordinate(withNormalizedOffset: CGVector(dx: 0.01, dy: 0.5))
+        edge.press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.8, dy: 0.5)))
+        XCTAssertTrue(app.staticTexts["What should we call you?"].waitForExistence(timeout: 5))
+        Thread.sleep(forTimeInterval: 0.8)
+        XCTAssertEqual(name.value as? String, "Sam")
+        XCTAssertFalse(app.staticTexts["Your look"].exists, "nothing left half-way between steps")
+        Thread.sleep(forTimeInterval: pace)
+        app.buttons["Continue"].firstMatch.press(forDuration: 0.15)
+
+        // 5 · Look
+        XCTAssertTrue(app.staticTexts["Your look"].waitForExistence(timeout: 10))
+        app.buttons["Dark"].press(forDuration: 0.15)
+        Thread.sleep(forTimeInterval: pace * 2)
+        app.buttons["Match iPhone"].press(forDuration: 0.15)
+        Thread.sleep(forTimeInterval: pace)
+        app.buttons["Continue"].press(forDuration: 0.15)
+
+        // 6 · Sync, last, with Not now
         XCTAssertTrue(app.staticTexts["Keep your diary in sync?"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 3), "the keyboard never follows to the next page")
         XCTAssertTrue(app.buttons["Continue with Apple"].firstMatch.exists)
         XCTAssertTrue(app.buttons["Continue with Google"].exists)
-        // Email opens its own step, and Cancel comes back here.
         app.buttons["Continue with email"].tap()
         XCTAssertTrue(app.textFields["Email address"].waitForExistence(timeout: 10), "email sign-in opens")
         Thread.sleep(forTimeInterval: pace)
@@ -39,51 +86,7 @@ final class OnboardingUITests: XCTestCase {
         // Greeting, then the tour's first step on the calendar, with its count.
         XCTAssertTrue(app.staticTexts["Your month"].waitForExistence(timeout: 30), "tour starts after the greeting")
         XCTAssertEqual(app.staticTexts["tour.count"].label.lowercased(), "step 1 of 6")
-        // Step 1 is look-only and moves on by itself after 4 s. Tapping Next would race it on a
-        // slow runner (the tap lands on step 2's Next and skips to step 3), so wait for it.
         XCTAssertTrue(app.staticTexts["Tap a day"].waitForExistence(timeout: 15), "step 1 advances by itself")
-        XCTAssertEqual(app.staticTexts["tour.count"].label.lowercased(), "step 2 of 6")
         Thread.sleep(forTimeInterval: pace * 2)
-    }
-
-    /// Batch E fix 3: a tap outside the name field, and Skip, both put the keyboard away.
-    @MainActor
-    func testNameKeyboardDismisses() throws {
-        let app = XCUIApplication()
-        app.launchArguments = ["-hasOnboarded", "NO", "-FolioOnboardingPage", "3", "-FolioNoTour", "YES",
-                               "-AppleLocale", "en_GB", "-AppleLanguages", "(en-GB)"]
-        app.launch()
-        let name = app.textFields["Your name"]
-        XCTAssertTrue(name.waitForExistence(timeout: 20))
-        name.tap()
-        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 3))
-        app.staticTexts["What should we call you?"].tap()
-        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 3), "tap outside dismisses")
-
-        name.tap()
-        name.typeText("Sam")
-        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 3))
-        // Tap empty space (the keyboard covers the buttons), then Skip.
-        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.15)).tap()
-        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 3), "tap on empty space dismisses")
-        tapVisible(app.buttons.matching(identifier: "Skip"), in: app)
-        XCTAssertTrue(app.staticTexts["Keep your diary in sync?"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.keyboards.firstMatch.waitForNonExistence(timeout: 3), "Skip dismisses")
-    }
-
-    /// Pages off screen keep their buttons in the tree; tap the one that's on screen.
-    @MainActor
-    private func tapVisible(_ query: XCUIElementQuery, in app: XCUIApplication) {
-        let screen = app.frame
-        let deadline = Date().addingTimeInterval(10)
-        while Date() < deadline {
-            // Frame check rather than `isHittable`, which fails outright if a page moves mid-check.
-            if let button = query.allElementsBoundByIndex.first(where: { screen.contains($0.frame) }) {
-                button.tap()
-                return
-            }
-            Thread.sleep(forTimeInterval: 0.2)
-        }
-        XCTFail("no visible button")
     }
 }
