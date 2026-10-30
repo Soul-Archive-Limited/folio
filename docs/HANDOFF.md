@@ -2,17 +2,20 @@
 
 The next session starts here. Read this, then `CLAUDE.md`, `docs/SPEC.md`, `docs/PHASES.md` and the last entries of `docs/DECISIONS.md`. Updated at the end of every batch.
 
-_Last updated: 2026-10-30, during Batch I (owner's iPhone test fixes, avatars, onboarding, seasons, smarter tasks)._
+_Last updated: 2026-10-30, end of Batch I (owner's test fixes, avatars, onboarding, seasons, smarter tasks; TestFlight upload waiting on the owner's Xcode sign-in)._
 
 ## Batch I status (resume here)
-- ✅ Part 1: 21 fixes from the owner's test of 0.1.0 (56) — DECISIONS 224–237 (settings apply instantly + Settings.bundle, tour rings, calendar collapse snap + drag profile, discard, checklist tap, share text/pages, markers + key, cover lines, Journal folding, To-do groups/reorder/tap-to-edit, natural quick add, Recently Deleted button, On this day, draft pill, compact headers, dictation, Profile stats off main). Onboarding glitch (bug 2) fixed by Part 3.
-- ✅ Part 2: profile pictures + 24 Folio avatars (`scripts/avatars/generate.py` → shared/iOS/web), schema v4 — DECISIONS 238–241.
-- ✅ Part 3: `docs/ONBOARDING.md` + new onboarding (NavigationStack steps) — DECISIONS 243–245; UI test `OnboardingUITests`, recording `docs/screenshots/batch-i/rec-onboarding.mp4`.
-- ✅ Part 4: seasonal aura layer — DECISION 242, SPEC §3.5 table.
-- ✅ Part 5: reminders (local, per device), repeats (iOS + web), subtasks — DECISIONS 246–248.
-- ⬜ Part 6: run the owner's checklist on Simulators (Account/sync/security, Web app, Tricky cases) against a local API (`wrangler dev`) and the live API; fix failures; write the short "Only you can test" list.
-- ⬜ Part 7: /vibesec on everything touched (sync payload fields, web avatar rendering, notifications), Release build 0 warnings, CI green, testflightUrl if build 56 approved, `scripts/testflight.sh` upload + Friends group, report `docs/reports/batch-i.md` (screenshots in `docs/screenshots/batch-i/`: before/, after/, avatars/, onboarding/, seasons/, tasks/; still to make: calendar-drag recording, 00-contact-sheet.png), HANDOFF.
-- Device questions for the owner (Part 7 report): Animation Hitches needs the iPhone (paired, shows offline to xctrace; a dev build would replace TestFlight's).
+All seven parts done — report `docs/reports/batch-i.md`, DECISIONS 224–252, screenshots `docs/screenshots/batch-i/`.
+- Part 1 fixes (21), Part 2 avatars + photo (schema v4), Part 3 onboarding (`docs/ONBOARDING.md`), Part 4 seasons, Part 5 reminders/repeats/subtasks, Part 6 two-Simulator run on the local API (two bugs found and fixed: day labels west of UTC, refused live socket), Part 7 /vibesec + Release 0 warnings + CI green; 0.1.0 (74) archived but **not uploaded** — Xcode's account session expired (`exportArchive Failed to Use Accounts`) and App Store Connect is signed out in the browser.
+- **Next session:** once the owner has signed in again (Xcode → Settings → Accounts), rerun `scripts/testflight.sh` (the build number is the commit count, so it'll be higher than 74), add the build to the Friends group, submit for Beta App Review if asked; then the Beta App Review result for build 56 (then `testflightUrl` in `web/src/config/site.ts`); the owner's notes on 0.1.0 (74) and the "Only you can test" list; the open question about a device Instruments run (dev build on the owner's iPhone vs. owner runs it); then the public-release list at the end of `docs/reports/batch-g.md`.
+
+### Batch I tools
+- Avatars: `python3 scripts/avatars/generate.py` regenerates `shared/avatars`, the asset catalog's `Avatars/` and `web/public/avatars` (then `cd ios && xcodegen generate`).
+- New DEBUG flags: `-FolioAvatar folio:07`, `-FolioSeedPhotoEntry 10`, `-FolioSeedLongEntry YES`, `-seasonEffect auto|spring|…|off`, `-FolioOpen avatars|avatarCrop|editTask`, `-FolioOnboardingPage 0…5` (steps).
+- Time-zone check: `SIMCTL_CHILD_TZ=Pacific/Pago_Pago xcrun simctl launch …` (west of UTC catches day-label bugs; London/India hide them).
+- Local two-device run: clear the local D1 first if an old review account exists (delete table by table in dependency order: rate_limits, deletions_log, link_requests, key_envelopes, blobs, records, handoff_codes, oauth_states, verification_codes, sessions, accounts, users), then `scripts/sync-live-test.sh` steps A1, B1+A2 (B's link text via `xcrun simctl pbpaste`), EditAndStay/WaitForEntry with `FOLIO_EXTRA_ARGS` (`|`-separated) and `FOLIO_API_BASE=http://127.0.0.1:9/api/` for "airplane mode".
+- Profiling: `xcrun xctrace record --template 'Time Profiler' --device <sim> --attach Folio --time-limit 22s`, drive with the Simulator tool's `touch_path`, export `time-profile` and sum main-thread frames (script pattern in DECISIONS 227).
+- The web app keeps the Data Key in memory: drive it with in-app navigation, not page reloads.
 
 ## Batch H status (resume here)
 - ✅ Part 1: story and copy — `docs/WEBSITE_COPY.md` (every page's words come from it).
@@ -62,8 +65,9 @@ _Last updated: 2026-10-30, during Batch I (owner's iPhone test fixes, avatars, o
 | 13 Motion polish | ✅ Batch G Part 2. |
 | 14 Release | ✅ Batch G Part 3 (TestFlight external beta; public-release list in the Batch G report). |
 | Website rebuild | ✅ Batch H (story + 3D; live). |
+| Batch I | ✅ Owner's test fixes, avatars, onboarding, seasons, reminders/repeats/subtasks, own test run; TestFlight upload pending the owner's Xcode sign-in. |
 
-Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8, Batch D = C fixes + Recently Deleted + 11 + Xcode Cloud, Batch E = D fixes + 9 + 10 + TestFlight, Batch F = improvements + 12 + TestFlight, Batch G = 13 + 14 + external TestFlight, Batch H = website rebuild.
+Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8, Batch D = C fixes + Recently Deleted + 11 + Xcode Cloud, Batch E = D fixes + 9 + 10 + TestFlight, Batch F = improvements + 12 + TestFlight, Batch G = 13 + 14 + external TestFlight, Batch H = website rebuild, Batch I = owner's test of 56 + avatars + onboarding + seasons + smarter tasks.
 
 ## Repo map
 

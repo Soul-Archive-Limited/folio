@@ -48,6 +48,15 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - [x] Part 2 — Phase 13 motion & performance
 - [x] Part 3 — Phase 14 compliance, App Review readiness, TestFlight 0.1.0 (56) for friends (Friends group, Beta App Review submitted, public link)
 
+### Batch I checklist
+- [x] Part 1 — 21 fixes from the owner's test of 0.1.0 (56)
+- [x] Part 2 — profile pictures + 24 Folio avatars (schema v4)
+- [x] Part 3 — onboarding research + redesign
+- [x] Part 4 — seasonal aura layer
+- [x] Part 5 — reminders, repeating tasks, subtasks, To-do groups
+- [x] Part 6 — own test run (local API, two Simulators, web) + fixes
+- [ ] Part 7 — /vibesec ✅, Release 0 warnings ✅, CI green ✅, report ✅; TestFlight 0.1.0 (74) archived, upload blocked (Xcode account session expired)
+
 ### Phase 14 — SPEC §12 / §13 checklist (2026-10-29)
 **App Review (§12)**
 - [x] 2.1 complete: no placeholder or beta text in the app; review account `review@devilsense.com` with a fixed code from the `REVIEW_CODE` Worker secret, rate-limited like any address, switchable with `REVIEW_ENABLED`; notes in `docs/APPSTORE.md`. Owner sets the 6 digits.
