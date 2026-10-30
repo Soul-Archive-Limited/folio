@@ -33,6 +33,12 @@ export interface TaskData {
   sortIndex: number;
   createdAt: number;
   trashedAt?: number;
+  /** Batch I: floating local "YYYY-MM-DDTHH:mm"; each iPhone schedules its own reminder. */
+  remindAt?: string;
+  /** Batch I: JSON `RepeatRule` (see RepeatRule.swift). */
+  repeatRule?: string;
+  /** Batch I: the parent task of a subtask. */
+  parentID?: string;
 }
 
 export interface CategoryData {
@@ -52,6 +58,10 @@ export interface SettingsData {
   firstWeekday?: number;
   defaultCategoryID?: string;
   createdAt: number;
+  /** Batch I: "folio:07" (a Folio avatar), "photo" (avatarPhoto) or absent (monogram). */
+  avatar?: string;
+  /** Batch I: base64 of a 256 px JPEG (Swift `Data` encodes as base64). */
+  avatarPhoto?: string;
 }
 
 export type SyncType = 'entry' | 'entryPhoto' | 'task' | 'category' | 'settings';

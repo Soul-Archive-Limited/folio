@@ -7,6 +7,7 @@ import { DiaryStore } from '../lib/store.ts';
 import { SyncEngine } from '../lib/sync.ts';
 import { Toasts } from './common.tsx';
 import { type ComposerRequest, type Diary, DiaryContext, type Tab, type TaskRequest, type Toast, useDiary } from './context.tsx';
+import { Avatar } from './Avatar.tsx';
 import { Icon, Mark } from './Icons.tsx';
 import CalendarView from './calendar/CalendarView.tsx';
 
@@ -117,7 +118,7 @@ export default function Shell({ me, dataKey, onSignOut, onSessionEnded }: { me: 
             <Icon name="plus" /><span>{tab === 'todo' ? 'New task' : 'New entry'}</span>
           </button>
           <button className="me" onClick={() => navigate('/app/profile')} title="Profile">
-            <span className="avatar" aria-hidden="true">{(name || me.email || 'F').slice(0, 1).toUpperCase()}</span>
+            <Avatar settings={settings} fallback={name || me.email || 'F'} />
             <span className="grow" style={{ minWidth: 0 }}>
               <span style={{ display: 'block', fontWeight: 600, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis' }}>{name || 'You'}</span>
               <SyncLine />

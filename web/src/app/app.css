@@ -150,6 +150,15 @@ svg.i.sm { width: 18px; height: 18px; }
 @media (hover: hover) and (pointer: fine) { .sidebar .me:hover { background: color-mix(in srgb, var(--ink) 5%, transparent); } }
 .avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(140deg, var(--ember), color-mix(in srgb, var(--ember) 40%, var(--aura2))); color: #fff; font-weight: 700; font-size: 15px; flex: none; }
 .avatar.big { width: 64px; height: 64px; font-size: 26px; }
+.avatar.pic { background: none; object-fit: cover; }
+.avatar-button { padding: 0; border: 0; background: none; border-radius: 50%; cursor: pointer; flex: none; }
+.avatar-button:focus-visible { outline: 2px solid var(--ember); outline-offset: 3px; }
+.avatar-panel { padding: 16px; border-radius: 22px; display: grid; gap: 12px; margin-top: 12px; }
+.avatar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 10px; }
+.avatar-option { padding: 2px; border: 0; background: none; border-radius: 50%; cursor: pointer; }
+.avatar-option img { width: 100%; height: auto; display: block; }
+.avatar-option[aria-selected='true'] { box-shadow: 0 0 0 3px var(--ember); }
+.avatar-option:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
 .main { min-width: 0; height: 100dvh; overflow: hidden; position: relative; }
 .scroll { height: 100%; overflow-y: auto; overscroll-behavior: contain; }
 .page { padding: 28px 28px 120px; max-width: 900px; }

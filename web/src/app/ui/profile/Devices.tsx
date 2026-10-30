@@ -4,6 +4,7 @@ import { fromUtf8, utf8 } from '../../lib/bytes.ts';
 import { openRecord, sealRecord } from '../../lib/crypto.ts';
 import { Modal } from '../common.tsx';
 import { useDiary } from '../context.tsx';
+import { Avatar } from '../Avatar.tsx';
 import { Icon } from '../Icons.tsx';
 import { Back } from './ProfileView.tsx';
 
@@ -18,7 +19,7 @@ function lastSeen(at: number) {
 
 /** Devices (SPEC §6.9, DECISIONS 189): model + OS, dates, this one, encrypted names. */
 export default function Devices() {
-  const { key, me, toast } = useDiary();
+  const { key, me, toast, store } = useDiary();
   const [devices, setDevices] = useState<(Device & { nickname?: string })[] | null>(null);
   const [problem, setProblem] = useState('');
   const [renaming, setRenaming] = useState<Device | null>(null);
@@ -63,7 +64,7 @@ export default function Devices() {
           <div className="group glass">
             {devices.map((d) => (
               <div key={d.id} className="row device-row">
-                <Icon name={d.platform === 'web' ? 'globe' : 'iphone'} />
+                {d.current ? <Avatar settings={store.settings} fallback={store.settings?.displayName || 'F'} /> : <Icon name={d.platform === 'web' ? 'globe' : 'iphone'} />}
                 <span className="grow">
                   <span style={{ display: 'block' }}>{d.nickname ?? d.name}</span>
                   {d.nickname && <span className="callout ink2" style={{ display: 'block' }}>{d.name}</span>}

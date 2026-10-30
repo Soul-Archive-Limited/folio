@@ -12,7 +12,7 @@ struct ProfileHeaderCard: View {
         let stats = store.profileStatsValue
         GlassCard {
             HStack(spacing: Spacing.m) {
-                Monogram(name: name)
+                AvatarMenu { ProfileAvatar(size: 64) }
                 VStack(alignment: .leading, spacing: Spacing.xxs) {
                     Button {
                         draftName = name
@@ -62,17 +62,19 @@ struct ProfileHeaderCard: View {
 /// Initials in an ember circle, or a person glyph when there's no name.
 struct Monogram: View {
     let name: String
+    var size: Double = 64
 
     var body: some View {
         ZStack {
             Circle().fill(.ember.gradient)
             if initials.isEmpty {
-                Image(systemName: "person.fill").font(.title2).foregroundStyle(.white)
+                Image(systemName: "person.fill").foregroundStyle(.white)
             } else {
-                Text(initials).font(.title2.weight(.semibold)).foregroundStyle(.white)
+                Text(initials).fontWeight(.semibold).foregroundStyle(.white)
             }
         }
-        .frame(width: 64, height: 64)
+        .frame(width: size, height: size)
+        .font(.system(size: size * 0.34))
         .accessibilityHidden(true)
     }
 

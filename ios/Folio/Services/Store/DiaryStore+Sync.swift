@@ -45,7 +45,8 @@ extension DiaryStore {
             return try encoder.encode(RecordPayload.Task(
                 title: task.title, notes: task.notes, dayKey: task.dayKey, minutesFromMidnight: task.minutesFromMidnight,
                 categoryID: task.categoryID, isCompleted: task.isCompleted, completedAt: task.completedAt, sortIndex: task.sortIndex,
-                createdAt: task.createdAt, trashedAt: task.trashedAt))
+                createdAt: task.createdAt, trashedAt: task.trashedAt, remindAt: task.remindAt, repeatRule: task.repeatRule,
+                parentID: task.parentID))
         case let category as Category:
             return try encoder.encode(RecordPayload.Category(
                 name: category.name, colorKey: category.colorKey, symbol: category.symbol, sortIndex: category.sortIndex,
@@ -53,7 +54,8 @@ extension DiaryStore {
         case let settings as UserSettings:
             return try encoder.encode(RecordPayload.Settings(
                 displayName: settings.displayName, appearance: settings.appearance, writingFont: settings.writingFont,
-                firstWeekday: settings.firstWeekday, defaultCategoryID: settings.defaultCategoryID, createdAt: settings.createdAt))
+                firstWeekday: settings.firstWeekday, defaultCategoryID: settings.defaultCategoryID, createdAt: settings.createdAt,
+                avatar: settings.avatar, avatarPhoto: settings.avatarPhoto))
         default:
             throw CocoaError(.coderInvalidValue)
         }
@@ -217,6 +219,9 @@ extension DiaryStore {
         task.sortIndex = p.sortIndex
         task.createdAt = p.createdAt
         task.trashedAt = p.trashedAt
+        task.remindAt = p.remindAt
+        task.repeatRule = p.repeatRule
+        task.parentID = p.parentID
         return task
     }
 
@@ -244,6 +249,8 @@ extension DiaryStore {
         settings.firstWeekday = p.firstWeekday
         settings.defaultCategoryID = p.defaultCategoryID
         settings.createdAt = p.createdAt
+        settings.avatar = p.avatar
+        settings.avatarPhoto = p.avatarPhoto
         return settings
     }
 }

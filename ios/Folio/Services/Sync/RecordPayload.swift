@@ -35,6 +35,10 @@ nonisolated enum RecordPayload {
         var sortIndex: Int
         var createdAt: Date
         var trashedAt: Date?
+        /// Batch I (schema v4); older apps leave them out.
+        var remindAt: String?
+        var repeatRule: String?
+        var parentID: UUID?
     }
 
     struct Category: Codable, Equatable, Sendable {
@@ -54,6 +58,9 @@ nonisolated enum RecordPayload {
         var firstWeekday: Int?
         var defaultCategoryID: UUID?
         var createdAt: Date
+        /// Batch I (schema v4): "folio:07", "photo" or absent; the photo is a small JPEG.
+        var avatar: String?
+        var avatarPhoto: Data?
     }
 
     static var encoder: JSONEncoder {

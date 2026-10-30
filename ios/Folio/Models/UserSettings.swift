@@ -21,6 +21,12 @@ final class UserSettings: SyncedRecord {
     /// 1 = Sunday … 7 = Saturday; nil follows the locale.
     var firstWeekday: Int?
     var defaultCategoryID: UUID?
+    /// The profile picture (Batch I, schema v4): "folio:07" for a Folio avatar, "photo" for
+    /// `avatarPhoto`, nil for the monogram.
+    var avatar: String?
+    /// A 256 px JPEG of the chosen photo, cropped round on display; synced encrypted like the
+    /// rest of the settings.
+    var avatarPhoto: Data?
 
     var createdAt: Date
     var updatedAt: Date

@@ -8,6 +8,7 @@ struct GreetingIntroView: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var containerSize: CGSize = .zero
+    @Environment(DiaryStore.self) private var store
 
     var body: some View {
         ZStack {
@@ -18,7 +19,17 @@ struct GreetingIntroView: View {
                 .offset(markOffset)
                 .opacity(isDissolving ? 0 : 1)
                 .overlay(alignment: .top) {
-                    GreetingTextBlock(model: model)
+                    VStack(spacing: Spacing.m) {
+                        // Your picture greets you too, once you've chosen one (Batch I).
+                        if store.settings().avatar != nil {
+                            ProfileAvatar(size: 48)
+                                .opacity(model.stage >= .lifted ? 1 : 0)
+                                .scaleEffect(model.stage >= .lifted || reduceMotion ? 1 : 0.8)
+                                .animation(reduceMotion ? FolioMotion.reduced : .bouncy(duration: 0.4, extraBounce: 0.1), value: model.stage)
+                                .accessibilityHidden(true)
+                        }
+                        GreetingTextBlock(model: model)
+                    }
                         .containerRelativeFrame(.horizontal) { width, _ in width - Spacing.sideMargin * 2 }
                         .offset(y: textOffset)
                         .opacity(isDissolving ? 0 : 1)

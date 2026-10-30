@@ -30,6 +30,14 @@ final class TaskItem: TrashableRecord {
     var isTombstone: Bool
     /// When it was moved to Recently Deleted (SPEC §5.2); nil while live. Added in schema v3.
     var trashedAt: Date?
+    /// Remind me at (Batch I, schema v4): a floating local time "YYYY-MM-DDTHH:mm", so a reminder,
+    /// like the task's day, never moves when the phone changes time zone. Each device
+    /// schedules its own local notification from it; nothing goes through the server.
+    var remindAt: String?
+    /// How the task repeats (`RepeatRule`, JSON); nil for a one-off.
+    var repeatRule: String?
+    /// The parent task when this is a subtask.
+    var parentID: UUID?
 
     init(id: UUID = UUID(), title: String, notes: String? = nil, day: DayKey? = nil, minutesFromMidnight: Int? = nil,
          categoryID: UUID? = nil, sortIndex: Int, now: Date) {

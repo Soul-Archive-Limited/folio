@@ -25,7 +25,7 @@ struct SchemaMigrationTests {
             try container.mainContext.save()
         }
 
-        let schema = Schema(versionedSchema: FolioSchemaV3.self)
+        let schema = Schema(versionedSchema: FolioSchemaV4.self)
         let container = try ModelContainer(for: schema, migrationPlan: FolioMigrationPlan.self,
                                            configurations: ModelConfiguration(schema: schema, url: url))
         let store = DiaryStore(context: container.mainContext, calendar: TestCalendar.london, now: { .now })
@@ -55,7 +55,7 @@ struct SchemaMigrationTests {
             try context.save()
         }
 
-        let schema = Schema(versionedSchema: FolioSchemaV3.self)
+        let schema = Schema(versionedSchema: FolioSchemaV4.self)
         let container = try ModelContainer(for: schema, migrationPlan: FolioMigrationPlan.self,
                                            configurations: ModelConfiguration(schema: schema, url: url))
         let store = DiaryStore(context: container.mainContext, calendar: TestCalendar.london, now: { .now })
@@ -64,5 +64,36 @@ struct SchemaMigrationTests {
         #expect(store.categories().first?.trashedAt == nil && store.categories().first?.unassignedIDs == nil)
         #expect(store.task(id: taskID)?.trashedAt == nil)
         #expect(store.trashCount == 0)
+    }
+
+    @Test("A v3 store opens as v4: tasks and settings keep everything, the new fields are empty")
+    func v3ToV4() throws {
+        let url = URL.temporaryDirectory.appending(path: "migration-\(UUID().uuidString).store")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let taskID = UUID()
+
+        do {
+            let schema = Schema(versionedSchema: FolioSchemaV3.self)
+            let container = try ModelContainer(for: schema, configurations: ModelConfiguration(schema: schema, url: url))
+            let context = container.mainContext
+            let task = FolioSchemaV3.TaskItem(title: "Call Mum", day: DayKey(rawValue: "2026-10-28"), minutesFromMidnight: 1080,
+                                              sortIndex: 0, now: .now)
+            task.id = taskID
+            context.insert(task)
+            let settings = FolioSchemaV3.UserSettings(now: .now)
+            settings.displayName = "Sam"
+            context.insert(settings)
+            try context.save()
+        }
+
+        let schema = Schema(versionedSchema: FolioSchemaV4.self)
+        let container = try ModelContainer(for: schema, migrationPlan: FolioMigrationPlan.self,
+                                           configurations: ModelConfiguration(schema: schema, url: url))
+        let store = DiaryStore(context: container.mainContext, calendar: TestCalendar.london, now: { .now })
+        let task = try #require(store.task(id: taskID))
+        #expect(task.title == "Call Mum" && task.minutesFromMidnight == 1080)
+        #expect(task.remindAt == nil && task.repeatRule == nil && task.parentID == nil)
+        #expect(store.settings().displayName == "Sam")
+        #expect(store.settings().avatar == nil && store.settings().avatarPhoto == nil)
     }
 }

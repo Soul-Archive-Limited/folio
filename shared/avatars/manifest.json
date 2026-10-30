@@ -1,0 +1,194 @@
+[
+  {
+    "id": 1,
+    "key": "folio:01",
+    "name": "Spark",
+    "palette": "ember",
+    "accent": "#F0602A",
+    "background": "#FFB08A"
+  },
+  {
+    "id": 2,
+    "key": "folio:02",
+    "name": "Margin",
+    "palette": "ocean",
+    "accent": "#2F6FE4",
+    "background": "#9FC4FF"
+  },
+  {
+    "id": 3,
+    "key": "folio:03",
+    "name": "Doodle",
+    "palette": "violet",
+    "accent": "#7A4DE0",
+    "background": "#C9AEFF"
+  },
+  {
+    "id": 4,
+    "key": "folio:04",
+    "name": "Pebble",
+    "palette": "sage",
+    "accent": "#2F8F52",
+    "background": "#A3D9B4"
+  },
+  {
+    "id": 5,
+    "key": "folio:05",
+    "name": "Sunny",
+    "palette": "sand",
+    "accent": "#B97A0A",
+    "background": "#F2CF7F"
+  },
+  {
+    "id": 6,
+    "key": "folio:06",
+    "name": "Ink",
+    "palette": "graphite",
+    "accent": "#3A3B48",
+    "background": "#B4B5C2"
+  },
+  {
+    "id": 7,
+    "key": "folio:07",
+    "name": "Bloom",
+    "palette": "rose",
+    "accent": "#D6336C",
+    "background": "#F7A8C6"
+  },
+  {
+    "id": 8,
+    "key": "folio:08",
+    "name": "Tide",
+    "palette": "teal",
+    "accent": "#13897D",
+    "background": "#92D9D1"
+  },
+  {
+    "id": 9,
+    "key": "folio:09",
+    "name": "Moss",
+    "palette": "olive",
+    "accent": "#6E7F1F",
+    "background": "#C8D38E"
+  },
+  {
+    "id": 10,
+    "key": "folio:10",
+    "name": "Plume",
+    "palette": "plum",
+    "accent": "#9C3FA0",
+    "background": "#D7A3D9"
+  },
+  {
+    "id": 11,
+    "key": "folio:11",
+    "name": "Comet",
+    "palette": "indigo",
+    "accent": "#4250D6",
+    "background": "#A9B4FF"
+  },
+  {
+    "id": 12,
+    "key": "folio:12",
+    "name": "Ember",
+    "palette": "coral",
+    "accent": "#E5484D",
+    "background": "#FFA99D"
+  },
+  {
+    "id": 13,
+    "key": "folio:13",
+    "name": "Echo",
+    "palette": "ocean",
+    "accent": "#2F6FE4",
+    "background": "#9FC4FF"
+  },
+  {
+    "id": 14,
+    "key": "folio:14",
+    "name": "Clover",
+    "palette": "sage",
+    "accent": "#2F8F52",
+    "background": "#A3D9B4"
+  },
+  {
+    "id": 15,
+    "key": "folio:15",
+    "name": "Dusk",
+    "palette": "violet",
+    "accent": "#7A4DE0",
+    "background": "#C9AEFF"
+  },
+  {
+    "id": 16,
+    "key": "folio:16",
+    "name": "Maple",
+    "palette": "ember",
+    "accent": "#F0602A",
+    "background": "#FFB08A"
+  },
+  {
+    "id": 17,
+    "key": "folio:17",
+    "name": "Quill",
+    "palette": "graphite",
+    "accent": "#3A3B48",
+    "background": "#B4B5C2"
+  },
+  {
+    "id": 18,
+    "key": "folio:18",
+    "name": "Fig",
+    "palette": "plum",
+    "accent": "#9C3FA0",
+    "background": "#D7A3D9"
+  },
+  {
+    "id": 19,
+    "key": "folio:19",
+    "name": "Ripple",
+    "palette": "teal",
+    "accent": "#13897D",
+    "background": "#92D9D1"
+  },
+  {
+    "id": 20,
+    "key": "folio:20",
+    "name": "Honey",
+    "palette": "sand",
+    "accent": "#B97A0A",
+    "background": "#F2CF7F"
+  },
+  {
+    "id": 21,
+    "key": "folio:21",
+    "name": "Pip",
+    "palette": "coral",
+    "accent": "#E5484D",
+    "background": "#FFA99D"
+  },
+  {
+    "id": 22,
+    "key": "folio:22",
+    "name": "Fern",
+    "palette": "olive",
+    "accent": "#6E7F1F",
+    "background": "#C8D38E"
+  },
+  {
+    "id": 23,
+    "key": "folio:23",
+    "name": "Nova",
+    "palette": "indigo",
+    "accent": "#4250D6",
+    "background": "#A9B4FF"
+  },
+  {
+    "id": 24,
+    "key": "folio:24",
+    "name": "Petal",
+    "palette": "rose",
+    "accent": "#D6336C",
+    "background": "#F7A8C6"
+  }
+]

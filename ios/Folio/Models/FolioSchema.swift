@@ -8,7 +8,7 @@ enum FolioSchemaV1: VersionedSchema {
     static let versionIdentifier = Schema.Version(1, 0, 0)
 
     static var models: [any PersistentModel.Type] {
-        [FolioSchemaV2.Category.self, Entry.self, EntryPhoto.self, FolioSchemaV2.TaskItem.self, UserSettings.self]
+        [FolioSchemaV2.Category.self, Entry.self, EntryPhoto.self, FolioSchemaV2.TaskItem.self, FolioSchemaV3.UserSettings.self]
     }
 
     @Model nonisolated
@@ -85,14 +85,25 @@ enum FolioSchemaV2: VersionedSchema {
 
     static var models: [any PersistentModel.Type] {
         [FolioSchemaV2.Category.self, FolioSchemaV2.Entry.self, FolioSchemaV2.EntryPhoto.self,
-         FolioSchemaV2.TaskItem.self, UserSettings.self]
+         FolioSchemaV2.TaskItem.self, FolioSchemaV3.UserSettings.self]
     }
 }
 
 /// Schema version 3 (Batch D, SPEC §5.2): `trashedAt` on Entry, TaskItem and Category, and
-/// `Category.unassignedIDs`, for Recently Deleted. These are the live models.
+/// `Category.unassignedIDs`, for Recently Deleted. Its frozen TaskItem and UserSettings are in
+/// `FolioSchemaV3Models.swift`.
 enum FolioSchemaV3: VersionedSchema {
     static let versionIdentifier = Schema.Version(3, 0, 0)
+
+    static var models: [any PersistentModel.Type] {
+        [Category.self, Entry.self, EntryPhoto.self, FolioSchemaV3.TaskItem.self, FolioSchemaV3.UserSettings.self]
+    }
+}
+
+/// Schema version 4 (Batch I): `TaskItem.remindAt`, `repeatRule`, `parentID`;
+/// `UserSettings.avatar`, `avatarPhoto`. These are the live models.
+enum FolioSchemaV4: VersionedSchema {
+    static let versionIdentifier = Schema.Version(4, 0, 0)
 
     static var models: [any PersistentModel.Type] {
         [Category.self, Entry.self, EntryPhoto.self, TaskItem.self, UserSettings.self]
@@ -100,12 +111,13 @@ enum FolioSchemaV3: VersionedSchema {
 }
 
 enum FolioMigrationPlan: SchemaMigrationPlan {
-    static var schemas: [any VersionedSchema.Type] { [FolioSchemaV1.self, FolioSchemaV2.self, FolioSchemaV3.self] }
+    static var schemas: [any VersionedSchema.Type] { [FolioSchemaV1.self, FolioSchemaV2.self, FolioSchemaV3.self, FolioSchemaV4.self] }
 
-    /// Each step only adds optional attributes, so both are lightweight. Renditions are
+    /// Each step only adds optional attributes, so all are lightweight. Renditions are
     /// backfilled after launch rather than inside the migration, so opening the store stays fast.
     static var stages: [MigrationStage] {
         [.lightweight(fromVersion: FolioSchemaV1.self, toVersion: FolioSchemaV2.self),
-         .lightweight(fromVersion: FolioSchemaV2.self, toVersion: FolioSchemaV3.self)]
+         .lightweight(fromVersion: FolioSchemaV2.self, toVersion: FolioSchemaV3.self),
+         .lightweight(fromVersion: FolioSchemaV3.self, toVersion: FolioSchemaV4.self)]
     }
 }

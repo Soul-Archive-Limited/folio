@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { SETTINGS_ID, type SettingsData } from '../../lib/payloads.ts';
 import { forgetBrowser, isTrusted } from '../../lib/trust.ts';
+import { Avatar, AvatarGrid } from '../Avatar.tsx';
 import { Modal } from '../common.tsx';
 import { useDiary } from '../context.tsx';
 import { Icon } from '../Icons.tsx';
@@ -49,6 +50,7 @@ function Main() {
   const [name, setName] = useState(settings.displayName);
   const [trusted, setTrusted] = useState<{ expiresAt: number } | null>(null);
   const [confirmSignOut, setConfirmSignOut] = useState(false);
+  const [picking, setPicking] = useState(false);
   useEffect(() => { void isTrusted().then(setTrusted); }, []);
   useEffect(() => setName(settings.displayName), [settings.displayName]);
 
@@ -68,7 +70,9 @@ function Main() {
     <>
       <div className="page-title"><h1 className="title1">Profile</h1></div>
       <section className="header-card glass">
-        <span className="avatar big" aria-hidden="true">{(settings.displayName || me.email || 'F').slice(0, 1).toUpperCase()}</span>
+        <button type="button" className="avatar-button" onClick={() => setPicking((v) => !v)} aria-expanded={picking} aria-label="Profile picture">
+          <Avatar settings={settings} fallback={settings.displayName || me.email || 'F'} big />
+        </button>
         <div className="grow" style={{ minWidth: 0, flex: 1 }}>
           <label className="sr-only" htmlFor="name">Your name</label>
           <input id="name" className="title-input" style={{ padding: 0 }} placeholder="Your name" maxLength={40} value={name}
@@ -80,6 +84,13 @@ function Main() {
           </p>
         </div>
       </section>
+      {picking && (
+        <section className="glass avatar-panel">
+          <p className="caption ink2">Folio avatars · choose a photo in the iPhone app</p>
+          <AvatarGrid current={settings.avatar} onPick={(key) => { update({ avatar: key, avatarPhoto: undefined }); setPicking(false); }} />
+          {settings.avatar && <button type="button" className="btn small" onClick={() => { update({ avatar: undefined, avatarPhoto: undefined }); setPicking(false); }}>Remove picture</button>}
+        </section>
+      )}
       <div className="tiles">
         {tiles.map(([label, value, to]) => (
           <button key={label} className="tile glass" onClick={() => navigate(to)}><b>{value.toLocaleString('en-GB')}</b><span className="callout ink2">{label}</span></button>

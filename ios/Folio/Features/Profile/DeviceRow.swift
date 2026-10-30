@@ -8,10 +8,15 @@ struct DeviceRow: View {
 
     var body: some View {
         HStack(spacing: Spacing.s) {
-            Image(systemName: symbol)
-                .foregroundStyle(.ember)
-                .frame(width: 26)
-                .accessibilityHidden(true)
+            if device.current {
+                // This device carries your picture (Batch I).
+                ProfileAvatar(size: 28).accessibilityHidden(true)
+            } else {
+                Image(systemName: symbol)
+                    .foregroundStyle(.ember)
+                    .frame(width: 26)
+                    .accessibilityHidden(true)
+            }
             VStack(alignment: .leading, spacing: 2) {
                 Text(label ?? device.name).foregroundStyle(.ink)
                 if label != nil {

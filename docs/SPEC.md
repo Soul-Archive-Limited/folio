@@ -178,7 +178,8 @@ var isDeleted: Bool         // tombstone, kept until server acknowledges, then p
 - Photos: max 10/entry; GPS EXIF stripped; HEIC long edge ≤ 2048 at quality 0.75 (target ≤ 600 KB); 240 px JPEG thumb.
 - Deleting a category un-assigns its items and remembers which ones (`unassignedIDs`), so restoring it re-links them.
 - **Deleting (moving to Recently Deleted, §5.2) is the only way an item leaves the calendar. Completing a task never removes it.** `trashedAt` (in Recently Deleted) and `isDeleted`/`isTombstone` (permanently deleted, kept only until the server acknowledges it) are separate.
-- Synced user settings (display name, appearance, writing font, first weekday, default category) live in one encrypted `Settings` record; device-only settings in `@AppStorage`.
+- Synced user settings (display name, appearance, writing font, first weekday, default category, profile picture — `avatar` "folio:01"…"folio:24" / "photo" with a 256 px JPEG `avatarPhoto`) live in one encrypted `Settings` record; device-only settings in `@AppStorage`.
+- Schema v4 (Batch I): `TaskItem.remindAt` (floating local "YYYY-MM-DDTHH:mm"), `repeatRule` (JSON), `parentID` (subtasks); `UserSettings.avatar`, `avatarPhoto`. Lightweight migration.
 - `PreviewData.swift`: ~40 entries across 3 years (some with sample photos), 25 tasks, 6 categories; DEBUG "Load sample data".
 
 ### 5.1 Formatted text
@@ -257,7 +258,7 @@ Title (required) · Notes · Date toggle → graphical DatePicker · Time toggle
 
 ### 6.9 Profile tab
 Inset-grouped glass sections:
-- **Header card [G]:** monogram (or local photo) avatar, name (tap to edit), "Writing since March 2019 · 412 pages". No streaks anywhere.
+- **Header card [G]:** profile picture, name (tap to edit), "Writing since March 2019 · 412 pages". No streaks anywhere. Tap the picture → **Choose photo** (PhotosPicker, then a circular crop: drag to move, pinch to zoom; saved as a 256 px JPEG) or **Folio avatars** (24 original "page spirits" — a little page with a folded corner, a face and the ember dot, each with its own palette and personality; vector art generated with the web's copies by `scripts/avatars/generate.py`) · Remove picture. Without one, the monogram. The picture syncs encrypted with the settings and shows in Profile, the greeting, Devices ("This device") and the web app (sidebar, Profile — where a Folio avatar can also be chosen —, Devices) (Batch I).
 - **Your archive** 2×2 tiles: Entries · Photos · Days written on · Tasks done (tap → filtered tab).
 - **Account:**
   - Guest: "Sync & web access" card with the three sign-in buttons (same as onboarding step 5).
