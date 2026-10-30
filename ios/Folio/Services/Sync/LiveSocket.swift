@@ -5,7 +5,9 @@ import Foundation
 /// pings are answered by the hub's auto-response, so they don't wake or bill it.
 final class LiveSocket {
     var onCursor: ((Int64) -> Void)?
-    var onClose: (() -> Void)?
+    /// Called once when the socket ends; `rejected` is true when the server refused the
+    /// upgrade (401/403 — the session was signed out or the account deleted elsewhere).
+    var onClose: ((_ rejected: Bool) -> Void)?
 
     private let task: URLSessionWebSocketTask
     private let session: URLSession
@@ -58,7 +60,8 @@ final class LiveSocket {
             if let cursor = decoded.cursor { onCursor?(cursor) }
         }
         guard !closed else { return }
+        let status = (task.response as? HTTPURLResponse)?.statusCode
         close()
-        onClose?()
+        onClose?(status == 401 || status == 403)
     }
 }

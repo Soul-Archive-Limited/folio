@@ -14,7 +14,7 @@ struct ComposerDatePill: View {
     var body: some View {
         Button { showsPicker = true } label: {
             HStack(spacing: 4) {
-                Text(day.utcDate, format: Date.FormatStyle(timeZone: .gmt).weekday(.abbreviated).day().month(.abbreviated).year(day.year == store.today.year ? .omitted : .defaultDigits))
+                Text(day.utcDate.formatted(Date.FormatStyle(timeZone: .gmt).weekday(.abbreviated).day().month(.abbreviated).year(day.year == store.today.year ? .omitted : .defaultDigits)))
                     .contentTransition(.numericText())
                 if let time {
                     Text(time, format: .dateTime.hour().minute())

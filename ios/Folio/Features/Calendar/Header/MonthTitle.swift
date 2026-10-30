@@ -14,7 +14,7 @@ struct MonthTitle: View {
             ? AnyLayout(VStackLayout(alignment: .leading, spacing: 0))
             : AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: Spacing.xs))
         layout {
-            Text(month.firstDay.utcDate, format: Date.FormatStyle(timeZone: .gmt).month(.wide))
+            Text(month.firstDay.utcDate.formatted(Date.FormatStyle(timeZone: .gmt).month(.wide)))
                 .folioFont(.title1)
                 .foregroundStyle(.ink)
                 .id(month.id)

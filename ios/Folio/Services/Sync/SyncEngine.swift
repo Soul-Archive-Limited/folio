@@ -213,7 +213,7 @@ final class SyncEngine {
         guard socket == nil, isActive, let token = account.api.currentToken else { return }
         let socket = LiveSocket(url: account.api.webSocketURL, token: token)
         socket.onCursor = { [weak self] cursor in self?.remoteCursor(cursor) }
-        socket.onClose = { [weak self] in self?.socketClosed() }
+        socket.onClose = { [weak self] rejected in self?.socketClosed(rejected: rejected) }
         self.socket = socket
         socket.connect()
     }
@@ -230,9 +230,16 @@ final class SyncEngine {
         }
     }
 
-    private func socketClosed() {
+    private func socketClosed(rejected: Bool) {
         socket = nil
         guard isForeground, isActive else { return }
+        // Refused: the session ended elsewhere (signed out, account deleted). A pull confirms it
+        // with the API, whose 401 signs this device out and keeps the diary — instead of
+        // reconnecting forever while showing "Up to date" (found in Batch I's two-device test).
+        if rejected {
+            requestSync(pull: true)
+            return
+        }
         // Reconnect after a pause; a dropped socket while offline shows as Offline.
         Task { [weak self] in
             try? await Task.sleep(for: .seconds(Double.random(in: 5...15)))

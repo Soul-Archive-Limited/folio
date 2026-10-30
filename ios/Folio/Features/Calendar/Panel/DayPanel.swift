@@ -20,7 +20,7 @@ struct DayPanel: View {
         VStack(alignment: .leading, spacing: Spacing.m) {
             HStack {
                 Button(action: onTitleTap) {
-                    Text(day.utcDate, format: Date.FormatStyle(timeZone: .gmt).weekday(.wide).day().month(.wide))
+                    Text(day.utcDate.formatted(Date.FormatStyle(timeZone: .gmt).weekday(.wide).day().month(.wide)))
                         .folioFont(.title2)
                         .foregroundStyle(.ink)
                         .multilineTextAlignment(.leading)

@@ -14,7 +14,7 @@ struct MonthCapsuleGrid: View {
                 let isCurrent = key == current
                 Button { onSelect(key) } label: {
                     VStack(spacing: 3) {
-                        Text(key.firstDay.utcDate, format: Date.FormatStyle(timeZone: .gmt).month(.abbreviated))
+                        Text(key.firstDay.utcDate.formatted(Date.FormatStyle(timeZone: .gmt).month(.abbreviated)))
                             .folioFont(.headline)
                         Circle()
                             .fill(isCurrent ? AnyShapeStyle(.white) : AnyShapeStyle(.ember))

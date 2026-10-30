@@ -50,7 +50,7 @@ struct JournalMonthHeader: View {
     var body: some View {
         Button(action: onToggle) {
             HStack(alignment: .firstTextBaseline, spacing: Spacing.xs) {
-                Text(month.firstDay.utcDate, format: Date.FormatStyle(timeZone: .gmt).month(.wide).year())
+                Text(month.firstDay.utcDate.formatted(Date.FormatStyle(timeZone: .gmt).month(.wide).year()))
                     .textCase(.uppercase)
                     .folioFont(.caption)
                     .foregroundStyle(.inkSecondary)
@@ -69,7 +69,7 @@ struct JournalMonthHeader: View {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(Text(month.firstDay.utcDate, format: Date.FormatStyle(timeZone: .gmt).month(.wide).year()))
+        .accessibilityLabel(Text(month.firstDay.utcDate.formatted(Date.FormatStyle(timeZone: .gmt).month(.wide).year())))
         .accessibilityValue(Text("^[\(count) page](inflect: true), \(isOpen ? String(localized: "open") : String(localized: "closed"))"))
         .accessibilityHint(isOpen ? "Hides this month's pages" : "Shows this month's pages")
         .accessibilityAddTraits(.isHeader)

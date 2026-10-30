@@ -168,7 +168,7 @@ struct OnboardingMiniMonth<Marker: View>: View {
         let days = month.gridDays(firstWeekday: firstWeekday)
         let rows = days.chunked(7).filter { $0.contains { $0.monthKey == month } }
         VStack(spacing: Spacing.s) {
-            Text(month.firstDay.utcDate, format: Date.FormatStyle(timeZone: .gmt).month(.wide).year())
+            Text(month.firstDay.utcDate.formatted(Date.FormatStyle(timeZone: .gmt).month(.wide).year()))
                 .folioFont(.headline)
                 .foregroundStyle(.ink)
             VStack(spacing: 4) {

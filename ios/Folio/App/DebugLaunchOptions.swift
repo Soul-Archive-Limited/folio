@@ -9,6 +9,8 @@ import Foundation
 /// - `-FolioGreetingHold YES` stops the greeting before it dissolves.
 /// - `-displayName Sam` sets the name in the synced settings.
 /// - `-FolioAvatar folio:07` sets the profile picture to a Folio avatar.
+/// - `-FolioSeedPhotoEntry 10` adds today's entry "Ten photos" with that many photos.
+/// - `-FolioSeedLongEntry YES` adds today's "Very long entry" (~50,000 characters).
 /// - `-FolioResetData YES` erases the local store first.
 /// - `-FolioSampleData YES` loads sample data into an empty store.
 /// - `-FolioStressData YES` loads 10,000 entries for performance checks.
@@ -84,6 +86,20 @@ enum DebugLaunchOptions {
         }
         if let title = defaults.string(forKey: "FolioRestoreEntry"), let entry = store.trashedEntries().first(where: { $0.title == title }) {
             store.restoreFromTrash(entry)
+        }
+        // Part 6 tricky cases: an entry with N photos, and a very long entry.
+        let photoCount = defaults.integer(forKey: "FolioSeedPhotoEntry")
+        if photoCount > 0, !store.allEntries().contains(where: { $0.title == "Ten photos" }),
+           let entry = try? store.createEntry(title: "Ten photos", body: "Every photo should arrive.", day: store.today) {
+            for seed in 0..<min(photoCount, Entry.maximumPhotos) {
+                if let jpeg = SampleImageRenderer.jpeg(seed: 40 + seed), let processed = try? PhotoProcessor().processSynchronously(jpeg) {
+                    _ = try? store.addPhoto(processed, to: entry)
+                }
+            }
+        }
+        if defaults.bool(forKey: "FolioSeedLongEntry"), !store.allEntries().contains(where: { $0.title == "Very long entry" }) {
+            let paragraph = "The train left at seven and the fields went by in long green bands, broken by rivers, villages and the odd startled heron. "
+            _ = try? store.createEntry(title: "Very long entry", body: String(repeating: paragraph + "\n\n", count: 400), day: store.today)
         }
         if let avatar = defaults.string(forKey: "FolioAvatar"), store.settings().avatar != avatar {
             store.updateSettings { $0.avatar = avatar }

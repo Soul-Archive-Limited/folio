@@ -56,7 +56,7 @@ struct JournalEntryCard: View {
 
     @ViewBuilder private var dateLine: some View {
         if let day = entry.day {
-            Text(day.utcDate, format: Date.FormatStyle(timeZone: .gmt).weekday(.abbreviated).day().month(.abbreviated))
+            Text(day.utcDate.formatted(Date.FormatStyle(timeZone: .gmt).weekday(.abbreviated).day().month(.abbreviated)))
                 .folioFont(.caption)
         }
     }
