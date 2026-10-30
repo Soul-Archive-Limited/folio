@@ -40,6 +40,7 @@ struct RepeatReminderSubtaskTests {
         #expect(rule.json == #"{"frequency":"custom","interval":2,"unit":"week"}"#)
         #expect(RepeatRule.decode(rule.json) == rule)
         #expect(RepeatRule.decode("nonsense") == nil)
+        #expect(RepeatRule.decode(#"{"frequency":"custom","interval":1000000000,"unit":"month"}"#)?.interval == 99)
     }
 
     @Test("Ticking a repeating task keeps it done and adds the next, once")

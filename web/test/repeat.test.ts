@@ -20,3 +20,7 @@ for (const [json, expected] of cases) {
 test('31 January monthly → 28 February', () => assert.equal(nextDay({ frequency: 'monthly' }, '2027-01-31'), '2027-02-28'));
 test('bad rules are ignored', () => assert.equal(parseRule('{"frequency":"hourly"}'), undefined));
 test('reminders move by the same days', () => assert.equal(shiftReminder('2026-10-30T08:00', 7), '2026-11-06T08:00'));
+test('intervals are bounded to 1…99', () => {
+  assert.equal(parseRule('{"frequency":"custom","interval":1e9,"unit":"day"}')!.interval, 99);
+  assert.equal(parseRule('{"frequency":"custom","interval":-4,"unit":"week"}')!.interval, 1);
+});

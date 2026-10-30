@@ -17,9 +17,13 @@ nonisolated struct RepeatRule: Codable, Equatable, Hashable, Sendable {
     var interval: Int = 1
     var unit: Unit = .day
 
+    /// Synced JSON is only trusted within bounds: the interval is clamped to 1…99 (what the
+    /// picker allows), so a malformed record can't push date arithmetic to absurd years.
     static func decode(_ json: String?) -> RepeatRule? {
-        guard let data = json?.data(using: .utf8) else { return nil }
-        return try? JSONDecoder().decode(RepeatRule.self, from: data)
+        guard let data = json?.data(using: .utf8), data.count <= 256,
+              var rule = try? JSONDecoder().decode(RepeatRule.self, from: data) else { return nil }
+        rule.interval = min(max(rule.interval, 1), 99)
+        return rule
     }
 
     var json: String? {

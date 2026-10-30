@@ -236,10 +236,9 @@ final class SyncEngine {
         // Refused: the session ended elsewhere (signed out, account deleted). A pull confirms it
         // with the API, whose 401 signs this device out and keeps the diary — instead of
         // reconnecting forever while showing "Up to date" (found in Batch I's two-device test).
-        if rejected {
-            requestSync(pull: true)
-            return
-        }
+        // If the pull succeeds (a passing refusal), the reconnect below picks the socket up again;
+        // if it signs the device out, `isActive` is false and nothing reconnects.
+        if rejected { requestSync(pull: true) }
         // Reconnect after a pause; a dropped socket while offline shows as Offline.
         Task { [weak self] in
             try? await Task.sleep(for: .seconds(Double.random(in: 5...15)))

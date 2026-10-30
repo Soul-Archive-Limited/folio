@@ -9,8 +9,13 @@ const FREQUENCIES = ['daily', 'weekdays', 'weekly', 'monthly', 'yearly', 'custom
 export function parseRule(json: string | undefined): RepeatRule | undefined {
   if (!json) return undefined;
   try {
+    if (json.length > 256) return undefined;
     const rule = JSON.parse(json) as RepeatRule;
-    return FREQUENCIES.includes(rule.frequency) ? rule : undefined;
+    if (!FREQUENCIES.includes(rule.frequency)) return undefined;
+    // Bounded like the iPhone (1…99), so a malformed record can't push dates to absurd years.
+    const interval = Number.isInteger(rule.interval) ? Math.min(Math.max(rule.interval as number, 1), 99) : 1;
+    const unit = rule.unit === 'week' || rule.unit === 'month' ? rule.unit : 'day';
+    return { frequency: rule.frequency, interval, unit };
   } catch { return undefined; }
 }
 
