@@ -109,6 +109,16 @@ Spacing 4/8/12/16/20/24/32/40; side margin 20. Radii: day cell 12, card 22, chip
 ### 3.5 Aura background
 `AuraBackground`: 3 blurred circles (radius 260–340, blur 90) drifting on 18–30 s paths via `TimelineView(.animation(minimumInterval: 1/30))`; 14% dark / 22% light; subtle seasonal hue shift per month; static under Reduce Motion; paused in background; ≤ ~2% CPU.
 
+**Seasonal layer (Batch I).** A very subtle layer over the aura and behind every view: spring blossom drift, summer warm glow (with a few rising motes), monsoon rain streaks, autumn leaves, winter snowflakes — about a dozen small shapes at low opacity, only in the top third of the screen (fading out before the content), 20 fps at most. Off under Reduce Motion, in Low Power Mode, while the app isn't active and on frozen backgrounds; ≤ 2% CPU (measured +0.1–0.7% in the Simulator). Profile → Appearance → **Season effect**: Auto / Spring / Summer / Monsoon / Autumn / Winter / Off (device-only, default Auto). Auto uses today's month and the region set on the iPhone (no location permission):
+
+| Climate | Regions | Seasons |
+|---|---|---|
+| Temperate north (default) | everywhere not listed below | spring Mar–May · summer Jun–Aug · autumn Sep–Nov · winter Dec–Feb |
+| Temperate south (flipped) | AU, NZ, AR, CL, UY, PY, ZA, LS, SZ, NA, BW, BR, FK | spring Sep–Nov · summer Dec–Feb · autumn Mar–May · winter Jun–Aug |
+| Indian subcontinent | IN, PK, BD, NP, BT | summer Mar–May · monsoon Jun–Sep · post-monsoon Oct–Nov (shown as autumn) · winter Dec–Feb |
+| Tropical, wet summer | TH, MM, KH, LA, VN, PH, NG, GH, CI, SN, ML, BF, MX, GT, BZ, HN, SV, NI, CR, PA, CU, JM, HT, DO, PR, TT, BS | monsoon (wet) May–Oct · summer (dry) Nov–Apr |
+| Tropical, wet winter | SG, MY, ID, BN, LK, MV, TL | monsoon (wet) Nov–Mar · summer (drier) Apr–Oct |
+
 ### 3.6 Motion language (quality bar: fluid, interruptible, never janky)
 - All animations are **springs**: default `.smooth(duration: 0.35)`, interactive `.snappy`, confirmations `.bouncy(duration: 0.4, extraBounce: 0.1)`.
 - **Interruptible:** any animation can be grabbed mid-flight (sheets, collapses, page swipes); gestures drive progress directly (no "play then wait").

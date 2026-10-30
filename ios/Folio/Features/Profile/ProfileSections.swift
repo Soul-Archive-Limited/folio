@@ -3,10 +3,12 @@ import SwiftUI
 /// Theme, writing font and first day of the week (SPEC §6.9). These are synced settings.
 struct ProfileAppearanceSection: View {
     @Environment(DiaryStore.self) private var store
+    @AppStorage(SeasonEffectSetting.key) private var seasonEffect: SeasonEffectSetting = .auto
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         let settings = store.settings()
-        Section("Appearance") {
+        Section {
             Picker(selection: binding(settings.appearance) { $0.appearance = $1 }) {
                 Text("System").tag(AppearancePreference.system.rawValue)
                 Text("Light").tag(AppearancePreference.light.rawValue)
@@ -29,8 +31,33 @@ struct ProfileAppearanceSection: View {
             } label: {
                 ProfileRowLabel(title: "First day of week", systemImage: "calendar")
             }
+            // Device-only; the aura's barely-there seasonal layer (Batch I).
+            Picker(selection: $seasonEffect) {
+                Text("Auto").tag(SeasonEffectSetting.auto)
+                Text("Spring").tag(SeasonEffectSetting.spring)
+                Text("Summer").tag(SeasonEffectSetting.summer)
+                Text("Monsoon").tag(SeasonEffectSetting.monsoon)
+                Text("Autumn").tag(SeasonEffectSetting.autumn)
+                Text("Winter").tag(SeasonEffectSetting.winter)
+                Text("Off").tag(SeasonEffectSetting.off)
+            } label: {
+                ProfileRowLabel(title: "Season effect", systemImage: "leaf")
+            }
+        } header: {
+            Text("Appearance")
+        } footer: {
+            Text(seasonFooter)
         }
         .listRowBackground(ProfileRowBackground())
+    }
+
+    private var seasonFooter: String {
+        if reduceMotion { return String(localized: "The season effect is off while Reduce Motion is on.") }
+        if seasonEffect == .auto {
+            let season = Season.current(month: Calendar.current.component(.month, from: AppClock.now))
+            return String(localized: "Auto follows the month and your iPhone's region: \(season.displayName) now. It turns off in Low Power Mode.")
+        }
+        return String(localized: "It turns off in Low Power Mode and with Reduce Motion.")
     }
 
     private func binding<Value>(_ value: Value, set: @escaping (UserSettings, Value) -> Void) -> Binding<Value> {
