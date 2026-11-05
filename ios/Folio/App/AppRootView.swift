@@ -56,6 +56,7 @@ struct AppRootView: View {
                 TrashMaintenance.scheduleRefresh(signedIn: account.isSignedIn)
                 sync.enterBackground()
                 lock.didEnterBackground()
+                WidgetSnapshotWriter.shared.writeNow()
             }
             // Launch reaches `.active` too, so this covers launch and every foreground.
             if phase == .active {
@@ -65,6 +66,7 @@ struct AppRootView: View {
                 WindowAppearance.apply(AppearancePreference(rawValue: store.settings().appearance) ?? .system)
                 TrashMaintenance.purgeIfPossible(store)
                 ReminderScheduler.shared.reschedule()
+                WidgetSnapshotWriter.shared.applyPendingTicks()
                 sync.enterForeground()
             }
         }
@@ -76,7 +78,12 @@ struct AppRootView: View {
         .task(priority: .utility) { await store.backfillDisplayRenditions() }
         // Reminders: each device schedules its own from the synced tasks (Batch I).
         .task { ReminderScheduler.shared.start(store: store) }
-        .onChange(of: store.revision) { ReminderScheduler.shared.reschedule() }
+        .onChange(of: store.revision) {
+            ReminderScheduler.shared.reschedule()
+            WidgetSnapshotWriter.shared.scheduleWrite()
+        }
+        // Widgets (Batch J): ticks made on a widget, then a fresh snapshot.
+        .task { WidgetSnapshotWriter.shared.start(store: store) }
         .task { await account.checkAppleCredential() }
     }
 

@@ -126,7 +126,7 @@ struct ProfilePrivacySection: View {
     private var footer: String {
         if let problem = lock.problem, !lockEnabled { return problem }
         return lockEnabled
-            ? String(localized: "Folio asks for \(lock.methodName) when you come back, and always covers your pages in the app switcher. Widgets show counts only on the Lock Screen.")
+            ? String(localized: "Folio asks for \(lock.methodName) when you come back, and always covers your pages in the app switcher.")
             : String(localized: "Covers your pages when you leave Folio, so they never show in the app switcher.")
     }
 
@@ -136,6 +136,30 @@ struct ProfilePrivacySection: View {
             if await lock.setEnabled(on) { lockEnabled = on }
             changingLock = false
         }
+    }
+}
+
+/// Widgets (Batch J): what the widgets may show. Stored in the App Group so they can read it.
+struct ProfileWidgetsSection: View {
+    @AppStorage(AppGroup.homeDetailsKey, store: AppGroup.defaults) private var homeDetails = true
+    @AppStorage(AppGroup.lockDetailsKey, store: AppGroup.defaults) private var lockDetails = false
+
+    var body: some View {
+        Section {
+            Toggle(isOn: $homeDetails) {
+                ProfileRowLabel(title: "Show details on Home Screen", systemImage: "square.grid.2x2")
+            }
+            Toggle(isOn: $lockDetails) {
+                ProfileRowLabel(title: "Show details on Lock Screen", systemImage: "lock.rectangle")
+            }
+        } header: {
+            Text("Widgets")
+        } footer: {
+            Text("Details are task titles and photo tiles. Without them, widgets show counts only. Widgets read a small copy kept on this iPhone; it never syncs.")
+        }
+        .listRowBackground(ProfileRowBackground())
+        .onChange(of: homeDetails) { WidgetSnapshotWriter.shared.writeNow() }
+        .onChange(of: lockDetails) { WidgetSnapshotWriter.shared.writeNow() }
     }
 }
 

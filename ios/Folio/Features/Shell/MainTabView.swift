@@ -14,6 +14,8 @@ struct MainTabView: View {
     @Namespace private var composerNamespace
     /// A draft left from before a full close (cold launch); cleared once resumed or discarded.
     @State private var launchDraft: ComposerDraft?
+    /// A `folio://` link that arrived before the calendar was ready (cold launch from a widget).
+    @State private var pendingRoute: FolioRoute?
 
     var body: some View {
         TabView(selection: $selection) {
@@ -73,6 +75,10 @@ struct MainTabView: View {
             if let destination { route(to: destination) }
         }
         .environment(toasts)
+        .onOpenURL { url in
+            guard let route = FolioRoute(url: url) else { return }
+            if calendar == nil { pendingRoute = route } else { open(route) }
+        }
         .sheet(item: $requester.pending) { request in
             ComposerRoute(request: request, calendar: selection == .calendar ? calendar : nil, namespace: composerNamespace)
                 .environment(toasts)
@@ -86,6 +92,10 @@ struct MainTabView: View {
             openDebugScreen(calendar: model)
             #endif
             calendar = model
+            if let pendingRoute {
+                self.pendingRoute = nil
+                open(pendingRoute)
+            }
             #if DEBUG
             if PerfDriver.isEnabled {
                 await PerfDriver.run(calendar: model, requester: requester) { selection = $0 }
@@ -131,6 +141,33 @@ struct MainTabView: View {
             selection = .calendar
         case .todo:
             selection = .todo
+        }
+    }
+
+    /// Widgets, controls and shortcuts (Batch J). Navigation only; Lock Folio covers it.
+    private func open(_ link: FolioRoute) {
+        let today = store.today
+        switch link {
+        case .newEntry: present(.entry(today))
+        case .dictate: present(.dictation(today))
+        case .newTask:
+            selection = .todo
+            present(.task(today))
+        case .today, .onThisDay:
+            requester.pending = nil
+            route(to: .day(today))
+            if link == .onThisDay { calendar?.revealsOnThisDay = true }
+        case .day(let raw):
+            requester.pending = nil
+            if let day = DayKey(rawValue: raw) { route(to: .day(day)) }
+        case .task:
+            requester.pending = nil
+            selection = .todo
+        case .search:
+            requester.pending = nil
+            calendar?.path = []
+            selection = .calendar
+            calendar?.showsSearch = true
         }
     }
 

@@ -28,6 +28,8 @@ struct FolioApp: App {
         DebugLaunchOptions.apply(to: store)
         #endif
         _store = State(initialValue: store)
+        // Siri and Shortcuts run in this process (Batch J): they reach the diary through here.
+        AppServices.store = store
         let account = AccountModel()
         _account = State(initialValue: account)
         _sync = State(initialValue: SyncEngine(store: store, account: account))
@@ -51,7 +53,10 @@ struct FolioApp: App {
     /// (DECISIONS 100).
     private static func backgroundRefresh(store: DiaryStore, account: AccountModel, sync: SyncEngine) async {
         TrashMaintenance.purgeIfPossible(store)
-        if UIApplication.shared.isProtectedDataAvailable { await sync.backgroundRefresh() }
+        if UIApplication.shared.isProtectedDataAvailable {
+            WidgetSnapshotWriter.shared.start(store: store)
+            await sync.backgroundRefresh()
+        }
         TrashMaintenance.scheduleRefresh(signedIn: account.isSignedIn)
     }
 }

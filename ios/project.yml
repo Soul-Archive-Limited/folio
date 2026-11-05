@@ -41,11 +41,15 @@ targets:
     sources:
       - path: Folio
         excludes: ["**/.gitkeep"]
+      # Code shared with the extensions (Batch J): App Group, snapshot, routes, open intents.
+      - path: Shared
     entitlements:
       path: Folio/Resources/Folio.entitlements
       properties:
         # Sign in with Apple (Phase 10). The App ID com.devilsense.folio has the capability.
         com.apple.developer.applesignin: [Default]
+        # Widgets and the share extension read/write small local files here (Batch J).
+        com.apple.security.application-groups: [group.com.devilsense.folio]
     info:
       path: Folio/Resources/Info.plist
       properties:
@@ -53,6 +57,11 @@ targets:
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSRequiresIPhoneOS: true
+        # folio:// — widget, control and shortcut links (Batch J; navigation only) and the
+        # Google sign-in callback (ASWebAuthenticationSession).
+        CFBundleURLTypes:
+          - CFBundleURLName: com.devilsense.folio
+            CFBundleURLSchemes: [folio]
         # Only Apple's CryptoKit and HTTPS: encryption within the operating system, exempt from
         # export documentation (DECISIONS 143). Never add a third-party crypto library.
         ITSAppUsesNonExemptEncryption: false
@@ -92,11 +101,41 @@ targets:
     dependencies:
       - target: FolioCrypto
         embed: false
+      - target: FolioWidgets
     scheme:
       testTargets:
         - FolioTests
         - FolioCryptoTests
         - FolioUITests
+
+  FolioWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: FolioWidgets
+      - path: Shared
+    entitlements:
+      path: FolioWidgets/FolioWidgets.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.devilsense.folio]
+    info:
+      path: FolioWidgets/Info.plist
+      properties:
+        CFBundleDisplayName: Folio
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.devilsense.folio.widgets
+        PRODUCT_NAME: FolioWidgets
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SKIP_INSTALL: YES
+        SWIFT_EMIT_LOC_STRINGS: YES
+        LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+        # Widget code runs wherever WidgetKit calls it.
+        SWIFT_DEFAULT_ACTOR_ISOLATION: nonisolated
 
   FolioCrypto:
     type: framework

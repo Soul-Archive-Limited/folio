@@ -47,6 +47,7 @@ struct ProfileView: View {
                 ProfileWritingSection()
                 ProfileIntelligenceSection()
                 ProfilePrivacySection()
+                ProfileWidgetsSection()
                 ProfileDataSection(showsRecentlyDeleted: $showsRecentlyDeleted)
 
                 Section("Help") {

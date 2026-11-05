@@ -291,6 +291,7 @@ Inset-grouped glass sections:
 - **Writing:** Default category · Show photo tiles on calendar.
 - **Dictation & Intelligence** (§8–9) with availability explanation.
 - **Privacy & Security:** **Lock Folio** + "Lock" delay (§4.4) · Hide content in app switcher.
+- **Widgets:** Show details on Home Screen · Show details on Lock Screen (§6.18).
 - **Your data:** **Recently Deleted · N** (§5.2) · Export as JSON + photos zip (decrypted, local; "Include Recently Deleted" toggle, off by default) · Export PDF (later; hidden) · Erase data on this iPhone (also empties Recently Deleted).
 - **Help:** "Show the tour again" · "What do the marks mean?" · Support & FAQ · Contact support (mailto).
 - **About:** Website · Privacy Policy · Terms · Open Source (GitHub) · Acknowledgements · Rate Folio (`requestReview` only here) · Version · "Made by Soul Archive Ltd".
@@ -329,6 +330,16 @@ One field per place: Calendar (pull-down / magnifier → sheet), Journal and To-
 - **Results:** "Pages · N" then "Tasks · N", newest first; the matched word starts are highlighted (ember wash + bold, never colour alone); page snippets start just before the first match; matching subtasks show under their task. Over 300 → "N more — add a word or a filter". Tap opens the page in place (pushed in the same stack; Back returns to the results) or the task sheet.
 - Empty: "Search titles, pages, categories and tasks. Everything stays on this iPhone." · No match: "No matches for “…”." · First build: "Getting your diary ready…".
 - 10,000 entries: a query is a binary search per word per item (a few ms); tested in `SearchIndexTests`.
+
+### 6.18 Widgets, controls and shortcuts (Batch J)
+All read a small **snapshot** the app writes to the App Group `group.com.devilsense.folio` (`Widgets/widget-snapshot.json` + the month's existing 240 px thumbnails), protected `completeUntilFirstUserAuthentication` (readable after the first unlock since a restart). It holds today's and tomorrow's tasks and open overdue ones (≤ 40), this and next month's grid (entry count, photo file, dot colours, task counts), one greeting per period and "on this day" years. Written ≤ 1 s after a change, on background and in background refresh, only when its content changed (then `reloadAllTimelines`). It's local and device-only: it never syncs and never reaches the server.
+- **Home Screen:** **Today** (small: weekday + big date, greeting, "3 to do · 1 pages"; medium: + next 4 tasks; large: + 7 tasks and "On this day in 2025…") with an **interactive tick** per task; **Month** (small: mini grid with dots; large: photo tiles, dots, task marks, each day opens that day); **Quick add** (small: New page · Add task · Dictate). Timeline entries at each greeting change and midnight.
+- **Lock Screen:** **Next task** (rectangular/inline) and **Today's count** (circular gauge, done of all today). Counts only unless "Show details on Lock Screen" is on.
+- **Details:** Profile → **Widgets** → "Show details on Home Screen" (on) · "Show details on Lock Screen" (off). Details = task titles and photo tiles; with both off, titles and photos aren't even written to the snapshot. Titles and tiles are `.privacySensitive()`, so a locked device redacts them.
+- **Ticks:** a widget can't open the diary, so `ToggleWidgetTaskIntent` queues the tick in the App Group (`pending-ticks.json`, last tick per task wins) and updates the snapshot at once; the app applies the queue on launch, foreground and background refresh as ordinary local edits (repeats spawn, it syncs).
+- **Control Center / Action Button:** New Entry · Dictate · Add Task (open Folio there).
+- **Siri & Shortcuts:** Add Task (title + optional date and time; runs in Folio's process without opening it; needs the iPhone unlocked; "Added “Buy stamps” for Fri 6 Nov.") · New Entry · Dictate Entry · Show Today · Open On This Day — phrases in `FolioShortcuts`.
+- **Links:** `folio://new-entry|new-task|dictate|today|on-this-day|search|day/YYYY-MM-DD|task/<uuid>` — navigation only, nothing is written from a link; Lock Folio (§4.4) covers wherever it lands.
 
 ---
 
@@ -539,7 +550,7 @@ folio/
 ---
 
 ## 17. Later (don't build until asked)
-Widgets · PDF export · alternate icons · On-this-day · Year in Pixels · scan paper diaries (VisionKit + on-device text recognition) · Journaling Suggestions · App Intents/Shortcuts · Share extension · passkeys.
+PDF export · alternate icons · On-this-day · Year in Pixels · scan paper diaries (VisionKit + on-device text recognition) · Journaling Suggestions · Share extension · passkeys.
 
 ---
 

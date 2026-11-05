@@ -24,6 +24,8 @@ final class CalendarModel {
     var showsJumpSheet = false
     /// The search sheet (Batch J): pull the day panel down, or the magnifier.
     var showsSearch = false
+    /// "Open On this day" (widget, Siri): the day panel scrolls to its On this day card.
+    var revealsOnThisDay = false
     /// The Calendar tab's navigation stack (entry detail).
     var path: [UUID] = []
     /// One selection haptic per gesture (SPEC §3.7). A tap on another month's day pages the
