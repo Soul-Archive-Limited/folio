@@ -155,6 +155,8 @@ targets:
       - path: FolioTests
       - path: ../shared/markdown-fixtures.json
         buildPhase: resources
+      - path: ../shared/search-fixtures.json
+        buildPhase: resources
     dependencies:
       - target: Folio
     settings:

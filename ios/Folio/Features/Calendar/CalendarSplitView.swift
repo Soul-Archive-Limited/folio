@@ -43,6 +43,7 @@ struct CalendarSplitView: View {
         .sheet(isPresented: $model.showsJumpSheet) {
             JumpSheet(model: model)
         }
+        .sheet(isPresented: $model.showsSearch) { SearchSheet() }
     }
 
     private var monthColumn: some View {

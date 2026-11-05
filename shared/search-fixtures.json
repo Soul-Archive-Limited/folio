@@ -1,0 +1,64 @@
+{
+  "_comment": "Search word rules (Batch J): SearchText.swift and web/src/app/lib/search.ts must both turn each input into exactly these words.",
+  "cases": [
+    {
+      "input": "Café, CRÈME-brûlée!",
+      "words": [
+        "cafe",
+        "creme",
+        "brulee"
+      ]
+    },
+    {
+      "input": "Don't stop: naïve 2026",
+      "words": [
+        "don",
+        "t",
+        "stop",
+        "naive",
+        "2026"
+      ]
+    },
+    {
+      "input": "आज मैंने किताब पढ़ी।",
+      "words": [
+        "आज",
+        "मैंने",
+        "किताब",
+        "पढ़ी"
+      ]
+    },
+    {
+      "input": "ÅNGSTRÖM Straße",
+      "words": [
+        "angstrom",
+        "straße"
+      ]
+    },
+    {
+      "input": "Ελληνικά Τέλος",
+      "words": [
+        "ελληνικά",
+        "τέλος"
+      ]
+    },
+    {
+      "input": "日記を書く",
+      "words": [
+        "日",
+        "記",
+        "を",
+        "書",
+        "く"
+      ]
+    },
+    {
+      "input": "éclair vs éclair",
+      "words": [
+        "eclair",
+        "vs",
+        "eclair"
+      ]
+    }
+  ]
+}

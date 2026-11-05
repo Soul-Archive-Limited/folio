@@ -20,6 +20,7 @@ const TaskComposer = lazy(() => import('./todo/TaskComposer.tsx'));
 const JournalView = lazy(loadJournal);
 const TodoView = lazy(loadTodo);
 const ProfileView = lazy(() => import('./profile/ProfileView.tsx'));
+const Search = lazy(() => import('./Search.tsx'));
 
 /** Fetches the composer (Tiptap) and the other tabs once the browser is idle, so the first
  *  "New entry" doesn't stall while its code downloads and parses (Phase 13: 158 ms). */
@@ -50,6 +51,7 @@ export default function Shell({ me, dataKey, onSignOut, onSessionEnded }: { me: 
   const [composer, setComposer] = useState<ComposerRequest | null>(null);
   const [task, setTask] = useState<TaskRequest | null>(null);
   const [entry, setEntry] = useState<string | null>(null);
+  const [searching, setSearching] = useState(false);
   useEffect(preloadWhenIdle, []);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [selectedDay, setSelectedDay] = useState(todayKey());
@@ -67,9 +69,19 @@ export default function Shell({ me, dataKey, onSignOut, onSessionEnded }: { me: 
     void engine.start().then(() => setLoaded(true));
     const pop = () => setRoute(location.pathname + location.search);
     window.addEventListener('popstate', pop);
+    // "/" or ⌘K / Ctrl-K opens search (Batch J), unless typing somewhere.
+    const onKey = (event: KeyboardEvent) => {
+      const typing = (event.target as HTMLElement | null)?.closest?.('input, textarea, select, [contenteditable]');
+      if ((event.key === 'k' && (event.metaKey || event.ctrlKey)) || (event.key === '/' && !typing)) {
+        event.preventDefault();
+        setSearching(true);
+      }
+    };
+    window.addEventListener('keydown', onKey);
     return () => {
       engine.stop();
       window.removeEventListener('popstate', pop);
+      window.removeEventListener('keydown', onKey);
       clearPhotoCache();
     };
   }, [engine]);
@@ -114,6 +126,9 @@ export default function Shell({ me, dataKey, onSignOut, onSessionEnded }: { me: 
               <Icon name={t.icon} /><span>{t.label}</span>
             </button>
           ))}
+          <button className="nav-item" onClick={() => setSearching(true)} title="Search (/)">
+            <Icon name="search" /><span>Search</span>
+          </button>
           <button className="btn primary new" onClick={() => tab === 'todo' ? diary.openTask({}) : diary.openComposer({ dayKey: tab === 'calendar' ? selectedDay : undefined })} title={tab === 'todo' ? 'New task' : 'New entry'}>
             <Icon name="plus" /><span>{tab === 'todo' ? 'New task' : 'New entry'}</span>
           </button>
@@ -140,6 +155,7 @@ export default function Shell({ me, dataKey, onSignOut, onSessionEnded }: { me: 
             <Icon name={t.icon} />{t.label}
           </button>
         ))}
+        <button onClick={() => setSearching(true)}><Icon name="search" />Search</button>
       </nav>
       {tab !== 'profile' && !composer && !entry && !task && (
         <button className="fab icon-btn ember" aria-label={tab === 'todo' ? 'New task' : 'New entry'}
@@ -151,6 +167,7 @@ export default function Shell({ me, dataKey, onSignOut, onSessionEnded }: { me: 
         {composer && <Composer request={composer} day={selectedDay} onDayChange={selectDay} onClose={() => setComposer(null)} />}
         {entry && <EntryDetail id={entry} onClose={() => setEntry(null)} />}
         {task && <TaskComposer request={task} onClose={() => setTask(null)} />}
+        {searching && <Search tasksOnly={tab === 'todo'} onClose={() => setSearching(false)} />}
       </Suspense>
       <Toasts toasts={toasts} dismiss={(id) => setToasts((list) => list.filter((t) => t.id !== id))} />
     </DiaryContext.Provider>

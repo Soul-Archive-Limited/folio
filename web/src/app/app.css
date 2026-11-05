@@ -180,7 +180,7 @@ svg.i.sm { width: 18px; height: 18px; }
   .sidebar { display: none; }
   .page { padding: 16px var(--side) calc(var(--tab-h) + 110px); }
   .tabbar {
-    display: grid; grid-template-columns: repeat(4, 1fr); position: fixed; z-index: 30;
+    display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; z-index: 30;
     left: 16px; right: 16px; bottom: max(14px, env(safe-area-inset-bottom)); height: var(--tab-h); border-radius: 999px; padding: 6px;
   }
   .tabbar button { border: 0; background: none; border-radius: 999px; display: grid; place-items: center; gap: 0; font-size: 11px; font-weight: 600; color: var(--ink); padding: 4px 0; }
@@ -512,3 +512,14 @@ body:has(.gate) .aura { opacity: 0.5; }
   .aura i { animation: none; }
 }
 @keyframes fadeOut { to { opacity: 0; } }
+
+/* Search (Batch J) */
+.search .search-field { display: flex; align-items: center; gap: 8px; position: relative; }
+.search .search-field svg { position: absolute; left: 14px; color: var(--ink-secondary); pointer-events: none; }
+.search .search-field .field { padding-left: 40px; }
+.search .search-filters { margin: 12px -4px 4px; }
+.search .search-filters select.chip { appearance: none; -webkit-appearance: none; padding-right: 14px; font: inherit; color: var(--ink); }
+.search .search-results { display: grid; gap: 10px; margin-top: 4px; }
+.search .card { display: flex; gap: 12px; text-align: start; width: 100%; font: inherit; color: inherit; }
+.search .card .p { display: block; }
+.search mark { background: color-mix(in srgb, var(--ember) 26%, transparent); color: inherit; font-weight: 700; border-radius: 3px; }

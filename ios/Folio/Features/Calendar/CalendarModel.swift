@@ -22,6 +22,8 @@ final class CalendarModel {
     }
     private(set) var isCollapsed = false
     var showsJumpSheet = false
+    /// The search sheet (Batch J): pull the day panel down, or the magnifier.
+    var showsSearch = false
     /// The Calendar tab's navigation stack (entry detail).
     var path: [UUID] = []
     /// One selection haptic per gesture (SPEC §3.7). A tap on another month's day pages the

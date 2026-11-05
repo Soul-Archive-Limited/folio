@@ -42,6 +42,7 @@ import Foundation
 /// - `-FolioAPIBase http://127.0.0.1:9/api/` points the API somewhere unreachable (offline tests).
 /// - `-FolioRenameEntry "Old=>New"`, `-FolioTrashEntry Title`, `-FolioRestoreEntry Title` edit
 ///   an entry by title at launch, as local edits that sync (two-Simulator tests).
+/// - `-FolioSearch "river"` opens search on the launch tab with that text (Batch J).
 enum DebugLaunchOptions {
     enum Screen: String {
         case gallery, cover, greeting
@@ -53,6 +54,10 @@ enum DebugLaunchOptions {
 
     static var skipsGreeting: Bool {
         UserDefaults.standard.bool(forKey: "FolioSkipGreeting")
+    }
+
+    static var searchText: String? {
+        UserDefaults.standard.string(forKey: "FolioSearch")
     }
 
     static var holdsGreeting: Bool {

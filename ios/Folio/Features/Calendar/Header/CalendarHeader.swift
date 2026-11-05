@@ -30,6 +30,14 @@ struct CalendarHeader: View {
                             .glassEffectID("today", in: glass)
                             .glassEffectTransition(.matchedGeometry)
                     }
+                    Button("Search", systemImage: "magnifyingglass") { model.showsSearch = true }
+                        .labelStyle(.iconOnly)
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(.ink)
+                        .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
+                        .glassEffect(.regular.interactive(), in: .circle)
+                        .glassEffectID("search", in: glass)
+                        .accessibilityIdentifier("calendar.search")
                     CalendarFilterMenu(model: model)
                         .glassEffectID("filter", in: glass)
                 }

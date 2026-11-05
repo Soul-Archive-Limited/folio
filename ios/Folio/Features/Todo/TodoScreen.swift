@@ -15,6 +15,8 @@ struct TodoScreen: View {
     @State private var isTyping = false
     @State private var quickAddHeight: Double = 48
     @State private var rejectedMoves = 0
+    /// Pull down to search tasks and subtasks (Batch J); results cover the list.
+    @State private var search = SearchModel(scope: .tasksOnly)
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -85,7 +87,13 @@ struct TodoScreen: View {
             // bottom inset, so taps on the quick-add bar itself are never caught.
             .scrollDismissesKeyboard(.immediately)
             .simultaneousGesture(TapGesture().onEnded { KeyboardDismissal.dismiss() }, including: isTyping ? .all : .subviews)
-            .safeAreaInset(edge: .bottom, spacing: 0) { bottomBar }
+            .safeAreaInset(edge: .bottom, spacing: 0) { if !isSearching { bottomBar } }
+            .overlay {
+                if isSearching {
+                    SearchResultsView(model: search, onOpenEntry: { _ in }, onOpenTask: { editing = store.task(id: $0) })
+                        .background { AuraBackground() }
+                }
+            }
             .onScrollPhaseChange { _, phase in isScrolling = phase.isScrolling }
 
             .background {
@@ -95,6 +103,9 @@ struct TodoScreen: View {
             .animation(FolioMotion.standard(), value: sections.active.map(\.id))
             .animation(FolioMotion.standard(), value: sections.completed.map(\.id))
             .compactTitle("To-do")
+            .searchable(text: $search.text, isPresented: $search.isPresented,
+                        placement: .navigationBarDrawer(displayMode: .automatic), prompt: Text("Search tasks"))
+            .searchIndexFeed(search)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     TodoDateFilterButton(day: $model.dayFilter, today: today)
@@ -106,6 +117,7 @@ struct TodoScreen: View {
         }
         #if DEBUG
         .onAppear {
+            search.applyDebugText()
             if let name = DebugLaunchOptions.string("FolioTodoFilter"),
                let category = store.categories().first(where: { $0.name == name }) { model.filter = [category.id] }
             if DebugLaunchOptions.string("FolioOpen") == "editTask" {
@@ -160,6 +172,8 @@ struct TodoScreen: View {
     }
 
     private static let scrimFade: Double = 60
+
+    private var isSearching: Bool { search.isPresented || search.isActive }
 
     /// Where the quick-add bar goes while the tab bar is minimised: down by `drop` so it's
     /// centred on the small circle, and in from the leading edge past it. Not while typing:

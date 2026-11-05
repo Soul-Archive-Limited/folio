@@ -13,6 +13,12 @@ struct CalendarScreen: View {
     @State private var width: Double = 402
     @State private var scrollPosition = ScrollPosition(edge: .top)
     @State private var viewportHeight: Double = 600
+    /// How far the day panel is pulled down past its top; past `searchPull` a release opens
+    /// search (Batch J). Only changes while pulling, so ordinary scrolling never touches it.
+    @State private var pullDistance: Double = 0
+    @State private var searchArmed = false
+    @State private var searchArmCount = 0
+    private static let searchPull: Double = 72
     @Namespace private var entryZoom
 
     var body: some View {
@@ -42,6 +48,10 @@ struct CalendarScreen: View {
         .sheet(isPresented: $model.showsJumpSheet) {
             JumpSheet(model: model)
         }
+        .sheet(isPresented: $model.showsSearch) { SearchSheet() }
+        #if DEBUG
+        .task { if DebugLaunchOptions.searchText != nil, DebugLaunchOptions.string("FolioTab") == nil { model.showsSearch = true } }
+        #endif
     }
 
     private var standardLayout: some View {
@@ -68,6 +78,12 @@ struct CalendarScreen: View {
                 .onScrollGeometryChange(for: Double.self) { geometry in
                     geometry.contentOffset.y + geometry.contentInsets.top
                 } action: { _, offset in
+                    let pull = max(-offset, 0)
+                    if pull != pullDistance { pullDistance = pull }
+                    if pull > Self.searchPull, !searchArmed {
+                        searchArmed = true
+                        searchArmCount += 1
+                    }
                     let progress = min(max(offset / layout.collapseDistance, 0), 1)
                     // Scrolling the panel past the collapse must not wake the grid each frame.
                     if progress != model.collapseProgress { model.collapseProgress = progress }
@@ -75,7 +91,12 @@ struct CalendarScreen: View {
                 // The target behaviour covers flicks and releases. A scroll that stops without
                 // one (a tap that catches a deceleration, the panel's content changing height
                 // under it) used to leave the month half-collapsed: settle it here.
-                .onScrollPhaseChange { _, phase in
+                .onScrollPhaseChange { old, phase in
+                    // Pull down and let go: search (Batch J).
+                    if old == .interacting, searchArmed {
+                        searchArmed = false
+                        if pullDistance > Self.searchPull { model.showsSearch = true }
+                    }
                     guard phase == .idle else { return }
                     settleCollapse(layout: layout)
                 }
@@ -85,9 +106,12 @@ struct CalendarScreen: View {
                 // The panel runs down to the tab bar — nothing full-width sits behind the "+"
                 // (owner's test, Batch I) — and its last row can scroll fully clear of it.
                 .contentMargins(.bottom, FloatingButtonMetrics.clearance + Spacing.s, for: .scrollContent)
+                PullToSearchHint(progress: pullDistance / Self.searchPull)
+                    .padding(.top, layout.fullGridHeight + Spacing.xs)
                 CalendarGridArea(model: model, layout: layout, firstWeekday: firstWeekday)
             }
         }
+        .folioHaptic(.selection, trigger: searchArmCount)
         .padding(.top, Spacing.xs)
         .onGeometryChange(for: Double.self) { $0.size.width } action: { width = $0 }
         #if DEBUG
