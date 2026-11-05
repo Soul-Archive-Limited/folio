@@ -66,7 +66,7 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - [x] Part 6 — scan paper pages, share extension (sealed inbox), Apple Calendar events
 - [x] Part 7 — PDF export + print
 - [x] Part 8 — invite-only sign-up (API, iPhone, web) + installable web app
-- [x] Part 9 — own test run, /vibesec, Release 0 warnings, CI, website, TestFlight 0.1.0 (93), report
+- [x] Part 9 — own test run, /vibesec, Release 0 warnings, CI, website, TestFlight 0.1.0 (94), report
 - [ ] Production API deploy + `OWNER_EMAILS` — owner (DECISION 272)
 
 ### Phase 14 — SPEC §12 / §13 checklist (2026-10-29)

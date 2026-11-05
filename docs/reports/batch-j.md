@@ -1,6 +1,6 @@
 # Batch J report
 
-Batch J = your notes on 0.1.0 (74) (Part 1) · search (2) · Lock Folio (3) · widgets, controls and Siri (4) · memories (5) · bringing things in (6) · PDF export (7) · private accounts and the installable web app (8) · test, ship, document (9). Shape per SPEC §18, one section per part. Contact sheet: `docs/screenshots/batch-j/00-contact-sheet.png`. Decisions 255–272. TestFlight: **0.1.0 (93)**.
+Batch J = your notes on 0.1.0 (74) (Part 1) · search (2) · Lock Folio (3) · widgets, controls and Siri (4) · memories (5) · bringing things in (6) · PDF export (7) · private accounts and the installable web app (8) · test, ship, document (9). Shape per SPEC §18, one section per part. Contact sheet: `docs/screenshots/batch-j/00-contact-sheet.png`. Decisions 255–272. TestFlight: **0.1.0 (94)**.
 
 ---
 
@@ -55,7 +55,7 @@ You said "all good" — nothing to fix.
 - **/vibesec:** access control, enumeration, CSRF, redirects, rate limits, extension inputs, App Group/Keychain, web output and the service worker — no new findings (DECISION 271). `npm audit` 0 in api and web; gitleaks clean on every commit.
 - **CI:** one failure found and fixed (Xcode 26.6 on CI couldn't type-check a long predicate in the PDF code).
 - **Website:** Features gains Find and remember · Bring it in · Around your iPhone with real screenshots; FAQ, Download ("Install on your phone") and Changelog updated.
-- **TestFlight:** 0.1.0 (91) uploaded first; the extensions then got their own privacy manifests (DECISION 273), so **0.1.0 (93)** is the build for Friends.
+- **TestFlight:** 0.1.0 (91) and (93) failed App Store Connect's processing — an App Intent description said "iPhone", which Apple doesn't allow (DECISION 274); 93 also added the extensions' privacy manifests (273). **0.1.0 (94)** is the build for Friends.
 
 **Files changed:** ~140 (`git diff --stat 5dbee75`). Key: `ios/Folio/{Services/Search,Features/Search,Features/Lock,Services/Widgets,App/Intents,Features/Scan,Services/Scan,Services/Calendar,Services/Export/DiaryPDF*,Features/Profile/{PDFExportSheet,InvitesView}}`, `ios/{Shared,FolioWidgets,FolioShare}`, `ios/Folio/Models/{Mood,FolioSchemaV4Models}.swift`, `api/src/{lib/invites,routes/invites}.ts`, `api/migrations/0003_invites.sql`, `web/src/app/{lib/search.ts,lib/install.ts,ui/Search.tsx,ui/Mood.tsx,ui/journal/YearPixels.tsx,ui/profile/{Invites,InstallHelp}.tsx}`, `web/public/{manifest.webmanifest,app-sw.js,icons}`.
 
@@ -66,7 +66,7 @@ You said "all good" — nothing to fix.
    - `npx wrangler secret put OWNER_EMAILS` (paste your email; several are comma-separated)
    - `npx wrangler d1 migrations apply folio-db --remote`
    - `npx wrangler deploy`
-2. Install 0.1.0 (93) and run the "Only you can test" list.
+2. Install 0.1.0 (94) and run the "Only you can test" list.
 
 **Only you can test**
 1. Face ID lock on your iPhone: unlock, Lock after 1 min, a widget or Siri opening a locked Folio.
@@ -84,7 +84,7 @@ You said "all good" — nothing to fix.
 **Known issues:**
 1. A widget tick reaches your other devices only once Folio next runs on that iPhone (widgets can't open the diary — DECISION 260).
 2. Hindi scanning needs an iOS version with Apple's Hindi text recognition (not iOS 26.5).
-3. Builds before 0.1.0 (93) that edit an entry drop its mood (older apps don't know the field) — testers should update.
+3. Builds before 0.1.0 (94) that edit an entry drop its mood (older apps don't know the field) — testers should update.
 4. Until the API is deployed, sign-up stays open and the new invite screens don't appear.
 
 **Next phase ready:** yes.

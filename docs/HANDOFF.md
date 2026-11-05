@@ -5,10 +5,10 @@ The next session starts here. Read this, then `CLAUDE.md`, `docs/SPEC.md`, `docs
 _Last updated: 2026-11-05, end of Batch J (search, lock, widgets, memories, scan/share/calendar, PDF, invites, PWA; TestFlight 0.1.0 (91)) (owner's test fixes, avatars, onboarding, seasons, smarter tasks; TestFlight 0.1.0 (74) uploaded)._
 
 ## Batch J status (resume here)
-All nine parts done — report `docs/reports/batch-j.md`, DECISIONS 255–272, screenshots and recordings `docs/screenshots/batch-j/`. TestFlight **0.1.0 (93)** uploaded 2026-11-05 (91 was replaced: extensions' privacy manifests, DECISION 273).
+All nine parts done — report `docs/reports/batch-j.md`, DECISIONS 255–272, screenshots and recordings `docs/screenshots/batch-j/`. TestFlight **0.1.0 (94)** uploaded 2026-11-05 (91 was replaced: extensions' privacy manifests, DECISION 273).
 - Part 1: owner said all good. 2 search · 3 Lock Folio · 4 widgets/controls/Siri · 5 mood, On this day, Year in Pixels (schema v5) · 6 scan, share extension, Apple Calendar · 7 PDF export · 8 invite-only sign-up + installable web app · 9 tests, /vibesec, website, TestFlight.
 - **Not done by me — owner's steps:** the production API deploy was refused by the session's permission rules. In `api/`: `npx wrangler secret put OWNER_EMAILS`, `npx wrangler d1 migrations apply folio-db --remote`, `npx wrangler deploy`. Until then production sign-up stays open (DECISION 272).
-- **Next session:** the owner's notes on 0.1.0 (93) and the "Only you can test" list in the Batch J report; the device hitch check (DECISION 253); then the public-release list at the end of `docs/reports/batch-g.md`.
+- **Next session:** the owner's notes on 0.1.0 (94) and the "Only you can test" list in the Batch J report; the device hitch check (DECISION 253); then the public-release list at the end of `docs/reports/batch-g.md`.
 
 ### Batch J tools
 - `-FolioSearch "text"`, `-lockEnabled YES`, `-FolioJournalMode year`, `-FolioSeedPixels YES`, `-FolioSeedEvents YES` (with `xcrun simctl privacy <sim> grant calendar com.devilsense.folio` and `-showsCalendarEvents YES`), `-FolioOpen scan -FolioScanSample <abs path>` (sample: `ios/FolioTests/Resources/sample-diary-page.jpg`).
@@ -83,7 +83,7 @@ All seven parts done — report `docs/reports/batch-i.md`, DECISIONS 224–252, 
 | 14 Release | ✅ Batch G Part 3 (TestFlight external beta; public-release list in the Batch G report). |
 | Website rebuild | ✅ Batch H (story + 3D; live). |
 | Batch I | ✅ Owner's test fixes, avatars, onboarding, seasons, reminders/repeats/subtasks, own test run; TestFlight 0.1.0 (74). |
-| Batch J | ✅ Search, Lock Folio, widgets/controls/Siri, mood + On this day + Year in Pixels, scan/share/Apple Calendar, PDF, invite-only sign-up, installable web app; TestFlight 0.1.0 (93). API deploy waits for the owner. |
+| Batch J | ✅ Search, Lock Folio, widgets/controls/Siri, mood + On this day + Year in Pixels, scan/share/Apple Calendar, PDF, invite-only sign-up, installable web app; TestFlight 0.1.0 (94). API deploy waits for the owner. |
 
 Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8, Batch D = C fixes + Recently Deleted + 11 + Xcode Cloud, Batch E = D fixes + 9 + 10 + TestFlight, Batch F = improvements + 12 + TestFlight, Batch G = 13 + 14 + external TestFlight, Batch H = website rebuild, Batch I = owner's test of 56 + avatars + onboarding + seasons + smarter tasks, Batch J = the remaining features (search … PWA).
 
