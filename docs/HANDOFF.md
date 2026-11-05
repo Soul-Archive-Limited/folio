@@ -2,12 +2,12 @@
 
 The next session starts here. Read this, then `CLAUDE.md`, `docs/SPEC.md`, `docs/PHASES.md` and the last entries of `docs/DECISIONS.md`. Updated at the end of every batch.
 
-_Last updated: 2026-10-30, end of Batch I (owner's test fixes, avatars, onboarding, seasons, smarter tasks; TestFlight upload waiting on the owner's Xcode sign-in)._
+_Last updated: 2026-10-30, end of Batch I (owner's test fixes, avatars, onboarding, seasons, smarter tasks; TestFlight 0.1.0 (74) uploaded)._
 
 ## Batch I status (resume here)
 All seven parts done — report `docs/reports/batch-i.md`, DECISIONS 224–252, screenshots `docs/screenshots/batch-i/`.
-- Part 1 fixes (21), Part 2 avatars + photo (schema v4), Part 3 onboarding (`docs/ONBOARDING.md`), Part 4 seasons, Part 5 reminders/repeats/subtasks, Part 6 two-Simulator run on the local API (two bugs found and fixed: day labels west of UTC, refused live socket), Part 7 /vibesec + Release 0 warnings + CI green; 0.1.0 (74) archived but **not uploaded** — Xcode's account session expired (`exportArchive Failed to Use Accounts`) and App Store Connect is signed out in the browser.
-- **Next session:** once the owner has signed in again (Xcode → Settings → Accounts), rerun `scripts/testflight.sh` (the build number is the commit count, so it'll be higher than 74), add the build to the Friends group, submit for Beta App Review if asked; then the Beta App Review result for build 56 (then `testflightUrl` in `web/src/config/site.ts`); the owner's notes on 0.1.0 (74) and the "Only you can test" list; the open question about a device Instruments run (dev build on the owner's iPhone vs. owner runs it); then the public-release list at the end of `docs/reports/batch-g.md`.
+- Part 1 fixes (21), Part 2 avatars + photo (schema v4), Part 3 onboarding (`docs/ONBOARDING.md`), Part 4 seasons, Part 5 reminders/repeats/subtasks, Part 6 two-Simulator run on the local API (two bugs found and fixed: day labels west of UTC, refused live socket), Part 7 /vibesec + Release 0 warnings + CI green; 0.1.0 (74) uploaded 2026-11-05 (export of the archived build after the owner signed in to Xcode again); adding it to Friends waits on App Store Connect sign-in (the browser pane is signed out).
+- **Next session:** check build 74 is in the Friends group (submitted for Beta App Review if Apple asked); the Beta App Review result for build 56 (then `testflightUrl` in `web/src/config/site.ts`); the owner's notes on 0.1.0 (74) and the "Only you can test" list; then the public-release list at the end of `docs/reports/batch-g.md`.
 
 ### Batch I tools
 - Avatars: `python3 scripts/avatars/generate.py` regenerates `shared/avatars`, the asset catalog's `Avatars/` and `web/public/avatars` (then `cd ios && xcodegen generate`).
@@ -65,7 +65,7 @@ All seven parts done — report `docs/reports/batch-i.md`, DECISIONS 224–252, 
 | 13 Motion polish | ✅ Batch G Part 2. |
 | 14 Release | ✅ Batch G Part 3 (TestFlight external beta; public-release list in the Batch G report). |
 | Website rebuild | ✅ Batch H (story + 3D; live). |
-| Batch I | ✅ Owner's test fixes, avatars, onboarding, seasons, reminders/repeats/subtasks, own test run; TestFlight upload pending the owner's Xcode sign-in. |
+| Batch I | ✅ Owner's test fixes, avatars, onboarding, seasons, reminders/repeats/subtasks, own test run; TestFlight 0.1.0 (74). |
 
 Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8, Batch D = C fixes + Recently Deleted + 11 + Xcode Cloud, Batch E = D fixes + 9 + 10 + TestFlight, Batch F = improvements + 12 + TestFlight, Batch G = 13 + 14 + external TestFlight, Batch H = website rebuild, Batch I = owner's test of 56 + avatars + onboarding + seasons + smarter tasks.
 

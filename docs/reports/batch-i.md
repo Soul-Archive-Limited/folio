@@ -97,19 +97,19 @@ Not run: weak-network shaping (no Network Link Conditioner on this Mac); unreach
 - **/vibesec** on everything touched: two fixes (bounded synced repeat rules; live reconnect only while signed in), rest clean — DECISION 252. `npm audit` 0, gitleaks clean on every commit.
 - **Release build:** 0 warnings. **Tests:** iOS 212 unit + 19 crypto + UI tests (32 incl. new onboarding and tour tests) pass locally; web 47 unit + 22 build checks; CI status in the closing note.
 - **TestFlight link:** still "This beta isn't accepting any new testers right now" — build 56 isn't approved yet, so `testflightUrl` stays empty.
-- **Upload — blocked:** 0.1.0 (74) archived (`ios/build/testflight/Folio.xcarchive`, from the CI-green commit), but the upload stopped with `exportArchive Failed to Use Accounts`: Xcode's Apple Account session on this Mac has expired, and App Store Connect in the browser is signed out. Both need your password, so the build isn't in TestFlight or the Friends group yet.
+- **Upload:** 0.1.0 (74) uploaded on 2026-11-05 (the archive made from the CI-green commit) after you signed in to Xcode again; App Store Connect processes it, then it goes to the Friends group (Beta App Review if Apple asks).
 
 **Files changed:** ~150 (`git diff --stat 379ff36`). Key: `ios/Folio/Features/{Onboarding,Avatar,Todo,Calendar,Composer,Share,Journal,Profile,Tour,Dictation}/*`, `Models/{RepeatRule,FolioSchema*,TaskItem,UserSettings}.swift`, `Services/{Reminders,Settings,Store,Sync}/*`, `DesignSystem/Background/{Season,SeasonalLayer}.swift`, `Resources/Settings.bundle`, `scripts/avatars/*`, `shared/avatars/*`, `web/src/app/{lib/repeat.ts,ui/Avatar.tsx}`, `docs/{ONBOARDING,SPEC,DECISIONS,HANDOFF}.md`.
 
 **Deviations from SPEC:** none left; SPEC updated for every behaviour change (§2, §3.1, §3.2, §3.5, §4.3, §5, §6.1–6.9, §7, §8, §17).
 
 **Manual steps needed from the owner:**
-1. Xcode → Settings → Accounts → sign in again with the Apple Account for team Soul Archive Ltd, then tell me "continue" (I'll rerun `scripts/testflight.sh`, add the build to Friends and submit it for review if Apple asks). Or upload the archive yourself from Xcode → Window → Organizer.
+1. Add build 74 to the Friends group in App Store Connect (and submit for Beta App Review if asked) — or sign in to the session's browser pane and I'll do it.
 2. Check the Beta App Review result for build 56; once approved, tell me (or put `https://testflight.apple.com/join/88BuzSRc` in `web/src/config/site.ts` → `testflightUrl`).
 3. Run the "Only you can test" list on the new build.
 
 **Open questions for the Architect:**
-1. For the device Instruments run: may I install a development build on your iPhone (it replaces the TestFlight install), or would you rather run Animation Hitches yourself from Xcode?
+none — the device Instruments run is planned for the final polish batch, keeping the TestFlight install (owner, 2026-11-05).
 
 **Known issues:**
 1. An older app version that edits a task or the settings drops the new fields (reminder, repeat, subtasks, avatar) — testers should update (DECISION 240).
