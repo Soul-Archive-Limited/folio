@@ -6,8 +6,8 @@ _Last updated: 2026-10-30, end of Batch I (owner's test fixes, avatars, onboardi
 
 ## Batch I status (resume here)
 All seven parts done — report `docs/reports/batch-i.md`, DECISIONS 224–252, screenshots `docs/screenshots/batch-i/`.
-- Part 1 fixes (21), Part 2 avatars + photo (schema v4), Part 3 onboarding (`docs/ONBOARDING.md`), Part 4 seasons, Part 5 reminders/repeats/subtasks, Part 6 two-Simulator run on the local API (two bugs found and fixed: day labels west of UTC, refused live socket), Part 7 /vibesec + Release 0 warnings + CI green; 0.1.0 (74) uploaded 2026-11-05 (export of the archived build after the owner signed in to Xcode again); adding it to Friends waits on App Store Connect sign-in (the browser pane is signed out).
-- **Next session:** check build 74 is in the Friends group (submitted for Beta App Review if Apple asked); the Beta App Review result for build 56 (then `testflightUrl` in `web/src/config/site.ts`); the owner's notes on 0.1.0 (74) and the "Only you can test" list; then the public-release list at the end of `docs/reports/batch-g.md`.
+- Part 1 fixes (21), Part 2 avatars + photo (schema v4), Part 3 onboarding (`docs/ONBOARDING.md`), Part 4 seasons, Part 5 reminders/repeats/subtasks, Part 6 two-Simulator run on the local API (two bugs found and fixed: day labels west of UTC, refused live socket), Part 7 /vibesec + Release 0 warnings + CI green; 0.1.0 (74) uploaded 2026-11-05, in the Friends group and Approved; build 56 approved too, so `testflightUrl` is set on the website.
+- **Next session:** the owner's notes on 0.1.0 (74) and the "Only you can test" list; then the public-release list at the end of `docs/reports/batch-g.md`.
 
 ### Batch I tools
 - Avatars: `python3 scripts/avatars/generate.py` regenerates `shared/avatars`, the asset catalog's `Avatars/` and `web/public/avatars` (then `cd ios && xcodegen generate`).

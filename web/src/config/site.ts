@@ -6,7 +6,7 @@ export const site = {
   name: 'Folio',
   url: 'https://folio.devilsense.com',
   /** Public TestFlight link, e.g. https://testflight.apple.com/join/XXXXXXXX. Empty = hidden. */
-  testflightUrl: '',
+  testflightUrl: 'https://testflight.apple.com/join/88BuzSRc',
   /** App Store listing. Empty = hidden. */
   appStoreUrl: '',
   /** True once the web app at /app is live (Phase 12). */
