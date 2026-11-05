@@ -8,6 +8,7 @@ struct AppRootView: View {
     @Environment(DiaryStore.self) private var store
     @Environment(AccountModel.self) private var account
     @Environment(SyncEngine.self) private var sync
+    @Environment(CalendarEvents.self) private var calendarEvents
     @AppStorage(PreferenceKeys.hasOnboarded) private var hasOnboarded = false
     @State private var greeting: GreetingIntroModel?
     @State private var tour = TourModel()
@@ -84,6 +85,9 @@ struct AppRootView: View {
             OnThisDayNotifier.shared.reschedule()
         }
         .task { OnThisDayNotifier.shared.start(store: store) }
+        #if DEBUG
+        .task { calendarEvents.seedForScreenshots() }
+        #endif
         // Widgets (Batch J): ticks made on a widget, then a fresh snapshot.
         .task { WidgetSnapshotWriter.shared.start(store: store) }
         .task { await account.checkAppleCredential() }

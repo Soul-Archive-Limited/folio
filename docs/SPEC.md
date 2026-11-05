@@ -248,6 +248,7 @@ Over `AuraBackground`:
 - **Day panel:** "Saturday, 25 October" `title2` + [G] mini "+". Entries section (cards: 64 pt photo, title, 2-line preview, category chip, time) → detail via zoom. Tasks section (checkbox toggles in place; completed shown checked, struck, 50% — they stay). Empty: "Nothing here yet." + Write · Add task.
   - Scrolling the panel up collapses the grid to the selected week (swipeable week strip); scroll to top or tap title to expand. Fully interactive (tracks finger). It always comes to rest fully open or fully collapsed: the release uses the system's projected (velocity-aware) target, and any scroll that stops in between (an interrupted deceleration, content changing height) settles to the nearer end. Only the grid's height, offset and fades read the drag progress (Batch I).
   - **On this day (Batch J):** at the top of the day panel, a glass card listing pages from this date in earlier years (year in bold, title, mood), newest first, three at most ("and N more"); tap opens the page. Nothing when there are none.
+  - **Apple Calendar (Batch J, opt-in):** a "Calendar" section in the day panel (colour bar, "All day" / 09:30 / "until 10:00", title; read-only) and a short bar in the bottom-left corner of a day cell that has events (its own zone). Off until Profile → Apple Calendar is turned on.
   - The day panel runs down to the tab bar: only the round "+" floats over it, and the panel's last row can scroll fully clear of the button.
   - After a full close with unsaved writing, a "Continue your draft" pill floats beside the "+": tap to reopen the draft's composer with it restored; swipe it away to discard the draft (Batch I).
 
@@ -295,6 +296,7 @@ Inset-grouped glass sections:
 - **Dictation & Intelligence** (§8–9) with availability explanation.
 - **Privacy & Security:** **Lock Folio** + "Lock" delay (§4.4) · Hide content in app switcher.
 - **Widgets:** Show details on Home Screen · Show details on Lock Screen (§6.18).
+- **Memories:** On this day notification + Time (§6.19). **Apple Calendar:** Show Apple Calendar events (§6.2).
 - **Your data:** **Recently Deleted · N** (§5.2) · Export as JSON + photos zip (decrypted, local; "Include Recently Deleted" toggle, off by default) · Export PDF (later; hidden) · Erase data on this iPhone (also empties Recently Deleted).
 - **Help:** "Show the tour again" · "What do the marks mean?" · Support & FAQ · Contact support (mailto).
 - **About:** Website · Privacy Policy · Terms · Open Source (GitHub) · Acknowledgements · Rate Folio (`requestReview` only here) · Version · "Made by Soul Archive Ltd".
@@ -334,6 +336,10 @@ One field per place: Calendar (pull-down / magnifier → sheet), Journal and To-
 - Empty: "Search titles, pages, categories and tasks. Everything stays on this iPhone." · No match: "No matches for “…”." · First build: "Getting your diary ready…".
 - 10,000 entries: a query is a binary search per word per item (a few ms); tested in `SearchIndexTests`.
 
+### 6.20 Bring things in (Batch J)
+- **Scan a paper page** ("+" long-press → Scan a paper page): VisionKit's document camera (several pages; explainer before the camera prompt) or "Choose photos of pages" → text read on the device (`RecognizeTextRequest`, accurate, language correction; the device language, English and Hindi where iOS supports them — iOS 26.5 has no Hindi model; lines under 0.4 confidence are dropped) → a review sheet: the pages, **the date found on the page suggested** (numeric dates day-first except in the US, written dates via `NSDataDetector`, Devanagari digits, 1900 → tomorrow), the text in an editor → Save makes a new entry for that day with the text as paragraphs and the scans as photos (≤ 10; GPS stripped, resized like any photo) and a "Saved to Tue 12 Mar 2019 · Show" toast.
+- **Share into Folio** (share extension "Folio" for up to 10 photos, text and a web link): a mini composer — the shared things, optional title and line, Day, "Add to that day's page" (when it has one), Category — then Save. The item is sealed with AES-GCM under an inbox key held in the Keychain (access group = the App Group, this device only, never synced) and written to the App Group inbox; Folio imports it on its next foreground as an ordinary local edit (new entry, or paragraphs + photos added to that day's latest page), deletes the file and says "Added 1 shared to Folio". The extension never opens the diary; its category list comes from a small sealed context the app writes.
+
 ### 6.19 Memories notification (Batch J)
 Profile → **Memories** → "On this day notification" (off by default; glass explainer before the system prompt the first time; denied → Open Settings) + Time (default 08:00). Local notifications on this device for the next 7 days that have pages from earlier years: title "On this day", body "In 2025, you wrote something. Take a look back?" — the year only, never a title or words (Lock Screen). Rescheduled after changes and on foreground; tap opens today with the On this day card. Reminders keep up to 56 of iOS's 64 pending notifications.
 
@@ -357,7 +363,9 @@ All read a small **snapshot** the app writes to the App Group `group.com.devilse
 | Microphone | First tap of Mic | "Folio uses the microphone only while you dictate. Audio is processed on your iPhone and never stored or sent anywhere." |
 | Speech recognition | Only if the Speech API requires it (verify) | "Folio turns your voice into text on your iPhone. Nothing is sent to a server." |
 | Face ID | Showing recovery key; approving a link; turning Lock Folio on/off and unlocking it (§4.4) | "Folio uses Face ID to protect your recovery key and diary." |
-| Notifications | The first time a task's "Remind me" is turned on (Batch I) | system |
+| Notifications | The first time a task's "Remind me" is turned on (Batch I), or the On this day notification (Batch J) | system |
+| Calendars (full access, read) | Profile → Apple Calendar → Show events (Batch J) | "Folio shows your calendar's events beside your diary, on this iPhone only. They're never copied into Folio or sent anywhere." |
+| Camera (scan) | Scan pages (Batch J) | same camera string, which now mentions scanning |
 Before each system prompt: a one-line glass explainer with Continue / Not now. Denied → gentle "Open Settings" row.
 
 ---
@@ -557,7 +565,7 @@ folio/
 ---
 
 ## 17. Later (don't build until asked)
-PDF export · alternate icons · scan paper diaries (VisionKit + on-device text recognition) · Journaling Suggestions · Share extension · passkeys.
+PDF export · alternate icons · Journaling Suggestions · passkeys.
 
 ---
 

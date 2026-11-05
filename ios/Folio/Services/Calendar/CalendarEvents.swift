@@ -7,7 +7,7 @@ import UIKit
 /// diary, the widgets' snapshot or anything that syncs.
 @Observable
 final class CalendarEvents {
-    struct Event: Identifiable, Equatable {
+    nonisolated struct Event: Identifiable, Equatable, Sendable {
         let id: String
         let title: String
         let start: Date
@@ -49,6 +49,23 @@ final class CalendarEvents {
         return granted
     }
 
+    #if DEBUG
+    /// `-FolioSeedEvents YES` (with calendar access): two events today and one tomorrow, for screenshots.
+    func seedForScreenshots() {
+        guard UserDefaults.standard.bool(forKey: "FolioSeedEvents"), hasAccess, let target = store.defaultCalendarForNewEvents else { return }
+        let start = Calendar.current.startOfDay(for: .now)
+        for (title, hour, length, days) in [("Standup", 9.5, 0.5, 0), ("Dinner with Ana", 19.0, 2.0, 0), ("Dentist", 11.0, 1.0, 1)] {
+            let event = EKEvent(eventStore: store)
+            event.title = title
+            event.calendar = target
+            event.startDate = start.addingTimeInterval(Double(days) * 86_400 + hour * 3600)
+            event.endDate = event.startDate.addingTimeInterval(length * 3600)
+            try? store.save(event, span: .thisEvent)
+        }
+        invalidate()
+    }
+    #endif
+
     func invalidate() {
         cache = [:]
         revision += 1
@@ -68,6 +85,21 @@ final class CalendarEvents {
         return Set(events(around: month, calendar: calendar).keys)
     }
 
+    /// Every day each event touches (one ending at midnight doesn't touch the next day),
+    /// all-day first, then by start.
+    nonisolated static func byDay(_ events: [Event], calendar: Calendar) -> [DayKey: [Event]] {
+        var byDay: [DayKey: [Event]] = [:]
+        for item in events {
+            var day = DayKey(date: item.start, calendar: calendar)
+            let lastDay = DayKey(date: max(item.start, item.end.addingTimeInterval(-1)), calendar: calendar)
+            while day <= lastDay {
+                byDay[day, default: []].append(item)
+                day = day.adding(days: 1)
+            }
+        }
+        return byDay.mapValues { $0.sorted { ($0.isAllDay ? 0 : 1, $0.start) < ($1.isAllDay ? 0 : 1, $1.start) } }
+    }
+
     /// A six-week window around the month, fetched once and cached until the store changes.
     private func events(around month: MonthKey, calendar: Calendar) -> [DayKey: [Event]] {
         let key = "\(month.year)-\(month.month)"
@@ -75,22 +107,12 @@ final class CalendarEvents {
         let first = month.firstDay.adding(days: -7).startDate(in: calendar)
         let last = month.firstDay.adding(days: 45).startDate(in: calendar)
         let predicate = store.predicateForEvents(withStart: first, end: last, calendars: nil)
-        var byDay: [DayKey: [Event]] = [:]
-        for event in store.events(matching: predicate) {
-            let item = Event(id: event.calendarItemIdentifier + "\(event.startDate.timeIntervalSince1970)",
-                             title: event.title ?? String(localized: "Event"), start: event.startDate, end: event.endDate,
-                             isAllDay: event.isAllDay, color: Color(cgColor: event.calendar.cgColor))
-            // Every day the event touches (an event ending at midnight doesn't touch the next day).
-            var day = DayKey(date: event.startDate, calendar: calendar)
-            let lastDay = DayKey(date: max(event.startDate, event.endDate.addingTimeInterval(-1)), calendar: calendar)
-            while day <= lastDay {
-                byDay[day, default: []].append(item)
-                day = day.adding(days: 1)
-            }
+        let items = store.events(matching: predicate).map { event in
+            Event(id: event.calendarItemIdentifier + "\(event.startDate.timeIntervalSince1970)",
+                  title: event.title ?? String(localized: "Event"), start: event.startDate, end: event.endDate,
+                  isAllDay: event.isAllDay, color: Color(cgColor: event.calendar.cgColor))
         }
-        for (day, items) in byDay {
-            byDay[day] = items.sorted { ($0.isAllDay ? 0 : 1, $0.start) < ($1.isAllDay ? 0 : 1, $1.start) }
-        }
+        let byDay = Self.byDay(items, calendar: calendar)
         cache[key] = byDay
         return byDay
     }

@@ -5,7 +5,8 @@ import Testing
 @testable import Folio
 
 @MainActor
-@Suite("Share into Folio", .serialized)
+// CI builds unsigned, so there is no App Group container there: these run on signed builds.
+@Suite("Share into Folio", .serialized, .enabled(if: AppGroup.container != nil))
 struct ShareInboxTests {
     let container: ModelContainer
     let store: DiaryStore

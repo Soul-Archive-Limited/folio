@@ -54,7 +54,7 @@ struct WidgetSnapshotTests {
     func addTaskIntent() async throws {
         AppServices.store = store
         defer { AppServices.store = nil }
-        var intent = AddTaskIntent()
+        let intent = AddTaskIntent()
         intent.title = "  Buy stamps "
         intent.date = Calendar.current.date(from: DateComponents(year: 2026, month: 11, day: 6, hour: 18, minute: 30))
         _ = try await intent.perform()
