@@ -14,6 +14,10 @@ enum PreferenceKeys {
     static let hasOnboarded = "hasOnboarded"
     /// Dictation language as a locale identifier; empty follows the device (SPEC §8).
     static let dictationLocale = "dictationLocale"
+    /// Profile → Privacy → Lock Folio (Batch J): device-only, never synced.
+    static let lockEnabled = "lockEnabled"
+    /// `LockAfter` raw value in seconds.
+    static let lockAfter = "lockAfter"
     /// DEBUG only: pretend Apple's on-device model is unavailable (SPEC §9 testing).
     static let fakeIntelligenceUnavailable = "FolioFakeIntelligenceUnavailable"
 }

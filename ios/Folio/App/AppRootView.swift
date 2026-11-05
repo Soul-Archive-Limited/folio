@@ -12,6 +12,8 @@ struct AppRootView: View {
     @State private var greeting: GreetingIntroModel?
     @State private var tour = TourModel()
     @State private var startsTourAfterGreeting = false
+    /// Lock Folio (Batch J): its own window over every scene.
+    @State private var lock = AppLock.shared
 
     var body: some View {
         ZStack {
@@ -38,6 +40,14 @@ struct AppRootView: View {
             SystemSettingsBridge().reconcile(with: store)
         }
         .privacyCovered()
+        // Cold launch with the lock on: draw the launch screen until the lock window is up.
+        .overlay {
+            if lock.hidesContent {
+                ZStack { Color.bg; AppMark() }.ignoresSafeArea()
+            }
+        }
+        .onChange(of: store.settings().displayName, initial: true) { _, name in lock.displayName = name }
+        .onAppear { lock.attachScenes() }
         .onChange(of: scenePhase) { old, phase in
             // Every cover (root and sheets) reads the same stored line, so it's picked here, once.
             if old == .active { PrivacyCoverLines.advance() }
@@ -45,9 +55,11 @@ struct AppRootView: View {
                 UserDefaults.standard.set(AppClock.now, forKey: PreferenceKeys.lastBackgroundAt)
                 TrashMaintenance.scheduleRefresh(signedIn: account.isSignedIn)
                 sync.enterBackground()
+                lock.didEnterBackground()
             }
             // Launch reaches `.active` too, so this covers launch and every foreground.
             if phase == .active {
+                lock.didBecomeActive()
                 // Theme, writing font or first weekday may have changed in the Settings app.
                 SystemSettingsBridge().reconcile(with: store)
                 WindowAppearance.apply(AppearancePreference(rawValue: store.settings().appearance) ?? .system)
@@ -100,7 +112,8 @@ struct AppRootView: View {
     }
 
     private func prepareGreetingIfNeeded() {
-        guard greeting == nil, hasOnboarded else { return }
+        // With the lock on, the lock screen is the greeting.
+        guard greeting == nil, hasOnboarded, lock.state == .open else { return }
         let factory = GreetingFactory(defaults: .standard)
         #if DEBUG
         if let screen = DebugLaunchOptions.screen, screen != .greeting { return }

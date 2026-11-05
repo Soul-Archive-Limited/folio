@@ -166,6 +166,14 @@ Strings in `Greetings.swift`, localisable.
 ### 4.3 App-switcher privacy cover
 On `.inactive`/`.background`, instantly overlay `bg` + static aura + app mark + short line, so diary content never appears in the app switcher. The line is picked fresh each time the app leaves the foreground from a pool of eight ("See you soon, {name}.", "Your pages are safe, {name}.", "Back whenever you're ready, {name}.", "Your days are kept, {name}.", "Locked away safely, {name}.", "Until next time, {name}.", "The page will wait for you, {name}.", "Only you can read this, {name}."; each also without the name) and never repeats the last one (Batch I). Fade out 0.2 s on `.active`. On by default; toggle in Profile → Privacy.
 
+### 4.4 Lock Folio (Batch J)
+Profile → Privacy & Security → **Lock Folio** (Face ID / Touch ID / Optic ID, falling back to the passcode — `LAContext` `.deviceOwnerAuthentication`) and **Lock: Immediately · After 1 minute · After 5 minutes · After 15 minutes**. Device-only, never synced; turning it on or off asks for Face ID / passcode first; without a device passcode it can't be turned on ("Set a passcode in the Settings app to lock Folio.").
+- The lock is its **own window above everything in every scene** (level above alerts), so sheets, menus, deep links, widget taps and shortcuts all open underneath it. The moment Folio goes to the background with the lock on, that window goes up as the §4.3 cover (centred mark + cover line) — the app-switcher snapshot is the cover even if "Hide content in app switcher" is off (that toggle is greyed while the lock is on). Coming back within "Lock after" fades it away (0.2 s); otherwise it locks.
+- **Locked:** mark and a time-of-day greeting ("Still up, Sam?") in the upper third (clear of the system's Face ID panel in the middle), Face ID asked for at once, and a glass **Unlock with Face ID** button near the bottom. Cancel keeps it locked; a real failure says "Couldn't unlock. Try again." The keyboard is put away when it locks.
+- **Cold launch with the lock on:** the launch screen (bg + mark) until the lock window is up, so nothing renders visibly first; the lock screen replaces the greeting intro.
+- A clock that went backwards locks (never trust a negative gap). If the device passcode was removed since, the lock opens (iOS no longer protects anything).
+- Returning from the Face ID sheet is not a new visit (no re-lock loop).
+
 ---
 
 ## 5. Data model (SwiftData, local-first)
@@ -282,7 +290,7 @@ Inset-grouped glass sections:
 - **Appearance:** Theme, Writing font, First day of week.
 - **Writing:** Default category · Show photo tiles on calendar.
 - **Dictation & Intelligence** (§8–9) with availability explanation.
-- **Privacy & Security:** Hide content in app switcher · Face ID lock (later; hidden until built).
+- **Privacy & Security:** **Lock Folio** + "Lock" delay (§4.4) · Hide content in app switcher.
 - **Your data:** **Recently Deleted · N** (§5.2) · Export as JSON + photos zip (decrypted, local; "Include Recently Deleted" toggle, off by default) · Export PDF (later; hidden) · Erase data on this iPhone (also empties Recently Deleted).
 - **Help:** "Show the tour again" · "What do the marks mean?" · Support & FAQ · Contact support (mailto).
 - **About:** Website · Privacy Policy · Terms · Open Source (GitHub) · Acknowledgements · Rate Folio (`requestReview` only here) · Version · "Made by Soul Archive Ltd".
@@ -331,7 +339,7 @@ One field per place: Calendar (pull-down / magnifier → sheet), Journal and To-
 | Camera | Tap Camera | "Folio uses the camera only when you choose to take a photo for an entry." |
 | Microphone | First tap of Mic | "Folio uses the microphone only while you dictate. Audio is processed on your iPhone and never stored or sent anywhere." |
 | Speech recognition | Only if the Speech API requires it (verify) | "Folio turns your voice into text on your iPhone. Nothing is sent to a server." |
-| Face ID | Showing recovery key; app lock (later) | "Folio uses Face ID to protect your recovery key and diary." |
+| Face ID | Showing recovery key; approving a link; turning Lock Folio on/off and unlocking it (§4.4) | "Folio uses Face ID to protect your recovery key and diary." |
 | Notifications | The first time a task's "Remind me" is turned on (Batch I) | system |
 Before each system prompt: a one-line glass explainer with Continue / Not now. Denied → gentle "Open Settings" row.
 
@@ -531,7 +539,7 @@ folio/
 ---
 
 ## 17. Later (don't build until asked)
-Widgets · Face ID app lock · PDF export · alternate icons · On-this-day · Year in Pixels · scan paper diaries (VisionKit + on-device text recognition) · Journaling Suggestions · App Intents/Shortcuts · Share extension · passkeys.
+Widgets · PDF export · alternate icons · On-this-day · Year in Pixels · scan paper diaries (VisionKit + on-device text recognition) · Journaling Suggestions · App Intents/Shortcuts · Share extension · passkeys.
 
 ---
 

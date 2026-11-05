@@ -89,21 +89,53 @@ struct ProfileWritingSection: View {
     }
 }
 
-/// Privacy & Security: the app-switcher cover (SPEC §4.3). Face ID lock is hidden until built.
+/// Privacy & Security: Lock Folio (Batch J) and the app-switcher cover (SPEC §4.3).
 struct ProfilePrivacySection: View {
     @AppStorage(PreferenceKeys.privacyCoverEnabled) private var hidesInSwitcher = true
+    @AppStorage(PreferenceKeys.lockEnabled) private var lockEnabled = false
+    @AppStorage(PreferenceKeys.lockAfter) private var lockAfter = LockAfter.immediately.rawValue
+    @State private var lock = AppLock.shared
+    @State private var changingLock = false
 
     var body: some View {
         Section {
+            Toggle(isOn: Binding(get: { lockEnabled }, set: { setLock($0) })) {
+                ProfileRowLabel(title: "Lock Folio", systemImage: lock.methodSymbol, detail: lock.methodName)
+            }
+            .disabled(changingLock)
+            .accessibilityIdentifier("profile.lock")
+            if lockEnabled {
+                Picker(selection: $lockAfter) {
+                    ForEach(LockAfter.allCases) { Text($0.title).tag($0.rawValue) }
+                } label: {
+                    ProfileRowLabel(title: "Lock", systemImage: "timer")
+                }
+            }
             Toggle(isOn: $hidesInSwitcher) {
                 ProfileRowLabel(title: "Hide content in app switcher", systemImage: "eye.slash")
             }
+            .disabled(lockEnabled)
         } header: {
             Text("Privacy & Security")
         } footer: {
-            Text("Covers your pages when you leave Folio, so they never show in the app switcher.")
+            Text(footer)
         }
         .listRowBackground(ProfileRowBackground())
+    }
+
+    private var footer: String {
+        if let problem = lock.problem, !lockEnabled { return problem }
+        return lockEnabled
+            ? String(localized: "Folio asks for \(lock.methodName) when you come back, and always covers your pages in the app switcher. Widgets show counts only on the Lock Screen.")
+            : String(localized: "Covers your pages when you leave Folio, so they never show in the app switcher.")
+    }
+
+    private func setLock(_ on: Bool) {
+        changingLock = true
+        Task {
+            if await lock.setEnabled(on) { lockEnabled = on }
+            changingLock = false
+        }
     }
 }
 
