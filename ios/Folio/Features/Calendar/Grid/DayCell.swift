@@ -24,6 +24,7 @@ struct DayCell: View {
                 todayOutline
                 TaskCornerMark(marker: state.marker, isPhoto: state.thumbnailPhotoID != nil, isSelected: state.isSelected)
                     .opacity(markerOpacity)
+                if state.hasEvents { eventMark }
                 selectionStroke
             }
             .frame(width: size, height: size)
@@ -62,6 +63,18 @@ struct DayCell: View {
             .opacity(state.isSelected && state.thumbnailPhotoID != nil ? 1 : 0)
             .animation(FolioMotion.confirm(reduceMotion: reduceMotion), value: state.isSelected)
             .allowsHitTesting(false)
+    }
+
+    /// Apple Calendar events (Batch J): a short bar in the bottom-left corner, a zone of its own.
+    private var eventMark: some View {
+        Capsule()
+            .fill(state.thumbnailPhotoID != nil || state.isSelected ? AnyShapeStyle(.white.opacity(0.9)) : AnyShapeStyle(.inkSecondary))
+            .frame(width: max(size * 0.18, 6), height: 2)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+            .padding(.leading, size * 0.14)
+            .padding(.bottom, size * 0.1)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
     }
 
     /// Non-matching days fade their markers to 15 % while a filter is on (SPEC §6.2).

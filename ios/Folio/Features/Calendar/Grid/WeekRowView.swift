@@ -10,6 +10,7 @@ struct WeekRowView: View {
 
     @Environment(DiaryStore.self) private var store
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(CalendarEvents.self) private var events: CalendarEvents?
 
     var body: some View {
         let days = (0..<7).map { weekStart.adding(days: $0) }
@@ -21,7 +22,8 @@ struct WeekRowView: View {
                 DayCell(
                     state: DayCellState(day: day, marker: markers[day], isToday: day == today,
                                         isSelected: day == model.selectedDay, isInMonth: true,
-                                        matchesFilter: model.matchesFilter(markers[day]), showsPhotoTiles: showsPhotoTiles),
+                                        matchesFilter: model.matchesFilter(markers[day]), showsPhotoTiles: showsPhotoTiles,
+                                        hasEvents: events?.days(in: day.monthKey).contains(day) == true),
                     size: layout.cellSize,
                     categoryColor: { $0.flatMap { categoryColors[$0] } ?? .inkSecondary },
                     onTap: { model.select(day, reduceMotion: reduceMotion) }

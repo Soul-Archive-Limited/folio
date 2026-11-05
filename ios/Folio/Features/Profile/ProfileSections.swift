@@ -206,6 +206,50 @@ struct ProfileMemoriesSection: View {
     }
 }
 
+/// Apple Calendar (Batch J): opt-in, read-only events beside the diary.
+struct ProfileCalendarSection: View {
+    @AppStorage(CalendarEvents.enabledKey) private var shows = false
+    @Environment(CalendarEvents.self) private var events
+    @State private var showsExplainer = false
+    @State private var showsDenied = false
+    @Environment(\.openURL) private var openURL
+
+    var body: some View {
+        Section {
+            Toggle(isOn: Binding(get: { shows && events.hasAccess }, set: { $0 ? turnOn() : (shows = false) })) {
+                ProfileRowLabel(title: "Show Apple Calendar events", systemImage: "calendar.badge.clock")
+            }
+            .tint(.emberStrong)
+        } header: {
+            Text("Apple Calendar")
+        } footer: {
+            Text("Today's events in the day panel and a small mark on the calendar. Read on this iPhone only; never copied into Folio or synced.")
+        }
+        .listRowBackground(ProfileRowBackground())
+        .onChange(of: shows) { events.invalidate() }
+        .sheet(isPresented: $showsExplainer) {
+            PermissionExplainer(systemImage: "calendar.badge.clock",
+                                message: "Folio can show your calendar's events beside your diary. They stay on this iPhone.",
+                                footnote: "iOS will ask next.") {
+                showsExplainer = false
+                Task { if await events.requestAccess() { shows = true } else { showsDenied = true } }
+            }
+        }
+        .alert("Calendar access is off for Folio", isPresented: $showsDenied) {
+            Button("Open Settings") { if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) } }
+            Button("Not now", role: .cancel) {}
+        }
+    }
+
+    private func turnOn() {
+        switch events.access {
+        case .granted: shows = true
+        case .needsPrompt: showsExplainer = true
+        case .denied: showsDenied = true
+        }
+    }
+}
+
 /// Widgets (Batch J): what the widgets may show. Stored in the App Group so they can read it.
 struct ProfileWidgetsSection: View {
     @AppStorage(AppGroup.homeDetailsKey, store: AppGroup.defaults) private var homeDetails = true

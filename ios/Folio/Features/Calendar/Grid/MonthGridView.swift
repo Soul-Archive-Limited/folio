@@ -12,6 +12,7 @@ struct MonthGridView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @AppStorage(PreferenceKeys.showPhotoTiles) private var showsPhotoTiles = true
     @Environment(TourModel.self) private var tour: TourModel?
+    @Environment(CalendarEvents.self) private var events: CalendarEvents?
 
     var body: some View {
         let days = month.gridDays(firstWeekday: firstWeekday)
@@ -19,6 +20,7 @@ struct MonthGridView: View {
         let today = store.today
         let selectedRow = month == model.selectedDay.monthKey ? model.selectedRow(firstWeekday: firstWeekday) : 0
         let categoryColors = Dictionary(uniqueKeysWithValues: store.categories().map { ($0.id, $0.color.color) })
+        let eventDays = events?.days(in: month) ?? []
 
         VStack(spacing: CalendarLayout.gap) {
             ForEach(0..<6, id: \.self) { row in
@@ -30,7 +32,8 @@ struct MonthGridView: View {
                             state: DayCellState(
                                 day: day, marker: inMonth ? markers[day] : nil, isToday: inMonth && day == today,
                                 isSelected: day == model.selectedDay, isInMonth: inMonth,
-                                matchesFilter: model.matchesFilter(markers[day]), showsPhotoTiles: showsPhotoTiles
+                                matchesFilter: model.matchesFilter(markers[day]), showsPhotoTiles: showsPhotoTiles,
+                                hasEvents: inMonth && eventDays.contains(day)
                             ),
                             size: layout.cellSize,
                             categoryColor: { $0.flatMap { categoryColors[$0] } ?? .inkSecondary },

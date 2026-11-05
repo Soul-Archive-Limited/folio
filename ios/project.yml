@@ -65,8 +65,9 @@ targets:
         # Only Apple's CryptoKit and HTTPS: encryption within the operating system, exempt from
         # export documentation (DECISIONS 143). Never add a third-party crypto library.
         ITSAppUsesNonExemptEncryption: false
-        NSCameraUsageDescription: "Folio uses the camera only when you take a photo for an entry or scan a code to link another device."
-        NSFaceIDUsageDescription: "Folio asks for Face ID before showing your recovery key or letting another device read your diary."
+        NSCameraUsageDescription: "Folio uses the camera only when you take a photo for an entry, scan a paper diary page or scan a code to link another device."
+        NSCalendarsFullAccessUsageDescription: "Folio shows your calendar's events beside your diary, on this iPhone only. They're never copied into Folio or sent anywhere."
+        NSFaceIDUsageDescription: "Folio asks for Face ID to unlock your diary when Lock Folio is on, and before showing your recovery key or letting another device read it."
         NSMicrophoneUsageDescription: "Folio uses the microphone only while you dictate. Audio is processed on your iPhone and never stored or sent anywhere."
         NSSpeechRecognitionUsageDescription: "Folio turns your voice into text on your iPhone. Nothing is sent to a server."
         # Background refresh runs the Recently Deleted purge (SPEC §5.2) and sync (SPEC §10.5).

@@ -10,6 +10,8 @@ struct DayCellState: Equatable {
     /// False when a filter is active and nothing on this day matches it.
     let matchesFilter: Bool
     let showsPhotoTiles: Bool
+    /// Apple Calendar has something on this day (Batch J, opt-in).
+    var hasEvents = false
 
     var thumbnailPhotoID: UUID? { showsPhotoTiles ? marker?.thumbnailPhotoID : nil }
 }

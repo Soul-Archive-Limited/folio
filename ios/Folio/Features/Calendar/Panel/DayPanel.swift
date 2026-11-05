@@ -10,6 +10,7 @@ struct DayPanel: View {
     @Environment(DiaryStore.self) private var store
     @Environment(\.newItemRequest) private var request
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(CalendarEvents.self) private var calendarEvents: CalendarEvents?
 
     var body: some View {
         let day = model.selectedDay
@@ -36,6 +37,9 @@ struct DayPanel: View {
 
             VStack(alignment: .leading, spacing: Spacing.m) {
                 OnThisDayCard(day: day)
+                if let events = calendarEvents?.events(on: day, calendar: store.calendar), !events.isEmpty {
+                    DayEventsSection(events: events, day: day, calendar: store.calendar)
+                }
                 if entries.isEmpty && tasks.isEmpty {
                     DayPanelEmptyState(day: day)
                 } else {

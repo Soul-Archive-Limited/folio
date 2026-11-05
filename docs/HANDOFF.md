@@ -2,9 +2,26 @@
 
 The next session starts here. Read this, then `CLAUDE.md`, `docs/SPEC.md`, `docs/PHASES.md` and the last entries of `docs/DECISIONS.md`. Updated at the end of every batch.
 
-_Last updated: 2026-10-30, end of Batch I (owner's test fixes, avatars, onboarding, seasons, smarter tasks; TestFlight 0.1.0 (74) uploaded)._
+_Last updated: 2026-11-05, mid Batch J (Parts 2–5 and most of 6 done). Before that: 2026-10-30, end of Batch I (owner's test fixes, avatars, onboarding, seasons, smarter tasks; TestFlight 0.1.0 (74) uploaded)._
 
-## Batch I status (resume here)
+## Batch J status (resume here — owner says "continue")
+Prompt: the owner's Batch J brief (Parts 1–9). Part 1: owner said **all good**. Skills installed globally (owner asked): widgetkit, app-intents, vision-framework, eventkit, pdfkit.
+- ✅ Part 2 Search (27fdefb) · ✅ Part 3 Lock Folio (6dd2d73) · ✅ Part 4 Widgets/controls/Siri (7f2a8fe) · ✅ Part 5 Mood, On this day, Year in Pixels (4ca9b8c) — DECISIONS 255–264, SPEC §4.4, §6.17–6.19 updated.
+- Part 6: ✅ scan (6e50c2d) · ✅ share extension (18b5192) · 🟡 **Apple Calendar events: code done and builds** (`Services/Calendar/CalendarEvents.swift`, `DayEventsSection`, cell mark in `DayCell`, Profile → Apple Calendar, purpose string) — **not yet run on the Simulator, no tests, no SPEC/DECISIONS entry**.
+- **Next steps, in order:**
+  1. Part 6 finish: run with calendar access (`xcrun simctl privacy <sim> grant calendar com.devilsense.folio`, add an event in the Calendar app or via a DEBUG seed), screenshot day panel + grid mark, unit-test the multi-day/all-day day split (`CalendarEvents.events(around:)` logic — extract it to a pure function first), SPEC §6.2/§6.9/§7 + DECISION 265 (scan: OCR confidence ≥ 0.4, Hindi unsupported on iOS 26.5 Simulator — `supportedRecognitionLanguages` lacks `hi`, garbled Devanagari lines can still pass the filter), 266 (share inbox: App Group used as the Keychain access group so existing items keep their default group; sealed with AES-GCM), 267 (EventKit read-only, in memory). Commit.
+  2. Part 7 PDF export (PDFKit / UIGraphicsPDFRenderer, background with progress, Print via UIPrintInteractionController; Profile → Your data "Export PDF" is hidden today).
+  3. Part 8 invites (D1 migration `0003_invites.sql`, `OWNER_EMAILS` secret — give the owner `npx wrangler secret put OWNER_EMAILS`; ask for the code only when sign-in would create a new account; review account + existing accounts unaffected; Profile → Invite a friend on iOS and web) + PWA (manifest, icons, standalone, offline app shell only; "Install on your phone" on /download and web Profile).
+  4. Part 9: full test run like Batch I Part 6, /vibesec (extensions, App Group, keychain group, invites, PWA), Release 0 warnings (new targets!), CI green, website Features/FAQ, `scripts/testflight.sh` (new App IDs `com.devilsense.folio.widgets` / `.share` and the App Group must register — automatic signing with `-allowProvisioningUpdates`), add build to Friends, `docs/reports/batch-j.md` + contact sheet + recordings, HANDOFF.
+- Not yet checked: CI on the Part 4–6 commits (new extension targets), web search/mood/Year UI in a browser, Lock Screen widgets and controls on a device.
+
+### Batch J tools
+- `-FolioSearch "text"`, `-lockEnabled YES` (Face ID on the Simulator: `notifyutil -s com.apple.BiometricKit.enrollmentChanged 1` + `-p …enrollmentChanged`, then `-p com.apple.BiometricKit_Sim.pearl.match|nomatch` via `xcrun simctl spawn`), `-FolioJournalMode year`, `-FolioSeedPixels YES`, `-FolioOpen scan -FolioScanSample <abs path jpg>` (sample: `ios/FolioTests/Resources/sample-diary-page.jpg`).
+- Share extension UI test: `xcrun simctl addmedia <sim> ios/FolioTests/Resources/sample-diary-page.jpg`, then `TEST_RUNNER_FOLIO_SHARE_TEST=1 [TEST_RUNNER_FOLIO_SHOTS=<dir>] xcodebuild test … -only-testing:FolioUITests/ShareExtensionUITests`.
+- System alerts (URL "Open in Folio?", other apps' permission prompts) ignore the Simulator tool's taps: press Return, or answer them from an XCUITest via SpringBoard.
+- Widgets on the Simulator: long-press Home → Edit (tap ~0.2 s) → Add Widget (touch_path) → search "Folio".
+
+## Batch I status
 All seven parts done — report `docs/reports/batch-i.md`, DECISIONS 224–252, screenshots `docs/screenshots/batch-i/`.
 - Part 1 fixes (21), Part 2 avatars + photo (schema v4), Part 3 onboarding (`docs/ONBOARDING.md`), Part 4 seasons, Part 5 reminders/repeats/subtasks, Part 6 two-Simulator run on the local API (two bugs found and fixed: day labels west of UTC, refused live socket), Part 7 /vibesec + Release 0 warnings + CI green; 0.1.0 (74) uploaded 2026-11-05, in the Friends group and Approved; build 56 approved too, so `testflightUrl` is set on the website.
 - **Next session:** the owner's notes on 0.1.0 (74) and the "Only you can test" list; then the public-release list at the end of `docs/reports/batch-g.md`.

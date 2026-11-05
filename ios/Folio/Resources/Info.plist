@@ -39,10 +39,12 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Folio shows your calendar's events beside your diary, on this iPhone only. They're never copied into Folio or sent anywhere.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Folio uses the camera only when you take a photo for an entry or scan a code to link another device.</string>
+	<string>Folio uses the camera only when you take a photo for an entry, scan a paper diary page or scan a code to link another device.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Folio asks for Face ID before showing your recovery key or letting another device read your diary.</string>
+	<string>Folio asks for Face ID to unlock your diary when Lock Folio is on, and before showing your recovery key or letting another device read it.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Folio uses the microphone only while you dictate. Audio is processed on your iPhone and never stored or sent anywhere.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>

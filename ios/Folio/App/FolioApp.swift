@@ -10,6 +10,7 @@ struct FolioApp: App {
     @State private var account: AccountModel
     @State private var sync: SyncEngine
     @State private var search = SearchCenter()
+    @State private var calendarEvents = CalendarEvents()
 
     init() {
         let container: ModelContainer
@@ -42,6 +43,7 @@ struct FolioApp: App {
                 .environment(account)
                 .environment(sync)
                 .environment(search)
+                .environment(calendarEvents)
                 .modelContainer(container)
         }
         .backgroundTask(.appRefresh(TrashMaintenance.refreshTaskID)) { [store, account, sync] in
