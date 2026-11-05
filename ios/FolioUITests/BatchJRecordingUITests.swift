@@ -36,6 +36,7 @@ final class BatchJRecordingUITests: XCTestCase {
 
     @MainActor
     func testRecordScanToEntry() throws {
+        try XCTSkipUnless(ProcessInfo.processInfo.environment["FOLIO_RECORDING"] == "1", "Only for screen recordings")
         let sample = try XCTUnwrap(ProcessInfo.processInfo.environment["FOLIO_SCAN_SAMPLE"])
         let app = try launch(["-FolioOpen", "scan", "-FolioScanSample", sample])
         let save = app.buttons["Save"]

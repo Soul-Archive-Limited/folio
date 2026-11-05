@@ -15,7 +15,7 @@ nonisolated struct NewEntryIntent: AppIntent {
 
 nonisolated struct DictateEntryIntent: AppIntent {
     static let title: LocalizedStringResource = "Dictate Entry"
-    static let description = IntentDescription("Opens a new page for today and starts dictation. Your voice is turned into text on your iPhone.")
+    static let description = IntentDescription("Opens a new page for today and starts dictation. Your voice is turned into text on this device, never sent anywhere.")
     func perform() async throws -> some IntentResult & OpensIntent {
         .result(opensIntent: OpenURLIntent(FolioRoute.dictate.url))
     }
