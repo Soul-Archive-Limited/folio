@@ -403,6 +403,12 @@ Speech framework **`SpeechAnalyzer` + `DictationTranscriber`** (verify with Cont
 - **Linking:** same verified email across providers links to one user (Apple private-relay emails won't match — that's fine). Profile shows linked providers.
 - **Sessions:** 256-bit random opaque token; only its SHA-256 stored in D1; 30-day sliding expiry; per-device row (name, platform, last seen). iOS: Keychain, `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`, not synchronizable. Web: `__Host-folio_session` cookie, `HttpOnly; Secure; SameSite=Lax; Path=/`. CSRF: SameSite + Origin check on all state-changing requests.
 
+### 10.2a Invite-only sign-up (Batch J)
+- **New accounts need a one-time invite** (8 Crockford base32 characters shown as `ABCD-EFGH`; typing is forgiving: case, spaces, O/0, I/L/1). Valid **7 days, single use**. Stored only as an HMAC (`OTP_PEPPER`) plus its last two characters; table `invites` (migration 0003), which account deletion clears.
+- **Unaffected:** every existing account (any provider, or a verified email that links to one), the owner's own addresses and App Review's address (while `REVIEW_ENABLED`). Guest mode needs nothing. `INVITES_REQUIRED` (var, default on) can switch it off.
+- **When it's asked for:** only when a sign-in would create an account. The server answers `403 invite_required` / `invite_invalid` **before anything single-use is spent** — the email code stays valid (it still counts attempts), Apple's authorization code isn't exchanged — so the app asks for the code and tries again: email → an "Invite code" field under the 6-digit code; Apple → a small sheet, then Sign in with Apple runs again with the invite; Google and web Apple → the code rides through the OAuth round trip as a hash in `oauth_states`, and the callback returns `error=invite_required` to the sign-in screen, which then shows the field. Invite tries: 10 per IP per hour.
+- **Owner:** emails in the Worker secret `OWNER_EMAILS` (comma-separated). `/api/account/me` returns `canInvite`; Profile → **Invite a friend** (iPhone and web): "Make an invite" shows the code once, large, with Share ("Join me on Folio, a private diary. Your invite code: … Get Folio: …/download"); the list shows `····-··XY`, status (Until 12 Nov / Used / Revoked / Expired) and Revoke for open ones. At most 20 open invites; 30 made per day. API: `GET/POST /api/invites`, `DELETE /api/invites/:id`.
+
 ### 10.3 End-to-end encryption
 - On first sign-in a random 256-bit **Data Key (DK)** is generated on the device.
 - **Every record** (Entry, EntryPhoto metadata, TaskItem, Category, Settings) is serialised to JSON and encrypted with **AES-256-GCM** (iOS CryptoKit `AES.GCM`, web WebCrypto), random 96-bit nonce per write, associated data = `recordId|recordType|userId`.
@@ -449,6 +455,8 @@ Use the Workers **rate-limiting binding** if available on the current plan (veri
 | sync push/pull | 120 per user per minute |
 | blobs PUT | one request per photo (3 renditions): 600 per user per hour, 3,000 per day (DECISIONS 190); 4 MB per rendition |
 | link requests | 10 per user per hour |
+| invite tries (sign-in with an invite) | 10 per IP per hour |
+| invites made | 30 per owner per day; ≤ 20 open |
 | delete account | 3 per user per day |
 Per-user storage quota: **1 GB of photos, 50,000 records** (friendly message when near). 429 responses include `Retry-After`.
 

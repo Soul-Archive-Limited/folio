@@ -8,6 +8,8 @@ nonisolated struct StoredSession: Codable, Equatable, Sendable {
     /// The address or provider shown in Profile; filled from `/account/me`.
     var email: String?
     var providers: [String] = []
+    /// Batch J: this account may make invites (Profile → Invite a friend).
+    var canInvite: Bool? = nil
     /// Sign in with Apple's user id, to check on launch that the person hasn't revoked it.
     var appleUserID: String?
 

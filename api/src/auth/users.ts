@@ -1,5 +1,6 @@
 import type { Env } from '../env';
 import { fail } from '../lib/errors';
+import { inviteIsOpen, needsInvite, redeemInvite } from '../lib/invites';
 
 export type Provider = 'apple' | 'google' | 'email';
 
@@ -20,7 +21,33 @@ export function normaliseEmail(email: string): string {
  * account always maps to the same user; otherwise a verified email that matches an existing
  * user links to it (Apple private-relay addresses simply won't match); otherwise a new user.
  */
-export async function resolveUser(env: Env, identity: Identity, now = Date.now()): Promise<{ userId: string; isNew: boolean }> {
+/** What an identity would sign in to: an existing user, or a new one (no account yet). */
+async function existingUser(env: Env, identity: Identity, email: string | null): Promise<string | null> {
+  const linked = await env.DB.prepare(
+    `SELECT a.user_id FROM accounts a JOIN users u ON u.id = a.user_id
+     WHERE a.provider = ?1 AND a.provider_user_id = ?2 AND u.deleting = 0`,
+  ).bind(identity.provider, identity.providerUserId).first<{ user_id: string }>();
+  if (linked) return linked.user_id;
+  if (email && identity.emailVerified) {
+    const byEmail = await env.DB.prepare('SELECT id FROM users WHERE email = ?1 AND deleting = 0 LIMIT 1').bind(email).first<{ id: string }>();
+    return byEmail?.id ?? null;
+  }
+  return null;
+}
+
+/**
+ * Invite-only sign-up (Batch J): refuses, before anything single-use is spent (an Apple
+ * authorization code, an email code), a sign-in that would create an account without an open
+ * invite. Existing accounts, the owner and App Review's address pass.
+ */
+export async function checkInvite(env: Env, identity: Identity, inviteHash: string | null): Promise<void> {
+  const email = identity.email ? normaliseEmail(identity.email) : null;
+  if (!needsInvite(env, email) || (await existingUser(env, identity, email))) return;
+  if (!inviteHash) fail(403, 'invite_required');
+  if (!(await inviteIsOpen(env, inviteHash))) fail(403, 'invite_invalid');
+}
+
+export async function resolveUser(env: Env, identity: Identity, inviteHash: string | null = null, now = Date.now()): Promise<{ userId: string; isNew: boolean }> {
   const email = identity.email ? normaliseEmail(identity.email) : null;
   const existing = await env.DB.prepare(
     `SELECT a.user_id FROM accounts a JOIN users u ON u.id = a.user_id
@@ -49,6 +76,10 @@ export async function resolveUser(env: Env, identity: Identity, now = Date.now()
   const statements: D1PreparedStatement[] = [];
   if (!userId) {
     userId = crypto.randomUUID();
+    if (needsInvite(env, email)) {
+      if (!inviteHash) fail(403, 'invite_required');
+      await redeemInvite(env, inviteHash, userId, now);
+    }
     statements.push(env.DB.prepare('INSERT INTO users (id, email, created_at) VALUES (?1, ?2, ?3)').bind(userId, email, now));
   }
   statements.push(env.DB.prepare(

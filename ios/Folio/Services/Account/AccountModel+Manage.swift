@@ -10,12 +10,28 @@ extension AccountModel {
             let me: AccountAPI.Me = try await api.send("GET", "account/me")
             stored.email = me.email
             stored.providers = me.providers
+            stored.canInvite = me.canInvite
             updateStoredSession(stored)
         } catch .unauthorized {
             sessionEnded()
         } catch {
             // Offline: the cached details stay.
         }
+    }
+
+    // MARK: Invites (Batch J, owner only)
+
+    func invites() async throws(APIError) -> [AccountAPI.Invite] {
+        let response: AccountAPI.Invites = try await api.send("GET", "invites")
+        return response.invites
+    }
+
+    func makeInvite() async throws(APIError) -> AccountAPI.NewInvite {
+        try await api.send("POST", "invites", json: [String: String]())
+    }
+
+    func revokeInvite(_ id: String) async throws(APIError) {
+        let _: OKResponse = try await api.send("DELETE", "invites/\(id)")
     }
 
     func devices() async throws(APIError) -> [AccountAPI.Device] {

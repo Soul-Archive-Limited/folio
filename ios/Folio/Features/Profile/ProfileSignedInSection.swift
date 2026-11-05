@@ -38,6 +38,12 @@ struct ProfileSignedInSection: View {
             NavigationLink { DevicesView() } label: {
                 ProfileRowLabel(title: "Devices", systemImage: "laptopcomputer.and.iphone")
             }
+            if account.session?.canInvite == true {
+                NavigationLink { InvitesView() } label: {
+                    ProfileRowLabel(title: "Invite a friend", systemImage: "envelope.open")
+                }
+                .accessibilityIdentifier("profile.invites")
+            }
             if account.status == .ready {
                 Button(action: showRecoveryKey) {
                     ProfileRowLabel(title: "Recovery key", systemImage: "key")

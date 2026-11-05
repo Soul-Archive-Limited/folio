@@ -28,7 +28,8 @@
     "GOOGLE_CLIENT_ID": "1035938398089-qgeb7hols8h1onoojsr7e7t4no9hut0g.apps.googleusercontent.com",
     "EMAIL_FROM": "Folio <no-reply@folio.devilsense.com>",
     "REVIEW_EMAIL": "review@devilsense.com",
-    "REVIEW_ENABLED": "true"
+    "REVIEW_ENABLED": "true",
+    "INVITES_REQUIRED": "true"
   },
   // Nightly clean-up of expired rows (D1 size is the free plan's tightest limit).
   "triggers": { "crons": ["17 3 * * *"] },

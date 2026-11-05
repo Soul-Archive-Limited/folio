@@ -15,6 +15,9 @@ struct EmailCodeStep: View {
     @State private var problem: SignInProblem?
     @State private var verifying = false
     @State private var succeeded = 0
+    /// Batch J: shown only when this address would be a new account.
+    @State private var invite = ""
+    @State private var asksInvite = false
     @FocusState private var focused: Bool
 
     static let resendDelay: TimeInterval = 30
@@ -35,8 +38,13 @@ struct EmailCodeStep: View {
                     .onChange(of: code) { _, new in
                         let digits = String(new.filter(\.isNumber).prefix(6))
                         if digits != new { code = digits }
-                        if digits.count == 6 { verify() }
+                        if digits.count == 6, !asksInvite { verify() }
                     }
+                if asksInvite {
+                    InviteCodeField(code: $invite)
+                        .padding(.top, Spacing.s)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                }
                 if let problem {
                     Text(problem.message)
                         .folioFont(.caption)
@@ -53,7 +61,7 @@ struct EmailCodeStep: View {
             }
             .buttonStyle(.glassProminent)
             .tint(.emberStrong)
-            .disabled(code.count != 6 || verifying)
+            .disabled(code.count != 6 || verifying || (asksInvite && invite.filter { $0.isLetter || $0.isNumber }.count != 8))
             TimelineView(.periodic(from: sentAt, by: 1)) { context in
                 let wait = Int((Self.resendDelay - context.date.timeIntervalSince(sentAt)).rounded(.up))
                 Button(wait > 0 ? "Send a new code in \(wait) s" : "Send a new code", action: resend)
@@ -83,12 +91,17 @@ struct EmailCodeStep: View {
         Task {
             defer { verifying = false }
             do throws(APIError) {
-                try await account.verifyEmailCode(code, email: email, reauth: reauth)
+                try await account.verifyEmailCode(code, email: email, reauth: reauth, invite: asksInvite ? invite : nil)
                 succeeded += 1
                 onDone()
             } catch {
                 problem = error.signInProblem
-                code = ""
+                if problem?.needsInvite == true {
+                    // The code is still good (Batch J): keep it and ask for the invite.
+                    withAnimation(.smooth(duration: 0.3)) { asksInvite = true }
+                } else {
+                    code = ""
+                }
             }
         }
     }

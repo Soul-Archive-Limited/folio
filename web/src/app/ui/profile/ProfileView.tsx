@@ -8,6 +8,7 @@ import { Icon } from '../Icons.tsx';
 import { SYNC_TEXT } from '../Shell.tsx';
 
 const Devices = lazy(() => import('./Devices.tsx'));
+const Invites = lazy(() => import('./Invites.tsx'));
 const Categories = lazy(() => import('./Categories.tsx'));
 const RecentlyDeleted = lazy(() => import('./RecentlyDeleted.tsx'));
 
@@ -19,7 +20,7 @@ export default function ProfileView() {
     <div className="scroll">
       <div className="page" style={{ maxWidth: 720 }}>
         <Suspense fallback={null}>
-          {path === '/app/profile/devices' ? <Devices /> : path === '/app/profile/categories' ? <Categories />
+          {path === '/app/profile/devices' ? <Devices /> : path === '/app/profile/invites' ? <Invites /> : path === '/app/profile/categories' ? <Categories />
             : path === '/app/profile/deleted' ? <RecentlyDeleted /> : <Main />}
         </Suspense>
       </div>
@@ -107,6 +108,7 @@ function Main() {
           <button className="btn small" onClick={() => engine.syncNow()}>Sync now</button>
         </div>
         <button className="row" onClick={() => navigate('/app/profile/devices')}><Icon name="devices" /><span className="grow">Devices</span><Icon name="chevronRight" small /></button>
+        {me.canInvite && <button className="row" onClick={() => navigate('/app/profile/invites')}><Icon name="plus" /><span className="grow">Invite a friend</span><Icon name="chevronRight" small /></button>}
         <div className="row">
           <Icon name="lock" />
           <span className="grow">{trusted ? 'This browser is trusted' : 'This browser unlocks each visit'}

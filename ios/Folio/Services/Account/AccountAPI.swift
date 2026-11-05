@@ -21,6 +21,8 @@ nonisolated enum AccountAPI {
         let authorizationCode: String?
         let deviceName: String
         let reauth: Bool
+        /// Batch J: only when a new account needs one (left out of the JSON when nil).
+        var invite: String?
     }
 
     struct EmailStart: Encodable, Sendable {
@@ -34,6 +36,7 @@ nonisolated enum AccountAPI {
         let client = "ios"
         let deviceName: String
         let reauth: Bool
+        var invite: String?
     }
 
     struct Exchange: Encodable, Sendable {
@@ -50,6 +53,26 @@ nonisolated enum AccountAPI {
         let createdAt: Double
         let providers: [String]
         let hasRecoveryKey: Bool
+        /// Batch J: the owner may make invites.
+        var canInvite: Bool? = nil
+    }
+
+    struct Invite: Decodable, Sendable, Identifiable, Equatable {
+        let id: String
+        let hint: String
+        let createdAt: Double
+        let expiresAt: Double
+        let status: String
+    }
+
+    struct Invites: Decodable, Sendable {
+        let invites: [Invite]
+    }
+
+    struct NewInvite: Decodable, Sendable, Equatable {
+        let id: String
+        let code: String
+        let expiresAt: Double
     }
 
     struct Device: Decodable, Sendable, Identifiable, Equatable {

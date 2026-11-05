@@ -16,6 +16,8 @@ export interface Env {
   EMAIL_FROM: string;
   REVIEW_EMAIL: string;
   REVIEW_ENABLED: string;
+  /** "false" turns invite-only sign-up off (Batch J); anything else keeps it on. */
+  INVITES_REQUIRED?: string;
 
   // Secrets
   APPLE_PRIVATE_KEY?: string;
@@ -25,6 +27,8 @@ export interface Env {
   OTP_PEPPER: string;
   TOKEN_ENCRYPTION_KEY: string;
   REVIEW_CODE?: string;
+  /** Comma-separated emails that may create invites (Batch J). */
+  OWNER_EMAILS?: string;
 
   /** Tests only: route sign-in emails to the outbox instead of Resend. */
   EMAIL_OUTBOX?: string;

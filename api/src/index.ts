@@ -5,6 +5,7 @@ import type { AppEnv } from './env';
 import { fail, log } from './lib/errors';
 import { account } from './routes/account';
 import { auth } from './routes/auth';
+import { invites } from './routes/invites';
 import { blobs } from './routes/blobs';
 import { keys } from './routes/keys';
 import { link } from './routes/link';
@@ -55,6 +56,7 @@ app.route('/keys', keys);
 app.route('/link', link);
 app.route('/live', live);
 app.route('/account', account);
+app.route('/invites', invites);
 app.get('/health', (c) => c.json({ ok: true }));
 
 app.notFound(() => fail(404, 'not_found'));

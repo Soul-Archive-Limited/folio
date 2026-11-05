@@ -90,6 +90,8 @@ export class UserHub extends DurableObject<Env> {
       db.prepare('DELETE FROM key_envelopes WHERE user_id = ?1').bind(id),
       db.prepare('DELETE FROM link_requests WHERE user_id = ?1').bind(id),
       db.prepare('DELETE FROM handoff_codes WHERE user_id = ?1').bind(id),
+      db.prepare('DELETE FROM invites WHERE created_by = ?1').bind(id),
+      db.prepare('UPDATE invites SET used_by = NULL WHERE used_by = ?1').bind(id),
       db.prepare('DELETE FROM sessions WHERE user_id = ?1').bind(id),
       db.prepare('DELETE FROM accounts WHERE user_id = ?1').bind(id),
       db.prepare('DELETE FROM users WHERE id = ?1').bind(id),

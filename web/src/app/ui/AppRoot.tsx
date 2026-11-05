@@ -22,6 +22,8 @@ type Phase =
 const SIGN_IN_ERRORS: Record<string, string> = {
   cancelled: 'Sign-in was cancelled.',
   failed: "Sign-in didn't work. Please try again.",
+  invite_required: 'Folio is invite-only for now. Enter the invite code you were given, then continue again.',
+  invite_invalid: "That invite code didn't work. It may be used, expired or mistyped.",
 };
 
 /**

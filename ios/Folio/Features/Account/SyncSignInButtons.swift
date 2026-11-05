@@ -19,6 +19,16 @@ struct SyncSignInButtons: View {
     @State private var rawNonce = ""
     @State private var busy = false
     @State private var signedIn = 0
+    /// Batch J: Apple or Google said this would be a new account and needs an invite.
+    @State private var invitePrompt: InvitePrompt?
+    @State private var appleRunner = AppleSignInRunner()
+
+    struct InvitePrompt: Identifiable {
+        enum Provider { case apple, google }
+        let id = UUID()
+        let provider: Provider
+        let problem: SignInProblem
+    }
 
     static let height: Double = 50
 
@@ -38,6 +48,14 @@ struct SyncSignInButtons: View {
         .opacity(busy ? 0.6 : 1)
         .overlay { if busy { ProgressView().controlSize(.large) } }
         .folioHaptic(.success, trigger: signedIn)
+        .sheet(item: $invitePrompt) { prompt in
+            InviteCodeSheet(problem: prompt.problem) { code in
+                switch prompt.provider {
+                case .google: google(invite: code)
+                case .apple: appleWithInvite(code)
+                }
+            }
+        }
     }
 
     private var appleButton: some View {
@@ -49,7 +67,7 @@ struct SyncSignInButtons: View {
             switch result {
             case .success(let authorization):
                 guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential else { return }
-                run { () throws(APIError) in try await account.signInWithApple(credential, rawNonce: rawNonce, reauth: reauth) }
+                run(provider: .apple) { () throws(APIError) in try await account.signInWithApple(credential, rawNonce: rawNonce, reauth: reauth) }
             case .failure(let error):
                 if (error as? ASAuthorizationError)?.code != .canceled { show(.failed) }
             }
@@ -63,7 +81,7 @@ struct SyncSignInButtons: View {
 
     private var googleButton: some View {
         let dark = colorScheme == .dark
-        return Button(action: google) {
+        return Button { google() } label: {
             HStack(spacing: Spacing.s) {
                 Image(.googleMark)
                     .resizable()
@@ -83,23 +101,34 @@ struct SyncSignInButtons: View {
         .buttonStyle(.pressable)
     }
 
-    private func google() {
+    private func google(invite: String? = nil) {
         busy = true
         Task {
             defer { busy = false }
             do throws(GoogleSignInError) {
-                try await account.signInWithGoogle(using: webAuthenticationSession, reauth: reauth)
+                try await account.signInWithGoogle(using: webAuthenticationSession, reauth: reauth, invite: invite)
                 finished()
             } catch .cancelled {
             } catch .api(let error) {
-                show(error.signInProblem)
+                handle(error.signInProblem, provider: .google)
             } catch {
                 show(.failed)
             }
         }
     }
 
-    private func run(_ work: @escaping () async throws(APIError) -> Void) {
+    /// Sign in with Apple again, this time with the invite.
+    private func appleWithInvite(_ invite: String) {
+        let nonce = SignInSecrets.randomToken()
+        Task {
+            guard let credential = await appleRunner.run(nonceHash: SignInSecrets.sha256Hex(nonce)) else { return }
+            run(provider: .apple) { () throws(APIError) in
+                try await account.signInWithApple(credential, rawNonce: nonce, reauth: reauth, invite: invite)
+            }
+        }
+    }
+
+    private func run(provider: InvitePrompt.Provider, _ work: @escaping () async throws(APIError) -> Void) {
         busy = true
         Task {
             defer { busy = false }
@@ -107,9 +136,13 @@ struct SyncSignInButtons: View {
                 try await work()
                 finished()
             } catch {
-                show(error.signInProblem)
+                handle(error.signInProblem, provider: provider)
             }
         }
+    }
+
+    private func handle(_ problem: SignInProblem, provider: InvitePrompt.Provider) {
+        if problem.needsInvite { invitePrompt = InvitePrompt(provider: provider, problem: problem) } else { show(problem) }
     }
 
     private func finished() {

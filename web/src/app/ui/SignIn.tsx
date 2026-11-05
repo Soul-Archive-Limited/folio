@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { turnstileKey } from '../../config/app.ts';
-import { api, friendly } from '../lib/api.ts';
+import { api, ApiError, friendly } from '../lib/api.ts';
 import { Gate } from './AppRoot.tsx';
 import { AppleLogo, GoogleLogo } from './Icons.tsx';
 
@@ -18,6 +18,10 @@ declare global {
 export function SignIn({ error }: { error?: string }) {
   const [step, setStep] = useState<'choose' | 'email' | 'code'>('choose');
   const [email, setEmail] = useState('');
+  // Batch J: Apple or Google came back saying a new account needs an invite.
+  const asksInvite = /invite_(required|invalid)/.test(location.search);
+  const [invite, setInvite] = useState('');
+  const withInvite = (href: string) => (asksInvite && invite ? `${href}${href.includes('?') ? '&' : '?'}invite=${encodeURIComponent(invite)}` : href);
 
   return (
     <Gate>
@@ -27,8 +31,9 @@ export function SignIn({ error }: { error?: string }) {
           <p className="sub">Sign in to read and write your diary in the browser. It's encrypted so only you can read it.</p>
           {error && <p className="error" role="alert">{error}</p>}
           <div style={{ display: 'grid', gap: 10, marginTop: 6 }}>
-            <a className="provider apple" href="/api/auth/apple/start"><AppleLogo />Continue with Apple</a>
-            <a className="provider" href="/api/auth/google/start?platform=web"><GoogleLogo />Continue with Google</a>
+            {asksInvite && <InviteField value={invite} onChange={setInvite} />}
+            <a className="provider apple" href={withInvite('/api/auth/apple/start')}><AppleLogo />Continue with Apple</a>
+            <a className="provider" href={withInvite('/api/auth/google/start?platform=web')}><GoogleLogo />Continue with Google</a>
             <div className="or">or</div>
             <button className="provider" onClick={() => setStep('email')}>Continue with email</button>
           </div>
@@ -126,8 +131,22 @@ function EmailStep({ email, setEmail, onSent, onBack }: { email: string; setEmai
   );
 }
 
+/** An invite code (Batch J), shown only when a sign-in would make a new account. */
+function InviteField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <>
+      <label className="sr-only" htmlFor="invite">Invite code</label>
+      <input id="invite" className="field code" style={{ letterSpacing: 4, fontSize: 22 }} placeholder="ABCD-EFGH" autoCapitalize="characters"
+        autoComplete="off" spellCheck={false} maxLength={9} value={value}
+        onChange={(e) => onChange(e.target.value.toUpperCase().replace(/[^0-9A-Z-]/g, ''))} />
+    </>
+  );
+}
+
 function CodeStep({ email, onDone, onBack }: { email: string; onDone: () => void; onBack: () => void }) {
   const [code, setCode] = useState('');
+  const [asksInvite, setAsksInvite] = useState(false);
+  const [invite, setInvite] = useState('');
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState('');
   const [wait, setWait] = useState(30);
@@ -141,11 +160,13 @@ function CodeStep({ email, onDone, onBack }: { email: string; onDone: () => void
     setBusy(true);
     setProblem('');
     try {
-      await api('POST', 'auth/email/verify', { email: email.trim(), code: value, client: 'web' });
+      await api('POST', 'auth/email/verify', { email: email.trim(), code: value, client: 'web', ...(asksInvite ? { invite } : {}) });
       onDone();
     } catch (error) {
       setProblem(friendly(error));
-      setCode('');
+      // A new account needs an invite: the email code is still good, so keep it.
+      if (error instanceof ApiError && error.code.startsWith('invite_')) setAsksInvite(true);
+      else setCode('');
     } finally {
       setBusy(false);
     }
@@ -160,10 +181,11 @@ function CodeStep({ email, onDone, onBack }: { email: string; onDone: () => void
         onChange={(e) => {
           const value = e.target.value.replace(/\D/g, '').slice(0, 6);
           setCode(value);
-          if (value.length === 6) void verify(value);
+          if (value.length === 6 && !asksInvite) void verify(value);
         }} />
+      {asksInvite && <InviteField value={invite} onChange={setInvite} />}
       {problem && <p className="error" role="alert">{problem}</p>}
-      <button className="btn primary wide" disabled={busy || code.length !== 6}>{busy ? 'Checking…' : 'Continue'}</button>
+      <button className="btn primary wide" disabled={busy || code.length !== 6 || (asksInvite && invite.replace(/-/g, '').length !== 8)}>{busy ? 'Checking…' : 'Continue'}</button>
       <button type="button" className="text-btn" disabled={wait > 0} onClick={onBack}>
         {wait > 0 ? `Send a new code in ${wait} s` : 'Send a new code'}
       </button>

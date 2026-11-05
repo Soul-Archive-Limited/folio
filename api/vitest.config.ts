@@ -16,6 +16,9 @@ export default defineConfig(async () => ({
           OTP_PEPPER: 'test-pepper',
           TOKEN_ENCRYPTION_KEY: 'test-token-key',
           REVIEW_CODE: '424242',
+          // The older sign-in tests create accounts freely; invite tests turn this on.
+          INVITES_REQUIRED: 'false',
+          OWNER_EMAILS: 'owner@example.com, second-owner@example.com',
           EMAIL_OUTBOX: 'memory',
           TURNSTILE_SECRET: 'test-turnstile',
           APPLE_KEY_ID: 'TESTKEY123',

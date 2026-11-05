@@ -45,6 +45,8 @@ export interface Me {
   createdAt: number;
   providers: string[];
   hasRecoveryKey: boolean;
+  /** Batch J: the owner may make invites. */
+  canInvite?: boolean;
   usage: { records: number; photoBytes: number };
 }
 
@@ -75,6 +77,8 @@ export function friendly(error: unknown): string {
   switch (error.code) {
     case 'rate_limited': return 'Too many tries. Please wait a little and try again.';
     case 'invalid_code': return "That code didn't work. Check it, or send a new one.";
+    case 'invite_required': return 'Folio is invite-only for now. Enter the invite code you were given.';
+    case 'invite_invalid': return "That invite code didn't work. It may be used, expired or mistyped.";
     case 'turnstile': return 'Please complete the check above and try again.';
     case 'quota_photos': return 'Your photo storage is full (1 GB). Delete some photos to add more.';
     case 'quota_records': return 'Your diary has reached 50,000 items.';

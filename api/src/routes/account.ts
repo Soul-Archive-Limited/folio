@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 import type { AppEnv } from '../env';
 import { fail } from '../lib/errors';
+import { isOwner } from '../lib/invites';
 import { limit } from '../lib/ratelimit';
 import { clearSessionCookie, requireSession } from '../lib/session';
 import { base64Text, body, deviceName, uuid } from '../lib/validate';
@@ -23,6 +24,7 @@ account.get('/me', async (c) => {
     userId, sessionId, platform, email: row.email, createdAt: row.created_at,
     providers: (providers?.results ?? []).map((p) => (p as { provider: string }).provider),
     hasRecoveryKey: (recovery?.results.length ?? 0) > 0,
+    canInvite: await isOwner(c.env, userId),
     usage: { records: row.record_count, photoBytes: row.blob_bytes },
   });
 });
