@@ -68,9 +68,13 @@ nonisolated enum DiaryPDF {
         }
         if options.includesTasks {
             // Compared in Swift: optional comparisons inside #Predicate don't translate to SQL safely.
-            let tasks = ((try? context.fetch(FetchDescriptor<TaskItem>(predicate: #Predicate {
-                $0.dayKey != nil && !$0.isTombstone && $0.trashedAt == nil && $0.parentID == nil
-            }))) ?? []).filter { ($0.dayKey ?? "") >= from && ($0.dayKey ?? "") <= through }
+            // (A short predicate: Xcode 26's type checker gave up on the longer one.)
+            let live = #Predicate<TaskItem> { !$0.isTombstone && $0.trashedAt == nil }
+            let fetched = (try? context.fetch(FetchDescriptor<TaskItem>(predicate: live))) ?? []
+            let tasks = fetched.filter { task in
+                guard task.parentID == nil, let day = task.dayKey else { return false }
+                return day >= from && day <= through
+            }
             for task in tasks.sorted(by: DiaryStore.taskOrder) {
                 guard let day = task.day else { continue }
                 days[day, default: Day(day: day)].tasks.append((task.title, task.isCompleted))
