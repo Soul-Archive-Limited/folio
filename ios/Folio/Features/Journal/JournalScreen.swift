@@ -4,6 +4,7 @@ import SwiftUI
 struct JournalScreen: View {
     @Environment(DiaryStore.self) private var store
     @Environment(\.newItemRequest) private var request
+    @Environment(\.tabRouter) private var router
     @Bindable var model: JournalModel
     @Namespace private var zoom
     /// Pull down for search (Batch J); while it's open the results replace the timeline.
@@ -47,6 +48,11 @@ struct JournalScreen: View {
             }
         }
         .sheet(item: $editingTask) { task in TaskComposerSheet(task: task, day: nil) }
+        .onChange(of: model.openDay) { _, day in
+            guard let day else { return }
+            model.openDay = nil
+            router?.open(.day(day))
+        }
         #if DEBUG
         .onAppear {
             model.applyDebugOptions()
@@ -65,6 +71,8 @@ struct JournalScreen: View {
                         .padding(.top, 80)
                 } else if model.mode == .timeline {
                     JournalTimeline(sections: model.sections(store: store), model: model, today: store.today, zoom: zoom)
+                } else if model.mode == .year {
+                    YearInPixelsView(model: model)
                 } else {
                     JournalPhotoGrid(photos: model.photos(store: store), zoom: zoom)
                         .padding(.horizontal, Spacing.sideMargin)
@@ -90,7 +98,7 @@ struct JournalScreen: View {
 #if DEBUG
 extension JournalModel {
     func applyDebugOptions() {
-        if DebugLaunchOptions.string("FolioJournalMode") == "photos" { mode = .photos }
+        if let raw = DebugLaunchOptions.string("FolioJournalMode"), let mode = Mode(rawValue: raw) { self.mode = mode }
     }
 }
 #endif

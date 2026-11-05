@@ -11,6 +11,7 @@ final class ComposerModel {
     var body = AttributedString() { didSet { if body != oldValue { markEdited() } } }
     var selection = AttributedTextSelection()
     var categoryID: UUID? { didSet { if categoryID != oldValue { markEdited() } } }
+    var mood: Mood? { didSet { if mood != oldValue { markEdited() } } }
     var photos: [ComposerPhoto] = [] { didSet { if photos != oldValue { markEdited() } } }
     private(set) var hasChanges = false
     private(set) var isProcessingPhotos = false
@@ -54,6 +55,7 @@ final class ComposerModel {
         title = entry.title
         body = RichTextBridge.attributedString(fromMarkdown: entry.bodyMarkdown, writingFont: writingFont)
         categoryID = entry.categoryID
+        mood = entry.mood.flatMap(Mood.init(rawValue:))
         photos = entry.orderedPhotos.map { .stored($0.id) }
         self.writingFont = writingFont
         self.drafts = drafts
@@ -61,6 +63,7 @@ final class ComposerModel {
                                  title: entry.title, bodyMarkdown: entry.bodyMarkdown, categoryID: entry.categoryID,
                                  photos: entry.orderedPhotos.map { DraftPhoto(id: $0.id, storedPhotoID: $0.id) },
                                  savedAt: .distantPast)
+        baseline.mood = entry.mood
         if let draft = drafts.load(), draft.entryID == entry.id, !draft.isEmpty {
             // A leftover draft that only repeats what's saved isn't unsaved work: drop it quietly.
             if draft.hasSameContent(as: baseline) { drafts.clear() } else { pendingDraft = draft }
@@ -133,6 +136,7 @@ final class ComposerModel {
                                      imageType: photo.processed?.imageType ?? "public.heic")
                       },
                       savedAt: AppClock.now)
+            .withMood(mood?.rawValue)
     }
 
     func restoreDraft() {
@@ -142,6 +146,7 @@ final class ComposerModel {
         title = draft.title
         body = RichTextBridge.attributedString(fromMarkdown: draft.bodyMarkdown, writingFont: writingFont)
         categoryID = draft.categoryID
+        mood = draft.mood.flatMap(Mood.init(rawValue:))
         let original = Set(photos.compactMap(\.storedPhotoID))
         photos = draft.photos.compactMap { kept in
             if let stored = kept.storedPhotoID { return original.contains(stored) ? .stored(stored) : nil }
@@ -253,6 +258,7 @@ final class ComposerModel {
             entry = try store.createEntry(title: cleanTitle, body: markdown, day: day,
                                           minutesFromMidnight: minutesFromMidnight, categoryID: categoryID)
         }
+        store.setMood(entry, mood)
         var order: [UUID] = []
         for photo in photos {
             if let stored = photo.storedPhotoID {

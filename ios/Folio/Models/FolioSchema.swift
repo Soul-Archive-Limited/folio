@@ -96,14 +96,24 @@ enum FolioSchemaV3: VersionedSchema {
     static let versionIdentifier = Schema.Version(3, 0, 0)
 
     static var models: [any PersistentModel.Type] {
-        [Category.self, Entry.self, EntryPhoto.self, FolioSchemaV3.TaskItem.self, FolioSchemaV3.UserSettings.self]
+        [Category.self, FolioSchemaV4.Entry.self, FolioSchemaV4.EntryPhoto.self, FolioSchemaV3.TaskItem.self, FolioSchemaV3.UserSettings.self]
     }
 }
 
 /// Schema version 4 (Batch I): `TaskItem.remindAt`, `repeatRule`, `parentID`;
-/// `UserSettings.avatar`, `avatarPhoto`. These are the live models.
+/// `UserSettings.avatar`, `avatarPhoto`. Its frozen Entry and EntryPhoto are in
+/// `FolioSchemaV4Models.swift`.
 enum FolioSchemaV4: VersionedSchema {
     static let versionIdentifier = Schema.Version(4, 0, 0)
+
+    static var models: [any PersistentModel.Type] {
+        [Category.self, FolioSchemaV4.Entry.self, FolioSchemaV4.EntryPhoto.self, TaskItem.self, UserSettings.self]
+    }
+}
+
+/// Schema version 5 (Batch J): `Entry.mood`. These are the live models.
+enum FolioSchemaV5: VersionedSchema {
+    static let versionIdentifier = Schema.Version(5, 0, 0)
 
     static var models: [any PersistentModel.Type] {
         [Category.self, Entry.self, EntryPhoto.self, TaskItem.self, UserSettings.self]
@@ -111,13 +121,14 @@ enum FolioSchemaV4: VersionedSchema {
 }
 
 enum FolioMigrationPlan: SchemaMigrationPlan {
-    static var schemas: [any VersionedSchema.Type] { [FolioSchemaV1.self, FolioSchemaV2.self, FolioSchemaV3.self, FolioSchemaV4.self] }
+    static var schemas: [any VersionedSchema.Type] { [FolioSchemaV1.self, FolioSchemaV2.self, FolioSchemaV3.self, FolioSchemaV4.self, FolioSchemaV5.self] }
 
     /// Each step only adds optional attributes, so all are lightweight. Renditions are
     /// backfilled after launch rather than inside the migration, so opening the store stays fast.
     static var stages: [MigrationStage] {
         [.lightweight(fromVersion: FolioSchemaV1.self, toVersion: FolioSchemaV2.self),
          .lightweight(fromVersion: FolioSchemaV2.self, toVersion: FolioSchemaV3.self),
-         .lightweight(fromVersion: FolioSchemaV3.self, toVersion: FolioSchemaV4.self)]
+         .lightweight(fromVersion: FolioSchemaV3.self, toVersion: FolioSchemaV4.self),
+         .lightweight(fromVersion: FolioSchemaV4.self, toVersion: FolioSchemaV5.self)]
     }
 }

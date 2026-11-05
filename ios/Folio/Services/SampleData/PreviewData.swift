@@ -112,6 +112,8 @@ enum PreviewData {
                 title: title, body: body, day: today.adding(days: -daysAgo), minutesFromMidnight: minutes,
                 categoryID: categoryIndex.flatMap { categoryIDs.indices.contains($0) ? categoryIDs[$0] : nil }
             ) else { continue }
+            // Most sample pages have a mood (Batch J), a few don't.
+            if index % 6 != 5 { store.setMood(entry, Mood(rawValue: (index * 7 + 3) % 5 + 1)) }
             for photoIndex in 0..<photoCount {
                 if let jpeg = SampleImageRenderer.jpeg(seed: index * 3 + photoIndex),
                    let processed = try? processor.processSynchronously(jpeg) {
@@ -135,6 +137,25 @@ enum PreviewData {
             for (item, done) in [("Passport", true), ("Charger", false), ("Sun cream", false)] {
                 if let sub = try? store.addSubtask(title: item, to: pack), done { store.setCompleted(sub, true) }
             }
+        }
+    }
+
+    /// Year in Pixels screenshots (Batch J): short pages with moods on most days of this year
+    /// so far and a scattering last year. DEBUG `-FolioSeedPixels YES`.
+    @MainActor
+    static func loadPixelYear(into store: DiaryStore) {
+        let today = store.today
+        let categoryIDs = store.categories().map(\.id)
+        var generator = SystemRandomNumberGenerator()
+        for back in 1..<500 {
+            let day = today.adding(days: -back)
+            guard day.year >= today.year - 1, Int.random(in: 0..<10, using: &generator) < (day.year == today.year ? 8 : 4) else { continue }
+            // A gentle drift through the seasons, so the grid has shape rather than noise.
+            let base = 3 + sin(Double(back) / 23) * 1.4
+            let mood = Mood(rawValue: min(max(Int((base + Double.random(in: -1...1, using: &generator)).rounded()), 1), 5))
+            guard let entry = try? store.createEntry(title: "", body: "A day.", day: day,
+                                                     categoryID: categoryIDs.randomElement(using: &generator)) else { continue }
+            store.setMood(entry, mood)
         }
     }
 

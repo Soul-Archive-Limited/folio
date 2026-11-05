@@ -7,6 +7,7 @@ import { CategoryChips, IPhoneOnly, Modal, PhotoImg, Sheet, useCloseSheet } from
 import { type ComposerRequest, useDiary } from './context.tsx';
 import { EditorBody, editorMarkdown, FormatPopover, useFolioEditor } from './Editor.tsx';
 import { Icon } from './Icons.tsx';
+import { MoodPicker, moodOf } from './Mood.tsx';
 
 type PhotoItem = { id: string; existing: true } | { id: string; existing: false; prepared: PreparedPhoto };
 
@@ -39,6 +40,7 @@ function ComposerBody({ request, day, onDayChange, dirty }: { request: ComposerR
   const [minutes, setMinutes] = useState<number | undefined>(existing?.data.minutesFromMidnight);
   const [title, setTitle] = useState(existing?.data.title ?? '');
   const [categoryId, setCategoryId] = useState<string | null>(existing?.data.categoryID ?? request.categoryId ?? store.settings?.defaultCategoryID ?? null);
+  const [mood, setMood] = useState<number | undefined>(moodOf(existing?.data.mood)?.value);
   const [photos, setPhotos] = useState<PhotoItem[]>(existing ? store.photosOf(existing.id).map((p) => ({ id: p.id, existing: true })) : []);
   const [bodyEmpty, setBodyEmpty] = useState(!existing?.data.bodyMarkdown);
   const [format, setFormat] = useState(false);
@@ -87,7 +89,7 @@ function ComposerBody({ request, day, onDayChange, dirty }: { request: ComposerR
     setBusy(true);
     const entryId = store.put('entry', {
       title: title.trim().slice(0, 120), bodyMarkdown: editorMarkdown(editor), dayKey, minutesFromMidnight: minutes,
-      categoryID: categoryId ?? undefined, ...(existing ? {} : { createdAt: Date.now() }),
+      categoryID: categoryId ?? undefined, mood, ...(existing ? {} : { createdAt: Date.now() }),
     }, existing?.id);
     const kept = new Set(photos.filter((p) => p.existing).map((p) => p.id.toLowerCase()));
     if (existing) {
@@ -164,6 +166,7 @@ function ComposerBody({ request, day, onDayChange, dirty }: { request: ComposerR
                 onChange={(e) => { const [h, m] = e.target.value.split(':').map(Number); if (h !== undefined && m !== undefined) touch(setMinutes)(h * 60 + m); }} />
             )}
           </label>
+          <MoodPicker value={mood} onChange={touch(setMood)} />
           {newCategory === null ? (
             <CategoryChips selected={categoryId} onSelect={touch(setCategoryId)} allLabel="None" onCreate={() => setNewCategory('')} />
           ) : (

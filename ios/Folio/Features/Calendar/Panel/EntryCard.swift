@@ -25,6 +25,9 @@ struct EntryCard: View {
                         .lineLimit(2)
                 }
                 HStack(spacing: Spacing.s) {
+                    if let mood = entry.mood.flatMap(Mood.init(rawValue:)) {
+                        MoodGlyph(mood: mood, size: 12).accessibilityLabel(mood.title)
+                    }
                     if let category { CategoryTag(category: category) }
                     if let time { Text(time, format: .dateTime.hour().minute()).folioFont(.caption).foregroundStyle(.inkSecondary) }
                 }

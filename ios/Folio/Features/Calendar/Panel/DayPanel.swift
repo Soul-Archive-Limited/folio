@@ -35,6 +35,7 @@ struct DayPanel: View {
             }
 
             VStack(alignment: .leading, spacing: Spacing.m) {
+                OnThisDayCard(day: day)
                 if entries.isEmpty && tasks.isEmpty {
                     DayPanelEmptyState(day: day)
                 } else {

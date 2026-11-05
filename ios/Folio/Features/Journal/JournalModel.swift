@@ -5,7 +5,7 @@ import Foundation
 @Observable
 final class JournalModel {
     enum Mode: String, CaseIterable, Identifiable {
-        case timeline, photos
+        case timeline, photos, year
         var id: Self { self }
     }
 
@@ -17,6 +17,10 @@ final class JournalModel {
     /// The floating "+" belongs to the Journal's root screen only.
     var isAtRoot: Bool { path.isEmpty && !showsTrash }
     var filter: Set<UUID> = []
+    /// Year in Pixels colours by mood (true) or category (Batch J).
+    var pixelsByMood = true
+    /// A Year in Pixels day with several pages: shown on the calendar.
+    var openDay: DayKey?
     /// Months the person opened or closed themselves, by `MonthKey.id` (Batch I). Everything
     /// else follows the default: this month and last month open, older months closed.
     private(set) var foldOverrides: [Int: Bool]

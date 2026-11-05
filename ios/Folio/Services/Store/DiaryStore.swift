@@ -249,6 +249,14 @@ final class DiaryStore {
         commit()
     }
 
+    /// Sets or clears how the day felt (Batch J).
+    func setMood(_ entry: Entry, _ mood: Mood?) {
+        guard entry.mood != mood?.rawValue else { return }
+        entry.mood = mood?.rawValue
+        entry.markChanged(at: now())
+        commit()
+    }
+
     /// Moves an entry to another day. Only an explicit move ever changes an item's day.
     func move(_ entry: Entry, to day: DayKey, minutesFromMidnight: Int?) {
         entry.dayKey = day.rawValue

@@ -13,6 +13,8 @@ nonisolated enum RecordPayload {
         var categoryID: UUID?
         var createdAt: Date
         var trashedAt: Date?
+        /// Batch J (schema v5): 1…5; older apps leave it out.
+        var mood: Int?
     }
 
     /// Photo metadata; the image bytes are three encrypted blobs in R2.

@@ -38,8 +38,20 @@ struct EntryDetailView: View {
                         .folioFont(.caption)
                         .foregroundStyle(.inkSecondary)
                 }
-                if let category = store.category(id: entry.categoryID) {
-                    CategoryTag(category: category)
+                let mood = entry.mood.flatMap(Mood.init(rawValue:))
+                let category = store.category(id: entry.categoryID)
+                if mood != nil || category != nil {
+                    HStack(spacing: Spacing.s) {
+                        if let category { CategoryTag(category: category) }
+                        if let mood {
+                            HStack(spacing: Spacing.xxs) {
+                                MoodGlyph(mood: mood, size: 14)
+                                Text(mood.title).folioFont(.caption).foregroundStyle(.inkSecondary)
+                            }
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel(String(localized: "Mood, \(mood.title)"))
+                        }
+                    }
                 }
                 if !entry.title.isEmpty {
                     Text(entry.title)

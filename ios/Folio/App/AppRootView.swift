@@ -81,7 +81,9 @@ struct AppRootView: View {
         .onChange(of: store.revision) {
             ReminderScheduler.shared.reschedule()
             WidgetSnapshotWriter.shared.scheduleWrite()
+            OnThisDayNotifier.shared.reschedule()
         }
+        .task { OnThisDayNotifier.shared.start(store: store) }
         // Widgets (Batch J): ticks made on a widget, then a fresh snapshot.
         .task { WidgetSnapshotWriter.shared.start(store: store) }
         .task { await account.checkAppleCredential() }

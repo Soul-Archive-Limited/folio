@@ -19,8 +19,7 @@ struct JournalControls: View {
                             Button {
                                 withAnimation(FolioMotion.standard(reduceMotion: reduceMotion)) { model.mode = mode }
                             } label: {
-                                Label(mode == .timeline ? "Timeline" : "Photos",
-                                      systemImage: mode == .timeline ? "list.bullet.below.rectangle" : "square.grid.3x3")
+                                Label(mode.title, systemImage: mode.symbol)
                                     .labelStyle(.iconOnly)
                                     .padding(.horizontal, Spacing.s)
                                     .frame(minWidth: Spacing.minHitTarget, minHeight: 36)
@@ -41,7 +40,25 @@ struct JournalControls: View {
                 }
             }
             .padding(.horizontal, Spacing.sideMargin)
-            CategoryFilterBar(selection: $model.filter)
+            if model.mode != .year { CategoryFilterBar(selection: $model.filter) }
+        }
+    }
+}
+
+extension JournalModel.Mode {
+    var title: LocalizedStringKey {
+        switch self {
+        case .timeline: "Timeline"
+        case .photos: "Photos"
+        case .year: "Year in Pixels"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .timeline: "list.bullet.below.rectangle"
+        case .photos: "square.grid.3x3"
+        case .year: "square.grid.4x3.fill"
         }
     }
 }

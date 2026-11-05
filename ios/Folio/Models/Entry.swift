@@ -29,6 +29,8 @@ final class Entry: TrashableRecord {
     var isTombstone: Bool
     /// When it was moved to Recently Deleted (SPEC §5.2); nil while live. Added in schema v3.
     var trashedAt: Date?
+    /// How the day felt, 1 (heavy) … 5 (bright); nil = not set. Added in schema v5 (Batch J).
+    var mood: Int?
 
     init(id: UUID = UUID(), title: String, bodyMarkdown: String, day: DayKey, minutesFromMidnight: Int? = nil,
          categoryID: UUID? = nil, now: Date) {

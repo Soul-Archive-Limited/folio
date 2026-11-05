@@ -7,6 +7,7 @@ import { CategoryChip, PhotoImg, Sheet, useCloseSheet } from './common.tsx';
 import { useDiary } from './context.tsx';
 import { EntryCard } from './EntryCard.tsx';
 import { Icon } from './Icons.tsx';
+import { MoodGlyph, moodOf } from './Mood.tsx';
 import { Prose } from './Prose.tsx';
 
 /** Entry detail (SPEC §6.5): photos, date, category, title, the text; Edit · ••• menu. */
@@ -83,7 +84,10 @@ function Detail({ id }: { id: string }) {
           </div>
         )}
         <p className="caption ink3">{formatLongYear(entry.data.dayKey)}{entry.data.minutesFromMidnight !== undefined && ` · ${formatTime(entry.data.minutesFromMidnight)}`}</p>
-        <div style={{ margin: '8px 0' }}><CategoryChip id={entry.data.categoryID} /></div>
+        <div style={{ margin: '8px 0', display: 'flex', gap: 10, alignItems: 'center' }}>
+          <CategoryChip id={entry.data.categoryID} />
+          {moodOf(entry.data.mood) && <span className="caption ink2" style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}><MoodGlyph mood={entry.data.mood} size={15} />{moodOf(entry.data.mood)!.title}</span>}
+        </div>
         {entry.data.title && <h1 className="title2" style={{ fontSize: 28, margin: '6px 0 12px' }}>{entry.data.title}</h1>}
         <Prose markdown={entry.data.bodyMarkdown} />
         {others.length > 0 && (

@@ -1,7 +1,7 @@
 import PhotosUI
 import SwiftUI
 
-/// The composer's glass tool row (SPEC §6.4): Aa · Photo · Camera · Category · Mic · ✦.
+/// The composer's glass tool row (SPEC §6.4): Aa · Photo · Camera · Category · Mood · Mic · ✦.
 /// It sits in the bottom safe-area inset, so it rests at the bottom of the sheet and rides
 /// above the keyboard when one is up: the tools are reachable with or without typing.
 struct ComposerToolRow: View {
@@ -20,6 +20,7 @@ struct ComposerToolRow: View {
             ComposerPhotoPickerButton(model: model)
             ComposerCameraButton(model: model)
             ComposerCategoryMenu(selection: $model.categoryID)
+            ComposerMoodButton(mood: $model.mood)
             Spacer(minLength: 0)
             if let onDictate {
                 // The 44 pt frame sits inside the label so the whole square is the hit area.

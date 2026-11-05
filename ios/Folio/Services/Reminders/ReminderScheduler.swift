@@ -1,5 +1,6 @@
 import Foundation
 import os
+import UIKit
 import UserNotifications
 
 /// Task reminders (Batch I, SPEC §6.8): local notifications only, nothing through the server.
@@ -16,7 +17,8 @@ final class ReminderScheduler: NSObject, UNUserNotificationCenterDelegate {
     static let snoozeTomorrow = "folio.task.tomorrow"
     nonisolated static let prefix = "task-"
     /// iOS keeps at most 64 pending requests per app; leave room.
-    static let limit = 60
+    /// iOS keeps 64 pending notifications; On this day uses up to 8 (Batch J).
+    static let limit = 56
 
     weak var store: DiaryStore?
     private var pending: Task<Void, Never>?
@@ -109,6 +111,10 @@ final class ReminderScheduler: NSObject, UNUserNotificationCenterDelegate {
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
         let identifier = response.notification.request.identifier
         let action = response.actionIdentifier
+        if identifier.hasPrefix(OnThisDayNotifier.prefix) {
+            await MainActor.run { UIApplication.shared.open(FolioRoute.onThisDay.url) }
+            return
+        }
         guard identifier.hasPrefix(Self.prefix), let id = UUID(uuidString: String(identifier.dropFirst(Self.prefix.count))) else { return }
         await MainActor.run { self.handle(action: action, taskID: id) }
     }

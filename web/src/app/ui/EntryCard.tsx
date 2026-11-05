@@ -5,6 +5,7 @@ import type { EntryData } from '../lib/payloads.ts';
 import type { Rec } from '../lib/store.ts';
 import { CategoryChip, PhotoImg } from './common.tsx';
 import { useDiary } from './context.tsx';
+import { MoodGlyph, moodOf } from './Mood.tsx';
 
 /** An entry in the day panel or a list: 64 pt photo, title, two-line preview, category, time. */
 export function EntryCard({ entry, style, showDate }: { entry: Rec<EntryData>; style?: CSSProperties; showDate?: boolean }) {
@@ -20,6 +21,7 @@ export function EntryCard({ entry, style, showDate }: { entry: Rec<EntryData>; s
         <span className="t" style={{ display: 'block' }}>{title}</span>
         {preview && entry.data.title.trim() && <span className="p">{preview}</span>}
         <span className="meta">
+          {moodOf(entry.data.mood) && <span title={moodOf(entry.data.mood)!.title}><MoodGlyph mood={entry.data.mood} size={13} /></span>}
           <CategoryChip id={entry.data.categoryID} />
           {(showDate || time) && <span className="caption ink3">{[showDate && formatShort(entry.data.dayKey), time].filter(Boolean).join(' · ')}</span>}
         </span>

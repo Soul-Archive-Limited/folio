@@ -12,6 +12,8 @@ nonisolated struct ComposerDraft: Codable, Equatable, Sendable {
     var categoryID: UUID?
     var photos: [DraftPhoto] = []
     var savedAt: Date
+    /// Batch J; drafts saved before it decode as nil.
+    var mood: Int?
 
     /// Same writing, ignoring when it was saved and whitespace at the ends of the text, so a
     /// draft that only repeats the saved entry never counts as unsaved work.
@@ -19,8 +21,14 @@ nonisolated struct ComposerDraft: Codable, Equatable, Sendable {
         func trimmed(_ text: String) -> String { text.trimmingCharacters(in: .whitespacesAndNewlines) }
         return entryID == other.entryID && dayKey == other.dayKey && minutesFromMidnight == other.minutesFromMidnight
             && trimmed(title) == trimmed(other.title) && trimmed(bodyMarkdown) == trimmed(other.bodyMarkdown)
-            && categoryID == other.categoryID
+            && categoryID == other.categoryID && mood == other.mood
             && photos.map { $0.storedPhotoID ?? $0.id } == other.photos.map { $0.storedPhotoID ?? $0.id }
+    }
+
+    func withMood(_ mood: Int?) -> ComposerDraft {
+        var copy = self
+        copy.mood = mood
+        return copy
     }
 
     var isEmpty: Bool {
@@ -52,6 +60,7 @@ nonisolated struct ComposerDraft: Codable, Equatable, Sendable {
         categoryID = try container.decodeIfPresent(UUID.self, forKey: .categoryID)
         photos = try container.decodeIfPresent([DraftPhoto].self, forKey: .photos) ?? []
         savedAt = try container.decode(Date.self, forKey: .savedAt)
+        mood = try container.decodeIfPresent(Int.self, forKey: .mood)
     }
 }
 

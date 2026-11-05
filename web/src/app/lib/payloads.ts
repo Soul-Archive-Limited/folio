@@ -12,6 +12,8 @@ export interface EntryData {
   categoryID?: string;
   createdAt: number;
   trashedAt?: number;
+  /** Batch J: 1…5 (Heavy … Bright); anything else is ignored when shown. */
+  mood?: number;
 }
 
 export interface PhotoData {

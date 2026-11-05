@@ -523,3 +523,26 @@ body:has(.gate) .aura { opacity: 0.5; }
 .search .card { display: flex; gap: 12px; text-align: start; width: 100%; font: inherit; color: inherit; }
 .search .card .p { display: block; }
 .search mark { background: color-mix(in srgb, var(--ember) 26%, transparent); color: inherit; font-weight: 700; border-radius: 3px; }
+
+/* Mood, On this day, Year in Pixels (Batch J) */
+.mood-picker { display: flex; gap: 6px; flex-wrap: wrap; }
+.mood-picker button { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--hairline); background: color-mix(in srgb, var(--bg-elevated) 60%, transparent); border-radius: 999px; padding: 6px 12px 6px 8px; font: 600 13px/1 inherit; color: var(--ink); min-height: 40px; cursor: pointer; }
+.mood-picker button[aria-checked='true'] { border-color: var(--ember); background: color-mix(in srgb, var(--ember) 14%, transparent); }
+.on-this-day { border-radius: 18px; padding: 10px 12px; margin-bottom: 12px; background: color-mix(in srgb, var(--bg-elevated) 70%, transparent); border: 1px solid var(--hairline); }
+.on-this-day h3 { margin: 0 0 4px; }
+.on-this-day button { display: flex; gap: 10px; align-items: center; width: 100%; border: 0; background: none; padding: 6px 0; font: inherit; color: var(--ink); text-align: start; cursor: pointer; min-height: 36px; }
+.on-this-day button span { flex: 1; min-width: 0; color: var(--ink-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pixels-head { display: flex; align-items: center; gap: 8px; margin: 8px 0 14px; }
+.pixels-head h2 { margin: 0; min-width: 3.2ch; text-align: center; }
+.pixel-grid { display: grid; grid-template-columns: 18px repeat(12, minmax(0, 1fr)); gap: 3px; max-width: 560px; }
+.pixel-month { text-align: center; font-weight: 600; }
+.pixel-day { font-size: 9px; color: var(--ink-tertiary); text-align: right; padding-right: 3px; line-height: 16px; }
+.pixel { height: 16px; border: 0; padding: 0; border-radius: 3.5px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.pixel.written { background: color-mix(in srgb, var(--ink) 22%, transparent); cursor: pointer; }
+.pixel.future { background: color-mix(in srgb, var(--ink) 3%, transparent); }
+.pixel.today { outline: 1.5px solid var(--ember); outline-offset: -1.5px; }
+@media (hover: hover) and (pointer: fine) { .pixel.written:hover { transform: scale(1.25); } }
+.pixel-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; }
+.pixel-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.pixel-legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.pixel-legend i.none { background: color-mix(in srgb, var(--ink) 22%, transparent); }

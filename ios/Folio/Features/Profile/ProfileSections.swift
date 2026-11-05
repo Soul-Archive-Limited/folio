@@ -139,6 +139,73 @@ struct ProfilePrivacySection: View {
     }
 }
 
+/// Memories (Batch J): the opt-in morning "On this day" notification.
+struct ProfileMemoriesSection: View {
+    @AppStorage(OnThisDayNotifier.enabledKey) private var notifies = false
+    @AppStorage(OnThisDayNotifier.minutesKey) private var minutes = 8 * 60
+    @State private var showsExplainer = false
+    @State private var showsDenied = false
+    @Environment(\.openURL) private var openURL
+
+    var body: some View {
+        Section {
+            Toggle(isOn: Binding(get: { notifies }, set: { $0 ? turnOn() : (notifies = false) })) {
+                ProfileRowLabel(title: "On this day notification", systemImage: "clock.arrow.circlepath")
+            }
+            .tint(.emberStrong)
+            if notifies {
+                DatePicker(selection: time, displayedComponents: .hourAndMinute) {
+                    ProfileRowLabel(title: "Time", systemImage: "sun.horizon")
+                }
+            }
+        } header: {
+            Text("Memories")
+        } footer: {
+            Text("A note in the morning on days you wrote something in an earlier year. It names the year only, never your words.")
+        }
+        .listRowBackground(ProfileRowBackground())
+        .onChange(of: notifies) { OnThisDayNotifier.shared.reschedule() }
+        .onChange(of: minutes) { OnThisDayNotifier.shared.reschedule() }
+        .sheet(isPresented: $showsExplainer) {
+            PermissionExplainer(systemImage: "clock.arrow.circlepath",
+                                message: "Folio can tell you in the morning when you wrote something on that date in an earlier year.",
+                                footnote: "iOS will ask next.") {
+                showsExplainer = false
+                Task {
+                    if await ReminderScheduler.shared.requestAccess() { notifies = true } else { showsDenied = true }
+                }
+            }
+        }
+        .alert("Notifications are off for Folio", isPresented: $showsDenied) {
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openNotificationSettingsURLString) { openURL(url) }
+            }
+            Button("Not now", role: .cancel) {}
+        } message: {
+            Text("Turn on notifications for Folio in Settings whenever you'd like them.")
+        }
+    }
+
+    private var time: Binding<Date> {
+        Binding {
+            Calendar.current.date(bySettingHour: minutes / 60, minute: minutes % 60, second: 0, of: AppClock.now) ?? AppClock.now
+        } set: { date in
+            let parts = Calendar.current.dateComponents([.hour, .minute], from: date)
+            minutes = (parts.hour ?? 8) * 60 + (parts.minute ?? 0)
+        }
+    }
+
+    private func turnOn() {
+        Task {
+            switch await ReminderScheduler.shared.access() {
+            case .granted: notifies = true
+            case .denied: showsDenied = true
+            default: showsExplainer = true
+            }
+        }
+    }
+}
+
 /// Widgets (Batch J): what the widgets may show. Stored in the App Group so they can read it.
 struct ProfileWidgetsSection: View {
     @AppStorage(AppGroup.homeDetailsKey, store: AppGroup.defaults) private var homeDetails = true

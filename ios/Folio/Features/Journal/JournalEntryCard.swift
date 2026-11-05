@@ -34,6 +34,9 @@ struct JournalEntryCard: View {
                 if !preview.isEmpty {
                     Text(preview).folioFont(.callout).foregroundStyle(.inkSecondary).lineLimit(3)
                 }
+                if let mood = entry.mood.flatMap(Mood.init(rawValue:)) {
+                    MoodGlyph(mood: mood, size: 12).accessibilityLabel(mood.title)
+                }
                 if let category = store.category(id: entry.categoryID) { CategoryTag(category: category) }
             }
             .padding(Spacing.m)

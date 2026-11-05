@@ -155,8 +155,8 @@ struct MainTabView: View {
             present(.task(today))
         case .today, .onThisDay:
             requester.pending = nil
+            // The day panel's On this day card sits at its top.
             route(to: .day(today))
-            if link == .onThisDay { calendar?.revealsOnThisDay = true }
         case .day(let raw):
             requester.pending = nil
             if let day = DayKey(rawValue: raw) { route(to: .day(day)) }

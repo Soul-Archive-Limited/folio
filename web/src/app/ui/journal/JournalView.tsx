@@ -7,11 +7,12 @@ import { CategoryChips, Empty, PhotoImg } from '../common.tsx';
 import { useDiary } from '../context.tsx';
 import { EntryCard } from '../EntryCard.tsx';
 import { Icon } from '../Icons.tsx';
+import { YearPixels } from './YearPixels.tsx';
 
 /** Journal (SPEC §6.6): Timeline with sticky months and cover cards, or every photo. */
 export default function JournalView() {
   const { store, openComposer, openEntry, navigate } = useDiary();
-  const [mode, setMode] = useState<'timeline' | 'photos'>('timeline');
+  const [mode, setMode] = useState<'timeline' | 'photos' | 'year'>('timeline');
   const [category, setCategory] = useState<string | null>(null);
   const entries = useMemo(() => store.entries()
     .filter((e) => !category || sameId(e.data.categoryID, category))
@@ -36,13 +37,16 @@ export default function JournalView() {
           <div className="segmented glass" role="group" aria-label="View">
             <button aria-pressed={mode === 'timeline'} onClick={() => setMode('timeline')}>Timeline</button>
             <button aria-pressed={mode === 'photos'} onClick={() => setMode('photos')}>Photos</button>
+            <button aria-pressed={mode === 'year'} onClick={() => setMode('year')}>Year</button>
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' }}>
           <CategoryChips selected={category} onSelect={setCategory} />
           <button className="btn small" onClick={() => openComposer({ dayKey: undefined })} style={{ marginLeft: 'auto' }}><Icon name="calendar" small />Write for a past day</button>
         </div>
-        {entries.length === 0 ? (
+        {mode === 'year' ? (
+          <YearPixels />
+        ) : entries.length === 0 ? (
           <Empty icon="journal" text={category ? 'No pages in this category yet.' : 'Your journal is empty. Tap + to write your first page.'} />
         ) : mode === 'timeline' ? (
           months.map((m) => (

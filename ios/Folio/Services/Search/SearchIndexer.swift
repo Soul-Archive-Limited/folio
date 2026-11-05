@@ -36,6 +36,7 @@ actor SearchIndexer {
             hasher.combine(entry.categoryID)
             hasher.combine(photos.first?.id)
             hasher.combine(photos.count)
+            hasher.combine(entry.mood)
             let signature = hasher.finalize()
             if let cached = entryCache[entry.id], cached.signature == signature {
                 fresh[entry.id] = cached
@@ -46,7 +47,7 @@ actor SearchIndexer {
             let document = SearchIndex.Document(
                 id: entry.id, kind: .entry, dayKey: entry.dayKey, minutesFromMidnight: entry.minutesFromMidnight,
                 categoryID: entry.categoryID, title: entry.title, text: text, subtasks: [],
-                firstPhotoID: photos.first?.id, photoCount: photos.count, isCompleted: false, mood: nil,
+                firstPhotoID: photos.first?.id, photoCount: photos.count, isCompleted: false, mood: entry.mood,
                 vocabulary: SearchText.vocabulary(of: [entry.title, text])
             )
             fresh[entry.id] = CachedEntry(signature: signature, document: document)
