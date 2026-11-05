@@ -297,7 +297,7 @@ Inset-grouped glass sections:
 - **Privacy & Security:** **Lock Folio** + "Lock" delay (§4.4) · Hide content in app switcher.
 - **Widgets:** Show details on Home Screen · Show details on Lock Screen (§6.18).
 - **Memories:** On this day notification + Time (§6.19). **Apple Calendar:** Show Apple Calendar events (§6.2).
-- **Your data:** **Recently Deleted · N** (§5.2) · Export as JSON + photos zip (decrypted, local; "Include Recently Deleted" toggle, off by default) · Export PDF (later; hidden) · Erase data on this iPhone (also empties Recently Deleted).
+- **Your data:** **Recently Deleted · N** (§5.2) · Export as JSON + photos zip (decrypted, local; "Include Recently Deleted" toggle, off by default) · **Export PDF** (§6.21) · Erase data on this iPhone (also empties Recently Deleted).
 - **Help:** "Show the tour again" · "What do the marks mean?" · Support & FAQ · Contact support (mailto).
 - **About:** Website · Privacy Policy · Terms · Open Source (GitHub) · Acknowledgements · Rate Folio (`requestReview` only here) · Version · "Made by Soul Archive Ltd".
 
@@ -335,6 +335,11 @@ One field per place: Calendar (pull-down / magnifier → sheet), Journal and To-
 - **Results:** "Pages · N" then "Tasks · N", newest first; the matched word starts are highlighted (ember wash + bold, never colour alone); page snippets start just before the first match; matching subtasks show under their task. Over 300 → "N more — add a word or a filter". Tap opens the page in place (pushed in the same stack; Back returns to the results) or the task sheet.
 - Empty: "Search titles, pages, categories and tasks. Everything stays on this iPhone." · No match: "No matches for “…”." · First build: "Getting your diary ready…".
 - 10,000 entries: a query is a binary search per word per item (a few ms); tested in `SearchIndexTests`.
+
+### 6.21 PDF export and print (Batch J)
+Profile → Your data → **Export PDF**: From / Until (GMT day pickers) with Quick ranges (This year · Last year · Last 3 years · Everything), toggles **Photos** and **Tasks**, then **Create PDF** → a progress bar (Stop cancels) → a PDFKit preview with **Share** (share sheet) and **Print** (`UIPrintInteractionController`).
+- The book: A5 pages on paper colour, always the light palette. **Cover:** profile picture (photo, Folio avatar, or the initial in an ember circle), "Sam's diary" / "My diary", the range in italic, "41 pages", the Folio word. **Each month opens a new page** with a big serif month name, the year in ember italic, "N PAGES" and a hairline. **Entries** in date order: an ember small-caps date line (weekday, day, month · time · mood word), the title in New York bold, the body with every §5.1 style (bold, italic, underline, strikethrough, highlight, heading, bullets, numbers, checklists ☐/☑, quotes), photos at text width (≤ 250 pt tall, ≤ 1000 px JPEG), the day's tasks under "TASKS" (☑ struck when done) if chosen, and a small "·  ·  ·" between days. Footer: month and page number.
+- Made entirely on the device in a background task (its own `ModelContext`, TextKit 1 laying each month over as many pages as it needs), with progress per day and a background-task grace period if Folio is sent away mid-way. The file goes to the app's temporary folder with complete file protection and nowhere else until shared. Three years of the sample diary: 38 pages in ~3 s on the Simulator.
 
 ### 6.20 Bring things in (Batch J)
 - **Scan a paper page** ("+" long-press → Scan a paper page): VisionKit's document camera (several pages; explainer before the camera prompt) or "Choose photos of pages" → text read on the device (`RecognizeTextRequest`, accurate, language correction; the device language, English and Hindi where iOS supports them — iOS 26.5 has no Hindi model; lines under 0.4 confidence are dropped) → a review sheet: the pages, **the date found on the page suggested** (numeric dates day-first except in the US, written dates via `NSDataDetector`, Devanagari digits, 1900 → tomorrow), the text in an editor → Save makes a new entry for that day with the text as paragraphs and the scans as photos (≤ 10; GPS stripped, resized like any photo) and a "Saved to Tue 12 Mar 2019 · Show" toast.
@@ -565,7 +570,7 @@ folio/
 ---
 
 ## 17. Later (don't build until asked)
-PDF export · alternate icons · Journaling Suggestions · passkeys.
+alternate icons · Journaling Suggestions · passkeys.
 
 ---
 

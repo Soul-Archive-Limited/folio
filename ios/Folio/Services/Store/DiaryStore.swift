@@ -587,7 +587,7 @@ final class DiaryStore {
     }
 
     /// Timed entries by time, then untimed, each in creation order.
-    static func entryOrder(_ a: Entry, _ b: Entry) -> Bool {
+    nonisolated static func entryOrder(_ a: Entry, _ b: Entry) -> Bool {
         switch (a.minutesFromMidnight, b.minutesFromMidnight) {
         case let (x?, y?) where x != y: x < y
         case (.some, nil): true
@@ -597,7 +597,7 @@ final class DiaryStore {
     }
 
     /// Open before done; then by time, then manual order.
-    static func taskOrder(_ a: TaskItem, _ b: TaskItem) -> Bool {
+    nonisolated static func taskOrder(_ a: TaskItem, _ b: TaskItem) -> Bool {
         if a.isCompleted != b.isCompleted { return !a.isCompleted }
         switch (a.minutesFromMidnight, b.minutesFromMidnight) {
         case let (x?, y?) where x != y: return x < y

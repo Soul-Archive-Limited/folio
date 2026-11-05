@@ -285,6 +285,7 @@ struct ProfileDataSection: View {
     @State private var exportIncludesTrash = false
     @State private var shareItems: ShareItems?
     @State private var confirmsErase = false
+    @State private var showsPDF = false
 
     struct ShareItems: Identifiable {
         let id = UUID()
@@ -305,6 +306,11 @@ struct ProfileDataSection: View {
                 }
             }
             .disabled(exporting)
+            Button { showsPDF = true } label: {
+                ProfileRowLabel(title: "Export PDF", systemImage: "doc.richtext")
+            }
+            .accessibilityIdentifier("profile.exportPDF")
+            .sheet(isPresented: $showsPDF) { PDFExportSheet(today: store.today) }
             Toggle(isOn: $exportIncludesTrash) {
                 ProfileRowLabel(title: "Include Recently Deleted in export", systemImage: "tray.full")
             }
