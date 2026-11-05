@@ -32,7 +32,31 @@ export const faq = {
   },
   export: {
     q: 'Can I get my diary out?',
-    a: 'Yes. Profile → Your data → Export makes a JSON file of everything plus a zip of your photos, right on your iPhone.',
+    a: 'Yes. Profile → Your data → Export makes a JSON file of everything plus a zip of your photos, right on your iPhone. Export PDF turns any range of dates into a typeset book — a cover, a page for each month, your entries with their photos and formatting — that you can share or print.',
+  },
+  search: {
+    q: 'Can I search my diary?',
+    a: 'Yes. Pull down on the calendar, the Journal or To-do and type: titles, what you wrote, category names, tasks and subtasks, with filters for category, photos, dates and done or open. The search runs on your iPhone (and in your browser tab on the web) — nothing is indexed on our servers.',
+  },
+  lock: {
+    q: 'Can I lock Folio with Face ID?',
+    a: 'Yes. Profile → Privacy & Security → Lock Folio, then choose when it locks: immediately, or after 1, 5 or 15 minutes away. Nothing in the app shows until you unlock — not sheets, widgets or links that open it.',
+  },
+  widgets: {
+    q: 'Are there widgets?',
+    a: 'Yes: Today (with tasks you can tick right on the Home Screen), Month, Quick add, and two for the Lock Screen. There are Control Center buttons and Siri shortcuts too. Widgets read a small copy kept on your iPhone, and the Lock Screen shows only counts unless you turn details on.',
+  },
+  paper: {
+    q: 'Can I bring in my old paper diary?',
+    a: 'Yes. Long-press + and choose Scan a paper page. Folio reads the page on your iPhone, suggests the date written on it, and keeps the scan as a photo with the text you can correct. You can also share photos, text and links into Folio from other apps.',
+  },
+  invite: {
+    q: 'How do I get an account?',
+    a: 'Folio works fully without one. Accounts (for sync and the web app) are invite-only for now: ask the person who told you about Folio for an invite code. People who already have an account don’t need one.',
+  },
+  install: {
+    q: 'Can I install the web app on my phone?',
+    a: 'Yes. Open <a href="/app">folio.devilsense.com/app</a>, then in Safari tap Share → Add to Home Screen, or in Chrome choose Install app. It opens full screen and starts even offline; your diary is still decrypted only in memory after you unlock it.',
   },
   android: {
     q: 'Is there an Android app?',

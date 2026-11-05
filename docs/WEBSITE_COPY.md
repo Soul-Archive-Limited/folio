@@ -123,3 +123,9 @@ Company line (unchanged): Soul Archive Ltd · Registered in England and Wales ·
 
 ## 404
 - **This page isn't in the diary.** Back to the calendar →
+
+### Batch J additions (Features, FAQ, Download, Changelog)
+- **Features** gains three groups before "Get things done": *Find and remember* (Search everything, on your iPhone · On this day · Year in Pixels), *Bring it in* (Scan paper diaries — and share in from any app), *Around your iPhone* (Widgets you can tick · Lock Folio). "Your archive and your data" mentions the typeset PDF.
+- **FAQ** adds: Can I search my diary? · Can I lock Folio with Face ID? · Are there widgets? · Can I bring in my old paper diary? · How do I get an account? (invite-only for now; Folio works fully without one) · Can I install the web app on my phone? Export now mentions PDF.
+- **Download** adds "Install on your phone" (Safari: Share → Add to Home Screen; Android: ⋮ → Install app; desktop: the install icon).
+- Words stay in the house voice: plain, short, no superlatives; "on your iPhone" wherever something stays local.

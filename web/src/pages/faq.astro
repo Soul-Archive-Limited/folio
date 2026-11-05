@@ -4,10 +4,10 @@ import PageHead from '../components/PageHead.astro';
 import Faq from '../components/Faq.astro';
 import { faq } from '../data/faq';
 const groups = [
-  { title: 'Privacy', items: [faq.readDiary, faq.recoveryKey, faq.dictation, faq.lostPhone] },
-  { title: 'Using Folio', items: [faq.account, faq.pastDays, faq.timeZones, faq.streaks, faq.shared, faq.free] },
+  { title: 'Privacy', items: [faq.readDiary, faq.recoveryKey, faq.lock, faq.dictation, faq.lostPhone] },
+  { title: 'Using Folio', items: [faq.account, faq.invite, faq.search, faq.pastDays, faq.paper, faq.widgets, faq.timeZones, faq.streaks, faq.shared, faq.free] },
   { title: 'Your data', items: [faq.recentlyDeleted, faq.export] },
-  { title: 'Web and devices', items: [faq.web, faq.android, faq.who] },
+  { title: 'Web and devices', items: [faq.web, faq.install, faq.android, faq.who] },
 ];
 ---
 <Base title="FAQ" og="faq" description="Answers about Folio: who can read your diary, accounts, the recovery key, writing for past days, time zones, dictation, the web app and exporting your data.">

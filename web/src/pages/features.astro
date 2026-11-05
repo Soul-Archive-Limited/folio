@@ -15,6 +15,18 @@ const groups = [
     { shot: 'dictation', title: 'Dictation, on your iPhone', text: 'Talk and watch the words appear. Speech is recognised on the device; audio isn’t stored and nothing is sent anywhere.', alt: 'Dictation: a glass capsule with a live waveform and the words appearing in the composer.' },
     { shot: 'intelligence', title: '✦ A light hand with words', text: 'Suggest a title, polish grammar while keeping your words, or find tasks in what you wrote. Runs on Apple’s on-device model on iPhones with Apple Intelligence. Nothing changes until you accept it.', alt: 'The ✦ menu showing three suggested titles for an entry.' },
   ] },
+  { id: 'find', title: 'Find and remember', items: [
+    { shot: 'search', title: 'Search everything, on your iPhone', text: 'Pull down and type. Titles, words, categories, tasks and subtasks, with filters for category, photos, dates and done or open. Matches are highlighted; nothing is indexed on a server.', alt: 'Search for “walk” showing one page, “Long walk”, with the word highlighted.' },
+    { shot: 'onthisday', title: 'On this day', text: 'What you wrote on today’s date in earlier years waits at the top of the day. A gentle morning note, if you want one, names only the year.', alt: 'The calendar on 27 October with an On this day card listing 2025 and 2024.' },
+    { shot: 'year', title: 'Year in Pixels', text: 'Give a page a mood if you like — five steps, our own quiet marks, never faces — and see your year as a grid of colour. By mood or by category. No streaks, ever.', alt: 'Year in Pixels for 2026: a grid of coloured squares, one per day, by mood.' },
+  ] },
+  { id: 'bring', title: 'Bring it in', items: [
+    { shot: 'scan', title: 'Scan paper diaries', text: 'Photograph a page; Folio reads it on your iPhone, finds the date written on it, and keeps the scan with text you can correct. Share photos, text and links in from any app, too.', alt: 'Bring in a page: a scanned diary page, the date found on it (12 March 2019) and its text.' },
+  ] },
+  { id: 'around', title: 'Around your iPhone', items: [
+    { shot: 'widgets', title: 'Widgets you can tick', text: 'Today with your next tasks, a Month of photo tiles, Quick add, Lock Screen counts, Control Center buttons and Siri. Details stay off the Lock Screen unless you choose.', alt: 'The Home Screen with Folio’s Month widget and Today widget, one task ticked.' },
+    { shot: 'lock', title: 'Lock Folio', text: 'Face ID or your passcode, immediately or after a few minutes away. Until you unlock, nothing of your diary shows — not even a sheet you left open.', alt: 'Folio locked: the Folio mark, “Still up, Sam?” and Face ID.' },
+  ] },
   { id: 'do', title: 'Get things done', items: [
     { shot: 'todo', title: 'To-do on the same calendar', text: 'Tasks with dates and categories, overdue first. Tick one and it stays on its day, done — with Undo for a few seconds, and Completed below.', alt: 'The To-do list with dated tasks, category colours and a quick-add bar.' },
   ] },
@@ -24,12 +36,12 @@ const groups = [
     { shot: 'entry', title: 'Entry detail', text: 'Photos in a carousel, your words in the writing font, and “Same day in other years” when there are any.', alt: 'An entry, “Train to Edinburgh”, with its photo, date, category and text.' },
   ] },
   { id: 'control', title: 'Stay in control', items: [
-    { shot: 'profile', title: 'Your archive and your data', text: 'Entries, photos, days written on and tasks done at a glance. Export everything as JSON plus your photos; deleted things wait 30 days in Recently Deleted.', alt: 'Profile: Sam, writing since January 2024, with archive tiles and the sync card.' },
+    { shot: 'profile', title: 'Your archive and your data', text: 'Entries, photos, days written on and tasks done at a glance. Export everything as JSON plus your photos, or as a typeset PDF book of any dates to share or print; deleted things wait 30 days in Recently Deleted.', alt: 'Profile: Sam, writing since January 2024, with archive tiles and the sync card.' },
     { shot: 'categories', title: 'Categories, your way', text: 'Up to 30, in twelve colours with your own names and symbols. Filter the calendar, Journal and To-do by them.', alt: 'The Categories list: Travel, Family, Work, Health, Ideas and Food with their counts.' },
   ] },
 ];
 ---
-<Base title="Features" og="features" description="Everything Folio does: a calendar diary with photo tiles, any-day writing, on-device dictation, tasks on the same calendar, a Journal, export and end-to-end encrypted sync.">
+<Base title="Features" og="features" description="Everything Folio does: a calendar diary with photo tiles, any-day writing, on-device search and dictation, widgets, Face ID lock, scanning paper diaries, PDF export and end-to-end encrypted sync.">
   <PageHead eyebrow="Features" lede="A short list, on purpose. Every screen on this page is the real iPhone app, with sample data.">
     Everything <em>Folio does.</em>
   </PageHead>
