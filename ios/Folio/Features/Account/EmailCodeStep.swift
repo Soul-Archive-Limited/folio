@@ -18,6 +18,7 @@ struct EmailCodeStep: View {
     /// Batch J: shown only when this address would be a new account.
     @State private var invite = ""
     @State private var asksInvite = false
+    @FocusState private var inviteFocused: Bool
     @FocusState private var focused: Bool
 
     static let resendDelay: TimeInterval = 30
@@ -42,7 +43,9 @@ struct EmailCodeStep: View {
                     }
                 if asksInvite {
                     InviteCodeField(code: $invite)
+                        .focused($inviteFocused)
                         .padding(.top, Spacing.s)
+                        .id("invite")
                         .transition(.opacity.combined(with: .move(edge: .top)))
                 }
                 if let problem {
@@ -99,6 +102,8 @@ struct EmailCodeStep: View {
                 if problem?.needsInvite == true {
                     // The code is still good (Batch J): keep it and ask for the invite.
                     withAnimation(.smooth(duration: 0.3)) { asksInvite = true }
+                    // Its own keyboard (letters), which also scrolls it into view above the buttons.
+                    inviteFocused = true
                 } else {
                     code = ""
                 }

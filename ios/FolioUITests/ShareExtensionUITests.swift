@@ -4,6 +4,7 @@ import XCTest
 /// `FOLIO_SHARE_TEST` is set (it drives Photos and needs the sample page in the library:
 /// `xcrun simctl addmedia <sim> FolioTests/Resources/sample-diary-page.jpg`).
 final class ShareExtensionUITests: XCTestCase {
+    @MainActor
     func testShareAPhotoIntoFolio() throws {
         try XCTSkipUnless(ProcessInfo.processInfo.environment["FOLIO_SHARE_TEST"] != nil, "Set FOLIO_SHARE_TEST to run")
         let folio = XCUIApplication()

@@ -37,6 +37,7 @@ struct InvitesView: View {
             } footer: {
                 Text("Folio is invite-only for now. Each code makes one new account and lasts 7 days. People who already have an account don't need one.")
             }
+            .listRowBackground(ProfileRowBackground())
             if !invites.isEmpty {
                 Section("Your invites") {
                     ForEach(invites) { invite in
@@ -57,9 +58,12 @@ struct InvitesView: View {
                         }
                     }
                 }
+                .listRowBackground(ProfileRowBackground())
             }
             if let problem { Text(problem).foregroundStyle(.danger) }
         }
+        .scrollContentBackground(.hidden)
+        .background { AuraBackground() }
         .navigationTitle("Invite a friend")
         .task { await load() }
         .refreshable { await load() }

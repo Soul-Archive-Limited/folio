@@ -14,10 +14,8 @@ struct InviteCodeField: View {
             .frame(minHeight: 56)
             .folioGlass(in: .rect(cornerRadius: Radius.card))
             .accessibilityLabel("Invite code")
-            .onChange(of: code) { _, new in
-                let cleaned = String(new.uppercased().filter { $0.isLetter || $0.isNumber || $0 == "-" }.prefix(9))
-                if cleaned != new { code = cleaned }
-            }
+            // Not rewritten while typing (that drops keystrokes): the server reads it forgivingly
+            // (case, spaces, dashes, O/0, I/L/1).
     }
 }
 
