@@ -192,9 +192,12 @@ targets:
     platform: iOS
     sources:
       - path: FolioTests
+        excludes: ["Resources/**"]
       - path: ../shared/markdown-fixtures.json
         buildPhase: resources
       - path: ../shared/search-fixtures.json
+        buildPhase: resources
+      - path: FolioTests/Resources
         buildPhase: resources
     dependencies:
       - target: Folio

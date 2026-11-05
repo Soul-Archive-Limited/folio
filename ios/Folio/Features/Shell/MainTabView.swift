@@ -113,6 +113,7 @@ struct MainTabView: View {
         case "composer": requester.send(.entry(calendar.selectedDay))
         case "composerLarge": if let firstEntry { requester.send(.editEntry(firstEntry.id)) }
         case "taskComposer": requester.send(.task(calendar.selectedDay))
+        case "scan": requester.send(.scan)
         case "entry": if let firstEntry { calendar.path = [firstEntry.id] }
         default: break
         }

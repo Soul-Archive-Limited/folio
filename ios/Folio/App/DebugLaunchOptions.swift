@@ -43,6 +43,7 @@ import Foundation
 /// - `-FolioAPIBase http://127.0.0.1:9/api/` points the API somewhere unreachable (offline tests).
 /// - `-FolioRenameEntry "Old=>New"`, `-FolioTrashEntry Title`, `-FolioRestoreEntry Title` edit
 ///   an entry by title at launch, as local edits that sync (two-Simulator tests).
+/// - `-FolioOpen scan -FolioScanSample /path/page.jpg` reads a sample page into the scan review.
 /// - `-FolioSearch "river"` opens search on the launch tab with that text (Batch J).
 enum DebugLaunchOptions {
     enum Screen: String {

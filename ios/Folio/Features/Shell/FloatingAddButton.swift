@@ -23,6 +23,7 @@ struct FloatingAddButton: View {
                     Button("New entry", systemImage: "square.and.pencil") { onRequest(.entry(day)) }
                     Button("New task", systemImage: "checklist") { onRequest(.task(day)) }
                     Button("Dictate an entry", systemImage: "mic") { onRequest(.dictation(day)) }
+                    Button("Scan a paper page", systemImage: "doc.viewfinder") { onRequest(.scan) }
                 } label: {
                     Image(systemName: "plus")
                         .font(.title2.weight(.semibold))

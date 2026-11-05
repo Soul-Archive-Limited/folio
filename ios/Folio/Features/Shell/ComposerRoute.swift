@@ -29,6 +29,8 @@ struct ComposerRoute: View {
             if let model = resumedDraftModel {
                 ComposerSheet(model: model, calendar: calendar, startsLarge: model.entryID != nil, onSaved: saved)
             }
+        case .scan:
+            ScanSheet(today: store.today)
         case .task(let day, let title, let minutes):
             TaskComposerSheet(task: nil, day: day, title: title, minutes: minutes, categoryID: store.settings().defaultCategoryID)
         }

@@ -12,6 +12,8 @@ enum NewItemRequest: Identifiable, Hashable {
     case pastEntry
     /// The "Continue your draft" pill (Batch I): opens the draft's composer with it restored.
     case resumeDraft
+    /// Scan paper pages into a new entry (Batch J).
+    case scan
 
     var id: String {
         switch self {
@@ -21,6 +23,7 @@ enum NewItemRequest: Identifiable, Hashable {
         case .editEntry(let id): "edit-\(id.uuidString)"
         case .pastEntry: "past-entry"
         case .resumeDraft: "resume-draft"
+        case .scan: "scan"
         }
     }
 }
