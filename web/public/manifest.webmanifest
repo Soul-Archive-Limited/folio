@@ -1,0 +1,18 @@
+{
+  "id": "/app",
+  "name": "Folio",
+  "short_name": "Folio",
+  "description": "Your private diary, encrypted so only you can read it.",
+  "start_url": "/app",
+  "scope": "/app",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5f3ef",
+  "theme_color": "#f5f3ef",
+  "categories": ["lifestyle", "productivity"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

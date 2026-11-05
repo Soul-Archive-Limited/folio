@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
+import { setUpInstall } from '../lib/install.ts';
 import { api, ApiError, type Me } from '../lib/api.ts';
 import { importDataKey, type DataKey } from '../lib/crypto.ts';
 import { forgetBrowser, trustBrowser, trustedKey } from '../lib/trust.ts';
@@ -72,6 +73,7 @@ export default function AppRoot() {
   }
 
   useEffect(() => { void boot(); }, []);
+  useEffect(setUpInstall, []);
 
   const fallback = <Splash />;
   switch (phase.kind) {

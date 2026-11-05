@@ -5,6 +5,7 @@ import { Avatar, AvatarGrid } from '../Avatar.tsx';
 import { Modal } from '../common.tsx';
 import { useDiary } from '../context.tsx';
 import { Icon } from '../Icons.tsx';
+import { InstallHelp } from './InstallHelp.tsx';
 import { SYNC_TEXT } from '../Shell.tsx';
 
 const Devices = lazy(() => import('./Devices.tsx'));
@@ -52,6 +53,7 @@ function Main() {
   const [trusted, setTrusted] = useState<{ expiresAt: number } | null>(null);
   const [confirmSignOut, setConfirmSignOut] = useState(false);
   const [picking, setPicking] = useState(false);
+  const [installing, setInstalling] = useState(false);
   useEffect(() => { void isTrusted().then(setTrusted); }, []);
   useEffect(() => setName(settings.displayName), [settings.displayName]);
 
@@ -108,6 +110,8 @@ function Main() {
           <button className="btn small" onClick={() => engine.syncNow()}>Sync now</button>
         </div>
         <button className="row" onClick={() => navigate('/app/profile/devices')}><Icon name="devices" /><span className="grow">Devices</span><Icon name="chevronRight" small /></button>
+        <button className="row" onClick={() => setInstalling(true)}><Icon name="iphone" /><span className="grow">Install on your phone</span><Icon name="chevronRight" small /></button>
+        {installing && <InstallHelp onClose={() => setInstalling(false)} />}
         {me.canInvite && <button className="row" onClick={() => navigate('/app/profile/invites')}><Icon name="plus" /><span className="grow">Invite a friend</span><Icon name="chevronRight" small /></button>}
         <div className="row">
           <Icon name="lock" />

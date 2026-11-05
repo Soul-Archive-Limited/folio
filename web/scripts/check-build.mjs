@@ -122,5 +122,17 @@ check(() => {
   }
   assert.doesNotMatch(readFileSync(new URL('../dist/sitemap-0.xml', import.meta.url), 'utf8'), /\/app/);
 }, 'web app: noindex, rewrite, its own CSP with Turnstile, not in the sitemap, no tracking');
+check(() => {
+  // Batch J: installable web app, offline shell only.
+  const manifest = JSON.parse(read('manifest.webmanifest'));
+  assert.equal(manifest.display, 'standalone');
+  assert.equal(manifest.start_url, '/app');
+  assert.ok(manifest.icons.some((i) => i.purpose === 'maskable'), 'a maskable icon');
+  for (const icon of manifest.icons) assert.ok(existsSync(dist(icon.src)), `${icon.src} exists`);
+  assert.match(read('app.html'), /rel="manifest" href="\/manifest\.webmanifest"/);
+  const sw = read('app-sw.js');
+  assert.match(sw, /url\.pathname\.startsWith\('\/api'\)\) return;/, 'the service worker never handles /api');
+  assert.ok(!/indexedDB|localStorage/.test(sw), 'the service worker stores nothing but the shell');
+}, 'web app: manifest, icons, shell-only service worker');
 
 console.log(`\n${checks} checks passed`);

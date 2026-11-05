@@ -29,6 +29,17 @@ const store = storeCta();
       </div>
     </section>
   </div>
+  {site.webAppLive && (
+    <section class="wrap install" aria-labelledby="install-h">
+      <h2 id="install-h">Install on your phone</h2>
+      <p>The web app installs like an app: its own icon, full screen, and it opens even without a connection. Your diary is still decrypted only in memory, after you unlock it.</p>
+      <ol>
+        <li><strong>iPhone or iPad:</strong> open <a href="/app">folio.devilsense.com/app</a> in Safari, tap <strong>Share</strong>, then <strong>Add to Home Screen</strong>.</li>
+        <li><strong>Android:</strong> open it in Chrome, tap the <strong>⋮</strong> menu, then <strong>Install app</strong>.</li>
+        <li><strong>Computer:</strong> in Chrome or Edge, click the install icon at the end of the address bar.</li>
+      </ol>
+    </section>
+  )}
 </Base>
 <style>
   .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -38,5 +49,9 @@ const store = storeCta();
   .soon { font-weight: 600; color: var(--ink) !important; }
   .card :global(.phone) { justify-self: center; }
   .mini-browser { margin: 0; border-radius: 14px; overflow: hidden; box-shadow: 0 0 0 1px var(--hairline); align-self: center; }
+  .install { margin-top: 48px; max-width: 760px; }
+  .install h2 { font: 400 36px/1.05 var(--serif); margin: 0 0 12px; letter-spacing: -0.02em; }
+  .install p, .install li { color: var(--text-2); line-height: 1.55; }
+  .install ol { display: grid; gap: 10px; padding-left: 22px; }
   @media (max-width: 760px) { .cards { grid-template-columns: 1fr; } }
 </style>

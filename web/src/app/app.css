@@ -546,3 +546,6 @@ body:has(.gate) .aura { opacity: 0.5; }
 .pixel-legend span { display: inline-flex; align-items: center; gap: 6px; }
 .pixel-legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
 .pixel-legend i.none { background: color-mix(in srgb, var(--ink) 22%, transparent); }
+
+/* Install on your phone (Batch J) */
+.install-steps { display: grid; gap: 10px; padding-left: 20px; margin: 4px 0 8px; line-height: 1.45; }
