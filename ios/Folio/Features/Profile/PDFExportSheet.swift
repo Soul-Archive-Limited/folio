@@ -80,23 +80,24 @@ struct PDFExportSheet: View {
     }
 
     private func actions(_ result: DiaryPDF.Result) -> some View {
-        HStack(spacing: Spacing.s) {
-            ShareLink(item: result.url) {
-                Label("Share", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity, minHeight: Spacing.minHitTarget)
+        VStack(spacing: Spacing.xs) {
+            Text("^[\(result.pageCount) page](inflect: true) · ^[\(result.entryCount) entry](inflect: true)")
+                .folioFont(.caption).foregroundStyle(.inkSecondary)
+            HStack(spacing: Spacing.s) {
+                ShareLink(item: result.url) {
+                    Label("Share", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity, minHeight: Spacing.minHitTarget)
+                }
+                .buttonStyle(.glassProminent)
+                .tint(.emberStrong)
+                Button { print(result.url) } label: {
+                    Label("Print", systemImage: "printer").frame(maxWidth: .infinity, minHeight: Spacing.minHitTarget)
+                }
+                .buttonStyle(.glass)
             }
-            .buttonStyle(.glassProminent)
-            .tint(.emberStrong)
-            Button { print(result.url) } label: {
-                Label("Print", systemImage: "printer").frame(maxWidth: .infinity, minHeight: Spacing.minHitTarget)
-            }
-            .buttonStyle(.glass)
         }
         .padding(.horizontal, Spacing.sideMargin)
         .padding(.vertical, Spacing.s)
-        .overlay(alignment: .top) {
-            Text("^[\(result.pageCount) page](inflect: true) · ^[\(result.entryCount) entry](inflect: true)")
-                .folioFont(.caption).foregroundStyle(.inkSecondary).offset(y: -18)
-        }
+        .background(.bar)
     }
 
     private func create() {
