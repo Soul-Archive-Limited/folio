@@ -30,9 +30,9 @@ final class EntryActionsUITests: XCTestCase {
         // A short swipe reveals Delete; a long one runs it straight away.
         let delete = app.buttons["Delete"]
         if delete.waitForExistence(timeout: 2) { delete.tap() }
-        XCTAssertTrue(app.staticTexts["Moved to Recently Deleted"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Moved to Recently Deleted"].waitForExistence(timeout: 8))
         XCTAssertFalse(app.sheets.firstMatch.exists, "no 'Are you sure?'")
-        XCTAssertTrue(card.waitForNonExistence(timeout: 3), "gone from the day panel")
+        XCTAssertTrue(card.waitForNonExistence(timeout: 8), "gone from the day panel")
         // Glass buttons need a short press for synthetic taps (HANDOFF gotcha 3); CI is slow.
         app.buttons["Undo"].press(forDuration: 0.15)
         XCTAssertTrue(card.waitForExistence(timeout: 8), "Undo brings it back")
@@ -72,7 +72,7 @@ final class EntryActionsUITests: XCTestCase {
             XCTAssertTrue(app.buttons[item].waitForExistence(timeout: 3), "\(item) in the long-press menu")
         }
         app.buttons["Delete"].tap()
-        XCTAssertTrue(app.staticTexts["Moved to Recently Deleted"].waitForExistence(timeout: 3))
-        XCTAssertTrue(card.waitForNonExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Moved to Recently Deleted"].waitForExistence(timeout: 8))
+        XCTAssertTrue(card.waitForNonExistence(timeout: 8))
     }
 }
