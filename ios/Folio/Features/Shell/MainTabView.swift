@@ -5,6 +5,7 @@ struct MainTabView: View {
     @Environment(DiaryStore.self) private var store
     @Environment(TourModel.self) private var tour: TourModel?
     @Environment(SyncEngine.self) private var sync
+    @Environment(\.scenePhase) private var scenePhase
     @State private var selection: AppTab = .calendar
     @State private var calendar: CalendarModel?
     @State private var journal = JournalModel()
@@ -75,6 +76,14 @@ struct MainTabView: View {
             if let destination { route(to: destination) }
         }
         .environment(toasts)
+        // Shared to Folio from other apps while it was away (Batch J).
+        .onChange(of: scenePhase, initial: true) { _, phase in
+            guard phase == .active else { return }
+            Task {
+                let added = await ShareInboxImporter.importPending(into: store)
+                if added > 0 { toasts.show(ToastMessage(text: "Added \(added) shared to Folio", systemImage: "square.and.arrow.down")) }
+            }
+        }
         .onOpenURL { url in
             guard let route = FolioRoute(url: url) else { return }
             if calendar == nil { pendingRoute = route } else { open(route) }

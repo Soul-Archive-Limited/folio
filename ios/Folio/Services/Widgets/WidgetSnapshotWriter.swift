@@ -42,6 +42,8 @@ final class WidgetSnapshotWriter {
 
     func writeNow() {
         guard let store, UIApplication.shared.isProtectedDataAvailable, let url = WidgetSnapshot.url else { return }
+        // The share extension's categories and recent days (sealed; cheap, so every time).
+        ShareInboxImporter.writeContext(store: store)
         let snapshot = Self.makeSnapshot(store: store)
         guard let data = snapshot.encoded(), data != lastWritten else { return }
         do {
