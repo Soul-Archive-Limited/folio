@@ -6,7 +6,8 @@
      Devices, and the diary itself — photos and other content (entries, tasks, categories) —
      which reaches the server only end-to-end encrypted. Declared anyway: Apple has no
      exemption for E2E-encrypted data (owner decision, as Day One and Ente do).
-     Required-reason APIs: UserDefaults (CA92.1, Folio's own settings only). -->
+     Required-reason APIs: UserDefaults (CA92.1, Folio's own settings; 1C8F.1, the App Group's
+     defaults shared with Folio's widgets and share extension — Batch J). -->
 <plist version="1.0">
 <dict>
 	<key>NSPrivacyTracking</key>
@@ -84,6 +85,7 @@
 			<key>NSPrivacyAccessedAPITypeReasons</key>
 			<array>
 				<string>CA92.1</string>
+				<string>1C8F.1</string>
 			</array>
 		</dict>
 	</array>

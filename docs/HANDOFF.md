@@ -2,24 +2,24 @@
 
 The next session starts here. Read this, then `CLAUDE.md`, `docs/SPEC.md`, `docs/PHASES.md` and the last entries of `docs/DECISIONS.md`. Updated at the end of every batch.
 
-_Last updated: 2026-11-05, mid Batch J (Parts 2–5 and most of 6 done). Before that: 2026-10-30, end of Batch I (owner's test fixes, avatars, onboarding, seasons, smarter tasks; TestFlight 0.1.0 (74) uploaded)._
+_Last updated: 2026-11-05, end of Batch J (search, lock, widgets, memories, scan/share/calendar, PDF, invites, PWA; TestFlight 0.1.0 (91)) (owner's test fixes, avatars, onboarding, seasons, smarter tasks; TestFlight 0.1.0 (74) uploaded)._
 
-## Batch J status (resume here — owner says "continue")
-Prompt: the owner's Batch J brief (Parts 1–9). Part 1: owner said **all good**. Skills installed globally (owner asked): widgetkit, app-intents, vision-framework, eventkit, pdfkit.
-- ✅ Part 2 Search (27fdefb) · ✅ Part 3 Lock Folio (6dd2d73) · ✅ Part 4 Widgets/controls/Siri (7f2a8fe) · ✅ Part 5 Mood, On this day, Year in Pixels (4ca9b8c) — DECISIONS 255–264, SPEC §4.4, §6.17–6.19 updated.
-- Part 6: ✅ scan (6e50c2d) · ✅ share extension (18b5192) · 🟡 **Apple Calendar events: code done and builds** (`Services/Calendar/CalendarEvents.swift`, `DayEventsSection`, cell mark in `DayCell`, Profile → Apple Calendar, purpose string) — **not yet run on the Simulator, no tests, no SPEC/DECISIONS entry**.
-- **Next steps, in order:**
-  1. Part 6 finish: run with calendar access (`xcrun simctl privacy <sim> grant calendar com.devilsense.folio`, add an event in the Calendar app or via a DEBUG seed), screenshot day panel + grid mark, unit-test the multi-day/all-day day split (`CalendarEvents.events(around:)` logic — extract it to a pure function first), SPEC §6.2/§6.9/§7 + DECISION 265 (scan: OCR confidence ≥ 0.4, Hindi unsupported on iOS 26.5 Simulator — `supportedRecognitionLanguages` lacks `hi`, garbled Devanagari lines can still pass the filter), 266 (share inbox: App Group used as the Keychain access group so existing items keep their default group; sealed with AES-GCM), 267 (EventKit read-only, in memory). Commit.
-  2. Part 7 PDF export (PDFKit / UIGraphicsPDFRenderer, background with progress, Print via UIPrintInteractionController; Profile → Your data "Export PDF" is hidden today).
-  3. Part 8 invites (D1 migration `0003_invites.sql`, `OWNER_EMAILS` secret — give the owner `npx wrangler secret put OWNER_EMAILS`; ask for the code only when sign-in would create a new account; review account + existing accounts unaffected; Profile → Invite a friend on iOS and web) + PWA (manifest, icons, standalone, offline app shell only; "Install on your phone" on /download and web Profile).
-  4. Part 9: full test run like Batch I Part 6, /vibesec (extensions, App Group, keychain group, invites, PWA), Release 0 warnings (new targets!), CI green, website Features/FAQ, `scripts/testflight.sh` (new App IDs `com.devilsense.folio.widgets` / `.share` and the App Group must register — automatic signing with `-allowProvisioningUpdates`), add build to Friends, `docs/reports/batch-j.md` + contact sheet + recordings, HANDOFF.
-- Not yet checked: CI on the Part 4–6 commits (new extension targets), web search/mood/Year UI in a browser, Lock Screen widgets and controls on a device.
+## Batch J status (resume here)
+All nine parts done — report `docs/reports/batch-j.md`, DECISIONS 255–272, screenshots and recordings `docs/screenshots/batch-j/`. TestFlight **0.1.0 (92)** uploaded 2026-11-05 (91 was replaced: extensions' privacy manifests, DECISION 273).
+- Part 1: owner said all good. 2 search · 3 Lock Folio · 4 widgets/controls/Siri · 5 mood, On this day, Year in Pixels (schema v5) · 6 scan, share extension, Apple Calendar · 7 PDF export · 8 invite-only sign-up + installable web app · 9 tests, /vibesec, website, TestFlight.
+- **Not done by me — owner's steps:** the production API deploy was refused by the session's permission rules. In `api/`: `npx wrangler secret put OWNER_EMAILS`, `npx wrangler d1 migrations apply folio-db --remote`, `npx wrangler deploy`. Until then production sign-up stays open (DECISION 272).
+- **Next session:** the owner's notes on 0.1.0 (92) and the "Only you can test" list in the Batch J report; the device hitch check (DECISION 253); then the public-release list at the end of `docs/reports/batch-g.md`.
 
 ### Batch J tools
-- `-FolioSearch "text"`, `-lockEnabled YES` (Face ID on the Simulator: `notifyutil -s com.apple.BiometricKit.enrollmentChanged 1` + `-p …enrollmentChanged`, then `-p com.apple.BiometricKit_Sim.pearl.match|nomatch` via `xcrun simctl spawn`), `-FolioJournalMode year`, `-FolioSeedPixels YES`, `-FolioOpen scan -FolioScanSample <abs path jpg>` (sample: `ios/FolioTests/Resources/sample-diary-page.jpg`).
-- Share extension UI test: `xcrun simctl addmedia <sim> ios/FolioTests/Resources/sample-diary-page.jpg`, then `TEST_RUNNER_FOLIO_SHARE_TEST=1 [TEST_RUNNER_FOLIO_SHOTS=<dir>] xcodebuild test … -only-testing:FolioUITests/ShareExtensionUITests`.
+- `-FolioSearch "text"`, `-lockEnabled YES`, `-FolioJournalMode year`, `-FolioSeedPixels YES`, `-FolioSeedEvents YES` (with `xcrun simctl privacy <sim> grant calendar com.devilsense.folio` and `-showsCalendarEvents YES`), `-FolioOpen scan -FolioScanSample <abs path>` (sample: `ios/FolioTests/Resources/sample-diary-page.jpg`).
+- Face ID on the Simulator: `xcrun simctl spawn <sim> notifyutil -s com.apple.BiometricKit.enrollmentChanged 1` then `-p com.apple.BiometricKit.enrollmentChanged`; `-p com.apple.BiometricKit_Sim.pearl.match|nomatch`.
+- Share extension UI test: `xcrun simctl addmedia <sim> ios/FolioTests/Resources/sample-diary-page.jpg`, then `TEST_RUNNER_FOLIO_SHARE_TEST=1 xcodebuild test … -only-testing:FolioUITests/ShareExtensionUITests`.
+- Recordings: `TEST_RUNNER_FOLIO_RECORDING=1 [TEST_RUNNER_FOLIO_SCAN_SAMPLE=<jpg>] … -only-testing:FolioUITests/BatchJRecordingUITests/<test>` while `simctl io recordVideo` runs.
 - System alerts (URL "Open in Folio?", other apps' permission prompts) ignore the Simulator tool's taps: press Return, or answer them from an XCUITest via SpringBoard.
-- Widgets on the Simulator: long-press Home → Edit (tap ~0.2 s) → Add Widget (touch_path) → search "Folio".
+- Widgets on the Simulator: long-press the Home Screen → Edit (tap ~0.2 s) → Add Widget → search "Folio". `xcodebuild test` reinstalls can remove them.
+- Local invite flow: put `OWNER_EMAILS=review@devilsense.com` in `api/.dev.vars` (local only); a new local account's email code can be recovered from the local D1 hash with the local pepper (1M HMACs, ~1 s) — never against production.
+- PWA checks: the desktop app's browser pane refuses service workers; use headless Brave (`playwright-core` in the scratchpad).
+- CI's Xcode (26.6) type-checks more slowly than 27.1: keep `#Predicate`s short.
 
 ## Batch I status
 All seven parts done — report `docs/reports/batch-i.md`, DECISIONS 224–252, screenshots `docs/screenshots/batch-i/`.
@@ -83,12 +83,13 @@ All seven parts done — report `docs/reports/batch-i.md`, DECISIONS 224–252, 
 | 14 Release | ✅ Batch G Part 3 (TestFlight external beta; public-release list in the Batch G report). |
 | Website rebuild | ✅ Batch H (story + 3D; live). |
 | Batch I | ✅ Owner's test fixes, avatars, onboarding, seasons, reminders/repeats/subtasks, own test run; TestFlight 0.1.0 (74). |
+| Batch J | ✅ Search, Lock Folio, widgets/controls/Siri, mood + On this day + Year in Pixels, scan/share/Apple Calendar, PDF, invite-only sign-up, installable web app; TestFlight 0.1.0 (92). API deploy waits for the owner. |
 
-Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8, Batch D = C fixes + Recently Deleted + 11 + Xcode Cloud, Batch E = D fixes + 9 + 10 + TestFlight, Batch F = improvements + 12 + TestFlight, Batch G = 13 + 14 + external TestFlight, Batch H = website rebuild, Batch I = owner's test of 56 + avatars + onboarding + seasons + smarter tasks.
+Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8, Batch D = C fixes + Recently Deleted + 11 + Xcode Cloud, Batch E = D fixes + 9 + 10 + TestFlight, Batch F = improvements + 12 + TestFlight, Batch G = 13 + 14 + external TestFlight, Batch H = website rebuild, Batch I = owner's test of 56 + avatars + onboarding + seasons + smarter tasks, Batch J = the remaining features (search … PWA).
 
 ## Repo map
 
-- `ios/project.yml` → XcodeGen. The `.xcodeproj` is git-ignored: after adding/removing files or editing the yml, run `cd ios && xcodegen generate`.
+- `ios/project.yml` → XcodeGen. Targets: Folio, FolioWidgets (widget extension), FolioShare (share extension), FolioCrypto + tests; `ios/Shared/` is compiled into the app and both extensions (App Group `group.com.devilsense.folio`). The `.xcodeproj` is git-ignored: after adding/removing files or editing the yml, run `cd ios && xcodegen generate`.
 - `ios/Folio/{App,DesignSystem,Models,Features/*,Services/*}`; tests in `ios/FolioTests` (Swift Testing), `ios/FolioUITests` (XCTest), `ios/FolioCryptoTests`.
 - `ios/Folio/Services/Store/DiaryStore.swift` is the single `@Observable` store (all queries, CRUD, markers, export inputs).
 - `shared/` design tokens + Markdown/crypto fixtures (used by iOS and later the web app).

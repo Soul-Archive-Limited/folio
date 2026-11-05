@@ -57,6 +57,18 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - [x] Part 6 — own test run (local API, two Simulators, web) + fixes
 - [x] Part 7 — /vibesec, Release 0 warnings, CI green, report, TestFlight 0.1.0 (74) uploaded (Friends group: owner)
 
+### Batch J checklist
+- [x] Part 1 — owner's notes on 0.1.0 (74): all good
+- [x] Part 2 — on-device search (iPhone + web), filters, highlights, 10k-entry test
+- [x] Part 3 — Lock Folio (Face ID / passcode, lock delay, own window)
+- [x] Part 4 — widgets (interactive tick), Lock Screen widgets, Control Center, Siri & Shortcuts
+- [x] Part 5 — mood (schema v5), On this day card + notification, Year in Pixels (iPhone + web)
+- [x] Part 6 — scan paper pages, share extension (sealed inbox), Apple Calendar events
+- [x] Part 7 — PDF export + print
+- [x] Part 8 — invite-only sign-up (API, iPhone, web) + installable web app
+- [x] Part 9 — own test run, /vibesec, Release 0 warnings, CI, website, TestFlight 0.1.0 (92), report
+- [ ] Production API deploy + `OWNER_EMAILS` — owner (DECISION 272)
+
 ### Phase 14 — SPEC §12 / §13 checklist (2026-10-29)
 **App Review (§12)**
 - [x] 2.1 complete: no placeholder or beta text in the app; review account `review@devilsense.com` with a fixed code from the `REVIEW_CODE` Worker secret, rate-limited like any address, switchable with `REVIEW_ENABLED`; notes in `docs/APPSTORE.md`. Owner sets the 6 digits.
