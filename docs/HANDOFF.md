@@ -7,7 +7,7 @@ _Last updated: 2026-11-05, end of Batch J (search, lock, widgets, memories, scan
 ## Batch J status (resume here)
 All nine parts done — report `docs/reports/batch-j.md`, DECISIONS 255–272, screenshots and recordings `docs/screenshots/batch-j/`. TestFlight **0.1.0 (94)** uploaded 2026-11-05, in Friends (Testing) (91 was replaced: extensions' privacy manifests, DECISION 273).
 - Part 1: owner said all good. 2 search · 3 Lock Folio · 4 widgets/controls/Siri · 5 mood, On this day, Year in Pixels (schema v5) · 6 scan, share extension, Apple Calendar · 7 PDF export · 8 invite-only sign-up + installable web app · 9 tests, /vibesec, website, TestFlight.
-- **Sign-up stays open** (owner, 2026-11-06, DECISION 276): `INVITES_REQUIRED` is "false" in `api/wrangler.jsonc`. To go invite-only later: set it to "true", `npx wrangler secret put OWNER_EMAILS`, `npx wrangler deploy` (in `api/`).
+- **API deployed 2026-11-06** (version 5e6922a0, DECISION 277). **Sign-up stays open** (owner, DECISION 276): `INVITES_REQUIRED` is "false" in `api/wrangler.jsonc`. To go invite-only later: set it to "true", `npx wrangler secret put OWNER_EMAILS`, `npx wrangler deploy` (in `api/`).
 - **Next session:** the owner's notes on 0.1.0 (94) and the "Only you can test" list in the Batch J report; the device hitch check (DECISION 253); then the public-release list at the end of `docs/reports/batch-g.md`.
 
 ### Batch J tools
