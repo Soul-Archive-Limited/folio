@@ -43,17 +43,18 @@ Sheets: `docs/screenshots/batch-k/` — `00-before-after-light.png`, `00-before-
 
 ## Part 6 — Ship
 - **Tests:** iOS 248 unit (incl. crypto) pass; UI suite 0 failures (26 opt-in recording/share tests skipped as usual); API 75; web 53 unit + 23 build checks. The full run caught one regression from the rename — quick add's month names (`(?:ember)` in Sept/Nov/Dec) — fixed.
-- **Release build: 0 warnings, 0 errors.** CI: see Known issues / HANDOFF for the final run.
+- **Release build: 0 warnings, 0 errors. CI green** (iOS, API & web, secret scan). On the way two UI tests timed out on a slow runner (a delete toast and onboarding's keyboard, 89 s and 188 s there; both pass locally); their waits were widened.
 - **/vibesec (auth + everything touched):** no findings. OAuth callbacks redirect only to two fixed targets with a closed set of reasons (no open redirect); the state prefix only chooses between them; logs carry Google's error code and an error class name, never tokens, emails or bodies; the `account_deleting` reason is only reachable after proving the Google identity; web photo retries are bounded and same-origin; `npm audit` 0 in api and web; gitleaks clean on every commit. Decision 285.
 - **Website:** new colours, mark, favicon, app screenshots (`scripts/site-shots.sh`), OG images (`scripts/og/`, now committed) and a changelog entry; Pages deploys on push.
-- **TestFlight 0.1.0 (107)** uploaded with `scripts/testflight.sh`.
+- **TestFlight 0.1.0 (107)** uploaded with `scripts/testflight.sh` (upload succeeded; processing on App Store Connect). **Not added to Friends yet:** App Store Connect isn't signed in in this session's browser and signing in needs your password.
 
 **Files changed:** ~260 (`git diff --stat a5b7c6f`). Key: `api/src/{routes/auth.ts,auth/google.ts}`, `api/test/oauth.test.ts`, `api/wrangler.jsonc`, `ios/Folio/Features/{Account/SignInProblem.swift,Calendar/Panel/DayPanel*.swift,Calendar/Grid/{PhotoLoadKey,PhotoTile}.swift,EntryDetail/FullPhotoImage.swift}`, `ios/Folio/AppIcon.icon`, `ios/Folio/Resources/Assets.xcassets/{Colors,Symbols,AppMark.imageset,AppTint.colorset}`, `ios/FolioWidgets/{Assets.xcassets,WidgetPalette.swift}`, `shared/{design-tokens.json,brand/}`, `scripts/{brand,og}/`, `scripts/{brand-shots,site-shots}.sh`, `web/src/{app/ui/{Icons,Shell,common}.tsx,app/ui/calendar/DayPanel.tsx,icons/folio-icons.ts,components/{Mark.astro,brand-mark.ts}}`, `web/public/{favicon.svg,icons,og,img/app}`.
 
 **Deviations from SPEC:** none; SPEC updated (§3.1, §3.2, §3.8, §3.10, §6.2, §10.2, §10.2a).
 
 **Manual steps needed from the owner:**
-1. Install 0.1.0 (107) from TestFlight and run "Only you can test" below.
+1. App Store Connect → Folio Diary → TestFlight → build 107 → add it to the **Friends** group with "What to Test" (new look, Google sign-in fixed, invite-only, empty-day line, photo refresh); submit it for Beta App Review if asked. (Or sign in to App Store Connect in this session's browser and ask me to do it.)
+2. Install 0.1.0 (107) from TestFlight and run "Only you can test" below.
 
 **Only you can test**
 1. Sign in on the new build with **Google** (new account needs an invite now — use your own account, which is exempt), then **Apple**, then **email**; and sign out / in again with an existing account.

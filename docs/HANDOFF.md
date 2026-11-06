@@ -7,7 +7,7 @@ _Last updated: 2026-11-06, end of Batch K (Google sign-in fix, invite-only on, d
 ## Batch K status (resume here)
 All six parts done — report `docs/reports/batch-k.md`, DECISIONS 278–285, sheets `docs/screenshots/batch-k/`.
 - Part 1 Google: root cause was a wrong `GOOGLE_CLIENT_SECRET` (`invalid_client`); the owner put a new one; failures now carry reasons (`expired`, `google_unavailable`, …). Part 2: **invite-only is ON** in production (`INVITES_REQUIRED` "true", `OWNER_EMAILS` secret = the owner's Apple relay address). Part 3 day panel, Part 4 photo refresh, Part 5 rebrand (Nib book mark, `.icon` app icon, Ink accent, custom symbols), Part 6 ship.
-- **API deployed** (version 97fa6013). TestFlight **0.1.0 (107)** uploaded 2026-11-06 — add it to Friends in App Store Connect if not done (see the report).
+- **API deployed** (version 97fa6013). TestFlight **0.1.0 (107)** uploaded 2026-11-06; CI green. Not yet in Friends: the owner adds it (App Store Connect wasn't signed in here).
 - **Next session:** the owner's notes on 0.1.0 (107) and the report's "Only you can test" (real Google/Apple/email sign-ins, a friend's invite); refresh `web/public/img/app/widgets-*` and `web-entry-*` (still orange); then DECISION 253's device hitch check and the public-release list in `docs/reports/batch-g.md`.
 
 ### Batch K tools
