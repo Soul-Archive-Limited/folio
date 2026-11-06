@@ -58,6 +58,14 @@ struct AccountHelpersTests {
         #expect(!APIError.unauthorized.isTransient)
     }
 
+    @Test("Google's folio://auth?error= reasons get their own messages (Batch K)",
+          arguments: [(String?("google_unavailable"), SignInProblem.googleUnavailable), ("expired", .expired),
+                      ("account_deleting", .deleting), ("invite_required", .inviteRequired),
+                      ("invite_invalid", .inviteInvalid), ("failed", .failed), (nil, .failed)])
+    func oauthReasons(reason: String?, problem: SignInProblem) {
+        #expect(SignInProblem(oauthError: reason) == problem)
+    }
+
     @Test("A new record's push sends baseVersion as null, not missing (the API requires the key)")
     func pushEncoding() throws {
         let change = SyncWire.Change(id: UUID(), type: "entry", ciphertext: "AA==", nonce: "AA==", clientUpdatedAt: 1, baseVersion: nil, deleted: false)

@@ -62,11 +62,26 @@ async function inviteFrom(c: Context<AppEnv>, raw: string | undefined): Promise<
   return presentedInviteHash(c.env, raw);
 }
 
-/** "invite_required" / "invite_invalid" from a refused sign-in, for the OAuth redirects. */
-async function inviteProblem(error: unknown): Promise<string | null> {
-  if (!(error instanceof HTTPException) || error.status !== 403) return null;
-  const code = (await error.getResponse().clone().json().catch(() => ({}))) as { error?: string };
-  return code.error === 'invite_required' || code.error === 'invite_invalid' ? code.error : null;
+/**
+ * The reason sent back when an OAuth round trip ends without a sign-in (Batch K): the app and
+ * the web app show a specific message for each. Unexpected errors are logged and become `failed`.
+ */
+type OAuthProblem = 'cancelled' | 'expired' | 'google_unavailable' | 'failed' | 'account_deleting' | 'invite_required' | 'invite_invalid';
+
+async function problemFrom(error: unknown, provider: 'apple' | 'google'): Promise<OAuthProblem> {
+  if (error instanceof HTTPException) {
+    const code = ((await error.getResponse().clone().json().catch(() => ({}))) as { error?: string }).error;
+    if (error.status === 403 && (code === 'invite_required' || code === 'invite_invalid')) return code;
+    if (error.status === 409) return 'account_deleting';
+    if (error.status === 429) return 'failed';
+  }
+  log('error', 'oauth_callback_error', { provider, kind: error instanceof Error ? error.name : typeof error });
+  return 'failed';
+}
+
+/** Back to whoever started the round trip, with a reason. */
+function oauthFailure(c: Context<AppEnv>, platform: 'ios' | 'web', problem: OAuthProblem) {
+  return platform === 'ios' ? c.redirect(`folio://auth?error=${problem}`, 302) : c.redirect(`/app?error=${problem}`, 303);
 }
 
 const appleNative = z.object({
@@ -129,7 +144,8 @@ async function saveState(c: Context<AppEnv>, provider: 'apple' | 'google', query
   } else if (query.reauth) {
     reauthSession = 'yes';
   }
-  const state = randomToken(24);
+  // The prefix says where to send an expired or unknown state back to (Batch K); it isn't trusted for anything else.
+  const state = `${query.platform === 'ios' ? 'i' : 'w'}.${randomToken(24)}`;
   const inviteHash = await inviteFrom(c, query.invite);
   await c.env.DB.prepare(
     `INSERT INTO oauth_states (state_hash, provider, platform, code_verifier, nonce, app_challenge, reauth_session, expires_at, invite_hash)
@@ -141,18 +157,26 @@ async function saveState(c: Context<AppEnv>, provider: 'apple' | 'google', query
 
 interface StateRow { provider: string; platform: 'ios' | 'web'; code_verifier: string | null; nonce: string; app_challenge: string | null; reauth_session: string | null; expires_at: number; invite_hash: string | null }
 
-/** Takes (and deletes) a state row; web flows must also present the matching cookie. */
-async function takeState(c: Context<AppEnv>, provider: 'apple' | 'google', state: string | undefined): Promise<StateRow> {
-  if (!state || state.length > 100) fail(400, 'invalid_state');
+/**
+ * Takes (and deletes) a state row; web flows must also present the matching cookie. Null for an
+ * unknown, replayed or expired state (10 minutes).
+ */
+async function takeState(c: Context<AppEnv>, provider: 'apple' | 'google', state: string | undefined): Promise<StateRow | null> {
+  if (!state || state.length > 100) return null;
   const row = await c.env.DB.prepare('DELETE FROM oauth_states WHERE state_hash = ?1 AND provider = ?2 RETURNING *')
     .bind(await sha256Hex(state), provider).first<StateRow>();
-  if (!row || row.expires_at < Date.now()) fail(400, 'invalid_state');
+  if (!row || row.expires_at < Date.now()) return null;
   if (row.platform === 'web') {
     const cookie = getCookie(c, OAUTH_COOKIE, 'host');
-    if (!cookie || !timingSafeEqual(cookie, state)) fail(400, 'invalid_state');
+    if (!cookie || !timingSafeEqual(cookie, state)) return null;
     deleteCookie(c, OAUTH_COOKIE, { path: '/', secure: true, prefix: 'host' });
   }
   return row;
+}
+
+/** Which side a state was made for, from its prefix (states without one are web). */
+function statePlatform(state: string | undefined): 'ios' | 'web' {
+  return state?.startsWith('i.') ? 'ios' : 'web';
 }
 
 /** Ends a web OAuth round trip on the web app; `reauthSession` is the session that asked. */
@@ -187,26 +211,29 @@ auth.get('/google/start', async (c) => {
 
 auth.get('/callback/google', async (c) => {
   await limit(c.env, `oauth:${await ipKey(c.env, c.req.raw)}`, 30, 3600);
-  const row = await takeState(c, 'google', c.req.query('state'));
+  const stateParam = c.req.query('state');
+  const row = await takeState(c, 'google', stateParam);
+  if (!row) {
+    log('warn', 'google_callback_failed', { step: 'state' });
+    return oauthFailure(c, statePlatform(stateParam), 'expired');
+  }
   const code = c.req.query('code');
-  const toApp = (params: string) => c.redirect(`folio://auth?${params}`, 302);
-  if (!code || code.length > 2048) return row.platform === 'ios' ? toApp('error=cancelled') : c.redirect('/app?error=cancelled', 303);
-  const idToken = await exchangeGoogleCode(c.env, code, row.code_verifier ?? '');
-  if (!idToken) return row.platform === 'ios' ? toApp('error=failed') : c.redirect('/app?error=failed', 303);
+  if (!code || code.length > 2048) return oauthFailure(c, row.platform, 'cancelled');
+  const exchanged = await exchangeGoogleCode(c.env, code, row.code_verifier ?? '');
+  if ('problem' in exchanged) return oauthFailure(c, row.platform, exchanged.problem === 'config' ? 'google_unavailable' : 'expired');
   let claims;
   try {
-    claims = await verifyGoogleIdToken(c.env, idToken, row.nonce);
-  } catch {
-    return row.platform === 'ios' ? toApp('error=failed') : c.redirect('/app?error=failed', 303);
+    claims = await verifyGoogleIdToken(c.env, exchanged.idToken, row.nonce);
+  } catch (error) {
+    log('warn', 'google_callback_failed', { step: 'id_token', kind: error instanceof Error ? error.name : 'unknown' });
+    return oauthFailure(c, row.platform, 'failed');
   }
   let resolved;
   try {
     resolved = await resolveUser(c.env, { provider: 'google', providerUserId: claims.sub, email: claims.email, emailVerified: claims.emailVerified }, row.invite_hash);
   } catch (error) {
-    // A new account without an open invite: back to the sign-in screen, which asks for one.
-    const problem = await inviteProblem(error);
-    if (!problem) throw error;
-    return row.platform === 'ios' ? toApp(`error=${problem}`) : c.redirect(`/app?error=${problem}`, 303);
+    // A new account without an open invite goes back to the sign-in screen, which asks for one.
+    return oauthFailure(c, row.platform, await problemFrom(error, 'google'));
   }
   const { userId, isNew } = resolved;
   if (row.platform === 'web') return finishWeb(c, userId, row.reauth_session);
@@ -216,7 +243,7 @@ auth.get('/callback/google', async (c) => {
   await c.env.DB.prepare(
     'INSERT INTO handoff_codes (code_hash, user_id, app_challenge, is_new, reauth_session, expires_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)',
   ).bind(await sha256Hex(handoff), userId, row.app_challenge, isNew ? 1 : 0, row.reauth_session, Date.now() + HANDOFF_TTL).run();
-  return toApp(`code=${handoff}`);
+  return c.redirect(`folio://auth?code=${handoff}`, 302);
 });
 
 const exchange = z.object({
@@ -251,6 +278,7 @@ auth.post('/callback/apple', async (c) => {
   await limit(c.env, `oauth:${await ipKey(c.env, c.req.raw)}`, 30, 3600);
   const form = await c.req.parseBody();
   const row = await takeState(c, 'apple', typeof form.state === 'string' ? form.state : undefined);
+  if (!row) return oauthFailure(c, 'web', 'expired');
   const code = typeof form.code === 'string' ? form.code : null;
   if (!code || code.length > 2048) return c.redirect('/app?error=cancelled', 303);
   const redirectUri = `${c.env.APP_ORIGIN}/api/auth/callback/apple`;
@@ -270,9 +298,7 @@ auth.post('/callback/apple', async (c) => {
       provider: 'apple', providerUserId: claims.sub, email: claims.email, emailVerified: claims.emailVerified, refreshTokenSealed: sealed,
     }, row.invite_hash));
   } catch (error) {
-    const problem = await inviteProblem(error);
-    if (!problem) throw error;
-    return c.redirect(`/app?error=${problem}`, 303);
+    return oauthFailure(c, 'web', await problemFrom(error, 'apple'));
   }
   return finishWeb(c, userId, row.reauth_session);
 });

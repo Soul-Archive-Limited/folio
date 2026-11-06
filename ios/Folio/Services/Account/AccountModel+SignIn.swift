@@ -67,9 +67,9 @@ extension AccountModel {
         let items = URLComponents(url: callback, resolvingAgainstBaseURL: false)?.queryItems ?? []
         guard callback.host() == "auth", let code = items.first(where: { $0.name == "code" })?.value else {
             let error = items.first { $0.name == "error" }?.value
-            // A new account without an open invite (Batch J): the screen asks for one.
-            if error == "invite_required" || error == "invite_invalid" { throw .api(.server(status: 403, code: error)) }
-            throw error == "cancelled" ? .cancelled : .failed
+            if error == "cancelled" { throw .cancelled }
+            // A reason from the Worker (Batch K); a new account without an invite asks for one (Batch J).
+            throw .refused(SignInProblem(oauthError: error))
         }
 
         let request = AccountAPI.Exchange(code: code, verifier: verifier, deviceName: SignInSecrets.deviceName, reauth: reauth)
@@ -81,6 +81,9 @@ extension AccountModel {
                 let result: AccountAPI.SignIn = try await api.send("POST", "auth/exchange", json: request)
                 completeSignIn(result)
             }
+        } catch .server(_, "invalid_code") {
+            // The 60-second hand-off code ran out (or was used): starting again is the fix.
+            throw .refused(.expired)
         } catch {
             throw .api(error)
         }
@@ -89,5 +92,6 @@ extension AccountModel {
 
 enum GoogleSignInError: Error {
     case cancelled, failed
+    case refused(SignInProblem)
     case api(APIError)
 }

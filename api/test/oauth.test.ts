@@ -1,6 +1,7 @@
 import { env } from 'cloudflare:test';
 import { SignJWT, exportJWK, generateKeyPair } from 'jose';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { exchangeGoogleCode } from '../src/auth/google';
 import { sha256Base64url, sha256Hex } from '../src/lib/crypto';
 import { api, makeUser } from './helpers';
 
@@ -13,20 +14,27 @@ function idToken(issuer: string, audience: string, claims: Record<string, unknow
 }
 
 // Outbound calls to Apple and Google, answered locally; anything else fails the test.
-const routes = new Map<string, () => unknown>([
+const routes = new Map<string, (init?: RequestInit) => unknown>([
   ['https://appleid.apple.com/auth/keys', () => ({ keys: [jwk] })],
   ['https://www.googleapis.com/oauth2/v3/certs', () => ({ keys: [jwk] })],
   ['https://appleid.apple.com/auth/token', () => ({ refresh_token: 'apple-refresh' })],
 ]);
 let googleIdToken = '';
-routes.set('https://oauth2.googleapis.com/token', () => ({ id_token: googleIdToken }));
+/** What Google's token endpoint answers next (Batch K: a refused client secret, a refused code). */
+let googleTokenReply: () => Response | unknown = () => ({ id_token: googleIdToken });
+let googleTokenBody: URLSearchParams | null = null;
+routes.set('https://oauth2.googleapis.com/token', (init) => {
+  googleTokenBody = new URLSearchParams(String(init?.body ?? ''));
+  return googleTokenReply();
+});
 
 beforeAll(() => {
-  vi.stubGlobal('fetch', async (input: RequestInfo | URL) => {
+  vi.stubGlobal('fetch', async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
     const route = routes.get(url.split('?')[0]!);
     if (!route) throw new Error(`unexpected fetch ${url}`);
-    return Response.json(route());
+    const reply = route(init);
+    return reply instanceof Response ? reply : Response.json(reply);
   });
 });
 
@@ -98,8 +106,9 @@ describe('Google on iOS: one-time code handoff (SPEC §10.2)', () => {
     expect(ok.status).toBe(200);
     expect((await ok.json<{ token: string }>()).token).toBeTruthy();
     expect((await api('/auth/exchange', { method: 'POST', json: { code: code2, verifier, deviceName: 'iPhone' } })).status).toBe(400);
-    // The state can't be replayed either.
-    expect((await api(`/auth/callback/google?state=${state}&code=abc`)).status).toBe(400);
+    // The state can't be replayed either: back to the app with "expired", never a JSON page.
+    const replay = await api(`/auth/callback/google?state=${state}&code=abc`);
+    expect(replay.headers.get('location')).toBe('folio://auth?error=expired');
   });
 
   it('an expired handoff code fails', async () => {
@@ -113,6 +122,71 @@ describe('Google on iOS: one-time code handoff (SPEC §10.2)', () => {
     const web = await api('/auth/google/start?platform=web');
     expect(web.headers.get('set-cookie')).toContain('__Host-folio_oauth=');
     const state = new URL(web.headers.get('location')!).searchParams.get('state')!;
-    expect((await api(`/auth/callback/google?state=${state}&code=abc`)).status).toBe(400);
+    const noCookie = await api(`/auth/callback/google?state=${state}&code=abc`);
+    expect(noCookie.status).toBe(303);
+    expect(noCookie.headers.get('location')).toBe('/app?error=expired');
+  });
+});
+
+describe('Google sign-in failures say why (Batch K)', () => {
+  const verifier = 'k'.repeat(43);
+
+  /** Start → Google → callback; returns where the callback sends the app. */
+  async function callback(sub: string, email: string, code = 'abc') {
+    await env.DB.prepare('DELETE FROM rate_limits').run();
+    const start = await api(`/auth/google/start?platform=ios&challenge=${await sha256Base64url(verifier)}`);
+    const location = new URL(start.headers.get('location')!);
+    const state = location.searchParams.get('state')!;
+    expect(state.startsWith('i.')).toBe(true);
+    googleIdToken = await idToken('https://accounts.google.com', env.GOOGLE_CLIENT_ID, { sub, email, email_verified: true, nonce: location.searchParams.get('nonce')! });
+    return (await api(`/auth/callback/google?state=${state}&code=${code}`)).headers.get('location')!;
+  }
+
+  afterEach(() => { googleTokenReply = () => ({ id_token: googleIdToken }); });
+
+  it('a refused client secret (the build 94 bug) is "google_unavailable", not a generic failure', async () => {
+    googleTokenReply = () => Response.json({ error: 'invalid_client', error_description: 'The provided client secret is invalid.' }, { status: 401 });
+    expect(await callback('g-k1', 'k1@gmail.com')).toBe('folio://auth?error=google_unavailable');
+  });
+
+  it('a refused code (expired, used, PKCE) is "expired", so trying again is the advice', async () => {
+    googleTokenReply = () => Response.json({ error: 'invalid_grant' }, { status: 400 });
+    expect(await callback('g-k2', 'k2@gmail.com')).toBe('folio://auth?error=expired');
+  });
+
+  it('an expired iOS state goes back to the app, not a JSON page in the sign-in sheet', async () => {
+    const start = await api(`/auth/google/start?platform=ios&challenge=${await sha256Base64url(verifier)}`);
+    const state = new URL(start.headers.get('location')!).searchParams.get('state')!;
+    await env.DB.prepare('UPDATE oauth_states SET expires_at = 0').run();
+    const response = await api(`/auth/callback/google?state=${state}&code=abc`);
+    expect(response.headers.get('location')).toBe('folio://auth?error=expired');
+  });
+
+  it('a Google email that already has an account links to it (no second user)', async () => {
+    const existing = await makeUser('same.person@gmail.com');
+    const location = await callback('g-k3', 'Same.Person@gmail.com');
+    const code = new URL(location).searchParams.get('code')!;
+    const signIn = await (await api('/auth/exchange', { method: 'POST', json: { code, verifier, deviceName: 'iPhone' } })).json<{ userId: string; isNew: boolean }>();
+    expect(signIn).toMatchObject({ userId: existing.userId, isNew: false });
+    const users = await env.DB.prepare(`SELECT COUNT(*) AS n FROM users WHERE email = 'same.person@gmail.com'`).first<{ n: number }>();
+    expect(users?.n).toBe(1);
+    // And again: the Google account itself is now linked.
+    const again = new URL(await callback('g-k3', 'same.person@gmail.com')).searchParams.get('code')!;
+    expect((await (await api('/auth/exchange', { method: 'POST', json: { code: again, verifier, deviceName: 'iPhone' } })).json<{ userId: string }>()).userId).toBe(existing.userId);
+  });
+
+  it('an account that is being deleted says so', async () => {
+    const location = await callback('g-k4', 'k4@gmail.com');
+    const code = new URL(location).searchParams.get('code')!;
+    const { userId } = await (await api('/auth/exchange', { method: 'POST', json: { code, verifier, deviceName: 'iPhone' } })).json<{ userId: string }>();
+    await env.DB.prepare('UPDATE users SET deleting = 1 WHERE id = ?1').bind(userId).run();
+    expect(await callback('g-k4', 'k4@gmail.com')).toBe('folio://auth?error=account_deleting');
+  });
+
+  it('trims a secret pasted with a newline', async () => {
+    const result = await exchangeGoogleCode({ ...env, GOOGLE_CLIENT_SECRET: ' test-google-secret\n' }, 'abc', verifier);
+    expect('idToken' in result).toBe(true);
+    expect(googleTokenBody?.get('client_secret')).toBe('test-google-secret');
+    expect(await exchangeGoogleCode({ ...env, GOOGLE_CLIENT_SECRET: '' }, 'abc', verifier)).toEqual({ problem: 'config' });
   });
 });

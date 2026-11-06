@@ -23,6 +23,9 @@ type Phase =
 const SIGN_IN_ERRORS: Record<string, string> = {
   cancelled: 'Sign-in was cancelled.',
   failed: "Sign-in didn't work. Please try again.",
+  expired: 'That sign-in took too long and expired. Please try again.',
+  google_unavailable: "Google sign-in isn't working on our side right now. Please use Apple or email, or try again later.",
+  account_deleting: 'This account is being deleted. Try again in a few minutes.',
   invite_required: 'Folio is invite-only for now. Enter the invite code you were given, then continue again.',
   invite_invalid: "That invite code didn't work. It may be used, expired or mistyped.",
 };

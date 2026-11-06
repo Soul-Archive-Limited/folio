@@ -109,6 +109,8 @@ struct SyncSignInButtons: View {
                 try await account.signInWithGoogle(using: webAuthenticationSession, reauth: reauth, invite: invite)
                 finished()
             } catch .cancelled {
+            } catch .refused(let problem) {
+                handle(problem, provider: .google)
             } catch .api(let error) {
                 handle(error.signInProblem, provider: .google)
             } catch {
