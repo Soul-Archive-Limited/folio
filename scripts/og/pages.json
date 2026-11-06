@@ -1,0 +1,9 @@
+[
+  { "file": "home", "before": "Your days,", "accent": "kept.", "line": "A private calendar diary for iPhone and the web.", "shot": "calendar-light" },
+  { "file": "features", "before": "Everything a diary", "accent": "needs.", "line": "Calendar, journal, to-do, photos and dictation, in one quiet place.", "shot": "journal-light" },
+  { "file": "how-it-works", "before": "How Folio", "accent": "works.", "line": "Write on your iPhone. Encrypted before it leaves. Read it wherever you sign in.", "shot": "composer-light" },
+  { "file": "security", "before": "Only you can", "accent": "read it.", "line": "End-to-end encrypted. No ads, no tracking.", "shot": "lock-light" },
+  { "file": "about", "before": "A quiet place to", "accent": "write.", "line": "Folio is made by Soul Archive Ltd, a small independent studio.", "shot": "entry-light" },
+  { "file": "faq", "before": "Questions,", "accent": "answered.", "line": "Privacy, sync, your data and getting started.", "shot": "onthisday-light" },
+  { "file": "download", "before": "Get", "accent": "Folio.", "line": "On iPhone and on the web.", "shot": "calendar-today-light" }
+]
