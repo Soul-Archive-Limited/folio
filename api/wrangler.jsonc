@@ -29,7 +29,7 @@
     "EMAIL_FROM": "Folio <no-reply@folio.devilsense.com>",
     "REVIEW_EMAIL": "review@devilsense.com",
     "REVIEW_ENABLED": "true",
-    "INVITES_REQUIRED": "true"
+    "INVITES_REQUIRED": "false"
   },
   // Nightly clean-up of expired rows (D1 size is the free plan's tightest limit).
   "triggers": { "crons": ["17 3 * * *"] },

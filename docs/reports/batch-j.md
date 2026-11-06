@@ -62,10 +62,7 @@ You said "all good" — nothing to fix.
 **Deviations from SPEC:** none left; SPEC updated for every new behaviour (§4.4, §5, §6.2, §6.4, §6.6, §6.7, §6.9, §6.17–6.21, §7, §10.2a, §10.7, §11.3, §17).
 
 **Manual steps needed from the owner:**
-1. Set your owner address(es) and deploy the API (this session wasn't allowed to deploy to production). In `api/`:
-   - `npx wrangler secret put OWNER_EMAILS` (paste your email; several are comma-separated)
-   - `npx wrangler d1 migrations apply folio-db --remote`
-   - `npx wrangler deploy`
+1. Nothing for sign-up: you chose to keep it open (DECISION 276). To go invite-only later, set `INVITES_REQUIRED` to "true" in `api/wrangler.jsonc`, run `npx wrangler secret put OWNER_EMAILS` and `npx wrangler deploy` in `api/`.
 2. Install 0.1.0 (94) and run the "Only you can test" list.
 
 **Only you can test**
@@ -76,7 +73,7 @@ You said "all good" — nothing to fix.
 5. Apple Calendar events with your own calendars.
 6. The On this day morning notification.
 7. Printing a PDF to a real printer.
-8. Invite flow on production once deployed: make an invite, a friend signs up with it.
+8. (Later, if you switch invites on) the invite flow on production: make an invite, a friend signs up with it.
 9. Installing the web app on your phone.
 
 **Open questions for the Architect:** none.
@@ -85,6 +82,6 @@ You said "all good" — nothing to fix.
 1. A widget tick reaches your other devices only once Folio next runs on that iPhone (widgets can't open the diary — DECISION 260).
 2. Hindi scanning needs an iOS version with Apple's Hindi text recognition (not iOS 26.5).
 3. Builds before 0.1.0 (94) that edit an entry drop its mood (older apps don't know the field) — testers should update.
-4. Until the API is deployed, sign-up stays open and the new invite screens don't appear.
+4. Sign-up is open by choice; the invite screens appear only once invites are switched on.
 
 **Next phase ready:** yes.
