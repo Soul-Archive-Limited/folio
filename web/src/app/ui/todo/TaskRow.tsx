@@ -15,6 +15,9 @@ export function TaskRow({ task, onToggle, checked, showDate, style, menu }: {
   const category = store.category(task.data.categoryID);
   const day = task.data.dayKey;
   const overdue = !!day && !task.data.isCompleted && day < todayKey();
+  const subtasks = store.subtasksOf(task.id);
+  const subtasksDone = subtasks.filter((s) => s.data.isCompleted).length;
+  const reminder = task.data.remindAt ? reminderText(task.data.remindAt) : '';
   const when = day ? [day === todayKey() ? 'Today' : formatDayMonth(day), task.data.minutesFromMidnight !== undefined ? formatTime(task.data.minutesFromMidnight) : ''].filter(Boolean).join(' ') : '';
   return (
     <div className={`task${done ? ' done' : ''}`} style={{ ...style, position: 'relative' }}>
@@ -25,6 +28,13 @@ export function TaskRow({ task, onToggle, checked, showDate, style, menu }: {
       <button className="title" onClick={() => openTask({ taskId: task.id })}>
         <b>{task.data.title}</b>
         {task.data.notes && <small>{task.data.notes.split('\n')[0]}</small>}
+        {(subtasks.length > 0 || task.data.remindAt || task.data.repeatRule) && (
+          <span className="task-meta">
+            {subtasks.length > 0 && <span aria-label={`${subtasksDone} of ${subtasks.length} subtasks done`}><Icon name="todo" small />{subtasksDone}/{subtasks.length}</span>}
+            {task.data.remindAt && <span aria-label={`Reminder ${reminder}`}><Icon name="bell" small />{reminder}</span>}
+            {task.data.repeatRule && <span aria-label="Repeats"><Icon name="repeat" small /></span>}
+          </span>
+        )}
       </button>
       {showDate && when && <span className={`when${overdue ? ' overdue' : ''}`}>{when}</span>}
       {menu && (
@@ -52,4 +62,11 @@ export function TaskRow({ task, onToggle, checked, showDate, style, menu }: {
       )}
     </div>
   );
+}
+
+/** "Today 09:00", "Tue 3 Nov 18:30" for a floating local reminder time (Batch I). */
+function reminderText(remindAt: string): string {
+  const [day, time] = remindAt.split('T');
+  if (!day || !time) return '';
+  return `${day === todayKey() ? 'Today' : formatDayMonth(day)} ${time.slice(0, 5)}`;
 }

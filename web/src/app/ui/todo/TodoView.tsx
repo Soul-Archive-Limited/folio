@@ -1,6 +1,8 @@
 import { useMemo, useRef, useState } from 'react';
 import { sameId } from '../../lib/bytes.ts';
-import { addDays, todayKey } from '../../lib/days.ts';
+import { addDays, formatShort, formatTime, todayKey } from '../../lib/days.ts';
+import { parseQuickAdd } from '../../lib/quickadd.ts';
+import { groupTasks } from '../../lib/task-groups.ts';
 import { CategoryChips, Empty } from '../common.tsx';
 import { useDiary } from '../context.tsx';
 import { Icon } from '../Icons.tsx';
@@ -24,6 +26,14 @@ export default function TodoView() {
     const rank = (t: typeof a) => (t.data.dayKey ? (t.data.dayKey < today ? 0 : 1) : 2);
     return rank(a) - rank(b) || (a.data.dayKey ?? '').localeCompare(b.data.dayKey ?? '') || (a.data.minutesFromMidnight ?? -1) - (b.data.minutesFromMidnight ?? -1) || a.data.sortIndex - b.data.sortIndex;
   });
+  const groups = groupTasks(active, today);
+  const [closed, setClosed] = useState<Set<string>>(() => { try { return new Set(JSON.parse(localStorage.getItem('folio.todoClosed') ?? '[]')); } catch { return new Set(); } });
+  const toggleGroup = (id: string) => setClosed((now) => {
+    const next = new Set(now);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    try { localStorage.setItem('folio.todoClosed', JSON.stringify([...next])); } catch { /* private mode */ }
+    return next;
+  });
   const done = all.filter((t) => t.data.isCompleted).sort((a, b) => (b.data.completedAt ?? 0) - (a.data.completedAt ?? 0));
 
   function tick(id: string) {
@@ -43,19 +53,17 @@ export default function TodoView() {
     }, 1200));
   }
 
-  /** Quick add: "today" / "tomorrow" in the text sets the date (SPEC §6.7). */
+  /** Quick add (SPEC §6.7): natural dates and times at the start or end, as on the iPhone. */
+  const minutesNow = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
+  const monthFirst = /-US$/.test(navigator.language);
+  const parsed = text.trim() ? parseQuickAdd(text, today, minutesNow(), monthFirst) : undefined;
+  const chip = parsed?.dayKey ? [parsed.dayKey === today ? 'Today' : parsed.dayKey === addDays(today, 1) ? 'Tomorrow' : formatShort(parsed.dayKey),
+    parsed.minutesFromMidnight !== undefined ? formatTime(parsed.minutesFromMidnight) : ''].filter(Boolean).join(' · ') : '';
   function quickAdd(event: React.FormEvent) {
     event.preventDefault();
-    let title = text.trim();
-    if (!title) return;
-    let dayKey: string | undefined;
-    const match = /\b(today|tomorrow)\b/i.exec(title);
-    if (match) {
-      dayKey = match[1]!.toLowerCase() === 'today' ? today : addDays(today, 1);
-      title = title.replace(match[0], '').replace(/\s{2,}/g, ' ').trim() || title;
-    }
+    if (!parsed?.title) return;
     const sortIndex = Math.max(-1, ...store.tasks().map((t) => t.data.sortIndex)) + 1;
-    store.put('task', { title: title.slice(0, 200), dayKey, isCompleted: false, sortIndex, createdAt: Date.now(), categoryID: category ?? undefined });
+    store.put('task', { title: parsed.title.slice(0, 200), dayKey: parsed.dayKey, minutesFromMidnight: parsed.minutesFromMidnight, isCompleted: false, sortIndex, createdAt: Date.now(), categoryID: category ?? undefined });
     setText('');
   }
 
@@ -66,8 +74,15 @@ export default function TodoView() {
         <div className="page-title"><h1 className="title1">To-do</h1></div>
         <CategoryChips selected={category} onSelect={setCategory} />
         <div style={{ marginTop: 12 }}>
-          {active.length === 0 ? <Empty icon="seal" text="All clear." /> : active.map((t, i) => (
-            <TaskRow key={t.id} task={t} checked={ticking.has(t.id)} showDate menu style={{ animationDelay: `${i * 30}ms` }} onToggle={() => tick(t.id)} />
+          {active.length === 0 ? <Empty icon="seal" text="All clear." /> : groups.map((g) => (
+            <section key={g.id} className="todo-group" aria-label={g.title}>
+              <button className={`group-head caption${g.id === 'overdue' ? ' overdue' : ''}`} aria-expanded={!closed.has(g.id)} onClick={() => toggleGroup(g.id)}>
+                <span>{g.title}</span><span className="count">{g.items.length}</span><i className="rule" aria-hidden="true" /><Icon name={closed.has(g.id) ? 'chevronRight' : 'chevronDown'} small />
+              </button>
+              {!closed.has(g.id) && g.items.map((t, i) => (
+                <TaskRow key={t.id} task={t} checked={ticking.has(t.id)} showDate={g.id !== 'today' && g.id !== 'tomorrow' && g.id !== 'noDate'} menu style={{ animationDelay: `${i * 30}ms` }} onToggle={() => tick(t.id)} />
+              ))}
+            </section>
           ))}
         </div>
         {done.length > 0 && (
@@ -85,9 +100,11 @@ export default function TodoView() {
         <form className="quick-add glass" onSubmit={quickAdd}>
           <label className="sr-only" htmlFor="quick-add">Add a task</label>
           <input id="quick-add" placeholder="Add a task…" value={text} maxLength={200} onChange={(e) => setText(e.target.value)} />
-          <button className="icon-btn accent" aria-label="Add task" disabled={!text.trim()}><Icon name="plus" /></button>
+          <button className="icon-btn accent" aria-label="Add task" disabled={!parsed?.title}><Icon name="plus" /></button>
+          {chip && <span className="quick-chip glass" aria-live="polite"><Icon name="calendar" small />{chip}</span>}
         </form>
       </div>
     </div>
   );
 }
+

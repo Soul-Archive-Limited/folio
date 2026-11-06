@@ -217,26 +217,32 @@ svg.i.sm { width: 18px; height: 18px; }
 .cell .n { font-size: 17px; font-weight: 500; line-height: 1; position: relative; z-index: 2; }
 .cell.out .n { color: var(--ink-tertiary); }
 .cell.today .n { color: var(--accent); font-weight: 700; }
-.cell.today::after { content: ''; position: absolute; bottom: 7px; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
-.cell.selected { background: var(--accent); animation: pop 0.4s var(--spring); }
+/* Batch L: the iPhone's marks (SPEC §6.2) — today = accent number + 1.5 px accent outline, selected
+   = accentStrong square with a white number, tasks = one small mark in the top-right corner
+   (hollow ring while any is open, green check once all are done), one zone per meaning. */
+.cell.today::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: 0 0 0 1.5px var(--accent) inset; pointer-events: none; z-index: 3; }
+.cell.selected { background: var(--accent-strong); animation: pop 0.4s var(--spring); }
+.cell.selected::after { box-shadow: none; }
 .cell.selected .n { color: #fff; font-weight: 700; }
-.cell.selected::after { background: #fff; }
 @keyframes pop { from { transform: scale(0.6); } }
 .cell .dots { display: flex; gap: 3px; position: relative; z-index: 2; }
 .cell .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--c, var(--ink-tertiary)); }
 .cell.selected .dots i { box-shadow: 0 0 0 1.5px #fff; }
-.cell .ring { position: absolute; inset: 3px; border-radius: 10px; border: 1.5px solid var(--ink-secondary); pointer-events: none; z-index: 1; }
-.cell .ring.done { border-color: var(--done); }
-.cell .ring.done::after { content: '✓'; position: absolute; right: 4px; bottom: 2px; font-size: 9px; font-weight: 800; color: var(--done); }
+.cell .ring { position: absolute; top: 5px; right: 5px; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--ink-secondary); pointer-events: none; z-index: 3; }
+.cell .ring.done { border: 0; width: 11px; height: 11px; top: 4px; right: 4px; background: var(--done) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3.2 6.2l1.9 1.9 3.8-4.2' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 100% no-repeat; }
+.cell.selected .ring { border-color: rgb(255 255 255 / 0.85); }
+.cell.photo .ring { border-color: #fff; box-shadow: 0 0 0 1px rgb(0 0 0 / 0.25); }
 .cell.photo { padding: 0; justify-content: stretch; }
 .cell.photo img, .cell.photo .ph { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .cell.photo .ph { background: color-mix(in srgb, var(--ink) 8%, transparent); animation: shimmer 1.4s ease-in-out infinite; }
 .cell.photo::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(160deg, rgb(0 0 0 / 0.5), rgb(0 0 0 / 0) 55%, rgb(0 0 0 / 0.35)); }
 .cell.photo .n { position: absolute; left: 7px; top: 6px; font-size: 12px; font-weight: 700; color: #fff; }
 .cell.photo .more { position: absolute; right: 5px; bottom: 5px; z-index: 2; font-size: 10px; font-weight: 700; color: #fff; padding: 1px 5px; border-radius: 6px; background: rgb(0 0 0 / 0.38); }
-.cell.photo.selected { box-shadow: 0 0 0 3px var(--accent) inset; }
+.cell.photo.selected { box-shadow: none; }
+.cell.photo.selected::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: 0 0 0 3px var(--accent) inset; z-index: 3; }
 .cell.photo.selected::before { background: linear-gradient(160deg, rgb(0 0 0 / 0.5), rgb(0 0 0 / 0.1)); }
-.cell.photo.today::after { z-index: 2; background: #fff; }
+.cell.photo.today:not(.selected)::after { box-shadow: none; }
+.cell.photo.today .n { background: var(--accent-strong); border-radius: 7px; padding: 2px 5px; left: 4px; top: 4px; }
 .cell.faded .dots, .cell.faded img, .cell.faded .ring { opacity: 0.15; }
 @keyframes shimmer { 50% { opacity: 0.5; } }
 
@@ -315,7 +321,18 @@ svg.i.sm { width: 18px; height: 18px; }
 .task .menu-btn { opacity: 0; transition: opacity 0.15s; }
 .task:focus-within .menu-btn { opacity: 1; }
 @media (hover: hover) and (pointer: fine) { .task:hover .menu-btn { opacity: 1; } }
-@media (hover: none) { .task .menu-btn { opacity: 1; } }
+@media (hover: none) { .task .menu-btn { opacity: 0.45; } }
+/* To-do groups (Batch L), as on the iPhone: small caps, count, hairline, chevron; folds remembered. */
+.todo-group { margin-top: 6px; }
+.group-head { display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: none; padding: 14px 8px 6px; color: var(--ink-secondary); cursor: pointer; min-height: 44px; text-align: left; }
+.group-head.overdue { color: var(--accent-text); }
+.group-head .count { color: var(--ink-tertiary); }
+.group-head .rule { flex: 1; height: 1px; background: var(--hairline); }
+.task-meta { display: flex; gap: 10px; margin-top: 2px; font-size: 12px; color: var(--ink-secondary); }
+.task-meta > span { display: inline-flex; align-items: center; gap: 3px; }
+.task-meta svg { width: 13px; height: 13px; }
+.quick-chip { position: absolute; left: 14px; bottom: calc(100% + 8px); display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--accent-text); animation: rise 0.25s var(--smooth) both; }
+.quick-chip svg { width: 14px; height: 14px; }
 
 /* MARK: Sheets — right-side glass sheet ≥ 768, bottom drawer below (SPEC §11.3) */
 .sheet-host { position: fixed; inset: 0; z-index: 50; pointer-events: none; }
@@ -453,9 +470,9 @@ svg.i.sm { width: 18px; height: 18px; }
 .swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
 .swatches button { aspect-ratio: 1; border-radius: 50%; border: 3px solid transparent; background: var(--c); padding: 0; }
 .swatches button[aria-pressed='true'] { border-color: var(--ink); }
-.quick-add { position: sticky; bottom: 16px; z-index: 5; display: flex; gap: 8px; padding: 6px 6px 6px 18px; border-radius: 999px; align-items: center; margin-top: 18px; }
+.quick-add { position: sticky; isolation: isolate; bottom: 16px; z-index: 5; display: flex; gap: 8px; padding: 6px 6px 6px 18px; border-radius: 999px; align-items: center; margin-top: 18px; }
 .quick-add input { flex: 1; border: 0; background: none; outline: none; font-size: 16px; min-height: 44px; }
-@media (max-width: 767px) { .quick-add { position: fixed; left: 16px; right: 88px; bottom: calc(max(14px, env(safe-area-inset-bottom)) + var(--tab-h) + 18px); } }
+@media (max-width: 767px) { .quick-add { position: fixed; left: 16px; right: 16px; bottom: calc(max(14px, env(safe-area-inset-bottom)) + var(--tab-h) + 18px); } }
 
 /* MARK: Toasts (SPEC §6.14) */
 .toasts { position: fixed; z-index: 90; left: 50%; bottom: 24px; transform: translateX(-50%); display: grid; gap: 8px; width: min(440px, calc(100vw - 32px)); }
@@ -572,3 +589,92 @@ body:has(.gate) .aura { opacity: 0.5; }
 
 /* Install on your phone (Batch J) */
 .install-steps { display: grid; gap: 10px; padding-left: 20px; margin: 4px 0 8px; line-height: 1.45; }
+
+@media (max-width: 767px) { .fab.hide-phone { display: none; } }
+
+/* Journal month headers (Batch L): lighter than the cards — small caps, count, hairline, chevron. */
+.month-head { margin: 10px -4px 4px; padding: 6px 4px 0; font: inherit; }
+.month-head button { display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: none; padding: 8px 4px; color: var(--ink-secondary); cursor: pointer; min-height: 44px; }
+.month-head .count { color: var(--ink-tertiary); }
+.month-head .rule { flex: 1; height: 1px; background: var(--hairline); }
+.segmented.icons button { width: 44px; padding: 0; display: grid; place-items: center; }
+.segmented.icons svg { width: 18px; height: 18px; }
+
+/* Export PDF (Batch L): the iPhone's A5 book (SPEC §6.21), printed by the browser. Always the
+   light palette on paper; only the book prints. */
+.print-book { display: none; }
+@media print {
+  @page { size: A5; margin: 16mm 14mm 18mm; @bottom-center { content: counter(page); font: 9pt Georgia, serif; color: #77736c; } }
+  html, body { height: auto !important; overflow: visible !important; background: #fffdf9 !important; }
+  body > :not(.print-book) { display: none !important; }
+  .print-book { display: block; color: #17161c; font: 10.5pt/1.5 'New York', 'Iowan Old Style', Georgia, serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .pb-cover { height: 170mm; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; break-after: page; }
+  .pb-cover .avatar { width: 30mm !important; height: 30mm !important; font-size: 40pt; }
+  .pb-cover h1 { font-size: 26pt; margin: 8mm 0 2mm; font-weight: 700; }
+  .pb-range { font-style: italic; color: #55525a; margin: 0; }
+  .pb-count { font: 600 8pt -apple-system, sans-serif; letter-spacing: 0.12em; color: #77736c; margin: 6mm 0 0; }
+  .pb-word { margin-top: auto; font: 400 14pt 'Instrument Serif', Georgia, serif; color: #3441d5; }
+  .pb-month { break-before: page; }
+  .pb-month header { border-bottom: 0.5pt solid #d8d3ca; margin-bottom: 6mm; padding-bottom: 2mm; }
+  .pb-month h2 { font-size: 28pt; font-weight: 700; margin: 0; }
+  .pb-month h2 em { color: #3441d5; font-weight: 400; }
+  .pb-month header p { font: 600 7.5pt -apple-system, sans-serif; letter-spacing: 0.14em; color: #77736c; margin: 1mm 0 0; }
+  .print-book article { break-inside: auto; }
+  .pb-date { font: 600 7.5pt -apple-system, sans-serif; letter-spacing: 0.1em; text-transform: uppercase; color: #3441d5; margin: 4mm 0 1mm; }
+  .print-book h3 { font-size: 13pt; font-weight: 700; margin: 0 0 1.5mm; break-after: avoid; }
+  .print-book .prose p { margin: 0 0 2mm; }
+  .print-book .prose mark { background: #f6e7a6; }
+  .print-book img { display: block; max-width: 100%; max-height: 88mm; margin: 3mm auto; border-radius: 3mm; break-inside: avoid; }
+  .pb-tasks { margin-top: 3mm; font-size: 9.5pt; }
+  .pb-tasks p:first-child { font: 600 7pt -apple-system, sans-serif; letter-spacing: 0.14em; color: #77736c; margin: 0 0 1mm; }
+  .pb-tasks p { margin: 0.5mm 0; }
+  .pb-tasks .done { text-decoration: line-through; color: #77736c; }
+  .pb-sep { text-align: center; color: #a9a49b; margin: 5mm 0; letter-spacing: 0.3em; }
+}
+
+/* Welcome (Batch L): the iPhone onboarding's voice on a first visit — one card, one sentence. */
+.welcome { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 16px; background: color-mix(in srgb, var(--bg) 55%, transparent); -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%); }
+.welcome-card { width: min(480px, 100%); border-radius: 32px; padding: 22px 28px 20px; display: grid; gap: 16px; box-shadow: var(--glass-shadow); }
+.welcome-progress { display: flex; gap: 6px; }
+.welcome-progress i { flex: 1; height: 3px; border-radius: 2px; background: color-mix(in srgb, var(--ink) 12%, transparent); transition: background 0.3s; }
+.welcome-progress i.on { background: var(--accent); }
+.welcome-step { display: grid; gap: 12px; min-height: 280px; align-content: start; animation: rise 0.4s var(--smooth) both; }
+.welcome-step h1 { font: 400 40px/1.02 'Instrument Serif', var(--serif); letter-spacing: -0.02em; margin: 8px 0 0; }
+.welcome-step .sub { color: var(--ink-secondary); font-size: 16px; line-height: 1.5; margin: 0; }
+.mini-month { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; width: 220px; margin: 6px 0 4px; }
+.mini-month span { aspect-ratio: 1; border-radius: 7px; background: color-mix(in srgb, var(--ink) 7%, transparent); animation: tileIn 0.5s var(--spring) both; }
+.mini-month span.tile { background: linear-gradient(160deg, var(--aura1), var(--accent)); }
+@keyframes tileIn { from { opacity: 0; transform: scale(0.6); } }
+.look-choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.look { display: grid; gap: 8px; justify-items: center; border: 1px solid var(--hairline); border-radius: 18px; padding: 12px 8px; background: none; color: var(--ink); font-weight: 600; font-size: 14px; min-height: 44px; }
+.look[aria-checked='true'] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.look-swatch { width: 64px; height: 44px; border-radius: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 3px; padding: 6px; background: #f6f3ec; border: 1px solid rgb(0 0 0 / 0.08); }
+.look.dark .look-swatch { background: #141418; }
+.look.system .look-swatch { background: linear-gradient(135deg, #f6f3ec 50%, #141418 50%); }
+.look-swatch i { border-radius: 3px; background: #3441d5; opacity: 0.7; }
+.look-swatch i:nth-child(2) { opacity: 0.25; } .look-swatch i:nth-child(3) { opacity: 0.4; }
+.welcome-tips { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.welcome-tips li { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; line-height: 1.45; color: var(--ink-secondary); }
+.welcome-tips li b { color: var(--ink); }
+.welcome-tips svg { flex: none; width: 20px; height: 20px; margin-top: 1px; color: var(--accent); }
+kbd { font: 600 12px/1 ui-monospace, 'SF Mono', Menlo, monospace; padding: 3px 6px; border-radius: 6px; border: 1px solid var(--hairline); background: color-mix(in srgb, var(--bg-elevated) 80%, transparent); box-shadow: 0 1px 0 var(--hairline); color: var(--ink); }
+.welcome-actions { display: flex; justify-content: space-between; align-items: center; }
+.welcome-mark { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0; font: 400 18px/1 'Instrument Serif', var(--serif); color: var(--ink-secondary); }
+.welcome-mark svg { width: 16px; height: 16px; }
+.shortcuts { display: grid; gap: 2px; margin: 0; }
+.shortcuts div { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 8px 2px; border-bottom: 1px solid var(--hairline); }
+.shortcuts dt { display: flex; gap: 4px; }
+.shortcuts dd { margin: 0; color: var(--ink-secondary); text-align: right; }
+.key-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+.key-list li { display: flex; gap: 14px; align-items: center; color: var(--ink-secondary); }
+.key-cell { position: relative; flex: none; width: 46px; height: 46px; border-radius: var(--r-cell); display: flex; flex-direction: column; align-items: center; padding-top: 8px; gap: 5px; background: color-mix(in srgb, var(--ink) 4%, transparent); overflow: hidden; }
+.key-cell .n { font-size: 15px; font-weight: 500; line-height: 1; }
+.key-cell .dots { display: flex; gap: 3px; } .key-cell .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--c); }
+.key-cell .ring { position: absolute; top: 5px; right: 5px; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--ink-secondary); }
+.key-cell .ring.done { border: 0; width: 11px; height: 11px; top: 4px; right: 4px; background: var(--done); }
+.key-cell.today { box-shadow: 0 0 0 1.5px var(--accent) inset; } .key-cell.today .n { color: var(--accent); font-weight: 700; }
+.key-cell.selected { background: var(--accent-strong); } .key-cell.selected .n { color: #fff; font-weight: 700; }
+.key-cell.photo-key { background: linear-gradient(160deg, #f2b48c, #5d7a5c); } .key-cell.photo-key .n { position: absolute; left: 6px; top: 5px; font-size: 11px; font-weight: 700; color: #fff; }
+.cell.drop-target { box-shadow: 0 0 0 2px var(--accent) inset; background: color-mix(in srgb, var(--accent) 14%, transparent); }
+body.dropping .sheet { box-shadow: 0 0 0 2px var(--accent), var(--glass-shadow); }
+@media (prefers-reduced-motion: reduce) { .mini-month span, .welcome-step { animation: fade 0.2s ease-out both; } }

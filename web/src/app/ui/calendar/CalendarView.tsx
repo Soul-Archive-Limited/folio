@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { addDays, addMonths, localeFirstWeekday, type Month, monthGrid, monthName, monthOf, todayKey, weekdayNames } from '../../lib/days.ts';
 import { indexByDay } from '../../lib/markers.ts';
 import { categoryColor } from '../../lib/payloads.ts';
@@ -36,6 +36,15 @@ export default function CalendarView({ selected, onSelect, composing }: { select
     if (m.year !== month.year || m.month !== month.month) go((m.year - month.year) * 12 + m.month - month.month);
     onSelect(day);
   };
+
+  // Batch L shortcuts from the shell: [ and ] change month, G goes to today.
+  useEffect(() => {
+    const onMonth = (e: Event) => go((e as CustomEvent<number>).detail);
+    const onToday = () => { setDirection(''); setMonth(monthOf(today)); onSelect(today); };
+    window.addEventListener('folio:month', onMonth);
+    window.addEventListener('folio:today', onToday);
+    return () => { window.removeEventListener('folio:month', onMonth); window.removeEventListener('folio:today', onToday); };
+  });
 
   function onGridKey(event: React.KeyboardEvent) {
     const steps: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
@@ -96,7 +105,8 @@ export default function CalendarView({ selected, onSelect, composing }: { select
           <div key={`${month.year}-${month.month}`} className={`grid${direction ? ` slide-${direction}` : ''}`} role="grid" aria-label={`${monthName(month)} ${month.year}`} onKeyDown={onGridKey}>
             {days.map((day) => (
               <DayCell key={day} day={day} month={month} today={today} selected={selected === day} index={index.get(day)} filter={filter} showTiles={showTiles}
-                onSelect={() => select(day)} onMenu={(x, y) => setMenu({ day, x, y })} />
+                onSelect={() => select(day)} onMenu={(x, y) => setMenu({ day, x, y })}
+                onDropFiles={composing ? undefined : (files) => { select(day); openComposer({ dayKey: day, files }); }} />
             ))}
           </div>
         </div>

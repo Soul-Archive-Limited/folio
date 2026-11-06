@@ -21,6 +21,9 @@ const JournalView = lazy(loadJournal);
 const TodoView = lazy(loadTodo);
 const ProfileView = lazy(() => import('./profile/ProfileView.tsx'));
 const Search = lazy(() => import('./Search.tsx'));
+const Welcome = lazy(() => import('./Welcome.tsx'));
+const Shortcuts = lazy(() => import('./Help.tsx').then((m) => ({ default: m.Shortcuts })));
+const MarksKey = lazy(() => import('./Help.tsx').then((m) => ({ default: m.MarksKey })));
 
 /** Fetches the composer (Tiptap) and the other tabs once the browser is idle, so the first
  *  "New entry" doesn't stall while its code downloads and parses (Phase 13: 158 ms). */
@@ -55,7 +58,10 @@ export default function Shell({ me, dataKey, onSignOut, onSessionEnded }: { me: 
   useEffect(preloadWhenIdle, []);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [selectedDay, setSelectedDay] = useState(todayKey());
-  const [, setLoaded] = useState(false);
+  const [help, setHelp] = useState<'shortcuts' | 'marks' | null>(null);
+  const shortcut = useRef<{ entry: () => void; task: () => void }>(undefined);
+  const [loaded, setLoaded] = useState(false);
+  const [welcomed, setWelcomed] = useState(() => { try { return localStorage.getItem(`folio.welcomed.${me.userId}`) === '1'; } catch { return true; } });
 
   const toast = useCallback((text: string, action?: Toast['action'], seconds = 4) => {
     const id = Date.now() + Math.random();
@@ -69,13 +75,26 @@ export default function Shell({ me, dataKey, onSignOut, onSessionEnded }: { me: 
     void engine.start().then(() => setLoaded(true));
     const pop = () => setRoute(location.pathname + location.search);
     window.addEventListener('popstate', pop);
-    // "/" or ⌘K / Ctrl-K opens search (Batch J), unless typing somewhere.
+    // "/" or ⌘K / Ctrl-K opens search (Batch J); Batch L adds the rest of the keyboard (Help.tsx),
+    // never while typing, with a sheet or menu open, or with a modifier held.
     const onKey = (event: KeyboardEvent) => {
       const typing = (event.target as HTMLElement | null)?.closest?.('input, textarea, select, [contenteditable]');
       if ((event.key === 'k' && (event.metaKey || event.ctrlKey)) || (event.key === '/' && !typing)) {
         event.preventDefault();
         setSearching(true);
+        return;
       }
+      if (typing || event.metaKey || event.ctrlKey || event.altKey || document.querySelector('.sheet, .modal, .menu, .print-book, .welcome')) return;
+      const paths: Record<string, string> = { '1': '/app', '2': '/app/journal', '3': '/app/todo', '4': '/app/profile' };
+      const key = event.key;
+      if (paths[key]) navigate(paths[key]);
+      else if (key === 'n' || key === 'N') shortcut.current?.entry();
+      else if (key === 't' || key === 'T') shortcut.current?.task();
+      else if (key === '?') setHelp('shortcuts');
+      else if (key === '[' || key === ']') window.dispatchEvent(new CustomEvent('folio:month', { detail: key === ']' ? 1 : -1 }));
+      else if (key === 'g' || key === 'G') window.dispatchEvent(new Event('folio:today'));
+      else return;
+      event.preventDefault();
     };
     window.addEventListener('keydown', onKey);
     return () => {
@@ -102,7 +121,7 @@ export default function Shell({ me, dataKey, onSignOut, onSessionEnded }: { me: 
   }, []);
 
   const diary: Diary = {
-    me, store, engine, key: dataKey, route, navigate, toast, selectedDay,
+    me, store, engine, key: dataKey, route, navigate, toast, selectedDay, showHelp: setHelp,
     openComposer: (request = {}) => { setEntry(null); setComposer(request); },
     openTask: (request = {}) => setTask(request),
     openEntry: (id) => setEntry(id),
@@ -110,6 +129,7 @@ export default function Shell({ me, dataKey, onSignOut, onSessionEnded }: { me: 
     signOut: async () => { engine.stop(); onSignOut(); },
     lock: () => {},
   };
+  shortcut.current = { entry: () => diary.openComposer({ dayKey: tabOf(route) === 'calendar' ? selectedDay : undefined }), task: () => diary.openTask({ dayKey: tabOf(route) === 'calendar' ? selectedDay : undefined }) };
   // Day selection lives here so the composer can move an entry by tapping another day.
   const selectDay = (day: string) => setSelectedDay(day);
 
@@ -158,7 +178,8 @@ export default function Shell({ me, dataKey, onSignOut, onSessionEnded }: { me: 
         <button onClick={() => setSearching(true)}><Icon name="search" />Search</button>
       </nav>
       {tab !== 'profile' && !composer && !entry && !task && (
-        <FloatingAdd tab={tab} onEntry={() => diary.openComposer({ dayKey: tab === 'calendar' ? selectedDay : undefined })}
+        // On To-do the quick-add bar has its own + (as on the iPhone), so phones show one button.
+        <FloatingAdd tab={tab} hideOnPhone={tab === 'todo'} onEntry={() => diary.openComposer({ dayKey: tab === 'calendar' ? selectedDay : undefined })}
           onTask={() => diary.openTask({ dayKey: tab === 'calendar' ? selectedDay : undefined })} />
       )}
       <Suspense fallback={null}>
@@ -166,6 +187,9 @@ export default function Shell({ me, dataKey, onSignOut, onSessionEnded }: { me: 
         {entry && <EntryDetail id={entry} onClose={() => setEntry(null)} />}
         {task && <TaskComposer request={task} onClose={() => setTask(null)} />}
         {searching && <Search tasksOnly={tab === 'todo'} onClose={() => setSearching(false)} />}
+        {loaded && !welcomed && <Welcome onDone={() => setWelcomed(true)} />}
+        {help === 'shortcuts' && <Shortcuts onClose={() => setHelp(null)} />}
+        {help === 'marks' && <MarksKey onClose={() => setHelp(null)} />}
       </Suspense>
       <Toasts toasts={toasts} dismiss={(id) => setToasts((list) => list.filter((t) => t.id !== id))} />
     </DiaryContext.Provider>
@@ -181,14 +205,14 @@ function SyncLine() {
 }
 
 /** The floating + (SPEC §2): tap = new entry (To-do: new task); long-press or right-click = both (Batch K). */
-function FloatingAdd({ tab, onEntry, onTask }: { tab: string; onEntry: () => void; onTask: () => void }) {
+function FloatingAdd({ tab, onEntry, onTask, hideOnPhone }: { tab: string; onEntry: () => void; onTask: () => void; hideOnPhone?: boolean }) {
   const [menu, setMenu] = useState(false);
   const press = useRef<ReturnType<typeof setTimeout>>(undefined);
   const held = useRef(false);
   const primary = tab === 'todo' ? onTask : onEntry;
   return (
     <>
-      <button className="fab icon-btn accent" aria-label={tab === 'todo' ? 'New task' : 'New entry'} aria-haspopup="menu"
+      <button className={`fab icon-btn accent${hideOnPhone ? ' hide-phone' : ''}`} aria-label={tab === 'todo' ? 'New task' : 'New entry'} aria-haspopup="menu"
         onClick={() => { if (held.current) { held.current = false; return; } primary(); }}
         onContextMenu={(e) => { e.preventDefault(); setMenu(true); }}
         onPointerDown={(e) => {

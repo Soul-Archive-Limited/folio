@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { sameId } from '../../lib/bytes.ts';
-import { formatMonthYear, formatShort } from '../../lib/days.ts';
+import { addMonths, formatMonthYear, formatShort, monthKey, monthOf, todayKey } from '../../lib/days.ts';
 import { byTimeInDay } from '../../lib/markers.ts';
 import { plainText } from '../../lib/markdown.ts';
 import { CategoryChips, Empty, PhotoImg } from '../common.tsx';
@@ -28,16 +28,26 @@ export default function JournalView() {
   }, [entries]);
   const photos = useMemo(() => entries.flatMap((e) => store.photosOf(e.id).map((p) => ({ photo: p, entry: e }))), [entries]);
   const trashCount = store.trashed().entries.length;
+  // Months fold (SPEC §6.6): this month and last open by default; a choice is remembered.
+  const [folds, setFolds] = useState<Record<string, boolean>>(() => { try { return JSON.parse(localStorage.getItem('folio.journalFolds') ?? '{}'); } catch { return {}; } });
+  const thisMonth = monthKey(monthOf(todayKey()));
+  const lastMonth = monthKey(addMonths(monthOf(todayKey()), -1));
+  const isOpen = (key: string) => folds[key] ?? (key === thisMonth || key === lastMonth || months.length <= 2);
+  const fold = (key: string) => setFolds((now) => {
+    const next = { ...now, [key]: !isOpen(key) };
+    try { localStorage.setItem('folio.journalFolds', JSON.stringify(next)); } catch { /* private mode */ }
+    return next;
+  });
 
   return (
     <div className="scroll">
       <div className="page">
         <div className="page-title">
           <h1 className="title1">Journal</h1>
-          <div className="segmented glass" role="group" aria-label="View">
-            <button aria-pressed={mode === 'timeline'} onClick={() => setMode('timeline')}>Timeline</button>
-            <button aria-pressed={mode === 'photos'} onClick={() => setMode('photos')}>Photos</button>
-            <button aria-pressed={mode === 'year'} onClick={() => setMode('year')}>Year</button>
+          <div className="segmented icons glass" role="group" aria-label="View">
+            <button aria-pressed={mode === 'timeline'} onClick={() => setMode('timeline')} title="Timeline"><Icon name="timeline" /><span className="sr-only">Timeline</span></button>
+            <button aria-pressed={mode === 'photos'} onClick={() => setMode('photos')} title="Photos"><Icon name="grid" /><span className="sr-only">Photos</span></button>
+            <button aria-pressed={mode === 'year'} onClick={() => setMode('year')} title="Year in Pixels"><Icon name="pixels" /><span className="sr-only">Year in Pixels</span></button>
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' }}>
@@ -51,8 +61,13 @@ export default function JournalView() {
         ) : mode === 'timeline' ? (
           months.map((m) => (
             <section key={m.key} aria-label={formatMonthYear(`${m.key}-01`)}>
-              <h2 className="month-head title2">{formatMonthYear(`${m.key}-01`)}</h2>
-              {m.items.map((e) => {
+              <h2 className="month-head">
+                <button className="caption" aria-expanded={isOpen(m.key)} onClick={() => fold(m.key)}>
+                  <span>{formatMonthYear(`${m.key}-01`)}</span><span className="count">{m.items.length}</span><i className="rule" aria-hidden="true" />
+                  <Icon name={isOpen(m.key) ? 'chevronDown' : 'chevronRight'} small />
+                </button>
+              </h2>
+              {isOpen(m.key) && m.items.map((e) => {
                 const cover = store.photosOf(e.id)[0];
                 if (!cover) return <EntryCard key={e.id} entry={e} showDate />;
                 return (

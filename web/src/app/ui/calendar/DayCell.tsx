@@ -7,11 +7,11 @@ import { useDiary } from '../context.tsx';
 
 interface Props {
   day: string; month: Month; today: string; selected: boolean; index?: DayIndex; filter: string | null; showTiles: boolean;
-  onSelect: () => void; onMenu: (x: number, y: number) => void;
+  onSelect: () => void; onMenu: (x: number, y: number) => void; onDropFiles?: (files: File[]) => void;
 }
 
 /** One day: photo tile (+N), category dots, task ring, today, selected, out-of-month, filter fade. */
-export const DayCell = memo(function DayCell({ day, month, today, selected, index, filter, showTiles, onSelect, onMenu }: Props) {
+export const DayCell = memo(function DayCell({ day, month, today, selected, index, filter, showTiles, onSelect, onMenu, onDropFiles }: Props) {
   const { store } = useDiary();
   const marker = markerFor(store, index);
   const press = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -31,6 +31,15 @@ export const DayCell = memo(function DayCell({ day, month, today, selected, inde
   return (
     <button className={classes} data-day={day} role="gridcell" aria-selected={selected} aria-label={label} tabIndex={selected ? 0 : -1}
       onClick={onSelect}
+      onDragOver={onDropFiles ? (e) => { if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); e.currentTarget.classList.add('drop-target'); } } : undefined}
+      onDragLeave={(e) => e.currentTarget.classList.remove('drop-target')}
+      onDrop={onDropFiles ? (e) => {
+        e.currentTarget.classList.remove('drop-target');
+        const files = [...e.dataTransfer.files].filter((f) => f.type.startsWith('image/') || /\.(heic|heif)$/i.test(f.name));
+        if (!files.length) return;
+        e.preventDefault();
+        onDropFiles(files);
+      } : undefined}
       onContextMenu={(e) => { e.preventDefault(); onMenu(e.clientX, e.clientY); }}
       onPointerDown={(e) => {
         if (e.pointerType === 'mouse') return;

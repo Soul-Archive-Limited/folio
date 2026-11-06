@@ -6,12 +6,14 @@ import { Modal } from '../common.tsx';
 import { useDiary } from '../context.tsx';
 import { Icon } from '../Icons.tsx';
 import { InstallHelp } from './InstallHelp.tsx';
+import { exportDiary, save } from '../../lib/export.ts';
 import { SYNC_TEXT } from '../Shell.tsx';
 
 const Devices = lazy(() => import('./Devices.tsx'));
 const Invites = lazy(() => import('./Invites.tsx'));
 const Categories = lazy(() => import('./Categories.tsx'));
 const RecentlyDeleted = lazy(() => import('./RecentlyDeleted.tsx'));
+const PrintBook = lazy(() => import('./PrintBook.tsx'));
 
 /** Profile (SPEC §6.9) and its screens, by route. */
 export default function ProfileView() {
@@ -47,7 +49,10 @@ export function useSettings() {
 }
 
 function Main() {
-  const { store, engine, me, navigate, signOut } = useDiary();
+  const { store, engine, me, navigate, signOut, key, showHelp, toast } = useDiary();
+  const [printing, setPrinting] = useState(false);
+  const [exporting, setExporting] = useState<string | null>(null);
+  const [withTrash, setWithTrash] = useState(false);
   const [settings, update] = useSettings();
   const [name, setName] = useState(settings.displayName);
   const [trusted, setTrusted] = useState<{ expiresAt: number } | null>(null);
@@ -169,16 +174,36 @@ function Main() {
       <h2 className="caption ink3 group-label">Your data</h2>
       <div className="group glass">
         <button className="row" onClick={() => navigate('/app/profile/deleted')}><Icon name="trash" /><span className="grow">Recently Deleted</span><span className="value">{Object.values(store.trashed()).reduce((n, l) => n + l.length, 0)}</span><Icon name="chevronRight" small /></button>
+        <button className="row" disabled={!!exporting} onClick={async () => {
+          setExporting('Starting…');
+          try {
+            const blob = await exportDiary(store, key, withTrash, (done, total) => setExporting(`Photos ${done} of ${total}`));
+            save(blob, `Folio Export ${new Date().toISOString().slice(0, 10)}.zip`);
+          } catch { toast("Couldn't make the export. Please try again."); }
+          setExporting(null);
+        }}><Icon name="export" /><span className="grow">Export as JSON + photos<small className="ink3" style={{ display: 'block', fontSize: 13 }}>{exporting ?? 'A zip made in this browser, decrypted. Nothing is uploaded.'}</small></span><Icon name="download" small /></button>
+        <label className="row"><span className="grow" style={{ paddingLeft: 34 }}>Include Recently Deleted</span><input type="checkbox" className="toggle" checked={withTrash} onChange={(e) => setWithTrash(e.target.checked)} /></label>
+        <button className="row" onClick={() => setPrinting(true)}><Icon name="journal" /><span className="grow">Export PDF<small className="ink3" style={{ display: 'block', fontSize: 13 }}>A book of your pages, through your browser's print window</small></span><Icon name="chevronRight" small /></button>
+      </div>
+      {printing && <Suspense fallback={null}><PrintBook onClose={() => setPrinting(false)} /></Suspense>}
+
+      <h2 className="caption ink3 group-label">Help</h2>
+      <div className="group glass">
+        <button className="row" onClick={() => showHelp('marks')}><Icon name="help" /><span className="grow">What do the marks mean?</span><Icon name="chevronRight" small /></button>
+        <button className="row" onClick={() => showHelp('shortcuts')}><Icon name="keyboard" /><span className="grow">Keyboard shortcuts</span><span className="value">?</span></button>
+        <button className="row" onClick={() => { try { localStorage.removeItem(`folio.welcomed.${me.userId}`); } catch { /* */ } location.reload(); }}><Icon name="sparkle" /><span className="grow">Show the welcome again</span><Icon name="chevronRight" small /></button>
+        <a className="row" href="/support" style={{ color: 'inherit', textDecoration: 'none' }}><Icon name="info" /><span className="grow">Support & FAQ</span><Icon name="chevronRight" small /></a>
+        <a className="row" href="mailto:support@devilsense.com" style={{ color: 'inherit', textDecoration: 'none' }}><Icon name="mail" /><span className="grow">Contact support</span><span className="value">support@devilsense.com</span></a>
       </div>
 
-      <h2 className="caption ink3 group-label">Help & about</h2>
+      <h2 className="caption ink3 group-label">About</h2>
       <div className="group glass">
-        <a className="row" href="/support" style={{ color: 'inherit', textDecoration: 'none' }}><span className="grow">Support & FAQ</span><Icon name="chevronRight" small /></a>
-        <a className="row" href="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}><span className="grow">Privacy Policy</span><Icon name="chevronRight" small /></a>
-        <a className="row" href="/terms" style={{ color: 'inherit', textDecoration: 'none' }}><span className="grow">Terms</span><Icon name="chevronRight" small /></a>
-        <a className="row" href="/open-source" style={{ color: 'inherit', textDecoration: 'none' }}><span className="grow">Open source</span><Icon name="chevronRight" small /></a>
+        {([['/', 'Website'], ['/privacy', 'Privacy Policy'], ['/terms', 'Terms of Use'], ['/cookies', 'Cookies and storage'], ['/acceptable-use', 'Acceptable use'],
+          ['/accessibility', 'Accessibility'], ['/imprint', 'Company details'], ['/open-source', 'Open source']] as const).map(([href, label]) => (
+          <a key={href} className="row" href={href} style={{ color: 'inherit', textDecoration: 'none' }}><span className="grow">{label}</span><Icon name="chevronRight" small /></a>
+        ))}
       </div>
-      <p className="fine" style={{ textAlign: 'center' }}>Made by Soul Archive Ltd · © 2026</p>
+      <p className="fine" style={{ textAlign: 'center' }}>Folio for the web · Made by Soul Archive Ltd, registered in England and Wales (no. 16186654) · © 2026</p>
 
       {confirmSignOut && (
         <Modal title="Sign out of Folio here?" message="Your diary stays in your account and on your other devices. This browser forgets it." onClose={() => setConfirmSignOut(false)}>

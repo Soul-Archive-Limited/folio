@@ -56,6 +56,37 @@ function ComposerBody({ request, day, onDayChange, dirty }: { request: ComposerR
   });
 
   useEffect(() => { onDayChange(dayKey); }, []);
+  // Batch L: photos dropped on a day arrive with the request; while the composer is open, photos
+  // dropped anywhere on the window join the entry, and ⌘/Ctrl-Enter saves.
+  useEffect(() => { if (request.files?.length) void addFiles(request.files); }, []);
+  const saveRef = useRef(save);
+  saveRef.current = save;
+  const addRef = useRef(addFiles);
+  addRef.current = addFiles;
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) { event.preventDefault(); saveRef.current(); }
+    };
+    const onOver = (event: DragEvent) => { if (event.dataTransfer?.types.includes('Files')) { event.preventDefault(); document.body.classList.add('dropping'); } };
+    const onLeave = (event: DragEvent) => { if (!event.relatedTarget) document.body.classList.remove('dropping'); };
+    const onDrop = (event: DragEvent) => {
+      if (!event.dataTransfer?.files.length) return;
+      event.preventDefault();
+      document.body.classList.remove('dropping');
+      void addRef.current(event.dataTransfer.files);
+    };
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('dragover', onOver);
+    window.addEventListener('dragleave', onLeave);
+    window.addEventListener('drop', onDrop);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('dragover', onOver);
+      window.removeEventListener('dragleave', onLeave);
+      window.removeEventListener('drop', onDrop);
+      document.body.classList.remove('dropping');
+    };
+  }, []);
   // Clicking a day in the calendar while writing moves the entry there (SPEC §6.4).
   useEffect(() => {
     if (day !== opened.current) {
@@ -68,8 +99,9 @@ function ComposerBody({ request, day, onDayChange, dirty }: { request: ComposerR
   const touch = <T,>(set: (v: T) => void) => (v: T) => { dirty.current = true; set(v); };
   const canSave = !!title.trim() || !bodyEmpty || photos.length > 0;
 
-  async function addFiles(files: FileList | null) {
-    if (!files) return;
+  async function addFiles(input: FileList | File[] | null | undefined) {
+    const files = input ? [...input].filter((f) => f.type.startsWith('image/') || /\.(heic|heif)$/i.test(f.name)) : [];
+    if (!files.length) return;
     const room = MAX_PHOTOS - photos.length;
     const picked = [...files].slice(0, room);
     if (files.length > room) toast(`Up to ${MAX_PHOTOS} photos per entry.`);
