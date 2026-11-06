@@ -46,7 +46,7 @@ final class TaskLifecycleUITests: XCTestCase {
 
         // Gone from the calendar.
         app.tabBars.buttons["Calendar"].tap()
-        XCTAssertTrue(app.staticTexts["Nothing here yet."].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Nothing written yet."].waitForExistence(timeout: 5))
         XCTAssertFalse(dayRow(app).exists, "deleting removes it from the calendar")
     }
 

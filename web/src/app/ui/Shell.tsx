@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Me } from '../lib/api.ts';
 import type { DataKey } from '../lib/crypto.ts';
 import { todayKey } from '../lib/days.ts';
@@ -158,10 +158,8 @@ export default function Shell({ me, dataKey, onSignOut, onSessionEnded }: { me: 
         <button onClick={() => setSearching(true)}><Icon name="search" />Search</button>
       </nav>
       {tab !== 'profile' && !composer && !entry && !task && (
-        <button className="fab icon-btn ember" aria-label={tab === 'todo' ? 'New task' : 'New entry'}
-          onClick={() => tab === 'todo' ? diary.openTask({}) : diary.openComposer({ dayKey: tab === 'calendar' ? selectedDay : undefined })}>
-          <Icon name="plus" />
-        </button>
+        <FloatingAdd tab={tab} onEntry={() => diary.openComposer({ dayKey: tab === 'calendar' ? selectedDay : undefined })}
+          onTask={() => diary.openTask({ dayKey: tab === 'calendar' ? selectedDay : undefined })} />
       )}
       <Suspense fallback={null}>
         {composer && <Composer request={composer} day={selectedDay} onDayChange={selectDay} onClose={() => setComposer(null)} />}
@@ -180,4 +178,35 @@ function SyncLine() {
   const { engine } = useDiary();
   const text = SYNC_TEXT[engine.status];
   return <span className="ink3" style={{ display: 'block', fontSize: 12 }}>{text}</span>;
+}
+
+/** The floating + (SPEC §2): tap = new entry (To-do: new task); long-press or right-click = both (Batch K). */
+function FloatingAdd({ tab, onEntry, onTask }: { tab: string; onEntry: () => void; onTask: () => void }) {
+  const [menu, setMenu] = useState(false);
+  const press = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const held = useRef(false);
+  const primary = tab === 'todo' ? onTask : onEntry;
+  return (
+    <>
+      <button className="fab icon-btn ember" aria-label={tab === 'todo' ? 'New task' : 'New entry'} aria-haspopup="menu"
+        onClick={() => { if (held.current) { held.current = false; return; } primary(); }}
+        onContextMenu={(e) => { e.preventDefault(); setMenu(true); }}
+        onPointerDown={(e) => {
+          if (e.pointerType === 'mouse') return;
+          held.current = false;
+          press.current = setTimeout(() => { held.current = true; setMenu(true); }, 450);
+        }}
+        onPointerUp={() => clearTimeout(press.current)} onPointerLeave={() => clearTimeout(press.current)} onPointerCancel={() => clearTimeout(press.current)}>
+        <Icon name="plus" />
+      </button>
+      {menu && (
+        <div className="modal-host" style={{ background: 'none', display: 'block' }} onClick={() => setMenu(false)}>
+          <div className="menu glass fab-menu" role="menu">
+            <button role="menuitem" autoFocus onClick={onEntry}><Icon name="edit" small />New entry</button>
+            <button role="menuitem" onClick={onTask}><Icon name="todo" small />New task</button>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }

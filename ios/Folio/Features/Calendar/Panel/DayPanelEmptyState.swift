@@ -1,27 +1,25 @@
 import SwiftUI
 
-/// "Nothing here yet." with Write and Add task (SPEC §6.2).
+/// An empty day: one calm line and a single "Add task" (SPEC §6.2, Batch K). A page comes from
+/// the floating +, so there's no second Write button here.
 struct DayPanelEmptyState: View {
     let day: DayKey
     @Environment(\.newItemRequest) private var request
 
     var body: some View {
-        VStack(spacing: Spacing.m) {
-            Text("Nothing here yet.")
-                .folioFont(.callout)
+        HStack(spacing: Spacing.xs) {
+            Text("Nothing written yet.")
                 .foregroundStyle(.inkSecondary)
-            GlassEffectContainer(spacing: Spacing.s) {
-                HStack(spacing: Spacing.s) {
-                    Button("Write", systemImage: "square.and.pencil") { request?.send(.entry(day)) }
-                        .buttonStyle(.glassProminent)
-                        .tint(.emberStrong)
-                    Button("Add task", systemImage: "checklist") { request?.send(.task(day)) }
-                        .buttonStyle(.glass)
-                }
-            }
+            Button("Add task") { request?.send(.task(day)) }
+                .buttonStyle(.plain)
+                .foregroundStyle(.emberText)
+                .fontWeight(.semibold)
+                .frame(minHeight: 44)
+                .contentShape(.rect)
         }
+        .folioFont(.callout)
         .frame(maxWidth: .infinity)
-        .padding(.vertical, Spacing.xl)
+        .padding(.vertical, Spacing.l)
         .staggeredAppear(index: 0)
     }
 }

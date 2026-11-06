@@ -1,30 +1,27 @@
 import { formatLong } from '../../lib/days.ts';
 import type { DayIndex } from '../../lib/markers.ts';
-import { Empty } from '../common.tsx';
 import { useDiary } from '../context.tsx';
 import { EntryCard } from '../EntryCard.tsx';
-import { Icon } from '../Icons.tsx';
 import { MoodGlyph } from '../Mood.tsx';
 import { TaskRow } from '../todo/TaskRow.tsx';
 
 /** The selected day's pages and tasks (SPEC §6.2). Tasks tick in place and stay. */
 export function DayPanel({ day, index, hidden }: { day: string; index?: DayIndex; hidden: boolean }) {
-  const { store, openComposer, openTask } = useDiary();
+  const { store, openTask } = useDiary();
   const entries = index?.entries ?? [];
   const tasks = index?.tasks ?? [];
   return (
     <section className="day-panel glass" aria-label={formatLong(day)} style={hidden ? { visibility: 'hidden' } : undefined}>
       <header>
         <h2 className="title2">{formatLong(day)}</h2>
-        <button className="icon-btn" aria-label="New entry for this day" onClick={() => openComposer({ dayKey: day })}><Icon name="plus" /></button>
       </header>
       <div className="body" key={day}>
         <OnThisDay day={day} />
         {entries.length === 0 && tasks.length === 0 ? (
-          <Empty icon="pages" text="Nothing here yet.">
-            <button className="btn small primary" onClick={() => openComposer({ dayKey: day })}>Write</button>
-            <button className="btn small" onClick={() => openTask({ dayKey: day })}>Add task</button>
-          </Empty>
+          // One calm line (Batch K): a page comes from the floating +, so only "Add task" is here.
+          <p className="day-empty callout ink2">
+            Nothing written yet. <button className="text-btn" onClick={() => openTask({ dayKey: day })}>Add task</button>
+          </p>
         ) : (
           <>
             {entries.length > 0 && <h3 className="caption ink3 section-label">Pages</h3>}

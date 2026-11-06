@@ -8,7 +8,6 @@ struct DayPanel: View {
     let onTitleTap: () -> Void
 
     @Environment(DiaryStore.self) private var store
-    @Environment(\.newItemRequest) private var request
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(CalendarEvents.self) private var calendarEvents: CalendarEvents?
 
@@ -31,9 +30,10 @@ struct DayPanel: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityAddTraits(.isHeader)
-                Spacer()
-                GlassIconButton(title: "New entry for this day", systemImage: "plus") { request?.send(.entry(day)) }
+                Spacer(minLength: 0)
             }
+            // New pages come from the floating + (tap = page for this day; Batch K removed the
+            // second + that sat here).
 
             VStack(alignment: .leading, spacing: Spacing.m) {
                 OnThisDayCard(day: day)
