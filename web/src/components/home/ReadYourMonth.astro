@@ -1,0 +1,87 @@
+---
+/**
+ * "A month you can read at a glance" (Batch L): the real calendar from the current build, with
+ * the key to its marks drawn the way the app draws them — replacing the earlier illustrated month.
+ */
+import Shot from '../Shot.astro';
+import FolioIcon from '../FolioIcon.astro';
+const key = [
+  { cell: 'photo', text: 'A day with a photo shows its latest one.' },
+  { cell: 'dots', text: 'Pages without photos: a dot per category.' },
+  { cell: 'ring', text: 'Tasks still open on that day.' },
+  { cell: 'done', text: 'Every task done — they stay on their day.' },
+  { cell: 'today', text: 'Today.' },
+] as const;
+const features = [
+  { icon: 'page.new', title: 'Write for any day', text: 'Back to 1900, in a half sheet with the calendar still in view.' },
+  { icon: 'journal', title: 'Read it back like a book', text: 'Months with covers from your photos, a wall of every picture, or a Year in Pixels.' },
+  { icon: 'category', title: 'Your own categories', text: 'Twelve colours, your names. Filter the month to just Travel.' },
+  { icon: 'mood', title: 'How it felt', text: 'Five quiet steps, from Heavy to Bright. Never a face, never a score.' },
+  { icon: 'trash', title: 'Nothing vanishes by accident', text: 'Deleted pages wait 30 days in Recently Deleted.' },
+  { icon: 'sparkle', title: 'A light hand with words', text: '✦ suggests a title or tidies grammar on your iPhone, and changes nothing until you say so.' },
+] as const;
+---
+<section class="month wrap" id="features" aria-labelledby="month-title">
+  <div class="month-grid">
+    <div class="month-shot" data-reveal>
+      <Shot name="calendar" width={300} alt="Folio's calendar on iPhone: October 2026 with photo tiles on 16, 22, 27 and 30, category dots under other days, small task marks in the corners, and Sunday 25 October selected with its page below." />
+    </div>
+    <div>
+      <header class="section-head">
+        <p class="caption">The calendar is the diary</p>
+        <h2 id="month-title">A month you can read <em>at a glance.</em></h2>
+        <p>Pages, photos and tasks all belong to a day, so the month itself tells you where you went and what you did. Here is how to read it.</p>
+      </header>
+      <ul class="marks">
+        {key.map((k) => (
+          <li data-reveal>
+            <span class={`mk ${k.cell}`} aria-hidden="true"><b>12</b>{k.cell === 'dots' && <span class="dts"><i></i><i></i></span>}{(k.cell === 'ring' || k.cell === 'done') && <span class="rg"></span>}</span>
+            <span>{k.text}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+  <ul class="feature-list">
+    {features.map((f, i) => (
+      <li data-reveal style={`--d:${i * 50}ms`}>
+        <span class="ic"><FolioIcon name={f.icon} size={22} /></span>
+        <h3>{f.title}</h3>
+        <p>{f.text}</p>
+      </li>
+    ))}
+  </ul>
+  <a class="link-arrow" href="/features">Every feature, with screenshots <span aria-hidden="true">→</span></a>
+</section>
+
+<style>
+  .month { padding-top: clamp(96px, 12vw, 160px); }
+  .month-grid { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(32px, 6vw, 96px); align-items: center; }
+  .month-shot { display: grid; justify-items: center; }
+  .marks { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; border-top: 1px solid var(--hairline); padding-top: 22px; }
+  .marks li { display: flex; align-items: center; gap: 16px; color: var(--text-2); font-size: 16px; }
+  .mk { position: relative; flex: none; width: 46px; height: 46px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; padding-top: 9px; gap: 5px; background: var(--bg-elevated); box-shadow: 0 0 0 1px var(--hairline); overflow: hidden; }
+  .mk b { font: 500 15px/1 var(--sans); color: var(--ink); }
+  .mk.photo { background: url('/img/photos/hills.webp') center / cover; }
+  .mk.photo b { position: absolute; left: 6px; top: 5px; font-size: 11px; font-weight: 700; color: #fff; }
+  .dts { display: flex; gap: 3px; } .dts i { width: 6px; height: 6px; border-radius: 50%; background: var(--cat-indigo); } .dts i + i { background: var(--cat-rose); }
+  .rg { position: absolute; top: 5px; right: 5px; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--ink-secondary); }
+  .mk.done .rg { border: 0; width: 11px; height: 11px; top: 4px; right: 4px; background: var(--done); }
+  .mk.today { box-shadow: 0 0 0 1.5px var(--accent) inset; } .mk.today b { color: var(--accent-text); font-weight: 700; }
+  .feature-list { list-style: none; margin: clamp(56px, 8vw, 96px) 0 24px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--hairline); }
+  .feature-list li { padding: 28px 28px 28px 0; border-bottom: 1px solid var(--hairline); }
+  .feature-list li:not(:nth-child(3n)) { border-right: 1px solid var(--hairline); }
+  .feature-list li:not(:nth-child(3n + 1)) { padding-left: 28px; }
+  .ic { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); margin-bottom: 16px; }
+  .feature-list h3 { font: 400 26px/1.1 var(--serif); margin: 0 0 8px; letter-spacing: -0.01em; }
+  .feature-list p { margin: 0; color: var(--text-2); font-size: 16px; }
+  @media (max-width: 900px) {
+    .month-grid { grid-template-columns: 1fr; }
+    .month-shot { order: 2; }
+    .feature-list { grid-template-columns: 1fr 1fr; }
+    .feature-list li, .feature-list li:not(:nth-child(3n + 1)) { padding: 24px 20px 24px 0; border-right: 0; }
+    .feature-list li:nth-child(odd) { border-right: 1px solid var(--hairline); }
+    .feature-list li:nth-child(even) { padding-left: 20px; }
+  }
+  @media (max-width: 560px) { .feature-list { grid-template-columns: 1fr; } .feature-list li, .feature-list li:nth-child(even) { padding: 22px 0; border-right: 0 !important; } }
+</style>

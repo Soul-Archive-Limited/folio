@@ -15,45 +15,23 @@ Mobile: a full-screen glass sheet with the same links, large, plus the two butto
 
 ## Home
 
-### Hero
-- Eyebrow: A calendar diary for iPhone and the web
-- H1: **Your days, *kept.***
-- Lede: Write about today, or any day back to 1900. Your words, photos and tasks land on one calendar — encrypted so only you can read them.
-- Buttons: **Get started** · *See how it works* (scrolls to "A day with Folio")
-- Small print under buttons: Free. No account needed on iPhone. No ads, no tracking.
-- Visual: a 3D phone floating over the drifting aura, showing Folio's real calendar; it tilts toward the cursor and turns as you scroll.
+### Hero (Batch L)
+- Visual: the page is a diary page — faint ruling and an Ink margin line — with the season drifting at the top (same seasons and regions as the app). On the right, the real web app window (calendar) with the 3D iPhone in front.
+- Pill: **New: the web app matches the iPhone →** (links to the changelog; change the words with each release, always something true).
+- H1: **Your days, *kept.*** — an ink stroke draws once under "kept."
+- Lede: A calendar diary for iPhone and the web. Write about today or any day back to 1900 — words, photos and tasks on one calendar, encrypted so only you can read them.
+- Buttons: **Get started** · store button when set. Small print: Free · no account needed on iPhone · no ads, no tracking
 
-### Problem — "Where did last spring go?"
-- Heading: **Your days are *scattered.***
-- Intro: Across a camera roll, three apps and a shoebox of notebooks — and none of them is a diary.
-- Four scattered cards that drift together on scroll and settle into one calendar:
-  1. **The camera roll** — 14,000 photos, and you still can't find the day you moved in.
-  2. **Notes and old notebooks** — a line here, a shoebox of paper diaries there.
-  3. **To-dos in another app** — finished, ticked, and gone without a trace.
-  4. **Apps that nag** — streaks, badges, a red dot because you had a quiet week.
-- Resolve line: **Folio puts them on the one thing you already think in: days.**
+### The calendar is the diary — "A month you can read *at a glance.*" (Batch L)
+- Body: Pages, photos and tasks all belong to a day, so the month itself tells you where you went and what you did. Here is how to read it.
+- The real calendar screenshot beside a key drawn like the app's cells: a photo day · dots per category · open tasks · all done · today.
+- Six features with Folio's own icons: Write for any day · Read it back like a book · Your own categories · How it felt (mood: five quiet steps, never a face) · Nothing vanishes by accident · A light hand with words. Link: *Every feature, with screenshots →*
 
-### A day with Folio (scroll story, pinned phone, the aura moves from dawn to night)
-1. **08:10 · Morning** — *A greeting, not a guilt trip.* Open Folio and it says good morning, with what's on today: two tasks, nothing overdue that can't wait. No streak to protect.
-2. **15:20 · Afternoon** — *Tasks that stay where they happened.* Tick "Post the letter to Ana" and it stays on today, done. Next year you'll still see the afternoon you finally sent it.
-3. **21:40 · Night** — *Say it on the walk home.* Dictate tonight's page while you walk; the words appear as you talk, on your iPhone, and nothing is sent anywhere. Add the photo from lunch. Save — and it becomes a little picture on today's square.
+### A day with Folio (unchanged; the sky now warms through paper and lilac, not orange)
 
-### Features story — "Everything lands on your calendar"
-The month grid assembles itself: day tiles fly in from depth, photo tiles flip in, one page lifts off a day and opens into an entry.
-- **Your month at a glance.** Days you wrote on show a tiny photo or a coloured dot. Days with tasks get a ring, and a tick once they're all done.
-- **Write for any day.** Pick a date back to 1900 and write in a half sheet while the calendar stays in view.
-- **Read it back like a book.** The Journal lays your pages out by month, with covers from your photos — or as one wall of every picture you've kept.
-- **Your own categories.** Twelve colours, your names. Filter the calendar to just Travel, or just Family.
-- **Nothing vanishes by accident.** Deleted pages wait 30 days in Recently Deleted.
-- **A light hand with words.** ✦ suggests a title or tidies grammar, on your iPhone, and never changes anything until you say so.
-- Link: *See every feature →*
-
-### Made for how you actually live (use cases)
-- **The traveller.** Mia flies Lisbon → Singapore on a Tuesday. Her Tuesday page stays on Tuesday — Folio days never shift when the time zone does. Each city becomes a photo on the day she was there.
-- **The student.** Theo keeps deadlines as tasks and his evenings as pages. In June he can scroll back and see the term — what was due, and what it was actually like.
-- **The new parent.** Priya started on the day her daughter was born. A photo a day, a line when there's time. The first year fits on twelve calendar pages.
-- **The paper diaries.** Jo has 22 notebooks from 1987 to 2009. One entry at a time, dated to the day it was written, with a photo of the page — the shoebox becomes a searchable decade.
-- **Two friends, two diaries.** Sam and Alex went to Kyoto together. Each wrote their own Folio — same trip, two private versions. Neither can read the other's, and neither can we.
+### The app itself — "Every screen, *as it is.*" (Batch L, replaces the illustrative personas)
+- Body: No mock-ups. These are screenshots of the current build, filled with the sample diary we test with.
+- A sideways strip: Journal · Year in Pixels · To-do · A page · Search · On this day · Lock Folio · Widgets — each with one line.
 
 ### Privacy — "Private by design, not by promise"
 - Heading: **We can't read your diary. That's the point.**
@@ -61,6 +39,9 @@ The month grid assembles itself: day tiles fly in from depth, photo tiles flip i
 - Three facts: **Encrypted on your device** · **No ads, no tracking** · **Works without an account**
 - Visual: a 3D lock closes over a page as you scroll; ciphertext streams out the other side.
 - Link: *How encryption works, in plain English →*
+
+### Make it yours — "Quiet, *but personal.*" (Batch L)
+- The 24 Folio avatars. A picture (24 avatars or a photo) · Your look (light, dark or match; New York or SF Pro) · The season (spring blossom · summer motes · monsoon rain · autumn leaves · winter snow, by where you live, or off) · Colours (twelve swatches).
 
 ### iPhone and the web
 - Heading: **On your iPhone. In your browser.**
@@ -71,11 +52,8 @@ The month grid assembles itself: day tiles fly in from depth, photo tiles flip i
 ### FAQ preview
 Can you read my diary? · Do I need an account? · What if I lose my iPhone? · Can I write for days in the past? · Does dictation send my voice anywhere? — *All questions →*
 
-### Whose days are these? (use-case heading on the page)
-Lede: Five people, five ways to keep a diary. The people are made up; the way Folio works for them isn't.
-
 ### A note from the maker (replaces reviews)
-> Folio is made by Soul Archive Ltd, a small company in London, for people who want their days kept — privately. There's no feed, no streak and nothing to share. Just your pages, on your calendar, for as long as you want them.
+> Folio is made by Soul Archive Ltd, an independent company registered in England and Wales, for people who want their days kept — privately. There's no feed, no streak and nothing to share. Just your pages, on your calendar, for as long as you want them.
 
 ### Closing call to action
 - **Start with today.** Get started — it takes a minute. Or open Folio on your iPhone and skip the account entirely.

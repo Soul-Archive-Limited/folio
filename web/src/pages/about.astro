@@ -4,7 +4,7 @@ import PageHead from '../components/PageHead.astro';
 import { site } from '../config/site';
 const wont = ['Show ads', 'Sell, analyse or train anything on your writing', 'Add streaks, badges or guilt', 'Turn your diary into a feed'];
 ---
-<Base title="About" og="about" description="Why Folio exists: a private diary built around a calendar, made by Soul Archive Ltd in London. No ads, no streaks, no feed.">
+<Base title="About" og="about" description="Why Folio exists: a private diary built around a calendar, made by Soul Archive Ltd, registered in England and Wales. No ads, no streaks, no feed.">
   <PageHead eyebrow="About">Why Folio <em>exists.</em></PageHead>
   <div class="wrap"><article class="story">
     <p class="big serif" data-reveal>Diaries used to be private by default — a book in a drawer.</p>
@@ -19,7 +19,7 @@ const wont = ['Show ads', 'Sell, analyse or train anything on your writing', 'Ad
   <section class="wrap who" aria-labelledby="who-h">
     <h2 id="who-h">Who makes it</h2>
     <p>{site.company.name}, a small company registered in England and Wales (no. {site.company.number}), at {site.company.office}. The code is open source on <a href={site.githubUrl} rel="noopener">GitHub</a>.</p>
-    <p>Questions or ideas: <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>. A person reads every message.</p>
+    <p>Questions or ideas: <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>.</p>
   </section>
 </Base>
 

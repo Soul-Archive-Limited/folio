@@ -1,5 +1,6 @@
 ---
 import Shot from '../Shot.astro';
+import Season from '../Season.astro';
 import { account, storeCta } from '../../config/site';
 const store = storeCta();
 const words = ['Your', 'days,'];
@@ -9,70 +10,110 @@ const words = ['Your', 'days,'];
     <i></i><i></i><i></i>
     <canvas class="aura-gl" data-aura></canvas>
   </div>
+  <!-- Batch L: the hero is a diary page — faint ruling and an Ink margin line — and the headline is
+       written on it. The ink stroke under "kept." draws once, like a pen. -->
+  <div class="ruling" aria-hidden="true"></div>
+  <Season />
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <p class="caption eyebrow">A calendar diary for iPhone and the web</p>
+      <a class="pill" href="/changelog"><span class="dot" aria-hidden="true"></span>New: the web app matches the iPhone <span aria-hidden="true">→</span></a>
       <h1 id="hero-title" class="serif">
-        {words.map((w, i) => <><span class="w" style={`--i:${i}`}>{w}</span>{' '}</>)}<em class="w" style="--i:2">kept.</em>
+        {words.map((w, i) => <><span class="w" style={`--i:${i}`}>{w}</span>{' '}</>)}<em class="w kept" style="--i:2">kept.<svg class="stroke" viewBox="0 0 300 40" preserveAspectRatio="none" aria-hidden="true"><path d="M4 26 C 60 14, 120 30, 176 20 S 262 12, 296 18" /></svg></em>
       </h1>
-      <p class="lede">Write about today, or any day back to 1900. Your words, photos and tasks land on one calendar — encrypted so only you can read them.</p>
+      <p class="lede">A calendar diary for iPhone and the web. Write about today or any day back to 1900 — words, photos and tasks on one calendar, encrypted so only you can read them.</p>
       <div class="ctas">
         <a class="btn btn-primary" href={account.getStarted}>Get started <span class="arrow" aria-hidden="true">→</span></a>
         {store && <a class="btn btn-glass" href={store.href} rel="noopener">{store.label}</a>}
-        <a class="btn btn-quiet" href="#day">See how it works</a>
       </div>
-      <p class="fine">Free. No account needed on iPhone. No ads, no tracking.</p>
+      <p class="fine">Free · no account needed on iPhone · no ads, no tracking</p>
     </div>
-    <div class="hero-stage" data-phone3d>
-      <div class="hero-poster">
-        <Shot name="calendar-today" eager width={300}
-          alt="Folio on iPhone: October 2026 with small photos on the days written about, coloured dots and task rings, and Tuesday 27 October's page below." />
+    <div class="hero-stage">
+      <figure class="window" aria-hidden="true">
+        <div class="bar"><i></i><i></i><i></i><span>folio.devilsense.com/app</span></div>
+        <picture>
+          <source srcset="/img/app/web-calendar-dark.webp" media="(prefers-color-scheme: dark)" />
+          <img src="/img/app/web-calendar-light.webp" alt="" width="1200" height="750" decoding="async" fetchpriority="low" />
+        </picture>
+      </figure>
+      <div class="phone-stage" data-phone3d>
+        <div class="hero-poster">
+          <Shot name="calendar-today" eager width={268}
+            alt="Folio on iPhone: October 2026 with small photos on the days written about, coloured dots and task marks, and Tuesday 27 October's page below." />
+        </div>
+        <div class="hero-floor" aria-hidden="true"></div>
       </div>
-      <div class="hero-floor" aria-hidden="true"></div>
     </div>
   </div>
 </section>
 
 <style>
-  .hero { position: relative; padding: clamp(28px, 6vw, 72px) 0 clamp(48px, 8vw, 96px); isolation: isolate; }
-  .hero-aura { position: absolute; inset: -140px 0 -10%; z-index: -1; pointer-events: none; overflow: hidden; -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent); mask-image: linear-gradient(to bottom, #000 62%, transparent); }
-  .hero-aura i { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.7; }
-  .hero-aura i:nth-child(1) { width: 46vw; height: 46vw; right: 6%; top: 8%; background: var(--aura1); }
-  .hero-aura i:nth-child(2) { width: 34vw; height: 34vw; right: -6%; top: 40%; background: var(--aura2); }
-  .hero-aura i:nth-child(3) { width: 38vw; height: 38vw; left: -10%; top: 50%; background: var(--aura3); opacity: 0.45; }
+  .hero { position: relative; padding: clamp(28px, 5vw, 64px) 0 clamp(56px, 8vw, 104px); isolation: isolate; overflow: clip; }
+  .hero-aura { position: absolute; inset: -140px 0 -10%; z-index: -2; pointer-events: none; overflow: hidden; -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent); mask-image: linear-gradient(to bottom, #000 62%, transparent); }
+  .hero-aura i { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.6; }
+  .hero-aura i:nth-child(1) { width: 46vw; height: 46vw; right: 2%; top: 4%; background: var(--aura1); }
+  .hero-aura i:nth-child(2) { width: 34vw; height: 34vw; right: -8%; top: 42%; background: var(--aura2); }
+  .hero-aura i:nth-child(3) { width: 38vw; height: 38vw; left: -12%; top: 54%; background: var(--aura3); opacity: 0.4; }
   .aura-gl { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 1.2s ease; }
   .aura-gl.is-on { opacity: 1; }
-  @media (prefers-color-scheme: dark) { .hero-aura i { opacity: 0.22; } .hero-aura i:nth-child(3) { opacity: 0.16; } }
+  @media (prefers-color-scheme: dark) { .hero-aura i { opacity: 0.2; } .hero-aura i:nth-child(3) { opacity: 0.14; } }
 
-  .hero-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); align-items: center; gap: clamp(24px, 4vw, 56px); }
-  .eyebrow { margin: 0 0 20px; }
-  h1 { font-size: clamp(76px, 10.4vw, 148px); line-height: 0.88; letter-spacing: -0.035em; margin: 0 0 28px; }
-  h1 em { font-style: italic; color: var(--accent-text); padding-right: 0.06em; }
+  /* The page: 34 px ruling (the headline's line height) and a margin line at the copy's left edge. */
+  .ruling { position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: repeating-linear-gradient(to bottom, transparent 0 33px, color-mix(in srgb, var(--accent) 9%, transparent) 33px 34px);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 70%, transparent); mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 70%, transparent); }
+  .ruling::before { content: ''; position: absolute; top: 0; bottom: 0; left: max(calc((100vw - var(--max)) / 2 + var(--side) - 22px), 8px); width: 1px; background: color-mix(in srgb, var(--accent) 34%, transparent); }
+
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); align-items: center; gap: clamp(24px, 4vw, 48px); }
+  .pill { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px 0 10px; margin: 0 0 22px -2px; border-radius: 999px; font-size: 14px; font-weight: 500; text-decoration: none; color: var(--ink);
+    background: var(--glass); box-shadow: 0 0 0 1px var(--hairline) inset; -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
+  .pill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent); }
+  .pill span:last-child { color: var(--accent-text); transition: transform 200ms var(--ease); }
+  @media (hover: hover) and (pointer: fine) { .pill:hover span:last-child { transform: translateX(3px); } }
+  h1 { font-size: clamp(72px, 9.6vw, 140px); line-height: 0.9; letter-spacing: -0.035em; margin: 0 0 28px; }
+  h1 em { font-style: italic; color: var(--accent-text); padding-right: 0.06em; position: relative; }
   .w { display: inline-block; }
-  .lede { font-size: clamp(18px, 1.9vw, 21px); line-height: 1.5; color: var(--text-2); max-width: 34ch; margin-bottom: 32px; }
+  .stroke { position: absolute; left: -2%; right: -4%; bottom: -0.16em; width: 106%; height: 0.32em; overflow: visible; }
+  .stroke path { fill: none; stroke: var(--accent); stroke-width: 5; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: 0.85; }
+  .lede { font-size: clamp(18px, 1.8vw, 21px); line-height: 1.5; color: var(--text-2); max-width: 36ch; margin-bottom: 30px; }
   .ctas { display: flex; flex-wrap: wrap; gap: 10px; margin-left: -2px; }
-  .fine { margin: 18px 0 0; font-size: 14px; color: var(--text-2); }
+  .fine { margin: 18px 0 0; font-size: 14px; color: var(--text-2); letter-spacing: 0.01em; }
 
-  .hero-stage { position: relative; height: clamp(520px, 52vw, 700px); display: grid; place-items: center; }
+  /* The real web app behind the phone: same diary, two devices. */
+  .hero-stage { position: relative; height: clamp(520px, 50vw, 680px); }
+  .window { position: absolute; margin: 0; right: -6%; top: 6%; width: 112%; border-radius: 18px; overflow: hidden; background: var(--bg-elevated);
+    box-shadow: 0 0 0 1px var(--hairline), 0 40px 90px -40px rgb(23 22 60 / 0.4); transform: perspective(2200px) rotateY(-9deg) rotateX(3deg); transform-origin: left center; }
+  .window .bar { display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px; border-bottom: 1px solid var(--hairline); background: color-mix(in srgb, var(--bg-elevated) 80%, var(--bg)); }
+  .window .bar i { width: 10px; height: 10px; border-radius: 50%; background: color-mix(in srgb, var(--ink) 14%, transparent); }
+  .window .bar span { margin: 0 auto; font: 12px var(--mono); color: var(--text-2); padding-right: 40px; }
+  .window img { width: 100%; height: auto; }
+  .phone-stage { position: absolute; left: -4%; bottom: -4%; width: 340px; height: 560px; display: grid; place-items: center; }
   .hero-poster { perspective: 1800px; transition: opacity 600ms ease, filter 600ms ease; }
-  .hero-poster .phone { transform: rotateY(-16deg) rotateX(5deg) rotateZ(2deg); box-shadow: 0 0 0 1.5px #3a3a40 inset, 0 60px 90px -40px rgb(60 30 10 / 0.45); }
-  .hero-stage :global(canvas) { position: absolute !important; inset: 0; opacity: 0; transition: opacity 700ms ease; }
-  .hero-stage.is-3d :global(canvas) { opacity: 1; }
-  .hero-stage.is-3d .hero-poster { opacity: 0; filter: blur(6px); }
-  .hero-floor { position: absolute; bottom: 4%; left: 50%; width: 52%; height: 28px; translate: -50% 0; border-radius: 50%; background: radial-gradient(closest-side, rgb(60 30 10 / 0.22), transparent); transition: opacity 600ms ease; }
-  .hero-stage.is-3d .hero-floor { opacity: 0; }
+  .hero-poster .phone { transform: rotateY(-14deg) rotateX(5deg) rotateZ(2deg); box-shadow: 0 0 0 1.5px #3a3a40 inset, 0 60px 90px -40px rgb(23 22 60 / 0.5); }
+  .phone-stage :global(canvas) { position: absolute !important; inset: 0; opacity: 0; transition: opacity 700ms ease; }
+  .phone-stage.is-3d :global(canvas) { opacity: 1; }
+  .phone-stage.is-3d .hero-poster { opacity: 0; filter: blur(6px); }
+  .hero-floor { position: absolute; bottom: 4%; left: 50%; width: 52%; height: 26px; translate: -50% 0; border-radius: 50%; background: radial-gradient(closest-side, rgb(23 22 60 / 0.24), transparent); transition: opacity 600ms ease; }
+  .phone-stage.is-3d .hero-floor { opacity: 0; }
 
-  /* Load: the headline sharpens word by word, like the app's greeting (SPEC §4.2); the phone rises. */
+  /* Load: the headline sharpens word by word like the app's greeting (SPEC §4.2), the ink stroke
+     draws, the window and phone rise. Reduced motion: everything is simply there. */
   @media (prefers-reduced-motion: no-preference) {
     .w { animation: word-in 900ms var(--ease) both; animation-delay: calc(80ms + var(--i) * 70ms); }
-    .hero-poster .phone { animation: phone-in 1200ms var(--ease) both 120ms; }
+    .stroke path { stroke-dasharray: 320; stroke-dashoffset: 320; animation: ink 1100ms cubic-bezier(0.65, 0, 0.35, 1) 520ms forwards; }
+    .window { animation: window-in 1100ms var(--ease) both 160ms; }
+    .hero-poster .phone { animation: phone-in 1200ms var(--ease) both 260ms; }
   }
   @keyframes word-in { from { transform: translateY(0.18em); filter: blur(12px); } }
-  @keyframes phone-in { from { transform: translateY(40px) rotateY(-26deg) rotateX(10deg) rotateZ(4deg); } }
+  @keyframes ink { to { stroke-dashoffset: 0; } }
+  @keyframes window-in { from { opacity: 0; translate: 0 24px; } }
+  @keyframes phone-in { from { transform: translateY(40px) rotateY(-24deg) rotateX(10deg) rotateZ(4deg); } }
 
-  @media (max-width: 900px) {
+  @media (max-width: 960px) {
     .hero-grid { grid-template-columns: 1fr; }
-    .hero-stage { height: clamp(460px, 120vw, 600px); margin-top: 8px; }
-    .hero-poster .phone { --phone-w: 250px !important; }
+    .hero-stage { height: clamp(420px, 96vw, 600px); margin-top: 12px; }
+    .window { width: 96%; right: -8%; top: 4%; }
+    .phone-stage { left: 0; bottom: -2%; width: 260px; height: 470px; }
+    .hero-poster .phone { --phone-w: 214px !important; }
+    .ruling::before { left: 8px; }
   }
 </style>

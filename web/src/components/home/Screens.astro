@@ -1,0 +1,46 @@
+---
+/**
+ * "Every screen, as it is" (Batch L) — replaces the illustrative personas. Real screenshots of
+ * the current build with the sample diary used for testing, in a strip you can scroll or swipe.
+ */
+import Shot from '../Shot.astro';
+const screens = [
+  { name: 'journal', title: 'Journal', text: 'Months with photo covers; this month and last open.', alt: 'The Journal on iPhone: November 2026 with the pages “Morning swim” and “Soup weather”.' },
+  { name: 'year', title: 'Year in Pixels', text: 'Every day of the year as a square, coloured by mood or category.', alt: 'Year in Pixels for 2026, coloured by mood.' },
+  { name: 'todo', title: 'To-do', text: 'Grouped by day. Ticked tasks stay on the day you did them.', alt: 'To-do on iPhone: tasks such as “Renew passport photo” and “Post the letter to Ana” with dates.' },
+  { name: 'entry', title: 'A page', text: 'Photos first, then your words, with the date and how it felt.', alt: 'An entry on iPhone: “Market day” with its photo, dated Tuesday 27 October 2026.' },
+  { name: 'search', title: 'Search', text: 'Runs on your iPhone, over titles, pages, categories and tasks.', alt: 'Search on iPhone for “river”, finding the page “Long walk” with the match highlighted.' },
+  { name: 'onthisday', title: 'On this day', text: 'Pages from the same date in earlier years, at the top of today.', alt: 'The day panel with an On this day card listing pages from 2025 and 2024.' },
+  { name: 'lock', title: 'Lock Folio', text: 'Face ID or your passcode, after the delay you choose.', alt: 'Folio’s lock screen with the mark, a greeting and “Unlock with Face ID”.' },
+  { name: 'widgets', title: 'Widgets', text: 'Today and Month on the Home Screen; tick tasks right there.', alt: 'The Home Screen with Folio’s Month widget and Today widget, one task ticked.' },
+] as const;
+---
+<section class="screens" aria-labelledby="screens-title">
+  <div class="wrap">
+    <header class="section-head">
+      <p class="caption">The app itself</p>
+      <h2 id="screens-title">Every screen, <em>as it is.</em></h2>
+      <p>No mock-ups. These are screenshots of the current build, filled with the sample diary we test with.</p>
+    </header>
+  </div>
+  <ul class="strip" tabindex="0" aria-label="Screenshots of Folio on iPhone — scroll sideways for more">
+    {screens.map((s) => (
+      <li>
+        <Shot name={s.name} width={232} alt={s.alt} />
+        <h3>{s.title}</h3>
+        <p>{s.text}</p>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .screens { padding-top: clamp(96px, 12vw, 160px); }
+  .strip { list-style: none; margin: 0; display: flex; gap: clamp(20px, 3vw, 36px); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--side);
+    padding: 8px max(var(--side), calc((100vw - var(--max)) / 2 + var(--side))) 28px; scrollbar-width: thin; }
+  .strip:focus-visible { outline-offset: -4px; }
+  .strip li { flex: none; width: 232px; scroll-snap-align: start; }
+  .strip h3 { font: 400 24px/1.1 var(--serif); margin: 18px 0 6px; }
+  .strip p { margin: 0; color: var(--text-2); font-size: 15px; }
+  .strip :global(.phone) { box-shadow: 0 0 0 1.5px #3a3a40 inset, 0 30px 50px -30px rgb(23 22 60 / 0.45); }
+</style>

@@ -1,10 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
 import Hero from '../components/home/Hero.astro';
-import Problem from '../components/home/Problem.astro';
 import DayStory from '../components/home/DayStory.astro';
-import CalendarStory from '../components/home/CalendarStory.astro';
-import UseCases from '../components/home/UseCases.astro';
+import ReadYourMonth from '../components/home/ReadYourMonth.astro';
+import Screens from '../components/home/Screens.astro';
+import MakeItYours from '../components/home/MakeItYours.astro';
 import PrivacyBand from '../components/home/PrivacyBand.astro';
 import Everywhere from '../components/home/Everywhere.astro';
 import Closing from '../components/home/Closing.astro';
@@ -13,11 +13,11 @@ import Closing from '../components/home/Closing.astro';
   <link slot="head" rel="preload" as="image" href="/img/app/calendar-today-light.webp" media="(prefers-color-scheme: light)" fetchpriority="high" />
   <link slot="head" rel="preload" as="image" href="/img/app/calendar-today-dark.webp" media="(prefers-color-scheme: dark)" fetchpriority="high" />
   <Hero />
-  <Problem />
+  <ReadYourMonth />
   <DayStory />
-  <CalendarStory />
-  <UseCases />
+  <Screens />
   <PrivacyBand />
+  <MakeItYours />
   <Everywhere />
   <Closing />
 </Base>

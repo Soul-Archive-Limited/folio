@@ -1,0 +1,44 @@
+---
+/** "Make it yours" (Batch L): the app's avatars, looks, seasons and category colours — real assets. */
+const avatars = Array.from({ length: 24 }, (_, i) => String(i + 1).padStart(2, '0'));
+const colours = ['indigo', 'ocean', 'teal', 'sage', 'violet', 'plum', 'rose', 'coral', 'ember', 'sand', 'olive', 'graphite'];
+const seasons = [['Spring', 'blossom'], ['Summer', 'warm motes'], ['Monsoon', 'rain'], ['Autumn', 'leaves'], ['Winter', 'snow']];
+---
+<section class="yours wrap" aria-labelledby="yours-title">
+  <div class="yours-grid">
+    <div class="avatars" aria-hidden="true">
+      {avatars.map((n, i) => <img src={`/avatars/avatar-${n}.svg`} alt="" width="72" height="72" loading="lazy" style={`--i:${i}`} />)}
+    </div>
+    <div>
+      <header class="section-head">
+        <p class="caption">Make it yours</p>
+        <h2 id="yours-title">Quiet, <em>but personal.</em></h2>
+      </header>
+      <dl class="choices">
+        <div><dt>A picture</dt><dd>One of 24 Folio avatars — little page spirits, drawn for Folio — or a photo of you.</dd></div>
+        <div><dt>Your look</dt><dd>Light, dark or match your iPhone. New York or SF Pro for your words.</dd></div>
+        <div><dt>The season</dt><dd>{seasons.map(([s, what], i) => <>{i > 0 && ' · '}<span>{s}</span> <span class="ink3">{what}</span></>)} — drifting at the top, by where you live. Or off.</dd></div>
+        <div><dt>Colours</dt><dd><span class="swatches" aria-hidden="true">{colours.map((c) => <i style={`--c:var(--cat-${c})`}></i>)}</span>Twelve for your categories, tuned for light and dark.</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<style>
+  .yours { padding-top: clamp(96px, 12vw, 160px); }
+  .yours-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); align-items: center; }
+  .avatars { display: grid; grid-template-columns: repeat(6, 1fr); gap: clamp(8px, 1.4vw, 16px); }
+  .avatars img { width: 100%; height: auto; border-radius: 50%; background: var(--bg-elevated); box-shadow: 0 0 0 1px var(--hairline), 0 10px 24px -14px rgb(23 22 60 / 0.35); }
+  @media (prefers-reduced-motion: no-preference) and (hover: hover) {
+    .avatars img { transition: transform 300ms var(--ease); }
+    .avatars img:hover { transform: translateY(-4px) rotate(-4deg); }
+  }
+  .choices { margin: 0; border-top: 1px solid var(--hairline); }
+  .choices div { display: grid; grid-template-columns: 140px 1fr; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--hairline); }
+  .choices dt { font: 400 22px/1.2 var(--serif); }
+  .choices dd { margin: 0; color: var(--text-2); }
+  .ink3 { color: var(--ink-tertiary); }
+  .swatches { display: flex; gap: 6px; margin-bottom: 8px; }
+  .swatches i { width: 18px; height: 18px; border-radius: 50%; background: var(--c); }
+  @media (max-width: 900px) { .yours-grid { grid-template-columns: 1fr; } .choices div { grid-template-columns: 1fr; gap: 4px; } }
+</style>

@@ -189,7 +189,12 @@ p { text-wrap: pretty; }
 @media (max-width: 760px) { .footer-grid { grid-template-columns: 1fr 1fr; } .footer-grid > div:first-child { grid-column: 1 / -1; } }
 
 /* Page heads for the inner pages */
-.page-head { position: relative; padding-top: clamp(56px, 10vw, 120px); padding-bottom: clamp(32px, 5vw, 56px); }
+.page-head { position: relative; padding-top: clamp(56px, 10vw, 120px); padding-bottom: clamp(32px, 5vw, 56px); isolation: isolate; }
+/* Batch L: inner pages open on the same diary page as the home hero — faint ruling and an Ink margin. */
+.page-head::before { content: ''; position: absolute; inset: 0 calc(50% - 50vw); z-index: -1; pointer-events: none;
+  background: linear-gradient(90deg, transparent calc(50vw - min(50vw, var(--max) / 2) + var(--side) - 23px), color-mix(in srgb, var(--accent) 30%, transparent) 0 calc(50vw - min(50vw, var(--max) / 2) + var(--side) - 22px), transparent 0),
+    repeating-linear-gradient(to bottom, transparent 0 33px, color-mix(in srgb, var(--accent) 8%, transparent) 33px 34px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 60%, transparent); mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 60%, transparent); }
 .page-head h1 { font: 400 clamp(52px, 8.5vw, 112px)/0.92 var(--serif); letter-spacing: -0.03em; margin: 14px 0 20px; max-width: 14ch; }
 .page-head h1 em { font-style: italic; color: var(--accent-text); }
 .page-head .lede { font-size: clamp(18px, 2vw, 21px); color: var(--text-2); max-width: 48ch; }
