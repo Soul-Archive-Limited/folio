@@ -129,6 +129,7 @@ struct ProfileView: View {
             .modifier(AccountPresentations(routes: accountRoutes))
             // Leave the toast room above the tab bar.
             .contentMargins(.bottom, Spacing.xxl, for: .scrollContent)
+            .readableWidth()
         }
         #if DEBUG
         .onAppear {

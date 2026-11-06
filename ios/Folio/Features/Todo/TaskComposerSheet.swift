@@ -100,6 +100,7 @@ struct TaskComposerSheet: View {
                     Button("Save", action: save)
                         .buttonStyle(.glassProminent)
                         .tint(.accentStrong)
+                        .keyboardShortcut(.return, modifiers: .command)
                         .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }

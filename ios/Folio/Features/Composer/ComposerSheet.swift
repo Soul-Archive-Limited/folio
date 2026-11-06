@@ -163,6 +163,7 @@ struct ComposerSheet: View {
             Button("Save", action: save)
                 .buttonStyle(.glassProminent)
                 .tint(.accentStrong)
+                .keyboardShortcut(.return, modifiers: .command)
                 .disabled(!model.hasContent)
         }
     }

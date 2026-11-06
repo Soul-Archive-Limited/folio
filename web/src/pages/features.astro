@@ -66,9 +66,16 @@ const groups = [
     <h2 id="ev-h">Everywhere you are</h2>
     <ul class="places">
       <li><b>iPhone</b><span>iOS 26 or later. Works offline and without an account.</span></li>
-      <li><b>iPad</b><span>The calendar and the day side by side.</span></li>
+      <li><b>iPad</b><span>The calendar and the day side by side, a sidebar for the tabs, keyboard shortcuts and the pointer.</span></li>
       <li><b>Web</b><span>Any modern browser at folio.devilsense.com/app, unlocked from your iPhone.</span></li>
     </ul>
+    <figure class="ipad">
+      <picture>
+        <source srcset="/img/app/ipad-calendar-dark.webp" media="(prefers-color-scheme: dark)" />
+        <img src="/img/app/ipad-calendar-light.webp" width="1200" height="900" loading="lazy" decoding="async"
+          alt="Folio on a 13-inch iPad in landscape: the tab sidebar, October 2026's calendar with photo tiles and marks, and Sunday 25 October's page beside it." />
+      </picture>
+    </figure>
     <div class="ctas"><a class="btn btn-primary" href={account.getStarted}>Get started <span class="arrow" aria-hidden="true">→</span></a><a class="btn btn-quiet" href="/how-it-works">How it works</a></div>
   </section>
 </Base>
@@ -77,6 +84,8 @@ const groups = [
   .jump { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
   .jump a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border-radius: 999px; background: var(--bg-elevated); box-shadow: 0 0 0 1px var(--hairline); text-decoration: none; font-size: 15px; font-weight: 500; }
   .group { padding-top: clamp(56px, 8vw, 96px); }
+  .ipad { margin: 32px 0; padding: 14px; border-radius: 34px; background: #1b1b1f; box-shadow: 0 0 0 1.5px #3a3a40 inset, 0 50px 90px -50px rgb(23 22 60 / 0.5); max-width: 980px; }
+  .ipad img { width: 100%; height: auto; border-radius: 22px; }
   .group h2 { font: 400 clamp(36px, 5vw, 56px)/1 var(--serif); letter-spacing: -0.02em; margin: 0 0 28px; }
   .items { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
   .item { padding: 28px 24px 26px; border-radius: 28px; background: var(--bg-elevated); box-shadow: 0 0 0 1px var(--hairline); }

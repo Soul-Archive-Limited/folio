@@ -331,6 +331,7 @@ Tips use the glass style, respect Reduce Motion, never reappear once done.
 
 ### 6.16 iPad
 Resizable `NavigationSplitView` (sidebar tabs · calendar · day panel/detail). No extra design work in v1.
+**Batch L:** the month column is wider by default (ideal 560 pt, 360–760) so cells grow in portrait; Journal, To-do, Profile and Year in Pixels keep a centred readable column on wide windows (`readableWidth()`: 760 pt, the photo wall 1100 pt) and the To-do quick-add bar lines up with it; nested horizontal pagers zero the inherited margins and are keyed by their width. **Keyboard** (menu bar and ⌘ overlay, focused window only): ⌘N New Entry (selected day) · ⇧⌘N New Task · ⌘1–4 tabs · ⌘T Today · ⌘[ / ⌘] month · ⌘F Search · ⌘↩ Save in both composers. **Pointer:** every `.pressable` control has the system highlight hover effect. Compact windows (narrow Split View or Stage Manager sizes) use the iPhone layout through the horizontal size class. Screenshots: `docs/screenshots/batch-l/ipad/` (13" and 11", portrait and landscape, light and dark); App Store: `docs/appstore/ipad-0*.jpg`.
 
 ### 6.17 Search (Batch J)
 One field per place: Calendar (pull-down / magnifier → sheet), Journal and To-do (pull-down search drawer). Searches entry titles and text, category names, task titles, notes and subtasks — **on the device only**, from an in-memory index built off the main thread (`SearchIndexer`, rebuilt in the background after writes while a search is open; changed pages only). Nothing new is written to disk; nothing leaves the device.

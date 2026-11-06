@@ -14,7 +14,7 @@ struct CalendarSplitView: View {
     var body: some View {
         NavigationSplitView(columnVisibility: $columns) {
             monthColumn
-                .navigationSplitViewColumnWidth(min: 360, ideal: 480, max: 760)
+                .navigationSplitViewColumnWidth(min: 360, ideal: 560, max: 760)
                 .toolbarVisibility(.hidden, for: .navigationBar)
         } detail: {
             NavigationStack(path: $model.path) {

@@ -6,6 +6,7 @@ struct YearInPixelsView: View {
     @Bindable var model: JournalModel
     @Environment(DiaryStore.self) private var store
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var pagerWidth: Double = 0
     @State private var visibleYear: Int?
 
     var body: some View {
@@ -42,7 +43,15 @@ struct YearInPixelsView: View {
             }
             .scrollTargetBehavior(.paging)
             .scrollIndicators(.hidden)
+            // The Journal's readable-width margins (Batch L) are for its own column; inherited
+            // here they'd offset each page and show a slice of the neighbouring year.
+            .contentMargins(.horizontal, 0, for: .scrollContent)
             .scrollPosition(id: $visibleYear)
+            // A paging scroll view keeps its pixel offset when its width changes (HANDOFF gotcha
+            // 19): rebuild it per width so it lands on the year it shows, and nothing peeks in.
+            .onGeometryChange(for: Double.self) { $0.size.width } action: { pagerWidth = $0 }
+            .id(pagerWidth)
+            .clipped()
             .onAppear { if visibleYear == nil { visibleYear = current } }
 
             PixelLegend(byMood: model.pixelsByMood)
@@ -165,5 +174,6 @@ struct PixelLegend: View {
             }
         }
         .scrollIndicators(.hidden)
+        .contentMargins(.horizontal, 0, for: .scrollContent)
     }
 }

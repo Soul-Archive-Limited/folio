@@ -63,7 +63,7 @@ journal,private,photo,memories,tasks,to-do,daily,writing,notes,offline,dictation
 
 **Screenshots** (`docs/appstore/`, JPEG, no alpha, sample data):
 - iPhone 6.3" (required size 1206 × 2622): `iphone-01-calendar.jpg` … `iphone-07-calendar-dark.jpg` (calendar, composer, entry, Journal, To-do, "Private by design", calendar in dark).
-- iPad 13" (2752 × 2064 landscape): `ipad-01-calendar.jpg` … `ipad-04-composer.jpg`.
+- iPad 13" (2752 × 2064 landscape, Batch L): `ipad-01-calendar.jpg` … `ipad-05-todo.jpg` (calendar, entry, journal, Year in Pixels, to-do).
 - Apple accepts these for the other sizes; the 6.9" (1320 × 2868) slot is optional.
 
 ## App Privacy (the "nutrition label")

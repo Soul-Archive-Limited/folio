@@ -84,6 +84,7 @@ struct MainTabView: View {
                 if added > 0 { toasts.show(ToastMessage(text: "Added \(added) shared to Folio", systemImage: "square.and.arrow.down")) }
             }
         }
+        .focusedSceneValue(\.folioCommands, FolioCommandHandler(perform: perform))
         .onOpenURL { url in
             guard let route = FolioRoute(url: url) else { return }
             if calendar == nil { pendingRoute = route } else { open(route) }
@@ -178,6 +179,22 @@ struct MainTabView: View {
             calendar?.path = []
             selection = .calendar
             calendar?.showsSearch = true
+        }
+    }
+
+    /// Keyboard shortcuts (Batch L): the same paths as the "+" button, tabs and the calendar header.
+    private func perform(_ command: FolioCommand) {
+        switch command {
+        case .newEntry: present(.entry(selection == .calendar ? calendar?.selectedDay ?? store.today : store.today))
+        case .newTask: open(.newTask)
+        case .search: open(.search)
+        case .today: open(.today)
+        case .previousMonth, .nextMonth:
+            selection = .calendar
+            calendar?.page(by: command == .nextMonth ? 1 : -1, reduceMotion: UIAccessibility.isReduceMotionEnabled)
+        case .tab(let tab):
+            requester.pending = nil
+            selection = tab
         }
     }
 

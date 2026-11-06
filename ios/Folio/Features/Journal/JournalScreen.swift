@@ -84,6 +84,8 @@ struct JournalScreen: View {
             }
             .padding(.bottom, FloatingButtonMetrics.clearance + Spacing.l)
         }
+        // The photo wall may use more of a wide screen than the timeline and the year.
+        .readableWidth(model.mode == .photos ? 1100 : 760)
     }
 }
 

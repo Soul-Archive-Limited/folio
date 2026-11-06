@@ -87,6 +87,13 @@ final class CalendarModel {
         }
     }
 
+    /// ⌘[ and ⌘] (Batch L): one month back or forward, as a swipe would.
+    func page(by months: Int, reduceMotion: Bool) {
+        let target = visibleMonth.adding(months: months)
+        ensureContains(target)
+        withAnimation(FolioMotion.standard(reduceMotion: reduceMotion)) { visibleMonthID = target.id }
+    }
+
     /// Jumps without scrolling through every month in between.
     func jump(to month: MonthKey, selecting day: DayKey? = nil) {
         ensureContains(month)

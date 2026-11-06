@@ -9,6 +9,8 @@ struct PressableButtonStyle: ButtonStyle {
             .scaleEffect(configuration.isPressed && !reduceMotion ? 0.97 : 1)
             .opacity(configuration.isPressed && reduceMotion ? 0.7 : 1)
             .animation(FolioMotion.interactive(reduceMotion: reduceMotion), value: configuration.isPressed)
+            // iPad pointer and trackpad (Batch L): the system's highlight shaped to the control.
+            .hoverEffect(.highlight)
     }
 }
 

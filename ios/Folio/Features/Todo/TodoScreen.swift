@@ -83,6 +83,7 @@ struct TodoScreen: View {
             // The inset holds the toast and the quick-add bar, so the last row always scrolls
             // clear of both and of the tab bar; the margin adds a little air under it.
             .contentMargins(.bottom, Spacing.m, for: .scrollContent)
+            .readableWidth()
             // Scrolling or tapping the list puts the keyboard away (Batch I). Attached before the
             // bottom inset, so taps on the quick-add bar itself are never caught.
             .scrollDismissesKeyboard(.immediately)
@@ -152,6 +153,9 @@ struct TodoScreen: View {
             }
             .onGeometryChange(for: Double.self) { $0.size.height - barPadding } action: { quickAddHeight = $0 }
         }
+        // Wide windows (Batch L): the bar lines up with the list's readable column.
+        .frame(maxWidth: 800)
+        .frame(maxWidth: .infinity)
         // A negative bottom padding shrinks the inset too, so the list's last row follows the bar down.
         .padding(.bottom, -(inline?.drop ?? 0))
         .animation(FolioMotion.standard(reduceMotion: reduceMotion), value: inline)

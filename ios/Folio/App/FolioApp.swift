@@ -46,6 +46,7 @@ struct FolioApp: App {
                 .environment(calendarEvents)
                 .modelContainer(container)
         }
+        .commands { FolioCommands() }
         .backgroundTask(.appRefresh(TrashMaintenance.refreshTaskID)) { [store, account, sync] in
             await Self.backgroundRefresh(store: store, account: account, sync: sync)
         }
