@@ -14,7 +14,7 @@ struct PermissionExplainer: View {
         VStack(spacing: Spacing.l) {
             Image(systemName: systemImage)
                 .font(.largeTitle)
-                .foregroundStyle(.ember)
+                .foregroundStyle(.accent)
                 .frame(width: 72, height: 72)
                 .folioGlass(in: .circle)
                 .accessibilityHidden(true)
@@ -34,7 +34,7 @@ struct PermissionExplainer: View {
                         .buttonStyle(.glass)
                     Button("Continue", action: onContinue)
                         .buttonStyle(.glassProminent)
-                        .tint(.emberStrong)
+                        .tint(.accentStrong)
                 }
             }
         }

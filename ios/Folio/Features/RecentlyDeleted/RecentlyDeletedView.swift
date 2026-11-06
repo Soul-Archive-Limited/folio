@@ -101,7 +101,7 @@ struct RecentlyDeletedView: View {
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             // Not `.destructive`: that removes the row before the confirmation is answered.
-            Button("Delete now", systemImage: "trash") { pendingDelete = [row.item] }
+            Button("Delete now", image: .folioTrash) { pendingDelete = [row.item] }
                 .tint(.danger)
         }
     }
@@ -131,9 +131,9 @@ struct RecentlyDeletedView: View {
                     Label("Restore selected", systemImage: "arrow.uturn.backward").frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.glassProminent)
-                .tint(.emberStrong)
+                .tint(.accentStrong)
                 Button(role: .destructive) { pendingDelete = selected } label: {
-                    Label("Delete selected", systemImage: "trash").frame(maxWidth: .infinity)
+                    Label("Delete selected", image: "folio.trash").frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.glass)
             }

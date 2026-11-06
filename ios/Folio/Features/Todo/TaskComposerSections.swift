@@ -18,12 +18,12 @@ struct TaskReminderSection: View {
             Toggle(isOn: Binding(get: { isOn }, set: { turnOn($0) })) {
                 Label("Remind me", systemImage: "bell")
             }
-            .tint(.emberStrong)
+            .tint(.accentStrong)
             if isOn {
                 DatePicker("At", selection: $time, displayedComponents: [.date, .hourAndMinute])
                 if let taskMoment, taskMoment != time {
-                    Button("At the task's time", systemImage: "clock.arrow.circlepath") { time = taskMoment }
-                        .tint(.emberStrong)
+                    Button("At the task's time", image: .folioMemories) { time = taskMoment }
+                        .tint(.accentStrong)
                 }
             }
         } footer: {
@@ -125,7 +125,7 @@ struct TaskSubtasksSection: View {
             }
             .onDelete { items.remove(atOffsets: $0) }
             HStack(spacing: Spacing.s) {
-                Image(systemName: "plus.circle").foregroundStyle(.ember).accessibilityHidden(true)
+                Image(systemName: "plus.circle").foregroundStyle(.accent).accessibilityHidden(true)
                 TextField("Add a subtask", text: $newTitle)
                     .focused($adding)
                     .submitLabel(.next)

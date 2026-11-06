@@ -17,9 +17,9 @@ struct OnboardingSyncStep: View {
     var body: some View {
         VStack(spacing: Spacing.xl) {
             Spacer()
-            Image(systemName: "arrow.triangle.2.circlepath.icloud")
+            Image("folio.sync")
                 .font(.system(size: 56, weight: .regular))
-                .foregroundStyle(.ember)
+                .foregroundStyle(.accent)
                 .frame(width: 112, height: 112)
                 .folioGlass(in: .circle)
                 .accessibilityHidden(true)
@@ -39,7 +39,7 @@ struct OnboardingSyncStep: View {
                 SyncSignInButtons(onEmail: { flow = .email }, onDone: { flow = .afterProvider })
                 Button("Not now — keep it on this iPhone", action: onGuest)
                     .font(.callout.weight(.semibold))
-                    .foregroundStyle(.emberText)
+                    .foregroundStyle(.accentText)
                     .frame(minHeight: Spacing.minHitTarget)
                 LegalFooter()
             }

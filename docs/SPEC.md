@@ -65,7 +65,7 @@ Floating glass "+" (Calendar, Journal, To-do): tap = New entry · long-press = N
 ### 3.1 Direction — "Quiet Glass"
 Rules distilled from the 7 reference pins:
 1. **One hero per screen.** Calendar on Calendar; the photo on an entry; the big numeral in the greeting.
-2. **Monochrome + one accent** ("Ember"). Colour comes from your content — photos and category colours.
+2. **Monochrome + one accent** ("Ink" — a deep fountain-pen blue with a hint of violet; Batch K replaced "Ember"). Colour comes from your content — photos and category colours.
 3. **Content as colour.** Day cells with a photo show it as a tiny rounded thumbnail. The app's signature.
 4. **Big confident numerals.** Dates are typography.
 5. **The sheet keeps context.** Lists and composers live in bottom sheets over the calendar.
@@ -76,18 +76,20 @@ Rules distilled from the 7 reference pins:
 ### 3.2 Colour tokens (asset catalog light/dark + Swift `Color` tokens; never raw hex in views)
 | Token | Dark | Light | Use |
 |---|---|---|---|
-| `bg` | `#0A0A0C` | `#F5F3EF` | Background |
-| `bgElevated` | `#141418` | `#FFFFFF` | Cards when Reduce Transparency is on |
-| `ink` | `#F4F4F5` | `#16161A` | Primary text |
+| `bg` | `#141418` (soft charcoal) | `#F6F3EC` (warm paper) | Background |
+| `bgElevated` | `#1E1E24` | `#FFFDF9` | Cards when Reduce Transparency is on |
+| `ink` | `#F3F2F0` | `#17161C` | Primary text |
 | `inkSecondary` | ink @ 62% | ink @ 60% | Secondary text |
 | `inkTertiary` | ink @ 36% | ink @ 34% | Placeholders, out-of-month days |
 | `hairline` | `#FFFFFF` @ 8% | `#000000` @ 7% | Separators |
-| `ember` | `#FF7A45` | `#F0602A` | Today, selection, primary actions |
+| `accent` ("Ink") | `#949FFF` | `#3441D5` | Marks, rings, icons, glyphs (non-text) |
+| `accentStrong` | `#4551D3` | `#303ECF` | Fills under white text: today, selection, primary buttons (white on it ≥ 6:1) |
+| `accentText` | `#9EA8FF` | `#303AC0` | Accent-coloured words and links (≥ 7:1 on `bg` and `bgElevated`) |
 | `done` | `#7ED69B` | `#2FA35A` | Completed marks |
 | `danger` | `#FF5A5F` | `#D93A3F` | Destructive actions |
-| `aura1/2/3` | `#FF7A45` / `#B65CFF` / `#3D7BFF` | `#FFB38F` / `#D9B8FF` / `#A9C6FF` | Aura blobs |
+| `aura1/2/3` | `#3441D5` / `#7A4FD0` / `#1E6A86` | `#B8C0FF` / `#E4CDF4` / `#F2DCC0` | Aura blobs (Ink, lilac, warm paper; dark: Ink, violet, deep teal) |
 
-**Category palette** (12, tuned light/dark): Ember, Coral, Rose, Plum, Violet, Indigo, Ocean, Teal, Sage, Olive, Sand, Graphite. Labels on category colours auto-switch dark/light to pass WCAG AA.
+**Category palette** (12, tuned light/dark), in picker order (Batch K): Indigo, Ocean, Teal, Sage, Violet, Plum, Rose, Coral, Amber, Sand, Olive, Graphite — a new category takes the first unused one, so orange is no longer the default. Amber is stored as `"ember"` (keys in synced data never change). Labels on category colours auto-switch dark/light to pass WCAG AA.
 Appearance follows system; Profile can force Light/Dark. Theme, Writing font and First day of week apply at once everywhere (the theme is set on every window, sheets included) and also appear on Folio's page in the iPhone Settings app (Settings.bundle), kept in sync both ways: a value changed in Settings wins over the last value Folio wrote there; anything else follows the synced setting (Batch I).
 
 ### 3.3 Typography
@@ -104,7 +106,7 @@ SF Pro for UI (`.monospacedDigit()` where numbers animate). Writing font: **New 
 | `micro` | 10 semibold | Numbers on photo tiles |
 
 ### 3.4 Spacing, radius, glass
-Spacing 4/8/12/16/20/24/32/40; side margin 20. Radii: day cell 12, card 22, chips/buttons capsule. Use `ConcentricRectangle` for nested shapes in glass. Glass via the system only: `.glassEffect(.regular, in:)`, `.regular.interactive()` for tappables, `.buttonStyle(.glass)` / `.glassProminent` tinted `ember`; neighbours inside `GlassEffectContainer`. Material + border only as the Reduce Transparency fallback.
+Spacing 4/8/12/16/20/24/32/40; side margin 20. Radii: day cell 12, card 22, chips/buttons capsule. Use `ConcentricRectangle` for nested shapes in glass. Glass via the system only: `.glassEffect(.regular, in:)`, `.regular.interactive()` for tappables, `.buttonStyle(.glass)` / `.glassProminent` tinted `accentStrong`; neighbours inside `GlassEffectContainer`. Material + border only as the Reduce Transparency fallback.
 
 ### 3.5 Aura background
 `AuraBackground`: 3 blurred circles (radius 260–340, blur 90) drifting on 18–30 s paths via `TimelineView(.animation(minimumInterval: 1/30))`; 14% dark / 22% light; subtle seasonal hue shift per month; static under Reduce Motion; paused in background; ≤ ~2% CPU.
@@ -135,14 +137,14 @@ Spacing 4/8/12/16/20/24/32/40; side margin 20. Radii: day cell 12, card 22, chip
 Selection on day tap and month change; `.success` on task complete, entry save, sign-in; `.impact(.light)` on untick/chip toggle; `.warning` before destructive confirmation. One haptic per gesture maximum.
 
 ### 3.8 Iconography & imagery
-SF Symbols only. Photos: radius 22 with 1 px inner hairline. Empty states: one large SF Symbol on glass + one sentence.
+**Folio's own icon set (Batch K)** for its signature concepts — tabs (calendar, journal = the mark's nib book, to-do, profile), +, dictate, ✦ writing tools, photo, camera, scan, category, mood, search, lock, share, Recently Deleted, new page / add task (widgets, controls, the + menu) and the main Profile rows (sync, export, invite, devices, widgets, memories, appearance): custom SF Symbol templates (`Assets.xcassets/Symbols`, also in the widget extension) with Ultralight / Regular / Black masters that interpolate to every weight and scale, generated by `scripts/brand/symbols.swift`, which also writes the same drawings as 24-px paths for the web (`web/src/icons/folio-icons.ts`). SF Symbols for everything generic (close, chevrons, checkmarks, formatting). Every control keeps its accessibility label. Photos: radius 22 with 1 px inner hairline. Empty states: one large SF Symbol on glass + one sentence.
 **Photo views follow the photo, not the entry (Batch K):** every photo view (calendar cell, day panel and Journal cards, entry detail, composer, web) remembers which photo id its image belongs to; when the same card is given a different photo (a replaced photo) it drops the old image and loads the new one at once. Caches are keyed by photo id (+ rendition and size); a photo's bytes never change under the same id. The widget snapshot names thumbnails by photo id. On the web a photo whose bytes haven't arrived yet (synced from another device a moment ago) is retried three times.
 
 ### 3.9 Accessibility
 ≥ 44 pt hit areas · day cells read e.g. "Tuesday 14 October, 2 entries, 1 task done" + rotor "Days with entries" · Reduce Transparency → `bgElevated` cards · Increase Contrast → stronger hairlines/secondary text · Dynamic Type to AX5 (calendar switches to week rows at AX sizes) · colour never the only signal.
 
 ### 3.10 App icon
-Layered Liquid Glass icon from **Icon Composer** (light/dark/tinted). Concept: rounded "page" glyph + small ember dot on deep ink. Builder makes a placeholder until supplied.
+**Mark (Batch K): "Nib book"** — an open diary whose gutter is a fountain-pen nib (slit and breather hole), paper on an Ink tile (gradient `#4150E0` → `#252FA6`). Under 32 px a simpler drawing (no slit, wider gutter). One source: `scripts/brand/generate.py` (shared/brand SVGs, launch/greeting/lock/privacy-cover `AppMark`, PDF cover, website logo, favicon, PWA and touch icons, 3D phone) — the three directions considered are in `docs/screenshots/batch-k/01-logo-directions.png`. **App icon:** an Icon Composer document, `ios/Folio/AppIcon.icon` (one glass layer, Ink fill; dark = charcoal fill with an Ink-tinted mark; tinted and clear come from the system), checked with `ictool` renders.
 
 ---
 
@@ -242,7 +244,7 @@ Over `AuraBackground`:
 - **Header:** month `title1` + year `title2` `inkSecondary`; tapping opens Jump sheet (chevron glyph). Right [G] group: Filter (category menu) and **Today** pill (morphs in only when off today/current month). Small sync indicator dot (only shown while syncing or on error).
 - **Weekday row** `caption` `inkTertiary`, locale first weekday (Profile override).
 - **Month grid [G panel, r22]:** infinite horizontal paging (`.scrollTargetBehavior(.paging)`, `scrollPosition(id:)`, lazily extended ±240 months, extend near edges). 6×7, gap 6.
-  - Cell states (one zone per meaning, so marks never overlap — Batch I): default · out-of-month (`inkTertiary`, tap jumps month) · today (ember bold number + 1.5 pt ember outline; on a photo tile, an ember pill behind the number) · selected (ember rounded square, white number, spring; on a photo, a 3 pt ember frame) · **entry with photo → latest photo thumbnail fills the cell**, `micro` white number top-left, "+2" badge bottom-right if more · entry without photo → up to 3 category dots under the number · tasks → one small mark in the top-right corner, inside the cell: a hollow ring while any is open, a green check once all are done · filter active → non-matching markers at 15%.
+  - Cell states (one zone per meaning, so marks never overlap — Batch I): default · out-of-month (`inkTertiary`, tap jumps month) · today (accent bold number + 1.5 pt accent outline; on a photo tile, an accentStrong pill behind the number) · selected (accentStrong rounded square, white number, spring; on a photo, a 3 pt accent frame) · **entry with photo → latest photo thumbnail fills the cell**, `micro` white number top-left, "+2" badge bottom-right if more · entry without photo → up to 3 category dots under the number · tasks → one small mark in the top-right corner, inside the cell: a hollow ring while any is open, a green check once all are done · filter active → non-matching markers at 15%.
   - "What do the marks mean?" key: Profile → Help, and a long-press on the weekday row (VoiceOver action too).
   - Long-press day → New entry / New task for this day.
   - **Search (Batch J):** pull the day panel down past its top ("Pull to search" → "Release to search", a selection haptic) or tap the magnifier beside Filter → the search sheet (§6.17).
@@ -258,10 +260,10 @@ Over `AuraBackground`:
 
 ### 6.4 Composer (half sheet)
 - `.presentationDetents([.medium, .large])`, `.presentationBackgroundInteraction(.enabled(upThrough: .medium))` — the calendar stays visible and tappable; tapping another day moves the entry to it (haptic tick, date pill animates). Drag indicator visible; `.interactiveDismissDisabled(hasUnsavedText)`.
-- Top bar: Cancel · date pill [G] (compact DatePicker popover + optional time) · **Save** (`.glassProminent` ember; disabled until there's content).
+- Top bar: Cancel · date pill [G] (compact DatePicker popover + optional time) · **Save** (`.glassProminent` accentStrong; disabled until there's content).
 - Title (`title2`, "Title"); rich body (writing font; "What happened today?" / past date: "What do you remember about this day?").
 - Keyboard toolbar [G]: Aa (format popover) · Photo (`PhotosPicker`, up to 10, no permission) · Camera (asks at use) · Category · **Mood** (Batch J: popover "How did it feel?" with five glyphs; tap again or Clear to unset) · Mic (§8) · ✦ (§9, only if available).
-- **Mood glyph (Batch J):** Folio's own — a ring filling from the bottom (⅕ … full), on a diverging ramp: Heavy indigo · Low indigo 50% · Steady sand · Good ember 55% · Bright ember. Never faces or emoji. Shown small on entry cards (day panel, Journal) and with its word in entry detail.
+- **Mood glyph (Batch J):** Folio's own — a ring filling from the bottom (⅕ … full), on a diverging ramp: Heavy indigo · Low indigo 50% · Steady sand · Good amber 55% · Bright amber. Never faces or emoji. Shown small on entry cards (day panel, Journal) and with its word in entry detail.
 - Photo strip (reorder by long-press, × remove). Category chips with inline "+".
 - Draft autosave every 2 s locally; "Continue your draft?" on reopen. Cancel with changes → "Discard this entry?" / Keep writing for a new entry, "Discard changes?" / Keep editing for an existing one; the sheet closes only after the dialog has gone (Batch I).
 - The sheet reads as its own layer: the screen behind dims slightly (more toward the sheet), a stronger material with a fine highlight along the top edge, in light and dark.
@@ -274,7 +276,7 @@ Zoom-in from the card. Photo carousel (4:3, paging, pinch to full-screen) · dat
 Compact title "Journal" with the *Timeline* / *Photos* toggle beside it; category chips [G]; "Past day" in the top bar. Timeline: month headers in a lighter style than the cards (small-caps month, count, hairline, chevron — no card), cards with cover photo (16:9, title over gradient) or text cards. **Year in Pixels (Batch J)** is the third Journal mode: a big year number, Mood | Category toggle, then 12 month columns × 31 day rows of rounded squares — the day's latest mood (or first category); written without one = ink 22 %; nothing written = ink 7 %; future = 3 %; today outlined in ember; impossible dates empty. Years swipe sideways (first written year → this year). Tap a day: one page opens in place, several go to that day on the calendar. Legend underneath. No streaks, no "days in a row". Months fold: this month and last month open by default, older months closed; tap to open or close; the choice is remembered (Batch I). Photos: 3-column masonry of all photos. "Write for a past day" button opens composer with date picker. Empty: "Your journal is empty. Tap + to write your first page." Pull down for the search field (§6.17); while it's open, results replace the timeline and open in the Journal's own stack.
 
 ### 6.7 To-do tab
-Compact title, category chips, and a date button in the top bar that shows one date's tasks only. **Active** in collapsible groups (state persisted): Overdue (ember) · Today · Tomorrow · This week (the next five days) · Later · No date; within a group by date, then time, then drag order. Tasks can be dragged to reorder among tasks of the same date (a drop onto another date springs back). Tapping a task opens it for editing; long-press keeps the menu. Scrolling or tapping outside the quick-add bar puts the keyboard away (Batch I). **Completed** (collapsible "Completed · 12", state persisted) by `completedAt` desc. Pull down for "Search tasks" (§6.17, tasks and subtasks only); results cover the list and open the task sheet. Row: 26 pt circular checkbox in category colour · title · 1-line notes · date/time chip.
+Compact title, category chips, and a date button in the top bar that shows one date's tasks only. **Active** in collapsible groups (state persisted): Overdue (accent) · Today · Tomorrow · This week (the next five days) · Later · No date; within a group by date, then time, then drag order. Tasks can be dragged to reorder among tasks of the same date (a drop onto another date springs back). Tapping a task opens it for editing; long-press keeps the menu. Scrolling or tapping outside the quick-add bar puts the keyboard away (Batch I). **Completed** (collapsible "Completed · 12", state persisted) by `completedAt` desc. Pull down for "Search tasks" (§6.17, tasks and subtasks only); results cover the list and open the task sheet. Row: 26 pt circular checkbox in category colour · title · 1-line notes · date/time chip.
 **Complete flow:** tap → fill + check + strike + haptic → stays **1.2 s** → moves to Completed; undo toast [G] 4 s; tapping again during 1.2 s cancels. Untick in Completed → back instantly.
 Swipes: leading Complete/Uncomplete; trailing Delete (to Recently Deleted, §5.2) · Edit · Date (Today / Tomorrow / Next week / Pick / Remove). Quick-add bar [G] above tab bar ("Add a task…") that understands natural dates and times at the start or end of the line — today, tonight, tomorrow, day after tomorrow, in/after N days|weeks|months, next week/month, (this) weekend, [on|this|next] Monday, on 5 Nov / 5th of November / November 5 / 5/11 (day first; month first in the US), times like 6pm, 6:30 pm, 18:30, at 7, noon, morning/afternoon/evening — with a live chip ("Tomorrow · 18:00") above the bar before saving (Batch I). "Today's papers" stays as typed. A bare "at 7" is the next 7 o'clock that hasn't passed; a time alone is today, or tomorrow once passed. Empty Active → "All clear." with `checkmark.seal`.
 
@@ -286,7 +288,7 @@ Title (required) · Notes · Date toggle → graphical DatePicker · Time toggle
 
 ### 6.9 Profile tab
 Inset-grouped glass sections:
-- **Header card [G]:** profile picture, name (tap to edit), "Writing since March 2019 · 412 pages". No streaks anywhere. Tap the picture → **Choose photo** (PhotosPicker, then a circular crop: drag to move, pinch to zoom; saved as a 256 px JPEG) or **Folio avatars** (24 original "page spirits" — a little page with a folded corner, a face and the ember dot, each with its own palette and personality; vector art generated with the web's copies by `scripts/avatars/generate.py`) · Remove picture. Without one, the monogram. The picture syncs encrypted with the settings and shows in Profile, the greeting, Devices ("This device") and the web app (sidebar, Profile — where a Folio avatar can also be chosen —, Devices) (Batch I).
+- **Header card [G]:** profile picture, name (tap to edit), "Writing since March 2019 · 412 pages". No streaks anywhere. Tap the picture → **Choose photo** (PhotosPicker, then a circular crop: drag to move, pinch to zoom; saved as a 256 px JPEG) or **Folio avatars** (24 original "page spirits" — a little page with a folded corner, a face and a coloured dot, each with its own palette and personality; vector art generated with the web's copies by `scripts/avatars/generate.py`) · Remove picture. Without one, the monogram. The picture syncs encrypted with the settings and shows in Profile, the greeting, Devices ("This device") and the web app (sidebar, Profile — where a Folio avatar can also be chosen —, Devices) (Batch I).
 - **Your archive** 2×2 tiles: Entries · Photos · Days written on · Tasks done (tap → filtered tab).
 - **Account:**
   - Guest: "Sync & web access" card with the three sign-in buttons (same as onboarding step 5).
@@ -333,13 +335,13 @@ Resizable `NavigationSplitView` (sidebar tabs · calendar · day panel/detail). 
 One field per place: Calendar (pull-down / magnifier → sheet), Journal and To-do (pull-down search drawer). Searches entry titles and text, category names, task titles, notes and subtasks — **on the device only**, from an in-memory index built off the main thread (`SearchIndexer`, rebuilt in the background after writes while a search is open; changed pages only). Nothing new is written to disk; nothing leaves the device.
 - **Words:** case-folded; accents dropped from Latin letters only (Hindi vowel signs and other scripts' marks are part of the word); Chinese and Japanese characters count one per word. Each typed word must prefix-match a word of the item (AND). Shared rules with the web, pinned by `shared/search-fixtures.json`.
 - **Filters** (glass chips): Category (several) · Photos (pages with photos) · Dates (Any time, This month, Past 3 months, This year, Last year, Choose dates…) · Open or done (tasks only when set). Filters alone are a query.
-- **Results:** "Pages · N" then "Tasks · N", newest first; the matched word starts are highlighted (ember wash + bold, never colour alone); page snippets start just before the first match; matching subtasks show under their task. Over 300 → "N more — add a word or a filter". Tap opens the page in place (pushed in the same stack; Back returns to the results) or the task sheet.
+- **Results:** "Pages · N" then "Tasks · N", newest first; the matched word starts are highlighted (accent wash + bold, never colour alone); page snippets start just before the first match; matching subtasks show under their task. Over 300 → "N more — add a word or a filter". Tap opens the page in place (pushed in the same stack; Back returns to the results) or the task sheet.
 - Empty: "Search titles, pages, categories and tasks. Everything stays on this iPhone." · No match: "No matches for “…”." · First build: "Getting your diary ready…".
 - 10,000 entries: a query is a binary search per word per item (a few ms); tested in `SearchIndexTests`.
 
 ### 6.21 PDF export and print (Batch J)
 Profile → Your data → **Export PDF**: From / Until (GMT day pickers) with Quick ranges (This year · Last year · Last 3 years · Everything), toggles **Photos** and **Tasks**, then **Create PDF** → a progress bar (Stop cancels) → a PDFKit preview with **Share** (share sheet) and **Print** (`UIPrintInteractionController`).
-- The book: A5 pages on paper colour, always the light palette. **Cover:** profile picture (photo, Folio avatar, or the initial in an ember circle), "Sam's diary" / "My diary", the range in italic, "41 pages", the Folio word. **Each month opens a new page** with a big serif month name, the year in ember italic, "N PAGES" and a hairline. **Entries** in date order: an ember small-caps date line (weekday, day, month · time · mood word), the title in New York bold, the body with every §5.1 style (bold, italic, underline, strikethrough, highlight, heading, bullets, numbers, checklists ☐/☑, quotes), photos at text width (≤ 250 pt tall, ≤ 1000 px JPEG), the day's tasks under "TASKS" (☑ struck when done) if chosen, and a small "·  ·  ·" between days. Footer: month and page number.
+- The book: A5 pages on paper colour, always the light palette. **Cover:** profile picture (photo, Folio avatar, or the initial in an Ink circle), "Sam's diary" / "My diary", the range in italic, "41 pages", the Folio word. **Each month opens a new page** with a big serif month name, the year in Ink italic, "N PAGES" and a hairline. **Entries** in date order: an ember small-caps date line (weekday, day, month · time · mood word), the title in New York bold, the body with every §5.1 style (bold, italic, underline, strikethrough, highlight, heading, bullets, numbers, checklists ☐/☑, quotes), photos at text width (≤ 250 pt tall, ≤ 1000 px JPEG), the day's tasks under "TASKS" (☑ struck when done) if chosen, and a small "·  ·  ·" between days. Footer: month and page number.
 - Made entirely on the device in a background task (its own `ModelContext`, TextKit 1 laying each month over as many pages as it needs), with progress per day and a background-task grace period if Folio is sent away mid-way. The file goes to the app's temporary folder with complete file protection and nowhere else until shared. Three years of the sample diary: 38 pages in ~3 s on the Simulator.
 
 ### 6.20 Bring things in (Batch J)

@@ -17,6 +17,7 @@ INK = "#2A2230"
 
 # name: (bg light, bg deep, page, fold/shade, accent) — tuned so the page reads on both themes.
 PALETTES = {
+    "ink":      ("#E2E5FF", "#AEB6FF", "#F7F8FF", "#CBD0F7", "#3441D5"),  # Batch K: the accent
     "ember":    ("#FFE6D8", "#FFB08A", "#FFF8F3", "#F5C6AA", "#F0602A"),
     "coral":    ("#FFE2DE", "#FFA99D", "#FFF7F5", "#F4C0B8", "#E5484D"),
     "rose":     ("#FFE0EC", "#F7A8C6", "#FFF7FA", "#F0C2D4", "#D6336C"),
@@ -33,7 +34,7 @@ PALETTES = {
 
 # (id, name, palette, page shape, fold side, eyes, mouth, accessory)
 AVATARS = [
-    (1, "Spark", "ember", "page", "right", "dots", "smile", "spark"),
+    (1, "Spark", "ink", "page", "right", "dots", "smile", "spark"),
     (2, "Margin", "ocean", "page", "left", "happy", "none", "ribbon"),
     (3, "Doodle", "violet", "tall", "right", "wink", "smile", "halo"),
     (4, "Pebble", "sage", "card", "right", "sleepy", "none", "leaf"),

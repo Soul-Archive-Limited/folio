@@ -73,8 +73,8 @@ check(() => {
 check(() => {
   const tokens = JSON.parse(readFileSync(new URL('../../shared/design-tokens.json', import.meta.url), 'utf8'));
   const css = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
-  assert.ok(css.includes(`--ember: ${tokens.colors.ember.light.toLowerCase()}`));
-  assert.ok(css.includes(`--ember: ${tokens.colors.ember.dark.toLowerCase()}`));
+  assert.ok(css.includes(`--accent: ${tokens.colors.accent.light.toLowerCase()}`));
+  assert.ok(css.includes(`--accent: ${tokens.colors.accent.dark.toLowerCase()}`));
 }, 'tokens.css matches shared/design-tokens.json');
 
 check(() => {
@@ -87,7 +87,7 @@ check(() => {
   assert.match(read('support.html'), /What happens when I delete something\?/);
 }, 'legal pages and FAQ content');
 
-// Fix 10 (Batch E): white text on `emberStrong` and `emberText` on the background pass WCAG AA in both modes.
+// Fix 10 (Batch E): white text on `accentStrong` and `accentText` on the background pass WCAG AA in both modes.
 check(() => {
   const tokens = JSON.parse(readFileSync(new URL('../../shared/design-tokens.json', import.meta.url), 'utf8')).colors;
   const lum = (hex) => {
@@ -97,11 +97,11 @@ check(() => {
   };
   const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
   for (const mode of ['light', 'dark']) {
-    assert.ok(ratio(tokens.emberStrong[mode], '#FFFFFF') >= 4.5, `white on emberStrong (${mode})`);
-    assert.ok(ratio(tokens.emberText[mode], tokens.bg[mode]) >= 4.5, `emberText on bg (${mode})`);
-    assert.ok(ratio(tokens.emberText[mode], tokens.bgElevated[mode]) >= 4.5, `emberText on bgElevated (${mode})`);
+    assert.ok(ratio(tokens.accentStrong[mode], '#FFFFFF') >= 4.5, `white on accentStrong (${mode})`);
+    assert.ok(ratio(tokens.accentText[mode], tokens.bg[mode]) >= 4.5, `accentText on bg (${mode})`);
+    assert.ok(ratio(tokens.accentText[mode], tokens.bgElevated[mode]) >= 4.5, `accentText on bgElevated (${mode})`);
   }
-}, 'ember text and fills pass WCAG AA (4.5:1)');
+}, 'accent text and fills pass WCAG AA (4.5:1)');
 
 // Phase 12 (Batch F): the web app's page, routing and policy.
 check(() => {

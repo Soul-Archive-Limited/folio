@@ -51,7 +51,7 @@ struct TaskExtrasLine: View {
                 Image(systemName: "repeat").accessibilityLabel(Text(RepeatRule.decode(task.repeatRule)?.label ?? ""))
             }
             if let progress {
-                Label("\(progress.done)/\(progress.total)", systemImage: "checklist")
+                Label("\(progress.done)/\(progress.total)", image: "folio.todo")
                     .labelStyle(.titleAndIcon)
                     .accessibilityLabel(Text("\(progress.done) of \(progress.total) subtasks done"))
             }

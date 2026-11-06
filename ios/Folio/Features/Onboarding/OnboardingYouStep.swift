@@ -87,7 +87,7 @@ struct OnboardingYouStep: View {
             content()
                 .frame(width: 52, height: 52)
                 .padding(3)
-                .overlay { Circle().strokeBorder(.ember, lineWidth: isOn ? 3 : 0) }
+                .overlay { Circle().strokeBorder(.accent, lineWidth: isOn ? 3 : 0) }
         }
         .buttonStyle(.pressable)
         .accessibilityLabel(key == nil ? Text("Monogram") : Text(""))

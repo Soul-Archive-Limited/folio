@@ -50,7 +50,7 @@ struct PDFExportSheet: View {
                     Button("Last 3 years") { set(DayKey(year: today.year - 2, month: 1, day: 1), today) }
                     Button("Everything") { set(store.firstYearWritten.flatMap { DayKey(year: $0, month: 1, day: 1) }, today) }
                 }
-                .tint(.emberStrong)
+                .tint(.accentStrong)
             } header: { Text("Dates") }
             .environment(\.timeZone, .gmt)
             Section {
@@ -59,17 +59,17 @@ struct PDFExportSheet: View {
             } footer: {
                 Text("A book of your pages: a cover, a page for each month, then every entry with its formatting. Made on this iPhone; it goes nowhere until you share it.")
             }
-            .tint(.emberStrong)
+            .tint(.accentStrong)
             Section {
                 if let progress {
                     ProgressView(value: progress) { Text("Making your diary…") } currentValueLabel: {
                         Text(progress.formatted(.percent.precision(.fractionLength(0))))
                     }
-                    .tint(.emberStrong)
+                    .tint(.accentStrong)
                 } else {
                     Button("Create PDF", systemImage: "doc.richtext", action: create)
                         .font(.headline)
-                        .tint(.emberStrong)
+                        .tint(.accentStrong)
                         .accessibilityIdentifier("pdf.create")
                 }
                 if let problem { Text(problem).foregroundStyle(.danger) }
@@ -85,10 +85,10 @@ struct PDFExportSheet: View {
                 .folioFont(.caption).foregroundStyle(.inkSecondary)
             HStack(spacing: Spacing.s) {
                 ShareLink(item: result.url) {
-                    Label("Share", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity, minHeight: Spacing.minHitTarget)
+                    Label("Share", image: "folio.share").frame(maxWidth: .infinity, minHeight: Spacing.minHitTarget)
                 }
                 .buttonStyle(.glassProminent)
-                .tint(.emberStrong)
+                .tint(.accentStrong)
                 Button { print(result.url) } label: {
                     Label("Print", systemImage: "printer").frame(maxWidth: .infinity, minHeight: Spacing.minHitTarget)
                 }

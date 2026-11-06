@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Search text with the matched words marked (Batch J): an ember wash and semibold weight,
+/// Search text with the matched words marked (Batch J): an accent wash and semibold weight,
 /// so the match never relies on colour alone.
 enum SearchHighlight {
     static func attributed(_ text: String, terms: [String]) -> AttributedString {
@@ -9,7 +9,7 @@ enum SearchHighlight {
         for range in SearchText.matchRanges(of: terms, in: text) {
             result += AttributedString(text[cursor..<range.lowerBound])
             var match = AttributedString(text[range])
-            match.backgroundColor = Color.ember.opacity(0.26)
+            match.backgroundColor = Color.accent.opacity(0.26)
             match.inlinePresentationIntent = .stronglyEmphasized
             result += match
             cursor = range.upperBound

@@ -46,7 +46,7 @@ function OnThisDay({ day }: { day: string }) {
   if (!earlier.length) return null;
   return (
     <div className="on-this-day">
-      <h3 className="caption" style={{ color: 'var(--ember-text)' }}>On this day</h3>
+      <h3 className="caption" style={{ color: 'var(--accent-text)' }}>On this day</h3>
       {earlier.slice(0, 3).map((e) => (
         <button key={e.id} onClick={() => openEntry(e.id)}>
           <b>{e.data.dayKey.slice(0, 4)}</b><span>{e.data.title || 'Untitled'}</span>{e.data.mood ? <MoodGlyph mood={e.data.mood} size={12} /> : null}

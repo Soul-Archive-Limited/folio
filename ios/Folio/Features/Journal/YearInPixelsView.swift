@@ -115,7 +115,7 @@ struct YearPixelGrid: View {
                 if let pixel { onOpen(pixel, day) }
             } label: {
                 shape.fill(fill)
-                    .overlay { if day == today { shape.strokeBorder(.ember, lineWidth: 1.5) } }
+                    .overlay { if day == today { shape.strokeBorder(.accent, lineWidth: 1.5) } }
                     .frame(maxWidth: .infinity)
                     .frame(height: 17)
             }

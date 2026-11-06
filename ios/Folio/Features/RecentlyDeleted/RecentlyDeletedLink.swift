@@ -9,7 +9,7 @@ struct RecentlyDeletedLink: View {
 
     var body: some View {
         Button(action: action) {
-            Label("Recently Deleted · \(count)", systemImage: "trash")
+            Label("Recently Deleted · \(count)", image: "folio.trash")
                 .folioFont(.callout)
                 .fontWeight(.medium)
                 .padding(.horizontal, Spacing.s)
@@ -17,7 +17,7 @@ struct RecentlyDeletedLink: View {
         }
         .buttonStyle(.bordered)
         .buttonBorderShape(.roundedRectangle(radius: 10))
-        .tint(.emberStrong)
+        .tint(.accentStrong)
         .frame(maxWidth: .infinity, minHeight: Spacing.minHitTarget)
         .accessibilityLabel("Recently Deleted, \(count) items")
         .accessibilityIdentifier("recently-deleted-link")

@@ -23,7 +23,7 @@ struct AvatarPickerSheet: View {
                                     .scaledToFit()
                                     .padding(4)
                                     .overlay {
-                                        if current == number { Circle().strokeBorder(.ember, lineWidth: 3) }
+                                        if current == number { Circle().strokeBorder(.accent, lineWidth: 3) }
                                     }
                                 Text(FolioAvatar.name(number))
                                     .folioFont(.caption)

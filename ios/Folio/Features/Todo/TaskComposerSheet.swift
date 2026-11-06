@@ -54,7 +54,7 @@ struct TaskComposerSheet: View {
                 }
                 Section {
                     Toggle("Date", isOn: $hasDate.animation())
-                        .tint(.emberStrong)
+                        .tint(.accentStrong)
                     if hasDate {
                         ComposerDatePicker(day: $day, minutes: $minutes)
                             .listRowInsets(EdgeInsets())
@@ -99,7 +99,7 @@ struct TaskComposerSheet: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save", action: save)
                         .buttonStyle(.glassProminent)
-                        .tint(.emberStrong)
+                        .tint(.accentStrong)
                         .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }

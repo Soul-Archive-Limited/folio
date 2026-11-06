@@ -38,7 +38,7 @@ struct ProfileView: View {
 
                 Section {
                     Button { showsCategories = true } label: {
-                        ProfileRowLabel(title: "Categories", systemImage: "tag", detail: "\(store.categories().count)")
+                        ProfileRowLabel(title: "Categories", image: "folio.category", detail: "\(store.categories().count)")
                     }
                 }
                 .listRowBackground(ProfileRowBackground())
@@ -111,7 +111,7 @@ struct ProfileView: View {
             .listStyle(.insetGrouped)
             .animation(FolioMotion.standard(), value: account.isSignedIn)
             .scrollContentBackground(.hidden)
-            .tint(.emberStrong)
+            .tint(.accentStrong)
             .background { AuraBackground() }
             .compactTitle("Profile")
             .navigationDestination(isPresented: $showsCategories) { CategoriesManagerView() }
@@ -153,14 +153,30 @@ struct ProfileView: View {
 /// A Profile row: icon, title and an optional value or an "opens elsewhere" arrow.
 struct ProfileRowLabel: View {
     let title: LocalizedStringKey
-    let systemImage: String
+    let icon: Image
     var detail: String?
     var external = false
 
+    init(title: LocalizedStringKey, systemImage: String, detail: String? = nil, external: Bool = false) {
+        self.init(title: title, icon: Image(systemName: systemImage), detail: detail, external: external)
+    }
+
+    /// A row with one of Folio's own symbols (Batch K), e.g. "folio.sync".
+    init(title: LocalizedStringKey, image: String, detail: String? = nil, external: Bool = false) {
+        self.init(title: title, icon: Image(image), detail: detail, external: external)
+    }
+
+    private init(title: LocalizedStringKey, icon: Image, detail: String?, external: Bool) {
+        self.title = title
+        self.icon = icon
+        self.detail = detail
+        self.external = external
+    }
+
     var body: some View {
         HStack(spacing: Spacing.s) {
-            Image(systemName: systemImage)
-                .foregroundStyle(.ember)
+            icon
+                .foregroundStyle(.accent)
                 .frame(width: 26)
                 .accessibilityHidden(true)
             Text(title).foregroundStyle(.ink)

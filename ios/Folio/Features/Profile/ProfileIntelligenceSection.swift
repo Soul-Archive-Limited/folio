@@ -21,7 +21,7 @@ struct ProfileIntelligenceSection: View {
                     Text(Self.name(of: Locale(identifier: dictationLocale))).tag(dictationLocale)
                 }
             } label: {
-                ProfileRowLabel(title: "Dictation", systemImage: "mic")
+                ProfileRowLabel(title: "Dictation", image: "folio.dictate")
             }
             Text(isSupported
                  ? "Dictation runs on your iPhone. Audio is never stored or sent anywhere."
@@ -29,7 +29,7 @@ struct ProfileIntelligenceSection: View {
                 .folioFont(.callout)
                 .foregroundStyle(.inkSecondary)
             HStack(alignment: .top, spacing: Spacing.s) {
-                Image(systemName: "sparkles").foregroundStyle(.ember).frame(width: 26).accessibilityHidden(true)
+                Image("folio.sparkle").foregroundStyle(.accent).frame(width: 26).accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: Spacing.xxs) {
                     Text("Writing tools").folioFont(.body).foregroundStyle(.ink)
                     Text(Self.explanation(for: assistant.availability))

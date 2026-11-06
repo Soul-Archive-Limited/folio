@@ -22,7 +22,7 @@ struct TodoQuickAddBar: View {
             if let summary = parsed.summary(today: store.today) {
                 Label(summary, systemImage: parsed.minutesFromMidnight == nil ? "calendar" : "clock")
                     .folioFont(.caption)
-                    .foregroundStyle(.emberText)
+                    .foregroundStyle(.accentText)
                     .padding(.horizontal, Spacing.s)
                     .frame(minHeight: 28)
                     .folioGlass(in: .capsule)
@@ -39,7 +39,7 @@ struct TodoQuickAddBar: View {
     private var bar: some View {
         HStack(spacing: Spacing.xs) {
             Image(systemName: "plus.circle.fill")
-                .foregroundStyle(.ember)
+                .foregroundStyle(.accent)
                 .accessibilityHidden(true)
             TextField("Add a task…", text: $text)
                 .focused($isFocused)

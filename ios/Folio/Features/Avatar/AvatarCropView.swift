@@ -54,7 +54,7 @@ struct AvatarCropView: View {
                         dismiss()
                     }
                     .buttonStyle(.glassProminent)
-                    .tint(.emberStrong)
+                    .tint(.accentStrong)
                 }
             }
         }

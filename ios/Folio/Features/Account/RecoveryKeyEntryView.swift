@@ -40,10 +40,10 @@ struct RecoveryKeyEntryView: View {
                 .frame(maxWidth: .infinity, minHeight: 44)
             }
             .buttonStyle(.glassProminent)
-            .tint(.emberStrong)
+            .tint(.accentStrong)
             .disabled(text.isEmpty || working)
             Button("Back", action: onBack)
-                .foregroundStyle(.emberText)
+                .foregroundStyle(.accentText)
                 .frame(minHeight: Spacing.minHitTarget)
         }
         .onAppear { focused = true }

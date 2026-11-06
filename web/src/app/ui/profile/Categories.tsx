@@ -55,7 +55,7 @@ function EditCategory({ category, onClose }: { category?: Rec<CategoryData>; onC
   const { store } = useDiary();
   const used = new Set(store.categories().map((c) => c.data.colorKey));
   const [name, setName] = useState(category?.data.name ?? '');
-  const [color, setColor] = useState(category?.data.colorKey ?? CATEGORY_COLORS.find((c) => !used.has(c)) ?? 'ember');
+  const [color, setColor] = useState(category?.data.colorKey ?? CATEGORY_COLORS.find((c) => !used.has(c)) ?? 'indigo');
   const clash = store.categories().some((c) => c.data.name.toLowerCase() === name.trim().toLowerCase() && (!category || !sameId(c.id, category.id)));
   function save() {
     if (!name.trim() || clash) return;

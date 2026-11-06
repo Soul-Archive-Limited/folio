@@ -25,7 +25,7 @@ struct ComposerToolRow: View {
             if let onDictate {
                 // The 44 pt frame sits inside the label so the whole square is the hit area.
                 Button(action: onDictate) {
-                    Label("Dictate", systemImage: "mic")
+                    Label("Dictate", image: "folio.dictate")
                         .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
                         .contentShape(.rect)
                 }
@@ -76,7 +76,7 @@ struct ComposerPhotoPickerButton: View {
         let side = Spacing.minHitTarget
         // PhotosPicker runs out of process: no photo-library permission is needed (SPEC §7).
         PhotosPicker(selection: $items, maxSelectionCount: max(model.remainingPhotoSlots, 1), matching: .images) {
-            Label("Add photos", systemImage: "photo.on.rectangle")
+            Label("Add photos", image: "folio.photo")
                 .frame(width: side, height: side)
         }
         .disabled(model.remainingPhotoSlots == 0)
@@ -103,7 +103,7 @@ struct ComposerCategoryMenu: View {
                 }
             }
         } label: {
-            Label("Category", systemImage: "tag")
+            Label("Category", image: "folio.category")
                 .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
         }
     }

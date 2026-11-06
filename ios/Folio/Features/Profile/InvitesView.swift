@@ -21,10 +21,10 @@ struct InvitesView: View {
                         Text("Works once, until \(Date(timeIntervalSince1970: fresh.expiresAt / 1000).formatted(date: .abbreviated, time: .omitted)).")
                             .folioFont(.caption).foregroundStyle(.inkSecondary)
                         ShareLink(item: message(fresh)) {
-                            Label("Share invite", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity, minHeight: Spacing.minHitTarget)
+                            Label("Share invite", image: "folio.share").frame(maxWidth: .infinity, minHeight: Spacing.minHitTarget)
                         }
                         .buttonStyle(.glassProminent)
-                        .tint(.emberStrong)
+                        .tint(.accentStrong)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, Spacing.s)
@@ -44,7 +44,7 @@ struct InvitesView: View {
                         HStack {
                             Text("····-··\(invite.hint)").font(.body.monospaced())
                             Spacer()
-                            Text(statusText(invite)).folioFont(.caption).foregroundStyle(invite.status == "open" ? .emberText : .inkSecondary)
+                            Text(statusText(invite)).folioFont(.caption).foregroundStyle(invite.status == "open" ? .accentText : .inkSecondary)
                         }
                         .swipeActions {
                             if invite.status == "open" {

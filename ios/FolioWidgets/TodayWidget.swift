@@ -59,9 +59,9 @@ struct TodayWidgetView: View {
                 TaskList(entry: entry, limit: 7)
                 if let year = entry.onThisDayYear {
                     Link(destination: FolioRoute.onThisDay.url) {
-                        Label("On this day in \(String(year)), you wrote something.", systemImage: "clock.arrow.circlepath")
+                        Label("On this day in \(String(year)), you wrote something.", image: "folio.memories")
                             .font(.caption.weight(.medium))
-                            .foregroundStyle(WidgetPalette.ember)
+                            .foregroundStyle(WidgetPalette.accentText)
                     }
                 }
             }
@@ -79,7 +79,7 @@ struct DateHeader: View {
             Text(date, format: .dateTime.weekday(.wide))
                 .font(.caption.weight(.semibold))
                 .textCase(.uppercase)
-                .foregroundStyle(WidgetPalette.ember)
+                .foregroundStyle(WidgetPalette.accentText)
             Text(date, format: .dateTime.day())
                 .font(.system(size: large ? 40 : 28, weight: .bold))
                 .monospacedDigit()
@@ -165,7 +165,7 @@ struct TaskRow: View {
                 .privacySensitive()
             Spacer(minLength: 4)
             if task.dayKey < today {
-                Text("Overdue").font(.caption2.weight(.semibold)).foregroundStyle(WidgetPalette.ember)
+                Text("Overdue").font(.caption2.weight(.semibold)).foregroundStyle(WidgetPalette.accentText)
             } else if let time = task.timeText {
                 Text(time).font(.caption2.monospacedDigit()).foregroundStyle(WidgetPalette.ink.opacity(0.55))
             }

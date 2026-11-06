@@ -162,7 +162,7 @@ struct ComposerSheet: View {
         ToolbarItem(placement: .confirmationAction) {
             Button("Save", action: save)
                 .buttonStyle(.glassProminent)
-                .tint(.emberStrong)
+                .tint(.accentStrong)
                 .disabled(!model.hasContent)
         }
     }

@@ -18,20 +18,20 @@ struct QuickAddWidget: Widget {
 struct QuickAddView: View {
     var body: some View {
         VStack(spacing: 6) {
-            button("New page", systemImage: "square.and.pencil", route: .newEntry, prominent: true)
-            button("Add task", systemImage: "checklist", route: .newTask)
-            button("Dictate", systemImage: "mic", route: .dictate)
+            button("New page", image: "folio.page.new", route: .newEntry, prominent: true)
+            button("Add task", image: "folio.task.add", route: .newTask)
+            button("Dictate", image: "folio.dictate", route: .dictate)
         }
     }
 
-    private func button(_ title: LocalizedStringKey, systemImage: String, route: FolioRoute, prominent: Bool = false) -> some View {
+    private func button(_ title: LocalizedStringKey, image: String, route: FolioRoute, prominent: Bool = false) -> some View {
         Link(destination: route.url) {
-            Label(title, systemImage: systemImage)
+            Label(title, image: image)
                 .font(.subheadline.weight(.semibold))
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                 .padding(.horizontal, 10)
                 .foregroundStyle(prominent ? Color.white : WidgetPalette.ink)
-                .background(prominent ? AnyShapeStyle(WidgetPalette.ember) : AnyShapeStyle(WidgetPalette.ink.opacity(0.07)),
+                .background(prominent ? AnyShapeStyle(WidgetPalette.accentStrong) : AnyShapeStyle(WidgetPalette.ink.opacity(0.07)),
                             in: .capsule)
         }
     }

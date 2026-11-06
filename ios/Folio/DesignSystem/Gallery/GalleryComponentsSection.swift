@@ -13,7 +13,7 @@ struct GalleryComponentsSection: View {
                         Text("Radius 22. Nested shapes use ConcentricRectangle.")
                             .folioFont(.callout).foregroundStyle(.inkSecondary)
                         ConcentricRectangle()
-                            .fill(.ember.opacity(0.18))
+                            .fill(.accent.opacity(0.18))
                             .frame(height: 44)
                     }
                 }
@@ -31,7 +31,7 @@ struct GalleryComponentsSection: View {
                         GlassIconButton(title: "Filter", systemImage: "line.3.horizontal.decrease") {}
                         GlassIconButton(title: "New entry", systemImage: "plus", prominent: true) {}
                         Button("Today") {}.buttonStyle(.glass)
-                        Button("Save") {}.buttonStyle(.glassProminent).tint(.emberStrong)
+                        Button("Save") {}.buttonStyle(.glassProminent).tint(.accentStrong)
                         Button("Delete", role: .destructive) {}.buttonStyle(.glass).tint(.danger)
                     }
                 }

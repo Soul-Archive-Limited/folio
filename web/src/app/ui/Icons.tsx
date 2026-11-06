@@ -1,4 +1,16 @@
-/** Line icons in the spirit of SF Symbols (the web has no SF Symbols). */
+import { FOLIO_ICONS, type FolioIconName } from '../../icons/folio-icons.ts';
+import { MARK_PATHS, NIB_PATH, NIB_TRANSFORM, TILE } from '../../components/brand-mark.ts';
+
+/** Folio's own icons (Batch K) — the same drawings as the iPhone's custom symbols — by the names
+ *  the web app already uses. Filled outlines, so they take `fill`, not the line icons' stroke. */
+const FOLIO: Record<string, FolioIconName> = {
+  calendar: 'calendar', journal: 'journal', todo: 'todo', profile: 'profile', plus: 'plus', photo: 'photo',
+  camera: 'camera', tag: 'category', mic: 'dictate', sparkle: 'sparkle', trash: 'trash', share: 'share',
+  lock: 'lock', sync: 'sync', devices: 'devices', search: 'search', mood: 'mood', scan: 'scan', invite: 'invite',
+  export: 'export', memories: 'memories', appearance: 'appearance', widgets: 'widgets', edit: 'page.new',
+};
+
+/** Line icons in the spirit of SF Symbols for everything else (the web has no SF Symbols). */
 const PATHS: Record<string, string> = {
   calendar: 'M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM4 10h16M8 3v4M16 3v4M8 14h.01M12 14h.01M16 14h.01M8 17.5h.01M12 17.5h.01',
   journal: 'M6 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6zM6 3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2M9 8h6M9 12h6M9 16h4M20 6v14',
@@ -48,20 +60,22 @@ const PATHS: Record<string, string> = {
 };
 
 export function Icon({ name, small, label }: { name: keyof typeof PATHS | string; small?: boolean; label?: string }) {
+  const own = FOLIO[name];
   return (
     <svg className={small ? 'i sm' : 'i'} viewBox="0 0 24 24" aria-hidden={label ? undefined : true} role={label ? 'img' : undefined} aria-label={label}>
-      <path d={PATHS[name] ?? ''} />
+      {own ? <path d={FOLIO_ICONS[own]} fill="currentColor" stroke="none" /> : <path d={PATHS[name] ?? ''} />}
     </svg>
   );
 }
 
-/** The app mark: a rounded page with an ember dot (SPEC §3.10). */
+/** The app mark (Batch K): an open diary whose gutter is a fountain-pen nib, on an Ink tile. */
 export function Mark({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 64 64" aria-hidden="true">
-      <rect x="6" y="6" width="52" height="52" rx="16" fill="#16161a" />
-      <rect x="19" y="16" width="26" height="32" rx="5" fill="#f5f3ef" />
-      <circle cx="40" cy="21" r="4.5" fill="#ff7a45" />
+    <svg className={className} viewBox="0 0 100 100" aria-hidden="true">
+      <defs><linearGradient id="folio-ink-app" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={TILE.top} /><stop offset="1" stopColor={TILE.bottom} /></linearGradient></defs>
+      <rect width="100" height="100" rx="22.5" fill="url(#folio-ink-app)" />
+      {MARK_PATHS.map((d) => <path key={d} d={d} fill={TILE.paper} />)}
+      <path transform={NIB_TRANSFORM} d={NIB_PATH} fill={TILE.paper} fillRule="evenodd" />
     </svg>
   );
 }

@@ -22,13 +22,15 @@ nonisolated enum Mood: Int, CaseIterable, Identifiable, Sendable {
 
     /// A diverging ramp, cool to warm through a neutral middle, so neighbouring steps read
     /// apart and the ends stand out (Year in Pixels, the glyph). Light and dark via the tokens.
+    /// Its own hues (indigo, sand, amber), not the accent: with Ink as the accent (Batch K) an
+    /// accent end would sit next to indigo.
     @MainActor var color: Color {
         switch self {
         case .heavy: .categoryIndigo
         case .low: .categoryIndigo.opacity(0.5)
         case .steady: .categorySand.opacity(0.75)
-        case .good: .ember.opacity(0.55)
-        case .bright: .ember
+        case .good: .categoryEmber.opacity(0.55)
+        case .bright: .categoryEmber
         }
     }
 }

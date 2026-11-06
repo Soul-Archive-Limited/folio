@@ -96,7 +96,7 @@ struct OnboardingProgress: View {
         HStack(spacing: 4) {
             ForEach(OnboardingStep.allCases.dropFirst()) { item in
                 Capsule()
-                    .fill(item.rawValue <= step.rawValue ? Color.ember : Color.inkTertiary.opacity(0.35))
+                    .fill(item.rawValue <= step.rawValue ? Color.accent : Color.inkTertiary.opacity(0.35))
                     .frame(width: 22, height: 4)
             }
         }
@@ -117,7 +117,7 @@ struct OnboardingPrimaryButton: View {
             Text(title).frame(maxWidth: .infinity, minHeight: 44)
         }
         .buttonStyle(.glassProminent)
-        .tint(.emberStrong)
+        .tint(.accentStrong)
         .disabled(!isEnabled)
     }
 }

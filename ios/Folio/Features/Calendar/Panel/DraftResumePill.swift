@@ -14,8 +14,8 @@ struct DraftResumePill: View {
     var body: some View {
         Button(action: onResume) {
             HStack(spacing: Spacing.xs) {
-                Image(systemName: "square.and.pencil")
-                    .foregroundStyle(.ember)
+                Image("folio.page.new")
+                    .foregroundStyle(.accent)
                 VStack(alignment: .leading, spacing: 0) {
                     Text("Continue your draft")
                         .folioFont(.callout)

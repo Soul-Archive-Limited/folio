@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The white day number (top-leading; on an ember pill when it's today) and "+2" badge
+/// The white day number (top-leading; on an accent pill when it's today) and "+2" badge
 /// (bottom-trailing) on a photo tile; the task mark has the top-trailing corner (Batch I),
 /// over a scrim that keeps them readable on any photo: a ~15 % dim over the whole tile and a
 /// soft dark-to-clear gradient behind the number's corner (owner's iPhone test, Batch E).
@@ -17,7 +17,7 @@ struct PhotoTileOverlay: View {
                 .foregroundStyle(.white)
                 .shadow(color: state.isToday ? .clear : .black.opacity(0.55), radius: 2)
                 .padding(.horizontal, state.isToday ? 3 : 0)
-                .background { if state.isToday { Capsule().fill(.emberStrong) } }
+                .background { if state.isToday { Capsule().fill(.accentStrong) } }
                 .padding(state.isToday ? 2.5 : 4)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             if let extra = state.marker?.extraEntryCount, extra > 0 {

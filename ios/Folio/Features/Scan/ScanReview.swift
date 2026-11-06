@@ -37,7 +37,7 @@ struct ScanReview: View {
                     .folioFont(.caption)
                     .foregroundStyle(.inkSecondary)
                     if model.day != suggested {
-                        Button("Use the date on the page") { model.day = suggested }.tint(.emberStrong)
+                        Button("Use the date on the page") { model.day = suggested }.tint(.accentStrong)
                     }
                 }
             } footer: {

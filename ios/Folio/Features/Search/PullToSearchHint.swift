@@ -12,7 +12,7 @@ struct PullToSearchHint: View {
             Text(clamped >= 1 ? "Release to search" : "Pull to search")
         }
         .folioFont(.caption)
-        .foregroundStyle(clamped >= 1 ? AnyShapeStyle(.ember) : AnyShapeStyle(.inkSecondary))
+        .foregroundStyle(clamped >= 1 ? AnyShapeStyle(.accent) : AnyShapeStyle(.inkSecondary))
         .opacity(clamped < 0.25 ? 0 : (clamped - 0.25) / 0.75)
         .scaleEffect(0.8 + 0.2 * clamped)
         .frame(maxWidth: .infinity)

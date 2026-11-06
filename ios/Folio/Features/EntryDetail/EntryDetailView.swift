@@ -69,15 +69,15 @@ struct EntryDetailView: View {
         }
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
-                Button("Edit", systemImage: "square.and.pencil") { request?.send(.editEntry(entry.id)) }
+                Button("Edit", image: .folioPageNew) { request?.send(.editEntry(entry.id)) }
                 // A small menu that says exactly what's shared (owner's iPhone test, Batch E).
                 Menu("Share", systemImage: "square.and.arrow.up") { EntryShareMenu(entry: entry) { shareKind = $0 } }
                     .accessibilityIdentifier("entry.share")
                 Menu("More", systemImage: "ellipsis") {
-                    Button("Change date", systemImage: "calendar") { showsDateSheet = true }
+                    Button("Change date", image: .folioCalendar) { showsDateSheet = true }
                     Button("Duplicate", systemImage: "plus.square.on.square") { duplicate(entry) }
                     Divider()
-                    Button("Delete", systemImage: "trash", role: .destructive) { delete(entry) }
+                    Button("Delete", image: .folioTrash, role: .destructive) { delete(entry) }
                 }
             }
         }

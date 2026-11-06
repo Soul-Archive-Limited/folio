@@ -17,13 +17,13 @@ struct MonthCapsuleGrid: View {
                         Text(key.firstDay.utcDate.formatted(Date.FormatStyle(timeZone: .gmt).month(.abbreviated)))
                             .folioFont(.headline)
                         Circle()
-                            .fill(isCurrent ? AnyShapeStyle(.white) : AnyShapeStyle(.ember))
+                            .fill(isCurrent ? AnyShapeStyle(.white) : AnyShapeStyle(.accent))
                             .frame(width: 5, height: 5)
                             .opacity(monthsWithEntries.contains(month) ? 1 : 0)
                     }
                     .foregroundStyle(isCurrent ? AnyShapeStyle(.white) : AnyShapeStyle(.ink))
                     .frame(maxWidth: .infinity, minHeight: Spacing.minHitTarget)
-                    .folioGlass(in: .capsule, interactive: true, solidFill: isCurrent ? .ember : nil)
+                    .folioGlass(in: .capsule, interactive: true, solidFill: isCurrent ? .accent : nil)
                 }
                 .buttonStyle(.pressable)
                 .accessibilityLabel(key.firstDay.utcDate.formatted(Date.FormatStyle(timeZone: .gmt).month(.wide)))

@@ -3,8 +3,8 @@ export const MOODS = [
   { value: 1, title: 'Heavy', color: 'var(--cat-indigo)', opacity: 1 },
   { value: 2, title: 'Low', color: 'var(--cat-indigo)', opacity: 0.5 },
   { value: 3, title: 'Steady', color: 'var(--cat-sand)', opacity: 0.75 },
-  { value: 4, title: 'Good', color: 'var(--ember)', opacity: 0.55 },
-  { value: 5, title: 'Bright', color: 'var(--ember)', opacity: 1 },
+  { value: 4, title: 'Good', color: 'var(--accent)', opacity: 0.55 },
+  { value: 5, title: 'Bright', color: 'var(--accent)', opacity: 1 },
 ] as const;
 
 /** A synced mood, or undefined when missing or off the scale (a crafted record). */

@@ -102,15 +102,15 @@ struct OnboardingFirstLineStep: View {
         .matchedGeometryEffect(id: "first", in: flight, isSource: !landed)
     }
 
-    /// What sits in today's square after landing: the photo tile, or an ember page dot.
+    /// What sits in today's square after landing: the photo tile, or an accent page dot.
     private var landedMarker: some View {
         Group {
             if let photo {
                 Image(uiImage: photo).resizable().scaledToFill()
             } else {
                 ZStack {
-                    RoundedRectangle(cornerRadius: Radius.dayCell / 2).fill(.ember.opacity(0.18))
-                    Circle().fill(.ember).frame(width: 6, height: 6).offset(y: 9)
+                    RoundedRectangle(cornerRadius: Radius.dayCell / 2).fill(.accent.opacity(0.18))
+                    Circle().fill(.accent).frame(width: 6, height: 6).offset(y: 9)
                 }
             }
         }
@@ -152,7 +152,7 @@ private struct PhotoPickerGlyph: View {
     var body: some View {
         Image(systemName: "photo.badge.plus")
             .font(.title3)
-            .foregroundStyle(.ember)
+            .foregroundStyle(.accent)
             .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
     }
 }
@@ -194,13 +194,13 @@ struct OnboardingMiniMonth<Marker: View>: View {
             Text(day.day, format: .number)
                 .font(.caption.weight(isToday ? .bold : .regular))
                 .monospacedDigit()
-                .foregroundStyle(isToday ? AnyShapeStyle(.emberText) : inMonth ? AnyShapeStyle(.ink) : AnyShapeStyle(.inkTertiary))
+                .foregroundStyle(isToday ? AnyShapeStyle(.accentText) : inMonth ? AnyShapeStyle(.ink) : AnyShapeStyle(.inkTertiary))
                 .opacity(inMonth ? 1 : 0.5)
         }
         .frame(maxWidth: .infinity)
         .frame(height: 34)
         .overlay {
-            if isToday { RoundedRectangle(cornerRadius: Radius.dayCell / 2).strokeBorder(.ember, lineWidth: 1.5) }
+            if isToday { RoundedRectangle(cornerRadius: Radius.dayCell / 2).strokeBorder(.accent, lineWidth: 1.5) }
         }
     }
 }

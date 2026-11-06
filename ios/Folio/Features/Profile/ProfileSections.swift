@@ -14,7 +14,7 @@ struct ProfileAppearanceSection: View {
                 Text("Light").tag(AppearancePreference.light.rawValue)
                 Text("Dark").tag(AppearancePreference.dark.rawValue)
             } label: {
-                ProfileRowLabel(title: "Theme", systemImage: "circle.lefthalf.filled")
+                ProfileRowLabel(title: "Theme", image: "folio.appearance")
             }
             Picker(selection: binding(settings.writingFont) { $0.writingFont = $1 }) {
                 ForEach(WritingFont.allCases) { font in
@@ -29,7 +29,7 @@ struct ProfileAppearanceSection: View {
                 Text("Sunday").tag(Int?.some(1))
                 Text("Saturday").tag(Int?.some(7))
             } label: {
-                ProfileRowLabel(title: "First day of week", systemImage: "calendar")
+                ProfileRowLabel(title: "First day of week", image: "folio.calendar")
             }
             // Device-only; the aura's barely-there seasonal layer (Batch I).
             Picker(selection: $seasonEffect) {
@@ -79,10 +79,10 @@ struct ProfileWritingSection: View {
                     Text(category.name).tag(Optional(category.id))
                 }
             } label: {
-                ProfileRowLabel(title: "Default category", systemImage: "tag")
+                ProfileRowLabel(title: "Default category", image: "folio.category")
             }
             Toggle(isOn: $showsPhotoTiles) {
-                ProfileRowLabel(title: "Photo tiles on calendar", systemImage: "photo")
+                ProfileRowLabel(title: "Photo tiles on calendar", image: "folio.photo")
             }
         }
         .listRowBackground(ProfileRowBackground())
@@ -108,7 +108,7 @@ struct ProfilePrivacySection: View {
                 Picker(selection: $lockAfter) {
                     ForEach(LockAfter.allCases) { Text($0.title).tag($0.rawValue) }
                 } label: {
-                    ProfileRowLabel(title: "Lock", systemImage: "timer")
+                    ProfileRowLabel(title: "Lock", image: "folio.lock")
                 }
             }
             Toggle(isOn: $hidesInSwitcher) {
@@ -150,9 +150,9 @@ struct ProfileMemoriesSection: View {
     var body: some View {
         Section {
             Toggle(isOn: Binding(get: { notifies }, set: { $0 ? turnOn() : (notifies = false) })) {
-                ProfileRowLabel(title: "On this day notification", systemImage: "clock.arrow.circlepath")
+                ProfileRowLabel(title: "On this day notification", image: "folio.memories")
             }
-            .tint(.emberStrong)
+            .tint(.accentStrong)
             if notifies {
                 DatePicker(selection: time, displayedComponents: .hourAndMinute) {
                     ProfileRowLabel(title: "Time", systemImage: "sun.horizon")
@@ -217,9 +217,9 @@ struct ProfileCalendarSection: View {
     var body: some View {
         Section {
             Toggle(isOn: Binding(get: { shows && events.hasAccess }, set: { $0 ? turnOn() : (shows = false) })) {
-                ProfileRowLabel(title: "Show Apple Calendar events", systemImage: "calendar.badge.clock")
+                ProfileRowLabel(title: "Show Apple Calendar events", image: "folio.calendar")
             }
-            .tint(.emberStrong)
+            .tint(.accentStrong)
         } header: {
             Text("Apple Calendar")
         } footer: {
@@ -258,7 +258,7 @@ struct ProfileWidgetsSection: View {
     var body: some View {
         Section {
             Toggle(isOn: $homeDetails) {
-                ProfileRowLabel(title: "Show details on Home Screen", systemImage: "square.grid.2x2")
+                ProfileRowLabel(title: "Show details on Home Screen", image: "folio.widgets")
             }
             Toggle(isOn: $lockDetails) {
                 ProfileRowLabel(title: "Show details on Lock Screen", systemImage: "lock.rectangle")
@@ -296,28 +296,28 @@ struct ProfileDataSection: View {
     var body: some View {
         Section {
             Button { showsRecentlyDeleted = true } label: {
-                ProfileRowLabel(title: "Recently Deleted", systemImage: "trash", detail: "\(store.trashCount)")
+                ProfileRowLabel(title: "Recently Deleted", image: "folio.trash", detail: "\(store.trashCount)")
             }
             .accessibilityIdentifier("profile-recently-deleted")
             Button(action: export) {
                 HStack {
-                    ProfileRowLabel(title: "Export as JSON + photos", systemImage: "square.and.arrow.up")
+                    ProfileRowLabel(title: "Export as JSON + photos", image: "folio.share")
                     if exporting { ProgressView() }
                 }
             }
             .disabled(exporting)
             Button { showsPDF = true } label: {
-                ProfileRowLabel(title: "Export PDF", systemImage: "doc.richtext")
+                ProfileRowLabel(title: "Export PDF", image: "folio.export")
             }
             .accessibilityIdentifier("profile.exportPDF")
             .sheet(isPresented: $showsPDF) { PDFExportSheet(today: store.today) }
             Toggle(isOn: $exportIncludesTrash) {
                 ProfileRowLabel(title: "Include Recently Deleted in export", systemImage: "tray.full")
             }
-            .tint(.emberStrong)
+            .tint(.accentStrong)
             Button(role: .destructive) { confirmsErase = true } label: {
                 HStack(spacing: Spacing.s) {
-                    Image(systemName: "trash").frame(width: 26).accessibilityHidden(true)
+                    Image("folio.trash").frame(width: 26).accessibilityHidden(true)
                     Text("Erase data on this iPhone")
                 }
                 .folioFont(.body)
@@ -385,7 +385,7 @@ struct ProfileDeveloperSection: View {
     var body: some View {
         Section("Developer") {
             Button("Design Gallery", systemImage: "swatchpalette") { showsGallery = true }
-            Button("Load sample data", systemImage: "tray.and.arrow.down") { PreviewData.loadIfEmpty(into: store) }
+            Button("Load sample data", image: .folioExport) { PreviewData.loadIfEmpty(into: store) }
                 .disabled(!store.isEmpty)
             Button("Show onboarding again", systemImage: "arrow.counterclockwise") { hasOnboarded = false }
             Toggle("Fake “writing tools unavailable”", systemImage: "sparkles", isOn: $fakesUnavailable)

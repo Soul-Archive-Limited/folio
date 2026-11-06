@@ -22,7 +22,7 @@ struct CalendarFilterMenu: View {
             Label("Filter", systemImage: model.isFiltering ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease")
                 .labelStyle(.iconOnly)
                 .font(.body.weight(.semibold))
-                .foregroundStyle(model.isFiltering ? AnyShapeStyle(.ember) : AnyShapeStyle(.ink))
+                .foregroundStyle(model.isFiltering ? AnyShapeStyle(.accent) : AnyShapeStyle(.ink))
                 .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
                 .glassEffect(.regular.interactive(), in: .circle)
         }

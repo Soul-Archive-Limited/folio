@@ -39,7 +39,7 @@ struct ScanSheet: View {
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Save") { Task { await save() } }
                             .buttonStyle(.glassProminent)
-                            .tint(.emberStrong)
+                            .tint(.accentStrong)
                             .disabled(model.isSaving)
                     }
                 }
@@ -87,20 +87,20 @@ struct ScanSheet: View {
         // Read here: the PhotosPicker label closure is Sendable.
         let height = Spacing.minHitTarget
         return VStack(spacing: Spacing.m) {
-            Image(systemName: "doc.text.viewfinder").font(.system(size: 52)).foregroundStyle(.ember)
+            Image(systemName: "doc.text.viewfinder").font(.system(size: 52)).foregroundStyle(.accent)
             Text("Move your paper diary in, a page at a time. The text is read on your iPhone; the scan is kept as a photo.")
                 .folioFont(.callout)
                 .foregroundStyle(.inkSecondary)
                 .multilineTextAlignment(.center)
             if DocumentCamera.isAvailable {
                 Button { scanTapped() } label: {
-                    Label("Scan pages", systemImage: "doc.viewfinder").frame(maxWidth: .infinity, minHeight: Spacing.minHitTarget)
+                    Label("Scan pages", image: "folio.scan").frame(maxWidth: .infinity, minHeight: Spacing.minHitTarget)
                 }
                 .buttonStyle(.glassProminent)
-                .tint(.emberStrong)
+                .tint(.accentStrong)
             }
             PhotosPicker(selection: $picked, maxSelectionCount: Entry.maximumPhotos, matching: .images) {
-                Label("Choose photos of pages", systemImage: "photo.on.rectangle").frame(maxWidth: .infinity, minHeight: height)
+                Label("Choose photos of pages", image: "folio.photo").frame(maxWidth: .infinity, minHeight: height)
             }
             .buttonStyle(.glass)
         }

@@ -7,9 +7,9 @@ import SwiftUI
 /// checklists and quotes are line prefixes (`RichTextPrefix`). Reading back uses iOS 26's
 /// `Font.Resolved` to tell bold and italic apart.
 enum RichTextBridge {
-    static var highlightColor: Color { Color(.ember).opacity(0.28) }
+    static var highlightColor: Color { Color(.accent).opacity(0.28) }
     static var prefixColor: Color { Color(.inkSecondary) }
-    static var quoteColor: Color { Color(.ember) }
+    static var quoteColor: Color { Color(.accent) }
 
     static func baseFont(_ writing: WritingFont) -> Font { writing.font(.body) }
     static func headingFont(_ writing: WritingFont) -> Font { .system(.title2, design: writing.design, weight: .medium) }

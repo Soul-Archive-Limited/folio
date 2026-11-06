@@ -21,7 +21,7 @@ struct OnboardingLookStep: View {
                         VStack(spacing: Spacing.xs) {
                             ThemeSwatch(option: option)
                                 .overlay {
-                                    RoundedRectangle(cornerRadius: 16).strokeBorder(.ember, lineWidth: current == option ? 3 : 0)
+                                    RoundedRectangle(cornerRadius: 16).strokeBorder(.accent, lineWidth: current == option ? 3 : 0)
                                 }
                             Text(option.title).folioFont(.callout).foregroundStyle(.ink)
                         }
@@ -39,7 +39,7 @@ struct OnboardingLookStep: View {
                         .folioFont(.callout).foregroundStyle(.inkSecondary)
                 }
             }
-            .tint(.emberStrong)
+            .tint(.accentStrong)
             .disabled(reduceMotion)
             .padding(Spacing.m)
             .folioGlass(in: .rect(cornerRadius: Radius.card))
@@ -53,7 +53,7 @@ struct OnboardingLookStep: View {
     }
 }
 
-/// A tiny drawing of Folio in a theme: page, a row of days, the ember dot.
+/// A tiny drawing of Folio in a theme: page, a row of days, the accent dot.
 private struct ThemeSwatch: View {
     let option: AppearancePreference
 

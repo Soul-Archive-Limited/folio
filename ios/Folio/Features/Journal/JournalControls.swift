@@ -29,7 +29,7 @@ struct JournalControls: View {
                             .foregroundStyle(model.mode == mode ? AnyShapeStyle(.white) : AnyShapeStyle(.ink))
                             .background {
                                 if model.mode == mode {
-                                    Capsule().fill(.emberStrong).matchedGeometryEffect(id: "mode", in: toggle)
+                                    Capsule().fill(.accentStrong).matchedGeometryEffect(id: "mode", in: toggle)
                                 }
                             }
                             .accessibilityAddTraits(model.mode == mode ? .isSelected : [])

@@ -6,7 +6,7 @@ struct DayContextMenu: View {
     @Environment(\.newItemRequest) private var request
 
     var body: some View {
-        Button("New entry", systemImage: "square.and.pencil") { request?.send(.entry(day)) }
-        Button("New task", systemImage: "checklist") { request?.send(.task(day)) }
+        Button("New entry", image: .folioPageNew) { request?.send(.entry(day)) }
+        Button("New task", image: .folioTodo) { request?.send(.task(day)) }
     }
 }

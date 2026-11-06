@@ -21,7 +21,7 @@ struct DevicesView: View {
                         .buttonStyle(.plain)
                         .accessibilityHint("Renames this device")
                         .swipeActions(edge: .leading) {
-                            Button("Rename") { startRenaming(device) }.tint(.ember)
+                            Button("Rename") { startRenaming(device) }.tint(.accent)
                         }
                         .swipeActions {
                             if !device.current {

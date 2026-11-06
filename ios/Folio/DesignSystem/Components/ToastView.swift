@@ -7,7 +7,7 @@ struct ToastView: View {
     var body: some View {
         HStack(spacing: Spacing.s) {
             Image(systemName: message.systemImage)
-                .foregroundStyle(.ember)
+                .foregroundStyle(.accent)
                 .accessibilityHidden(true)
             Text(message.text)
                 .folioFont(.callout)
@@ -15,7 +15,7 @@ struct ToastView: View {
             if let undo = message.undo {
                 Button(String(localized: undo.title), action: onUndo)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.emberText)
+                    .foregroundStyle(.accentText)
                     .frame(minHeight: Spacing.minHitTarget)
             }
         }

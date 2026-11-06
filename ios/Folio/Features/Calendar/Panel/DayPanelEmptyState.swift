@@ -12,7 +12,7 @@ struct DayPanelEmptyState: View {
                 .foregroundStyle(.inkSecondary)
             Button("Add task") { request?.send(.task(day)) }
                 .buttonStyle(.plain)
-                .foregroundStyle(.emberText)
+                .foregroundStyle(.accentText)
                 .fontWeight(.semibold)
                 .frame(minHeight: 44)
                 .contentShape(.rect)

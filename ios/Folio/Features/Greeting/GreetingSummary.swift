@@ -17,13 +17,13 @@ struct GreetingSummary: Equatable, Sendable {
     var text: Text? {
         var parts: [Text] = []
         if tasksToday > 0 {
-            parts.append(Text("\(Image(systemName: "checklist")) ^[\(tasksToday) task](inflect: true) today"))
+            parts.append(Text("\(Image("folio.todo")) ^[\(tasksToday) task](inflect: true) today"))
         }
         if tasksOverdue > 0 {
             parts.append(Text("\(Image(systemName: "clock.badge.exclamationmark")) \(tasksOverdue) overdue"))
         }
         if pagesThisWeek > 0 {
-            parts.append(Text("\(Image(systemName: "book.pages")) ^[\(pagesThisWeek) page](inflect: true) this week"))
+            parts.append(Text("\(Image("folio.journal")) ^[\(pagesThisWeek) page](inflect: true) this week"))
         }
         guard var result = parts.first else { return nil }
         for part in parts.dropFirst() {

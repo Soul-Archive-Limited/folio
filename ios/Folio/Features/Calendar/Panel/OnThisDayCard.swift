@@ -10,9 +10,9 @@ struct OnThisDayCard: View {
         let earlier = store.entriesOnSameDay(as: day, excluding: UUID()).filter { ($0.day?.year ?? .max) < day.year }
         if !earlier.isEmpty {
             VStack(alignment: .leading, spacing: Spacing.xs) {
-                Label("On this day", systemImage: "clock.arrow.circlepath")
+                Label("On this day", image: "folio.memories")
                     .folioFont(.caption)
-                    .foregroundStyle(.ember)
+                    .foregroundStyle(.accent)
                 ForEach(earlier.prefix(3)) { entry in
                     NavigationLink(value: entry.id) {
                         HStack(spacing: Spacing.s) {

@@ -36,29 +36,29 @@ struct DayCell: View {
         .accessibilityAddTraits(state.isSelected ? .isSelected : [])
     }
 
-    /// Selected day without a photo: an ember square that springs from 0.6 to 1 (SPEC §3.6).
+    /// Selected day without a photo: an accent square that springs from 0.6 to 1 (SPEC §3.6).
     private var selectionFill: some View {
         RoundedRectangle(cornerRadius: Radius.dayCell)
-            .fill(.emberStrong)
+            .fill(.accentStrong)
             .scaleEffect(state.isSelected || reduceMotion ? 1 : 0.6)
             .opacity(state.isSelected && state.thumbnailPhotoID == nil ? 1 : 0)
             .animation(FolioMotion.confirm(reduceMotion: reduceMotion), value: state.isSelected)
     }
 
-    /// Today without a photo and not selected: ember number plus a thin ember outline. (On a
-    /// photo tile today is an ember pill behind the number, `PhotoTileOverlay`.)
+    /// Today without a photo and not selected: accent number plus a thin accent outline. (On a
+    /// photo tile today is an accent pill behind the number, `PhotoTileOverlay`.)
     @ViewBuilder private var todayOutline: some View {
         if state.isToday, !state.isSelected, state.thumbnailPhotoID == nil {
             RoundedRectangle(cornerRadius: Radius.dayCell)
-                .strokeBorder(.ember.opacity(0.85), lineWidth: 1.5)
+                .strokeBorder(.accent.opacity(0.85), lineWidth: 1.5)
                 .allowsHitTesting(false)
         }
     }
 
-    /// Selected photo day: an ember frame drawn above the photo and task ring.
+    /// Selected photo day: an accent frame drawn above the photo and task ring.
     private var selectionStroke: some View {
         RoundedRectangle(cornerRadius: Radius.dayCell)
-            .strokeBorder(.ember, lineWidth: 3)
+            .strokeBorder(.accent, lineWidth: 3)
             .scaleEffect(state.isSelected || reduceMotion ? 1 : 0.6)
             .opacity(state.isSelected && state.thumbnailPhotoID != nil ? 1 : 0)
             .animation(FolioMotion.confirm(reduceMotion: reduceMotion), value: state.isSelected)
@@ -89,7 +89,7 @@ struct DayCell: View {
                 state: DayCellState(day: today.adding(days: index), marker: DayMarker(entryCount: index, dotCategoryIDs: [nil, nil],
                                     openTaskCount: index == 2 ? 1 : 0, doneTaskCount: index == 3 ? 2 : 0),
                                     isToday: index == 0, isSelected: index == 1, isInMonth: true, matchesFilter: true, showsPhotoTiles: true),
-                size: 46, categoryColor: { _ in .ember }, onTap: {}
+                size: 46, categoryColor: { _ in .accent }, onTap: {}
             )
         }
     }

@@ -3,8 +3,8 @@ import SwiftUI
 /// Picks a label colour for text drawn on a coloured fill so it passes WCAG AA
 /// (SPEC §3.2: "labels on category colours auto-switch dark/light").
 enum ContrastLabel {
-    /// Dark label colour: `ink` in light mode (#16161A).
-    static let dark = Color(red: 0x16 / 255, green: 0x16 / 255, blue: 0x1A / 255)
+    /// Dark label colour: `ink` in light mode (#17161C).
+    static let dark = Color(red: 0x17 / 255, green: 0x16 / 255, blue: 0x1C / 255)
     static let light = Color.white
 
     /// Returns the label colour with the higher contrast ratio against `fill`.
@@ -18,7 +18,7 @@ enum ContrastLabel {
         contrastRatio(fillLuminance, 1) >= contrastRatio(fillLuminance, darkLuminance)
     }
 
-    static let darkLuminance = relativeLuminance(red: 0x16 / 255, green: 0x16 / 255, blue: 0x1A / 255)
+    static let darkLuminance = relativeLuminance(red: 0x17 / 255, green: 0x16 / 255, blue: 0x1C / 255)
 
     /// WCAG 2.x relative luminance of a gamma-encoded sRGB colour.
     static func relativeLuminance(red: Double, green: Double, blue: Double) -> Double {

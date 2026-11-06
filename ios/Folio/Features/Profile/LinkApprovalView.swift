@@ -23,11 +23,11 @@ struct LinkApprovalView: View {
                     .frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .buttonStyle(.glassProminent)
-                .tint(.emberStrong)
+                .tint(.accentStrong)
                 .disabled(working)
                 .accessibilityIdentifier("linkAllow")
                 Button("Don't allow", action: onDeny)
-                    .foregroundStyle(.emberText)
+                    .foregroundStyle(.accentText)
                     .frame(minHeight: Spacing.minHitTarget)
             }
         }

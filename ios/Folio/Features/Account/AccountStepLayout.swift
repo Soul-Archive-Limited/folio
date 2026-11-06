@@ -14,7 +14,7 @@ struct AccountStepLayout<Content: View, Actions: View>: View {
             VStack(spacing: Spacing.xl) {
                 Image(systemName: systemImage)
                     .font(.system(size: 40, weight: .regular))
-                    .foregroundStyle(.ember)
+                    .foregroundStyle(.accent)
                     .frame(width: 88, height: 88)
                     .folioGlass(in: .circle)
                     .accessibilityHidden(true)

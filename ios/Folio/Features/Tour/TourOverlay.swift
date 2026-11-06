@@ -43,8 +43,8 @@ private struct TourOverlay: View {
                 let ring = target.insetBy(dx: -Self.ringInset, dy: -Self.ringInset)
                 ZStack(alignment: .topLeading) {
                     RoundedRectangle(cornerRadius: highlightRadius(step, target) + Self.ringInset, style: .continuous)
-                        .strokeBorder(.ember, lineWidth: 2.5)
-                        .shadow(color: .ember.opacity(0.45), radius: 8)
+                        .strokeBorder(.accent, lineWidth: 2.5)
+                        .shadow(color: .accent.opacity(0.45), radius: 8)
                         .frame(width: ring.width, height: ring.height)
                         .offset(x: ring.minX, y: ring.minY)
                         .allowsHitTesting(false)

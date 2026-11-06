@@ -33,7 +33,7 @@ export function JumpPopover({ month, index, onPick, onToday, onClose }: {
           return (
             <button key={m} className="chip" aria-pressed={current} style={{ justifyContent: 'center', position: 'relative' }} onClick={() => onPick({ year: Math.max(1900, year), month: m })}>
               {new Intl.DateTimeFormat('en-GB', { month: 'short' }).format(new Date(2024, m, 1))}
-              {withEntries.has(key) && <i className="dot" style={{ position: 'absolute', bottom: 3, width: 4, height: 4, background: 'var(--ember)' }} aria-label="has entries" />}
+              {withEntries.has(key) && <i className="dot" style={{ position: 'absolute', bottom: 3, width: 4, height: 4, background: 'var(--accent)' }} aria-label="has entries" />}
             </button>
           );
         })}

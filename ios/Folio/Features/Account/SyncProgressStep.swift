@@ -17,7 +17,7 @@ struct SyncProgressStep: View {
             if let progress = sync.progress {
                 VStack(spacing: Spacing.xs) {
                     ProgressView(value: Double(progress.done), total: Double(max(progress.total, 1)))
-                        .tint(.emberStrong)
+                        .tint(.accentStrong)
                     Text("Encrypting and syncing \(sync.migratingPages ?? progress.total) pages…")
                         .folioFont(.caption)
                         .foregroundStyle(.inkSecondary)
@@ -32,7 +32,7 @@ struct SyncProgressStep: View {
                     .frame(maxWidth: .infinity, minHeight: 44)
             }
             .buttonStyle(.glassProminent)
-            .tint(.emberStrong)
+            .tint(.accentStrong)
         }
         .contentTransition(.opacity)
         .animation(.smooth, value: finished)

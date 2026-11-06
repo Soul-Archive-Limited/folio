@@ -18,10 +18,10 @@ struct LinkQRView: View {
             if model?.phase == .expired || model?.phase == .failed {
                 Button("Show a new code") { attempt += 1 }
                     .buttonStyle(.glassProminent)
-                    .tint(.emberStrong)
+                    .tint(.accentStrong)
             }
             Button("Back", action: onBack)
-                .foregroundStyle(.emberText)
+                .foregroundStyle(.accentText)
                 .frame(minHeight: Spacing.minHitTarget)
         }
         .task(id: attempt) {

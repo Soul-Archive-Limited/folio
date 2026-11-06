@@ -1,56 +1,23 @@
 {
-  "images" : [
+  "images": [
     {
-      "filename" : "AppMark-light@1x.png",
-      "idiom" : "universal",
-      "scale" : "1x"
+      "filename": "AppMark@1x.png",
+      "idiom": "universal",
+      "scale": "1x"
     },
     {
-      "filename" : "AppMark-light@2x.png",
-      "idiom" : "universal",
-      "scale" : "2x"
+      "filename": "AppMark@2x.png",
+      "idiom": "universal",
+      "scale": "2x"
     },
     {
-      "filename" : "AppMark-light@3x.png",
-      "idiom" : "universal",
-      "scale" : "3x"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        }
-      ],
-      "filename" : "AppMark-dark@1x.png",
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        }
-      ],
-      "filename" : "AppMark-dark@2x.png",
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        }
-      ],
-      "filename" : "AppMark-dark@3x.png",
-      "idiom" : "universal",
-      "scale" : "3x"
+      "filename": "AppMark@3x.png",
+      "idiom": "universal",
+      "scale": "3x"
     }
   ],
-  "info" : {
-    "author" : "xcode",
-    "version" : 1
+  "info": {
+    "author": "xcode",
+    "version": 1
   }
 }

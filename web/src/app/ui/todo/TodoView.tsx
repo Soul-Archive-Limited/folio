@@ -85,7 +85,7 @@ export default function TodoView() {
         <form className="quick-add glass" onSubmit={quickAdd}>
           <label className="sr-only" htmlFor="quick-add">Add a task</label>
           <input id="quick-add" placeholder="Add a task…" value={text} maxLength={200} onChange={(e) => setText(e.target.value)} />
-          <button className="icon-btn ember" aria-label="Add task" disabled={!text.trim()}><Icon name="plus" /></button>
+          <button className="icon-btn accent" aria-label="Add task" disabled={!text.trim()}><Icon name="plus" /></button>
         </form>
       </div>
     </div>

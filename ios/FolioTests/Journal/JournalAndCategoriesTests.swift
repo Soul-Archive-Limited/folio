@@ -88,7 +88,7 @@ struct CategoriesManagerTests {
 
     @Test("Reordering changes the order everywhere categories are listed")
     func reorder() throws {
-        let a = try store.createCategory(name: "A", color: .ember)
+        let a = try store.createCategory(name: "A", color: .amber)
         let b = try store.createCategory(name: "B", color: .ocean)
         let c = try store.createCategory(name: "C", color: .sage)
         store.reorderCategories([c, a, b])

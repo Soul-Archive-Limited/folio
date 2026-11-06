@@ -3,9 +3,9 @@
     "id": 1,
     "key": "folio:01",
     "name": "Spark",
-    "palette": "ember",
-    "accent": "#F0602A",
-    "background": "#FFB08A"
+    "palette": "ink",
+    "accent": "#3441D5",
+    "background": "#AEB6FF"
   },
   {
     "id": 2,

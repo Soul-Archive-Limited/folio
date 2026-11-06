@@ -35,7 +35,7 @@ struct AccessibleMonthList: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(Spacing.m)
                             .folioGlass(in: .rect(cornerRadius: Radius.card), interactive: true,
-                                        solidFill: day == model.selectedDay ? .ember : nil)
+                                        solidFill: day == model.selectedDay ? .accent : nil)
                     }
                     .buttonStyle(.pressable)
                     .padding(.horizontal, Spacing.sideMargin)

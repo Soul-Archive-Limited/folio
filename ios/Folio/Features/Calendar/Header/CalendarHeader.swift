@@ -30,7 +30,7 @@ struct CalendarHeader: View {
                             .glassEffectID("today", in: glass)
                             .glassEffectTransition(.matchedGeometry)
                     }
-                    Button("Search", systemImage: "magnifyingglass") { model.showsSearch = true }
+                    Button("Search", image: .folioSearch) { model.showsSearch = true }
                         .labelStyle(.iconOnly)
                         .font(.body.weight(.semibold))
                         .foregroundStyle(.ink)

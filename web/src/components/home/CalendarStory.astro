@@ -14,7 +14,7 @@ cells.push({ day: 1, out: true });
 const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 const features = [
-  { title: 'Your month at a glance', text: 'Days you wrote on show a tiny photo or a coloured dot. Days with tasks get a ring, and a tick once they’re all done.', cat: 'ember' },
+  { title: 'Your month at a glance', text: 'Days you wrote on show a tiny photo or a coloured dot. Days with tasks get a ring, and a tick once they’re all done.', cat: 'indigo' },
   { title: 'Write for any day', text: 'Pick a date back to 1900 and write in a half sheet while the calendar stays in view.', cat: 'ocean' },
   { title: 'Read it back like a book', text: 'The Journal lays your pages out by month, with covers from your photos — or as one wall of every picture.', cat: 'violet' },
   { title: 'Your own categories', text: 'Twelve colours, your names. Filter the calendar to just Travel, or just Family.', cat: 'rose' },
@@ -79,12 +79,12 @@ const features = [
   .cell.photo { place-items: start; overflow: hidden; }
   .cell.photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .cell.photo .n { position: relative; margin: 5px 6px; font-size: clamp(9px, 1vw, 11px); font-weight: 700; color: #fff; text-shadow: 0 1px 4px rgb(0 0 0 / 0.4); }
-  .cell.today { color: var(--ember-text); font-weight: 700; }
-  .cell.today::after { content: ''; position: absolute; bottom: 18%; width: 4px; height: 4px; border-radius: 50%; background: var(--ember); }
+  .cell.today { color: var(--accent-text); font-weight: 700; }
+  .cell.today::after { content: ''; position: absolute; bottom: 18%; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
   .cell.ring-open { box-shadow: 0 0 0 1.5px var(--ink-secondary) inset; }
   .cell.ring-done { box-shadow: 0 0 0 1.5px var(--done) inset; }
   .cell.photo.ring-done { box-shadow: 0 0 0 2px var(--done); }
-  .cell.lift { box-shadow: 0 0 0 2.5px var(--ember); }
+  .cell.lift { box-shadow: 0 0 0 2.5px var(--accent); }
   .dots { position: absolute; bottom: 14%; display: flex; gap: 3px; }
   .dots i { width: 4px; height: 4px; border-radius: 50%; }
 

@@ -1,33 +1,135 @@
 {
-  "$comment": "Folio colour tokens (SPEC §3.2). Source of truth for iOS asset colours (scripts/generate-ios-colors.py) and, from Phase 11, the web CSS variables. Values are sRGB hex; alpha 0-1. 'contrast' = Increase Contrast variant. 'ember' is for non-text accents (dots, rings, icons); 'emberStrong' fills anything with white text on it (buttons, selected states; white on it ≥ 4.5:1); 'emberText' is ember-coloured text on the page background (≥ 4.5:1 in both modes).",
+  "$comment": "Folio colour tokens (SPEC §3.2). Source of truth for iOS asset colours (scripts/generate-ios-colors.py), the widgets, the web CSS variables (web/scripts/tokens.mjs), the PDF and the generated art. Values are sRGB hex; alpha 0-1. 'contrast' = Increase Contrast variant. The accent is 'Ink' (Batch K): 'accent' is for non-text accents (dots, rings, icons, glyphs); 'accentStrong' fills anything with white text on it (buttons, selected days; white on it >= 6:1 in both modes); 'accentText' is accent-coloured text on the page background (>= 7:1 in both modes). Category keys are stored in synced data and never change: 'ember' is shown as Amber.",
   "colors": {
-    "bg":           { "light": "#F5F3EF", "dark": "#0A0A0C" },
-    "bgElevated":   { "light": "#FFFFFF", "dark": "#141418" },
-    "ink":          { "light": "#16161A", "dark": "#F4F4F5" },
-    "inkSecondary": { "light": "#16161A", "dark": "#F4F4F5", "alpha": { "light": 0.66, "dark": 0.64 }, "contrast": { "light": 0.78, "dark": 0.80 } },
-    "inkTertiary":  { "light": "#16161A", "dark": "#F4F4F5", "alpha": { "light": 0.34, "dark": 0.36 }, "contrast": { "light": 0.56, "dark": 0.58 } },
-    "hairline":     { "light": "#000000", "dark": "#FFFFFF", "alpha": { "light": 0.07, "dark": 0.08 }, "contrast": { "light": 0.22, "dark": 0.24 } },
-    "ember":        { "light": "#F0602A", "dark": "#FF7A45" },
-    "emberStrong":  { "light": "#B9441B", "dark": "#C4461A" },
-    "emberText":    { "light": "#B9441B", "dark": "#FF7A45" },
-    "done":         { "light": "#2FA35A", "dark": "#7ED69B" },
-    "danger":       { "light": "#D93A3F", "dark": "#FF5A5F" },
-    "aura1":        { "light": "#FFB38F", "dark": "#FF7A45" },
-    "aura2":        { "light": "#D9B8FF", "dark": "#B65CFF" },
-    "aura3":        { "light": "#A9C6FF", "dark": "#3D7BFF" }
+    "bg": {
+      "light": "#F6F3EC",
+      "dark": "#141418"
+    },
+    "bgElevated": {
+      "light": "#FFFDF9",
+      "dark": "#1E1E24"
+    },
+    "ink": {
+      "light": "#17161C",
+      "dark": "#F3F2F0"
+    },
+    "inkSecondary": {
+      "light": "#17161C",
+      "dark": "#F3F2F0",
+      "alpha": {
+        "light": 0.66,
+        "dark": 0.64
+      },
+      "contrast": {
+        "light": 0.78,
+        "dark": 0.8
+      }
+    },
+    "inkTertiary": {
+      "light": "#17161C",
+      "dark": "#F3F2F0",
+      "alpha": {
+        "light": 0.34,
+        "dark": 0.36
+      },
+      "contrast": {
+        "light": 0.56,
+        "dark": 0.58
+      }
+    },
+    "hairline": {
+      "light": "#000000",
+      "dark": "#FFFFFF",
+      "alpha": {
+        "light": 0.07,
+        "dark": 0.08
+      },
+      "contrast": {
+        "light": 0.22,
+        "dark": 0.24
+      }
+    },
+    "accent": {
+      "light": "#3441D5",
+      "dark": "#949FFF"
+    },
+    "accentStrong": {
+      "light": "#303ECF",
+      "dark": "#4551D3"
+    },
+    "accentText": {
+      "light": "#303AC0",
+      "dark": "#9EA8FF"
+    },
+    "done": {
+      "light": "#2FA35A",
+      "dark": "#7ED69B"
+    },
+    "danger": {
+      "light": "#D93A3F",
+      "dark": "#FF5A5F"
+    },
+    "aura1": {
+      "light": "#B8C0FF",
+      "dark": "#3441D5"
+    },
+    "aura2": {
+      "light": "#E4CDF4",
+      "dark": "#7A4FD0"
+    },
+    "aura3": {
+      "light": "#F2DCC0",
+      "dark": "#1E6A86"
+    }
   },
   "categories": {
-    "ember":    { "light": "#F0602A", "dark": "#FF7A45" },
-    "coral":    { "light": "#E25A4A", "dark": "#FF8A73" },
-    "rose":     { "light": "#C93C70", "dark": "#F2709B" },
-    "plum":     { "light": "#9E3D8A", "dark": "#CF72BA" },
-    "violet":   { "light": "#7650D6", "dark": "#A587F2" },
-    "indigo":   { "light": "#4657D1", "dark": "#808EF2" },
-    "ocean":    { "light": "#1A72B2", "dark": "#52ABEA" },
-    "teal":     { "light": "#0C7D76", "dark": "#3FC4BA" },
-    "sage":     { "light": "#4A7650", "dark": "#8FC191" },
-    "olive":    { "light": "#86862B", "dark": "#BDBD5E" },
-    "sand":     { "light": "#B08A52", "dark": "#DBBC8E" },
-    "graphite": { "light": "#585B63", "dark": "#9C9FA8" }
+    "indigo": {
+      "light": "#4657D1",
+      "dark": "#808EF2"
+    },
+    "ocean": {
+      "light": "#1A72B2",
+      "dark": "#52ABEA"
+    },
+    "teal": {
+      "light": "#0C7D76",
+      "dark": "#3FC4BA"
+    },
+    "sage": {
+      "light": "#4A7650",
+      "dark": "#8FC191"
+    },
+    "violet": {
+      "light": "#7650D6",
+      "dark": "#A587F2"
+    },
+    "plum": {
+      "light": "#9E3D8A",
+      "dark": "#CF72BA"
+    },
+    "rose": {
+      "light": "#C93C70",
+      "dark": "#F2709B"
+    },
+    "coral": {
+      "light": "#E25A4A",
+      "dark": "#FF8A73"
+    },
+    "ember": {
+      "light": "#F0602A",
+      "dark": "#FF7A45"
+    },
+    "sand": {
+      "light": "#B08A52",
+      "dark": "#DBBC8E"
+    },
+    "olive": {
+      "light": "#86862B",
+      "dark": "#BDBD5E"
+    },
+    "graphite": {
+      "light": "#585B63",
+      "dark": "#9C9FA8"
+    }
   }
 }

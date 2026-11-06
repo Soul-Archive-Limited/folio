@@ -23,8 +23,8 @@ struct ProfileAccountSection: View {
                                 .foregroundStyle(.inkSecondary)
                         }
                     } icon: {
-                        Image(systemName: "arrow.triangle.2.circlepath.icloud")
-                            .foregroundStyle(.ember)
+                        Image("folio.sync")
+                            .foregroundStyle(.accent)
                     }
                     SyncSignInButtons(onEmail: { routes.flow = .email }, onDone: { routes.flow = .continuing })
                     LegalFooter()

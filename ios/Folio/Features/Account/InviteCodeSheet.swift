@@ -37,7 +37,7 @@ struct InviteCodeSheet: View {
                 Text("Continue").frame(maxWidth: .infinity, minHeight: 44)
             }
             .buttonStyle(.glassProminent)
-            .tint(.emberStrong)
+            .tint(.accentStrong)
             .disabled(code.filter { $0.isLetter || $0.isNumber }.count != 8)
             Button("Not now") { dismiss() }
                 .foregroundStyle(.inkSecondary)

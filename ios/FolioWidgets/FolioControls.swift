@@ -7,7 +7,7 @@ struct NewEntryControl: ControlWidget {
     var body: some ControlWidgetConfiguration {
         StaticControlConfiguration(kind: "com.devilsense.folio.control.newEntry") {
             ControlWidgetButton(action: NewEntryIntent()) {
-                Label("New Entry", systemImage: "square.and.pencil")
+                Label("New Entry", image: "folio.page.new")
             }
         }
         .displayName("New Entry")
@@ -19,7 +19,7 @@ struct DictateControl: ControlWidget {
     var body: some ControlWidgetConfiguration {
         StaticControlConfiguration(kind: "com.devilsense.folio.control.dictate") {
             ControlWidgetButton(action: DictateEntryIntent()) {
-                Label("Dictate", systemImage: "mic")
+                Label("Dictate", image: "folio.dictate")
             }
         }
         .displayName("Dictate Entry")
@@ -31,7 +31,7 @@ struct AddTaskControl: ControlWidget {
     var body: some ControlWidgetConfiguration {
         StaticControlConfiguration(kind: "com.devilsense.folio.control.addTask") {
             ControlWidgetButton(action: OpenNewTaskIntent()) {
-                Label("Add Task", systemImage: "checklist")
+                Label("Add Task", image: "folio.task.add")
             }
         }
         .displayName("Add Task")

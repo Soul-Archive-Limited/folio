@@ -65,7 +65,7 @@ h1, h2, h3 { text-wrap: balance; }
 p { text-wrap: pretty; }
 
 :focus-visible {
-  outline: 2.5px solid var(--ember);
+  outline: 2.5px solid var(--accent);
   outline-offset: 3px;
   border-radius: 6px;
 }
@@ -108,13 +108,13 @@ p { text-wrap: pretty; }
 }
 .btn:active { transform: scale(0.97); }
 .btn-primary { background: var(--ink); color: var(--bg); }
-.btn-ember { background: var(--ember-strong); color: #fff; }
+.btn-accent { background: var(--accent-strong); color: #fff; }
 .btn-quiet { color: var(--ink); background: transparent; }
 .btn-glass { color: var(--ink); background: var(--glass); box-shadow: 0 0 0 1px var(--hairline) inset; }
 .btn .arrow { transition: transform 200ms var(--ease); }
 @media (hover: hover) and (pointer: fine) {
-  .btn-primary:hover { background: color-mix(in srgb, var(--ink) 86%, var(--ember)); }
-  .btn-ember:hover { background: color-mix(in srgb, var(--ember-strong) 88%, #000); }
+  .btn-primary:hover { background: color-mix(in srgb, var(--ink) 86%, var(--accent)); }
+  .btn-accent:hover { background: color-mix(in srgb, var(--accent-strong) 88%, #000); }
   .btn-quiet:hover, .btn-glass:hover { background: var(--bg-elevated); }
   .btn:hover .arrow { transform: translateX(3px); }
 }
@@ -160,7 +160,7 @@ p { text-wrap: pretty; }
 .menu ul { list-style: none; margin: 40px 0 0; padding: 0; }
 .menu li { border-bottom: 1px solid var(--hairline); }
 .menu ul a { display: flex; align-items: center; justify-content: space-between; min-height: 64px; font: 400 40px/1 var(--serif); text-decoration: none; letter-spacing: -0.01em; }
-.menu ul a span { color: var(--ember-text); font: 400 20px/1 var(--sans); }
+.menu ul a span { color: var(--accent-text); font: 400 20px/1 var(--sans); }
 .menu-actions { margin-top: auto; display: grid; gap: 10px; padding-top: 32px; }
 .menu-actions .btn { min-height: 54px; font-size: 17px; }
 .menu[open] .menu-inner > * { animation: menu-in 420ms var(--ease) both; }
@@ -191,7 +191,7 @@ p { text-wrap: pretty; }
 /* Page heads for the inner pages */
 .page-head { position: relative; padding-top: clamp(56px, 10vw, 120px); padding-bottom: clamp(32px, 5vw, 56px); }
 .page-head h1 { font: 400 clamp(52px, 8.5vw, 112px)/0.92 var(--serif); letter-spacing: -0.03em; margin: 14px 0 20px; max-width: 14ch; }
-.page-head h1 em { font-style: italic; color: var(--ember-text); }
+.page-head h1 em { font-style: italic; color: var(--accent-text); }
 .page-head .lede { font-size: clamp(18px, 2vw, 21px); color: var(--text-2); max-width: 48ch; }
 .page-aura {
   position: absolute; top: -240px; left: -20%; right: -20%; height: 820px; z-index: -1; pointer-events: none;
@@ -211,16 +211,16 @@ p { text-wrap: pretty; }
 .prose h3 { font-size: 18px; margin: 32px 0 8px; }
 .prose ul, .prose ol { padding-left: 1.2em; }
 .prose li { margin: 0.35em 0; }
-.prose a { color: var(--ink); text-decoration-color: var(--ember); text-underline-offset: 3px; text-decoration-thickness: 2px; }
+.prose a { color: var(--ink); text-decoration-color: var(--accent); text-underline-offset: 3px; text-decoration-thickness: 2px; }
 .updated { margin-top: 12px; }
 
 /* Section heads */
 .section-head { max-width: 720px; margin-bottom: clamp(40px, 6vw, 72px); }
 .section-head h2 { font: 400 clamp(42px, 6vw, 76px)/0.98 var(--serif); letter-spacing: -0.025em; margin: 14px 0 18px; }
-.section-head h2 em { font-style: italic; color: var(--ember-text); }
+.section-head h2 em { font-style: italic; color: var(--accent-text); }
 .section-head p { font-size: clamp(17px, 1.7vw, 19px); color: var(--text-2); max-width: 52ch; }
 .link-arrow { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-weight: 600; text-decoration: none; color: var(--ink); }
-.link-arrow span { color: var(--ember-text); transition: transform 200ms var(--ease); }
+.link-arrow span { color: var(--accent-text); transition: transform 200ms var(--ease); }
 @media (hover: hover) and (pointer: fine) { .link-arrow:hover span { transform: translateX(3px); } }
 
 /* Phone frame for real screenshots (our own simple frame, no device model). */
@@ -247,7 +247,7 @@ p { text-wrap: pretty; }
   font: 400 clamp(22px, 2.6vw, 28px)/1.2 var(--serif);
 }
 .faq summary::-webkit-details-marker { display: none; }
-.faq summary::after { content: '+'; font-family: var(--sans); font-size: 24px; color: var(--ember-text); transition: transform 250ms var(--ease); }
+.faq summary::after { content: '+'; font-family: var(--sans); font-size: 24px; color: var(--accent-text); transition: transform 250ms var(--ease); }
 .faq details[open] summary::after { transform: rotate(45deg); }
 .faq .answer { padding: 0 0 24px; max-width: 64ch; color: var(--text-2); }
 .faq .answer a { color: var(--ink); }

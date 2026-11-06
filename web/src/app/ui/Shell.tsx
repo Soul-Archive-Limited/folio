@@ -188,7 +188,7 @@ function FloatingAdd({ tab, onEntry, onTask }: { tab: string; onEntry: () => voi
   const primary = tab === 'todo' ? onTask : onEntry;
   return (
     <>
-      <button className="fab icon-btn ember" aria-label={tab === 'todo' ? 'New task' : 'New entry'} aria-haspopup="menu"
+      <button className="fab icon-btn accent" aria-label={tab === 'todo' ? 'New task' : 'New entry'} aria-haspopup="menu"
         onClick={() => { if (held.current) { held.current = false; return; } primary(); }}
         onContextMenu={(e) => { e.preventDefault(); setMenu(true); }}
         onPointerDown={(e) => {

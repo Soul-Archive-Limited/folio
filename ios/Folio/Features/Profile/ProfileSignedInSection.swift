@@ -17,7 +17,7 @@ struct ProfileSignedInSection: View {
             Label {
                 if let email = account.session?.email { Text(verbatim: email) } else { Text("Signed in") }
             } icon: {
-                Image(systemName: providerSymbol).foregroundStyle(.ember)
+                Image(systemName: providerSymbol).foregroundStyle(.accent)
             }
             .foregroundStyle(.ink)
             .folioFont(.body)
@@ -25,7 +25,7 @@ struct ProfileSignedInSection: View {
             if account.status == .ready {
                 SyncStatusRow()
                 Button { Task { await sync.syncNow() } } label: {
-                    ProfileRowLabel(title: "Sync now", systemImage: "arrow.clockwise")
+                    ProfileRowLabel(title: "Sync now", image: "folio.sync")
                 }
                 .disabled(sync.status == .syncing)
                 .accessibilityIdentifier("syncNow")
@@ -36,11 +36,11 @@ struct ProfileSignedInSection: View {
                 }
             }
             NavigationLink { DevicesView() } label: {
-                ProfileRowLabel(title: "Devices", systemImage: "laptopcomputer.and.iphone")
+                ProfileRowLabel(title: "Devices", image: "folio.devices")
             }
             if account.session?.canInvite == true {
                 NavigationLink { InvitesView() } label: {
-                    ProfileRowLabel(title: "Invite a friend", systemImage: "envelope.open")
+                    ProfileRowLabel(title: "Invite a friend", image: "folio.invite")
                 }
                 .accessibilityIdentifier("profile.invites")
             }
@@ -57,7 +57,7 @@ struct ProfileSignedInSection: View {
                 ProfileRowLabel(title: "Sign out", systemImage: "rectangle.portrait.and.arrow.right")
             }
             Button { routes.showsDelete = true } label: {
-                Label("Delete account", systemImage: "trash")
+                Label("Delete account", image: "folio.trash")
                     .foregroundStyle(.danger)
                     .folioFont(.body)
                     .frame(minHeight: Spacing.minHitTarget)

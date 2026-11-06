@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// A To-do group's header — "TODAY · 3" — tap to fold or unfold (state persisted, Batch I).
-/// Overdue is in ember so it reads first.
+/// Overdue is in accent so it reads first.
 struct TodoGroupHeader: View {
     let title: LocalizedStringKey
     let count: Int
@@ -14,7 +14,7 @@ struct TodoGroupHeader: View {
             HStack(spacing: Spacing.xs) {
                 Text(title)
                     .folioFont(.caption)
-                    .foregroundStyle(isOverdue ? AnyShapeStyle(.emberText) : AnyShapeStyle(.inkSecondary))
+                    .foregroundStyle(isOverdue ? AnyShapeStyle(.accentText) : AnyShapeStyle(.inkSecondary))
                 Text(count, format: .number)
                     .folioFont(.caption)
                     .foregroundStyle(.inkTertiary)
@@ -47,12 +47,12 @@ struct TodoDateFilterButton: View {
     var body: some View {
         Button { picking = true } label: {
             if day == nil {
-                Label("Show one date", systemImage: "calendar")
+                Label("Show one date", image: "folio.calendar")
             } else {
-                Label(label, systemImage: "calendar").labelStyle(.titleAndIcon)
+                Label(label, image: "folio.calendar").labelStyle(.titleAndIcon)
             }
         }
-        .tint(day == nil ? .ink : .emberStrong)
+        .tint(day == nil ? .ink : .accentStrong)
         .accessibilityLabel(day == nil ? Text("Show one date") : Text("Showing \(label)"))
         .popover(isPresented: $picking) {
             VStack(spacing: Spacing.s) {
@@ -64,7 +64,7 @@ struct TodoDateFilterButton: View {
                         day = nil
                         picking = false
                     }
-                    .tint(.emberStrong)
+                    .tint(.accentStrong)
                 }
             }
             .padding()

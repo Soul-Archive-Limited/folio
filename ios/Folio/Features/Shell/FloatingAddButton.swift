@@ -20,16 +20,16 @@ struct FloatingAddButton: View {
         GlassEffectContainer {
             if isVisible {
                 Menu {
-                    Button("New entry", systemImage: "square.and.pencil") { onRequest(.entry(day)) }
-                    Button("New task", systemImage: "checklist") { onRequest(.task(day)) }
-                    Button("Dictate an entry", systemImage: "mic") { onRequest(.dictation(day)) }
-                    Button("Scan a paper page", systemImage: "doc.viewfinder") { onRequest(.scan) }
+                    Button("New entry", image: .folioPageNew) { onRequest(.entry(day)) }
+                    Button("New task", image: .folioTaskAdd) { onRequest(.task(day)) }
+                    Button("Dictate an entry", image: .folioDictate) { onRequest(.dictation(day)) }
+                    Button("Scan a paper page", image: .folioScan) { onRequest(.scan) }
                 } label: {
-                    Image(systemName: "plus")
+                    Image("folio.plus")
                         .font(.title2.weight(.semibold))
                         .foregroundStyle(.white)
                         .frame(width: FloatingButtonMetrics.diameter, height: FloatingButtonMetrics.diameter)
-                        .glassEffect(.regular.tint(.emberStrong).interactive(), in: .circle)
+                        .glassEffect(.regular.tint(.accentStrong).interactive(), in: .circle)
                         .glassEffectID("add", in: glass)
                         .glassEffectTransition(reduceMotion ? .identity : .materialize)
                 } primaryAction: {

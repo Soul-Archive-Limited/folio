@@ -13,7 +13,7 @@ const scrambled = 'LxZDiQzY/bGmIsS6kD';
     </li>
     <li class="cd-link" aria-hidden="true"><i class="cd-packet plain">{plain}</i></li>
     <li class="cd-node lockn">
-      <span class="cd-icon ember" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="5" y="11" width="14" height="10" rx="3" fill="currentColor"/></svg></span>
+      <span class="cd-icon accent" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="5" y="11" width="14" height="10" rx="3" fill="currentColor"/></svg></span>
       <b>Locked on the phone</b>
       <span class="cd-pill key">Key: on your devices only</span>
       <small>AES-256-GCM, before upload.</small>
@@ -44,11 +44,11 @@ const scrambled = 'LxZDiQzY/bGmIsS6kD';
   .cd-node small { color: var(--text-2); font-size: 13px; }
   .cd-icon { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 16px; background: color-mix(in srgb, var(--ink) 6%, transparent); color: var(--ink); }
   .cd-icon svg { width: 26px; height: 26px; }
-  .cd-icon.ember { color: var(--ember); background: color-mix(in srgb, var(--ember) 14%, transparent); }
+  .cd-icon.accent { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
   .cd-pill { font-family: var(--mono); font-size: 12px; padding: 5px 10px; border-radius: 999px; white-space: nowrap; }
   .cd-pill.plain { background: color-mix(in srgb, var(--done) 16%, transparent); }
   .cd-pill.cipher { background: color-mix(in srgb, var(--ink) 8%, transparent); color: var(--text-2); }
-  .cd-pill.key { background: color-mix(in srgb, var(--ember) 14%, transparent); }
+  .cd-pill.key { background: color-mix(in srgb, var(--accent) 14%, transparent); }
   .cd-link { position: relative; height: 2px; background: repeating-linear-gradient(90deg, var(--ink-tertiary) 0 4px, transparent 4px 9px); overflow: visible; }
   .cd-packet { position: absolute; top: 50%; left: 0; translate: 0 -50%; font-style: normal; font-family: var(--mono); font-size: 10px; padding: 3px 7px; border-radius: 999px; white-space: nowrap; opacity: 0; }
   .cd-packet.plain { background: var(--done); color: #fff; }

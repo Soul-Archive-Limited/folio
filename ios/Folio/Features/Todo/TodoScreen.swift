@@ -205,14 +205,14 @@ struct TodoScreen: View {
                 .tint(task.isCompleted ? .inkSecondary : .done)
             }
             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                Button("Delete", systemImage: "trash", role: .destructive) { delete(task) }
+                Button("Delete", image: .folioTrash, role: .destructive) { delete(task) }
                 Button("Edit", systemImage: "pencil") { editing = task }.tint(.indigo)
-                Button("Date", systemImage: "calendar") { rescheduling = task }.tint(.emberStrong)
+                Button("Date", image: .folioCalendar) { rescheduling = task }.tint(.accentStrong)
             }
             .contextMenu {
                 Button("Edit", systemImage: "pencil") { editing = task }
-                Button("Date", systemImage: "calendar") { rescheduling = task }
-                Button("Delete", systemImage: "trash", role: .destructive) { delete(task) }
+                Button("Date", image: .folioCalendar) { rescheduling = task }
+                Button("Delete", image: .folioTrash, role: .destructive) { delete(task) }
             }
     }
 

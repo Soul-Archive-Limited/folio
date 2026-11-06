@@ -23,12 +23,12 @@ private struct EntryActionsModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .contextMenu {
-                Button("Edit", systemImage: "square.and.pencil", action: edit)
-                Button("Change date", systemImage: "calendar") { showsDateSheet = true }
+                Button("Edit", image: .folioPageNew, action: edit)
+                Button("Change date", image: .folioCalendar) { showsDateSheet = true }
                 Button("Duplicate", systemImage: "plus.square.on.square", action: duplicate)
                 Menu("Share", systemImage: "square.and.arrow.up") { EntryShareMenu(entry: entry) { shareKind = $0 } }
                 Divider()
-                Button("Delete", systemImage: "trash", role: .destructive, action: delete)
+                Button("Delete", image: .folioTrash, role: .destructive, action: delete)
             }
             .modifier(SwipesIfEnabled(enabled: swipes, cornerRadius: cornerRadius,
                                       leading: CardSwipeAction(title: "Edit", systemImage: "square.and.pencil", tint: .inkSecondary, perform: edit),

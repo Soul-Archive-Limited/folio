@@ -67,11 +67,11 @@ const cannot = ['Your entries, their titles and their text', 'Your photos', 'You
   .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
   .list li { display: flex; gap: 12px; align-items: baseline; }
   .list li::before { content: ''; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-tertiary); translate: 0 -1px; }
-  .no .list li::before { background: var(--ember); }
+  .no .list li::before { background: var(--accent); }
   .prose-sections { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 5vw, 64px) clamp(32px, 6vw, 80px); padding-top: clamp(64px, 8vw, 104px); }
   .prose-sections h2 { font: 400 clamp(28px, 3vw, 36px)/1.05 var(--serif); margin: 0 0 10px; letter-spacing: -0.01em; }
   .prose-sections p { color: var(--text-2); font-size: 17px; margin: 0; }
-  .prose-sections a { color: var(--ink); text-decoration-color: var(--ember); text-underline-offset: 3px; }
+  .prose-sections a { color: var(--ink); text-decoration-color: var(--accent); text-underline-offset: 3px; }
   .links { display: flex; flex-wrap: wrap; gap: 10px; padding-top: clamp(56px, 7vw, 88px); }
   @media (max-width: 760px) { .cols, .prose-sections { grid-template-columns: 1fr; } }
 </style>

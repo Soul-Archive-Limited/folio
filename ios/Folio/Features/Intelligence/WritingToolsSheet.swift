@@ -109,7 +109,7 @@ struct WritingToolsSheet: View {
                         ForEach($tasks) { $task in
                             Toggle(isOn: $task.isOn) { Text(task.title).folioFont(.body) }
                                 .toggleStyle(.switch)
-                                .tint(.emberStrong)
+                                .tint(.accentStrong)
                         }
                     } footer: {
                         Text("Ticked tasks are added to \(model.day.startDate(in: store.calendar).formatted(.dateTime.weekday(.wide).day().month(.wide))).")
@@ -131,13 +131,13 @@ struct WritingToolsSheet: View {
                         model.body = RichTextBridge.attributedString(fromMarkdown: polished, writingFont: model.writingFont)
                         dismiss()
                     }
-                    .buttonStyle(.glassProminent).tint(.emberStrong)
+                    .buttonStyle(.glassProminent).tint(.accentStrong)
                 }
             }
             if tool == .tasks, tasks.contains(where: \.isOn) {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Add \(tasks.count { $0.isOn })", action: addTasks)
-                        .buttonStyle(.glassProminent).tint(.emberStrong)
+                        .buttonStyle(.glassProminent).tint(.accentStrong)
                 }
             }
         }
@@ -190,7 +190,7 @@ enum PolishPreview {
             case .added(let text):
                 var part = AttributedString(text)
                 part.underlineStyle = .single
-                part.foregroundColor = .ember
+                part.foregroundColor = .accent
                 result += part
             }
         }
@@ -207,9 +207,9 @@ struct WritingToolsMenu: View {
         Menu {
             Button("Suggest a title", systemImage: "textformat.size") { onPick(.titles) }
             Button("Polish grammar", systemImage: "text.badge.checkmark") { onPick(.polish) }
-            Button("Find tasks", systemImage: "checklist") { onPick(.tasks) }
+            Button("Find tasks", image: .folioTodo) { onPick(.tasks) }
         } label: {
-            Label("Writing tools", systemImage: "sparkles")
+            Label("Writing tools", image: "folio.sparkle")
                 .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
         }
         .accessibilityInputLabels(["Writing tools", "Sparkles", "Intelligence"])

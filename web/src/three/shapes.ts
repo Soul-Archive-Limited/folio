@@ -1,3 +1,4 @@
+import { MARK_PATHS, NIB_PATH, TILE } from '../components/brand-mark.ts';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
@@ -59,27 +60,24 @@ export function shadowTexture(): THREE.CanvasTexture {
   return new THREE.CanvasTexture(canvas);
 }
 
-/** Folio's mark (a page with an ember dot) for the back of the phone. */
-export function markTexture(ink: string, paper: string, ember: string): THREE.CanvasTexture {
+/** Folio's mark (Batch K: an open diary with a nib for a gutter, on an Ink tile) for the back of the phone. */
+export function markTexture(): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 256;
   const ctx = canvas.getContext('2d')!;
+  ctx.scale(2.56, 2.56);
+  const ink = ctx.createLinearGradient(0, 0, 0, 100);
+  ink.addColorStop(0, TILE.top);
+  ink.addColorStop(1, TILE.bottom);
   ctx.fillStyle = ink;
   ctx.beginPath();
-  ctx.roundRect(46, 22, 164, 212, 32);
+  ctx.roundRect(0, 0, 100, 100, 22.5);
   ctx.fill();
-  ctx.fillStyle = paper;
-  ctx.globalAlpha = 0.35;
-  for (const [y, w] of [[104, 106], [132, 120], [160, 90]] as const) {
-    ctx.beginPath();
-    ctx.roundRect(74, y, w, 11, 5.5);
-    ctx.fill();
-  }
-  ctx.globalAlpha = 1;
-  ctx.fillStyle = ember;
-  ctx.beginPath();
-  ctx.arc(196, 42, 28, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.fillStyle = TILE.paper;
+  for (const d of MARK_PATHS) ctx.fill(new Path2D(d));
+  ctx.translate(50, 83);
+  ctx.scale(0.95, 0.95);
+  ctx.fill(new Path2D(NIB_PATH), 'evenodd');
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   return texture;

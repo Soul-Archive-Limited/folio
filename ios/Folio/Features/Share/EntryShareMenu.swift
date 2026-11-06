@@ -25,7 +25,7 @@ struct EntryShareMenu: View {
         let content = EntryShareContent(entry: entry)
         Button("Share as text", systemImage: "text.alignleft") { onShare(.text) }
         if !content.photoIDs.isEmpty {
-            Button("Share text and photos", systemImage: "photo.on.rectangle") { onShare(.textAndPhotos) }
+            Button("Share text and photos", image: .folioPhoto) { onShare(.textAndPhotos) }
         }
         let pages = EntryStoryPages.pageCount(content: content, hasPhoto: !content.photoIDs.isEmpty, writingFont: writingFont)
         if pages > 1 || content.isCutOnCard {

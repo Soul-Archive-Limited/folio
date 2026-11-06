@@ -13,7 +13,7 @@ struct DictationTidyOffer: View {
 
     var body: some View {
         HStack(spacing: Spacing.s) {
-            Image(systemName: "sparkles").foregroundStyle(.ember).accessibilityHidden(true)
+            Image("folio.sparkle").foregroundStyle(.accent).accessibilityHidden(true)
             Text(note ?? "Tidy punctuation and capitals?")
                 .folioFont(.callout)
                 .foregroundStyle(.ink)
@@ -23,7 +23,7 @@ struct DictationTidyOffer: View {
             } else if note == nil {
                 Button("Tidy", action: tidy)
                     .buttonStyle(.glassProminent)
-                    .tint(.emberStrong)
+                    .tint(.accentStrong)
             }
             Button("Close", systemImage: "xmark", action: onClose)
                 .labelStyle(.iconOnly)

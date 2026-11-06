@@ -21,7 +21,7 @@ struct CategoriesManagerView: View {
                 }
                 .buttonStyle(.plain)
                 .swipeActions(edge: .trailing) {
-                    Button("Delete", systemImage: "trash", role: .destructive) { delete(category) }
+                    Button("Delete", image: .folioTrash, role: .destructive) { delete(category) }
                 }
             }
             .onMove { indices, offset in
@@ -40,7 +40,7 @@ struct CategoriesManagerView: View {
         .navigationTitle("Categories")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button("New category", systemImage: "plus") { editing = .new }
+                Button("New category", image: .folioPlus) { editing = .new }
                     .disabled(categories.count >= Category.maximumCount)
             }
         }

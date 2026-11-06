@@ -26,7 +26,7 @@ struct UnlockView: View {
                         .frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .buttonStyle(.glassProminent)
-                .tint(.emberStrong)
+                .tint(.accentStrong)
                 Button { mode = .recoveryKey } label: {
                     Label("Enter recovery key", systemImage: "key")
                         .frame(maxWidth: .infinity, minHeight: 44)
@@ -34,7 +34,7 @@ struct UnlockView: View {
                 .buttonStyle(.glass)
                 .foregroundStyle(.ink)
                 Button("Not now", action: onCancel)
-                    .foregroundStyle(.emberText)
+                    .foregroundStyle(.accentText)
                     .frame(minHeight: Spacing.minHitTarget)
             }
         }

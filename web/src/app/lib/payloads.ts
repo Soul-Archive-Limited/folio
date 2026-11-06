@@ -82,5 +82,6 @@ export function encodePayload(data: object): string {
 
 export const decodePayload = <T>(text: string): T => JSON.parse(text) as T;
 
-export const CATEGORY_COLORS = ['ember', 'coral', 'rose', 'plum', 'violet', 'indigo', 'ocean', 'teal', 'sage', 'olive', 'sand', 'graphite'] as const;
+// Picker order (Batch K): Indigo first; 'ember' is the stored key of Amber and never changes.
+export const CATEGORY_COLORS = ['indigo', 'ocean', 'teal', 'sage', 'violet', 'plum', 'rose', 'coral', 'ember', 'sand', 'olive', 'graphite'] as const;
 export const categoryColor = (key: string | undefined) => `var(--cat-${CATEGORY_COLORS.includes(key as never) ? key : 'graphite'})`;

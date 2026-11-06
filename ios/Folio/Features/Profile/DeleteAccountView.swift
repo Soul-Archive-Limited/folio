@@ -38,14 +38,14 @@ struct DeleteAccountView: View {
                 }
                 .buttonStyle(.glassProminent)
                 .tint(.danger)
-                Button("Cancel") { dismiss() }.foregroundStyle(.emberText).frame(minHeight: Spacing.minHitTarget)
+                Button("Cancel") { dismiss() }.foregroundStyle(.accentText).frame(minHeight: Spacing.minHitTarget)
             }
         case .reauth:
             AccountStepLayout(systemImage: "person.badge.key", title: "Confirm it's you",
                               subtitle: "Sign in again with the account you use here.") {
                 SyncSignInButtons(reauth: true, onEmail: { step = .email }, onDone: { step = .confirm })
             } actions: {
-                Button("Cancel") { dismiss() }.foregroundStyle(.emberText).frame(minHeight: Spacing.minHitTarget)
+                Button("Cancel") { dismiss() }.foregroundStyle(.accentText).frame(minHeight: Spacing.minHitTarget)
             }
         case .email:
             EmailSignInFlow(reauth: true, initialEmail: account.session?.email ?? "",
@@ -87,7 +87,7 @@ struct DeleteAccountView: View {
             .foregroundStyle(.danger)
             .disabled(typed != "DELETE" || working)
             .opacity(typed == "DELETE" ? 1 : 0.5)
-            Button("Cancel") { dismiss() }.foregroundStyle(.emberText).frame(minHeight: Spacing.minHitTarget)
+            Button("Cancel") { dismiss() }.foregroundStyle(.accentText).frame(minHeight: Spacing.minHitTarget)
         }
         .overlay { if working { ProgressView().controlSize(.large) } }
         .task {

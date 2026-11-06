@@ -71,14 +71,14 @@ struct MonthWidgetView: View {
                 Text("\(number)")
                     .font(.system(size: large ? 13 : 9, weight: isToday ? .bold : .medium))
                     .monospacedDigit()
-                    .foregroundStyle(photo != nil ? .white : (isToday ? WidgetPalette.ember : WidgetPalette.ink.opacity(inMonth ? 1 : 0.3)))
+                    .foregroundStyle(photo != nil ? .white : (isToday ? WidgetPalette.accentText : WidgetPalette.ink.opacity(inMonth ? 1 : 0.3)))
                 if photo == nil, let day, day.entries > 0 {
                     HStack(spacing: 1.5) {
                         ForEach(Array(day.dots.prefix(3).enumerated()), id: \.offset) { _, dot in
                             Circle().fill(WidgetPalette.pair(dot) ?? WidgetPalette.ink.opacity(0.5))
                                 .frame(width: large ? 4 : 3, height: large ? 4 : 3)
                         }
-                        if day.dots.isEmpty { Circle().fill(WidgetPalette.ember).frame(width: 3, height: 3) }
+                        if day.dots.isEmpty { Circle().fill(WidgetPalette.accent).frame(width: 3, height: 3) }
                     }
                 }
             }
@@ -95,7 +95,7 @@ struct MonthWidgetView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .clipShape(.rect(cornerRadius: large ? 8 : 4))
         .overlay {
-            if isToday { RoundedRectangle(cornerRadius: large ? 8 : 4).strokeBorder(WidgetPalette.ember, lineWidth: 1.5) }
+            if isToday { RoundedRectangle(cornerRadius: large ? 8 : 4).strokeBorder(WidgetPalette.accent, lineWidth: 1.5) }
         }
         if large {
             Link(destination: FolioRoute.day(raw).url) { content }

@@ -63,7 +63,7 @@ struct SeasonalLayer: View {
         case .spring:
             context.rotate(by: .radians(time / 4 + random(i, 7) * 6))
             let petal = Path(ellipseIn: CGRect(x: -size, y: -size / 2, width: size * 2, height: size))
-            context.fill(petal, with: .color(Color(red: 1, green: 0.72, blue: 0.80).opacity(0.55)))
+            context.fill(petal, with: .color(Color(red: 0.93, green: 0.74, blue: 0.90).opacity(0.55)))
         case .autumn:
             context.rotate(by: .radians(time / 3 + random(i, 7) * 6))
             var leaf = Path()
@@ -71,16 +71,16 @@ struct SeasonalLayer: View {
             leaf.addQuadCurve(to: CGPoint(x: size * 1.2, y: 0), control: CGPoint(x: 0, y: -size * 1.1))
             leaf.addQuadCurve(to: CGPoint(x: -size * 1.2, y: 0), control: CGPoint(x: 0, y: size * 1.1))
             let tone = random(i, 8)
-            context.fill(leaf, with: .color(Color(red: 0.95, green: 0.45 + tone * 0.3, blue: 0.15).opacity(0.5)))
+            context.fill(leaf, with: .color(Color(red: 0.84, green: 0.44 + tone * 0.26, blue: 0.22).opacity(0.42)))
         case .winter:
             let flake = Path(ellipseIn: CGRect(x: -size / 2, y: -size / 2, width: size, height: size))
-            let snow = colorScheme == .dark ? Color.white.opacity(0.7) : Color(red: 0.62, green: 0.72, blue: 0.86).opacity(0.6)
+            let snow = colorScheme == .dark ? Color.white.opacity(0.7) : Color(red: 0.62, green: 0.66, blue: 0.92).opacity(0.6)
             context.fill(flake, with: .color(snow))
         case .monsoon:
             var streak = Path()
             streak.move(to: .zero)
             streak.addLine(to: CGPoint(x: -4, y: 14 + size * 2))
-            let rain = colorScheme == .dark ? Color.white.opacity(0.35) : Color(red: 0.4, green: 0.55, blue: 0.75).opacity(0.4)
+            let rain = colorScheme == .dark ? Color.white.opacity(0.35) : Color(red: 0.32, green: 0.38, blue: 0.80).opacity(0.36)
             context.stroke(streak, with: .color(rain), style: StrokeStyle(lineWidth: 1.2, lineCap: .round))
         case .summer:
             break
@@ -92,7 +92,7 @@ struct SeasonalLayer: View {
         let breathe = 0.85 + 0.15 * sin(time / 6)
         let center = CGPoint(x: size.width * 0.85, y: size.height * 0.04)
         let radius = size.width * 0.75 * breathe
-        let warm = Color(red: 1, green: 0.78, blue: 0.42)
+        let warm = Color(red: 0.98, green: 0.82, blue: 0.52)
         canvas.fill(Path(ellipseIn: CGRect(x: center.x - radius, y: center.y - radius, width: radius * 2, height: radius * 2)),
                     with: .radialGradient(Gradient(colors: [warm.opacity(0.35), warm.opacity(0)]), center: center,
                                           startRadius: 0, endRadius: radius))

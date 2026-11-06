@@ -1,12 +1,13 @@
 import UIKit
 
-/// How the diary PDF looks (Batch J): paper, New York for writing, ember for dates — always the
+/// How the diary PDF looks (Batch J): paper, New York for writing, accent for dates — always the
 /// light palette, since it's for paper and screens alike.
 nonisolated enum DiaryPDFStyle {
-    static let paper = UIColor(red: 0.961, green: 0.953, blue: 0.937, alpha: 1)
-    static let ink = UIColor(red: 0.086, green: 0.086, blue: 0.102, alpha: 1)
-    static let secondary = UIColor(red: 0.086, green: 0.086, blue: 0.102, alpha: 0.6)
-    static let ember = UIColor(red: 0.941, green: 0.376, blue: 0.165, alpha: 1)
+    // Light tokens (Batch K): paper #F6F3EC, ink #17161C, accent text #303AC0 (Ink).
+    static let paper = UIColor(red: 0.965, green: 0.953, blue: 0.925, alpha: 1)
+    static let ink = UIColor(red: 0.090, green: 0.086, blue: 0.110, alpha: 1)
+    static let secondary = UIColor(red: 0.090, green: 0.086, blue: 0.110, alpha: 0.6)
+    static let accent = UIColor(red: 0.188, green: 0.227, blue: 0.753, alpha: 1)
     static let highlight = UIColor(red: 1, green: 0.85, blue: 0.55, alpha: 0.7)
 
     static func serif(_ size: CGFloat, _ weight: UIFont.Weight = .regular, italic: Bool = false) -> UIFont {
@@ -49,17 +50,19 @@ nonisolated enum DiaryPDFStyle {
         } else if let number = cover.avatarNumber, let image = UIImage(named: FolioAvatar.assetName(number)) {
             image.draw(in: avatarRect)
         } else {
-            ember.withAlphaComponent(0.15).setFill()
+            accent.withAlphaComponent(0.15).setFill()
             UIBezierPath(ovalIn: avatarRect).fill()
             let initial = cover.name.first.map(String.init)?.uppercased() ?? "F"
-            centered(initial, font: serif(46, .bold), color: ember, y: avatarRect.midY - 30)
+            centered(initial, font: serif(46, .bold), color: accent, y: avatarRect.midY - 30)
         }
         let title = cover.name.isEmpty ? String(localized: "My diary") : String(localized: "\(cover.name)’s diary")
         centered(title, font: serif(30, .bold), color: ink, y: 290)
         let style = Date.FormatStyle(timeZone: .gmt).month(.wide).year()
         centered("\(from.utcDate.formatted(style)) – \(through.utcDate.formatted(style))", font: serif(16, italic: true), color: secondary, y: 336)
         centered(pagesLabel(entries), font: sans(11, .medium), color: secondary, y: 362)
-        centered("Folio", font: sans(10, .semibold), color: ember, y: DiaryPDF.pageSize.height - 70)
+        let mark = CGRect(x: (width - 28) / 2, y: DiaryPDF.pageSize.height - 108, width: 28, height: 28)
+        UIImage(named: "AppMark")?.draw(in: mark)
+        centered("Folio", font: sans(10, .semibold), color: accent, y: DiaryPDF.pageSize.height - 70)
     }
 
     /// "3 pages", inflected.
@@ -67,14 +70,14 @@ nonisolated enum DiaryPDFStyle {
         String(AttributedString(localized: "^[\(count) page](inflect: true)").characters)
     }
 
-    /// The month's opening, at the top of its first page: a big month name, the year in ember,
+    /// The month's opening, at the top of its first page: a big month name, the year in accent,
     /// how many pages, and a hairline.
     static func monthHeading(_ month: MonthKey, pages: Int) -> NSAttributedString {
         let text = NSMutableAttributedString()
         let name = month.firstDay.utcDate.formatted(Date.FormatStyle(timeZone: .gmt).month(.wide))
         text.append(NSAttributedString(string: name + " ", attributes: [.font: serif(30, .bold), .foregroundColor: ink,
                                                                         .paragraphStyle: paragraph(after: 0, lineHeight: 1)]))
-        text.append(NSAttributedString(string: String(month.year) + "\n", attributes: [.font: serif(20, italic: true), .foregroundColor: ember,
+        text.append(NSAttributedString(string: String(month.year) + "\n", attributes: [.font: serif(20, italic: true), .foregroundColor: accent,
                                                                                     .paragraphStyle: paragraph(after: 0, lineHeight: 1)]))
         text.append(NSAttributedString(string: pagesLabel(pages).uppercased() + "\n", attributes: [
             .font: sans(7.5, .semibold), .foregroundColor: secondary, .kern: 0.8, .paragraphStyle: paragraph(spacingBefore: 4, after: 2)]))
@@ -111,7 +114,7 @@ nonisolated enum DiaryPDFStyle {
             if let mood = entry.mood.flatMap(Mood.init(rawValue:)) { line += (line.isEmpty ? "" : " · ") + mood.title.uppercased() }
             if !line.isEmpty {
                 text.append(NSAttributedString(string: line + "\n", attributes: [
-                    .font: sans(8.5, .semibold), .foregroundColor: ember, .kern: 0.8,
+                    .font: sans(8.5, .semibold), .foregroundColor: accent, .kern: 0.8,
                     .paragraphStyle: paragraph(spacingBefore: 14, after: 4)]))
             }
             if !entry.title.isEmpty {
@@ -131,7 +134,7 @@ nonisolated enum DiaryPDFStyle {
         if !day.tasks.isEmpty {
             if day.entries.isEmpty {
                 text.append(NSAttributedString(string: dateLine + "\n", attributes: [
-                    .font: sans(8.5, .semibold), .foregroundColor: ember, .kern: 0.8, .paragraphStyle: paragraph(spacingBefore: 14, after: 4)]))
+                    .font: sans(8.5, .semibold), .foregroundColor: accent, .kern: 0.8, .paragraphStyle: paragraph(spacingBefore: 14, after: 4)]))
             }
             text.append(NSAttributedString(string: String(localized: "TASKS") + "\n", attributes: [
                 .font: sans(7.5, .semibold), .foregroundColor: secondary, .kern: 0.8, .paragraphStyle: paragraph(spacingBefore: 6, after: 2)]))

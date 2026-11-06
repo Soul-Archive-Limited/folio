@@ -32,7 +32,7 @@ struct ProfileArchiveTiles: View {
             VStack(alignment: .leading, spacing: Spacing.xxs) {
                 Image(systemName: systemImage)
                     .font(.headline)
-                    .foregroundStyle(.ember)
+                    .foregroundStyle(.accent)
                 Text(value, format: .number)
                     .folioFont(.title2)
                     .foregroundStyle(.ink)

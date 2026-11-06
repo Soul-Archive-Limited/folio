@@ -61,7 +61,7 @@ struct RecoveryKeyView: View {
                     .frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .buttonStyle(.glassProminent)
-                .tint(.emberStrong)
+                .tint(.accentStrong)
                 .disabled(!confirmed || continuing)
             }
         }

@@ -26,13 +26,13 @@ struct NextTaskView: View {
         switch family {
         case .accessoryInline:
             if showsTitle, let next {
-                Label(next.title, systemImage: "checklist").privacySensitive()
+                Label(next.title, image: "folio.todo").privacySensitive()
             } else {
-                Label(entry.openCount == 0 ? String(localized: "All clear") : String(localized: "\(entry.openCount) to do today"), systemImage: "checklist")
+                Label(entry.openCount == 0 ? String(localized: "All clear") : String(localized: "\(entry.openCount) to do today"), image: "folio.todo")
             }
         default:
             VStack(alignment: .leading, spacing: 1) {
-                Label("Folio", systemImage: "book.pages")
+                Label("Folio", image: "folio.journal")
                     .font(.caption2.weight(.semibold))
                     .widgetAccentable()
                 if showsTitle, let next {
@@ -69,7 +69,7 @@ struct TodayCountView: View {
     var body: some View {
         let total = entry.openCount + entry.doneToday
         Gauge(value: Double(entry.doneToday), in: 0...Double(max(total, 1))) {
-            Image(systemName: "checklist")
+            Image("folio.todo")
         } currentValueLabel: {
             Text("\(entry.openCount)").monospacedDigit()
         }

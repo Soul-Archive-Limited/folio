@@ -10,7 +10,7 @@ struct SyncStatusRow: View {
         Button { if sync.status == .error { explainsError = true } } label: {
             HStack(spacing: Spacing.s) {
                 Image(systemName: symbol)
-                    .foregroundStyle(sync.status == .error ? .danger : .ember)
+                    .foregroundStyle(sync.status == .error ? .danger : .accent)
                     .frame(width: 26)
                     .symbolEffect(.rotate, isActive: sync.status == .syncing)
                     .contentTransition(.symbolEffect(.replace))

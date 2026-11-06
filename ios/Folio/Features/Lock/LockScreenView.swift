@@ -35,7 +35,7 @@ struct LockScreenView: View {
                                 .frame(minHeight: Spacing.minHitTarget)
                         }
                         .buttonStyle(.glassProminent)
-                        .tint(.emberStrong)
+                        .tint(.accentStrong)
                         .disabled(lock.isAuthenticating)
                         .accessibilityIdentifier("lock.unlock")
                     }

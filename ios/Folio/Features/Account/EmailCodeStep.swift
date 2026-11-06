@@ -63,13 +63,13 @@ struct EmailCodeStep: View {
                 .frame(maxWidth: .infinity, minHeight: 44)
             }
             .buttonStyle(.glassProminent)
-            .tint(.emberStrong)
+            .tint(.accentStrong)
             .disabled(code.count != 6 || verifying || (asksInvite && invite.filter { $0.isLetter || $0.isNumber }.count != 8))
             TimelineView(.periodic(from: sentAt, by: 1)) { context in
                 let wait = Int((Self.resendDelay - context.date.timeIntervalSince(sentAt)).rounded(.up))
                 Button(wait > 0 ? "Send a new code in \(wait) s" : "Send a new code", action: resend)
                     .disabled(wait > 0)
-                    .foregroundStyle(wait > 0 ? .inkTertiary : .emberText)
+                    .foregroundStyle(wait > 0 ? .inkTertiary : .accentText)
                     .monospacedDigit()
             }
             .frame(minHeight: Spacing.minHitTarget)

@@ -19,10 +19,10 @@ struct AvatarMenu<Label: View>: View {
 
     var body: some View {
         Menu {
-            Button("Choose photo", systemImage: "photo") { showsPhotoPicker = true }
+            Button("Choose photo", image: .folioPhoto) { showsPhotoPicker = true }
             Button("Folio avatars", systemImage: "face.smiling") { showsAvatars = true }
             if store.settings().avatar != nil {
-                Button("Remove picture", systemImage: "trash", role: .destructive) {
+                Button("Remove picture", image: .folioTrash, role: .destructive) {
                     store.updateSettings { $0.avatar = nil; $0.avatarPhoto = nil }
                 }
             }

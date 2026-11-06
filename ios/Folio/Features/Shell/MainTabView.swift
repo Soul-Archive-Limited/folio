@@ -20,7 +20,7 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $selection) {
-            Tab("Calendar", systemImage: "calendar", value: .calendar) {
+            Tab("Calendar", image: "folio.calendar", value: .calendar) {
                 if let calendar {
                     let isRoot = calendar.path.isEmpty
                     CalendarScreen(model: calendar)
@@ -41,7 +41,7 @@ struct MainTabView: View {
                         .toastHost(toasts, trailingClearance: isRoot ? FloatingButtonMetrics.toastTrailingClearance : 0)
                 }
             }
-            Tab("Journal", systemImage: "book.pages", value: .journal) {
+            Tab("Journal", image: "folio.journal", value: .journal) {
                 let isRoot = journal.isAtRoot
                 JournalScreen(model: journal)
                     .floatingAddButton(day: store.today, isVisible: isRoot, namespace: composerNamespace, onRequest: present)
@@ -49,10 +49,10 @@ struct MainTabView: View {
             }
             // No "+" on To-do: the full-width quick-add bar has its own expand button, and the
             // toast rides above that bar (owner review, Batch B).
-            Tab("To-do", systemImage: "checklist", value: .todo) {
+            Tab("To-do", image: "folio.todo", value: .todo) {
                 TodoScreen()
             }
-            Tab("Profile", systemImage: "person.crop.circle", value: .profile) {
+            Tab("Profile", image: "folio.profile", value: .profile) {
                 ProfileView()
                     .toastHost(toasts)
             }

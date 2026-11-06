@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Date (and time) of a task, e.g. "Today 14:30", "Tomorrow", "Mon 3 Nov". Overdue tasks
-/// get an ember chip (SPEC §6.7).
+/// get an accent chip (SPEC §6.7).
 struct TaskDateChip: View {
     let task: TaskItem
     let today: DayKey
@@ -18,7 +18,7 @@ struct TaskDateChip: View {
             .foregroundStyle(overdue ? AnyShapeStyle(.white) : AnyShapeStyle(.inkSecondary))
             .padding(.horizontal, overdue ? Spacing.xs : 0)
             .padding(.vertical, overdue ? 2 : 0)
-            .background(overdue ? AnyShapeStyle(.emberStrong) : AnyShapeStyle(.clear), in: .capsule)
+            .background(overdue ? AnyShapeStyle(.accentStrong) : AnyShapeStyle(.clear), in: .capsule)
             .accessibilityLabel(overdue ? "Overdue, \(label(day))" : label(day))
         }
     }

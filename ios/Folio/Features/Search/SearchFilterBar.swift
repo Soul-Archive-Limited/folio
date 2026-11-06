@@ -117,7 +117,7 @@ private struct FilterLabel: View {
         .foregroundStyle(isOn ? Color.white : .ink)
         .padding(.horizontal, Spacing.s)
         .frame(minHeight: Spacing.minHitTarget - 12)
-        .folioGlass(in: .capsule, interactive: true, solidFill: isOn ? .emberStrong : nil)
+        .folioGlass(in: .capsule, interactive: true, solidFill: isOn ? .accentStrong : nil)
         .padding(.vertical, 6)
         .accessibilityAddTraits(isOn ? .isSelected : [])
     }

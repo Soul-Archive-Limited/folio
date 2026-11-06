@@ -14,10 +14,10 @@ struct DictationCapsule: View {
         HStack(spacing: Spacing.s) {
             switch session.state {
             case .downloading(let fraction):
-                Image(systemName: "arrow.down.circle").foregroundStyle(.ember).accessibilityHidden(true)
+                Image(systemName: "arrow.down.circle").foregroundStyle(.accent).accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: Spacing.xxs) {
                     Text("Getting dictation ready on your iPhone…").folioFont(.callout).foregroundStyle(.ink)
-                    ProgressView(value: fraction).tint(.emberStrong)
+                    ProgressView(value: fraction).tint(.accentStrong)
                         .accessibilityLabel("Speech model download")
                         .accessibilityValue(Text(fraction, format: .percent.precision(.fractionLength(0))))
                 }
@@ -42,7 +42,7 @@ struct DictationCapsule: View {
                     .disabled(session.state == .preparing)
                 Button("Done", action: onDone)
                     .buttonStyle(.glassProminent)
-                    .tint(.emberStrong)
+                    .tint(.accentStrong)
             }
         }
         .padding(.horizontal, Spacing.m)
@@ -96,7 +96,7 @@ struct DictationWaveform: View {
         HStack(alignment: .center, spacing: 1.5) {
             ForEach(Array(levels.suffix(16).enumerated()), id: \.offset) { _, level in
                 Capsule()
-                    .fill(isActive ? Color.ember : Color.inkTertiary)
+                    .fill(isActive ? Color.accent : Color.inkTertiary)
                     .frame(width: 2.5, height: max(3, 32 * Double(reduceMotion ? min(level, 0.3) : level)))
             }
         }

@@ -61,7 +61,7 @@ struct OtherYearCard: View {
         VStack(alignment: .leading, spacing: Spacing.xxs) {
             Text(entry.day?.year ?? 0, format: .number.grouping(.never))
                 .folioFont(.title2)
-                .foregroundStyle(.emberText)
+                .foregroundStyle(.accentText)
             Text(entry.title.isEmpty ? String(localized: "Untitled") : entry.title)
                 .folioFont(.callout)
                 .foregroundStyle(.ink)

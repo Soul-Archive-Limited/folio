@@ -44,7 +44,7 @@ export function Phone({ dark, screen, input }: { dark: boolean; screen: string; 
     shadow: shadowTexture(),
   }), []);
 
-  const mark = useMemo(() => (dark ? markTexture('#f4f4f5', '#16161a', '#ff7a45') : markTexture('#16161a', '#f5f3ef', '#f0602a')), [dark]);
+  const mark = useMemo(() => markTexture(), []);
   const frameColor = dark ? '#3b3b41' : '#d8d1c6';
 
   useFrame((state, delta) => {

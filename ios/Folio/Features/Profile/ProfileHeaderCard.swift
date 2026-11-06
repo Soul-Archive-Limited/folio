@@ -59,14 +59,14 @@ struct ProfileHeaderCard: View {
     }
 }
 
-/// Initials in an ember circle, or a person glyph when there's no name.
+/// Initials in an accent circle, or a person glyph when there's no name.
 struct Monogram: View {
     let name: String
     var size: Double = 64
 
     var body: some View {
         ZStack {
-            Circle().fill(.ember.gradient)
+            Circle().fill(.accent.gradient)
             if initials.isEmpty {
                 Image(systemName: "person.fill").foregroundStyle(.white)
             } else {

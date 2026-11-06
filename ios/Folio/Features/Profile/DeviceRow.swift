@@ -13,7 +13,7 @@ struct DeviceRow: View {
                 ProfileAvatar(size: 28).accessibilityHidden(true)
             } else {
                 Image(systemName: symbol)
-                    .foregroundStyle(.ember)
+                    .foregroundStyle(.accent)
                     .frame(width: 26)
                     .accessibilityHidden(true)
             }
@@ -30,10 +30,10 @@ struct DeviceRow: View {
             if device.current {
                 Text("This device")
                     .folioFont(.caption)
-                    .foregroundStyle(.emberText)
+                    .foregroundStyle(.accentText)
                     .padding(.horizontal, Spacing.xs)
                     .padding(.vertical, 4)
-                    .background(Capsule().fill(.ember.opacity(0.14)))
+                    .background(Capsule().fill(.accent.opacity(0.14)))
             }
         }
         .folioFont(.body)

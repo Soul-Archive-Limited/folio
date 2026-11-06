@@ -72,7 +72,7 @@ export default function RecentlyDeleted() {
           {items.map((item) => (
             <div key={item.id}>
               <div className="row" data-testid="trash-row">
-                {selecting && <input type="checkbox" aria-label={`Select ${title(item.id)}`} checked={selected.has(item.id)} style={{ width: 20, height: 20, accentColor: 'var(--ember)' }}
+                {selecting && <input type="checkbox" aria-label={`Select ${title(item.id)}`} checked={selected.has(item.id)} style={{ width: 20, height: 20, accentColor: 'var(--accent)' }}
                   onChange={(e) => { const s = new Set(selected); if (e.target.checked) s.add(item.id); else s.delete(item.id); setSelected(s); }} />}
                 <button className="grow" style={{ border: 0, background: 'none', textAlign: 'left', padding: '4px 0' }} onClick={() => kind === 'entry' && setPreview(preview === item.id ? null : item.id)} aria-expanded={kind === 'entry' ? preview === item.id : undefined}>
                   <span style={{ display: 'block' }}>{title(item.id)}</span>

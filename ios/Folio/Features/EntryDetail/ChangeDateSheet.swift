@@ -23,7 +23,7 @@ struct ChangeDateSheet: View {
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) { Button("Cancel", systemImage: "xmark") { dismiss() } }
                     ToolbarItem(placement: .confirmationAction) {
-                        Button("Move", action: move).buttonStyle(.glassProminent).tint(.emberStrong)
+                        Button("Move", action: move).buttonStyle(.glassProminent).tint(.accentStrong)
                     }
                 }
         }

@@ -24,7 +24,7 @@ struct OnboardingUsesStep: View {
                         HStack(spacing: Spacing.s) {
                             Image(systemName: use.symbol)
                                 .font(.title3)
-                                .foregroundStyle(isOn ? AnyShapeStyle(.white) : AnyShapeStyle(.ember))
+                                .foregroundStyle(isOn ? AnyShapeStyle(.white) : AnyShapeStyle(.accent))
                                 .frame(width: 28)
                             Text(use.title)
                                 .folioFont(.headline)
@@ -34,7 +34,7 @@ struct OnboardingUsesStep: View {
                         .padding(.horizontal, Spacing.m)
                         .frame(minHeight: 60)
                         .background {
-                            RoundedRectangle(cornerRadius: Radius.card).fill(.emberStrong).opacity(isOn ? 1 : 0)
+                            RoundedRectangle(cornerRadius: Radius.card).fill(.accentStrong).opacity(isOn ? 1 : 0)
                         }
                         .folioGlass(in: .rect(cornerRadius: Radius.card), interactive: true)
                     }

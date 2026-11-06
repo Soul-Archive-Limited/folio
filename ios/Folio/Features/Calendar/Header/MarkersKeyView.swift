@@ -20,8 +20,8 @@ struct MarkersKeyView: View {
                          matchesFilter: true, showsPhotoTiles: true)
         }
         return [
-            Row(id: 0, state: state(nil, today: true), title: "Today", detail: "An ember number in a thin ember outline."),
-            Row(id: 1, state: state(nil, selected: true), title: "Selected day", detail: "Filled ember. Its pages and tasks show below."),
+            Row(id: 0, state: state(nil, today: true), title: "Today", detail: "An accent number in a thin accent outline."),
+            Row(id: 1, state: state(nil, selected: true), title: "Selected day", detail: "Filled accent. Its pages and tasks show below."),
             Row(id: 2, state: state(DayMarker(entryCount: 2, dotCategoryIDs: [nil, nil])), title: "Pages",
                 detail: "A dot under the number for each page, in its category's colour (up to three)."),
             Row(id: 3, state: state(DayMarker(entryCount: 1, thumbnailPhotoID: photoID)), title: "Photo",
@@ -40,7 +40,7 @@ struct MarkersKeyView: View {
         NavigationStack {
             List(rows) { row in
                 HStack(spacing: Spacing.m) {
-                    DayCell(state: row.state, size: 44, categoryColor: { _ in .ember }, onTap: {})
+                    DayCell(state: row.state, size: 44, categoryColor: { _ in .accent }, onTap: {})
                         .allowsHitTesting(false)
                         .accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 2) {

@@ -4,11 +4,14 @@ import UIKit
 /// Folio's tokens for the widget extension (SPEC §3.2), which doesn't carry the app's asset
 /// catalog: the same light/dark values, as dynamic colours.
 enum WidgetPalette {
-    static let bg = dynamic(light: "F5F3EF", dark: "0A0A0C")
-    static let ink = dynamic(light: "16161A", dark: "F4F4F5")
-    static let ember = dynamic(light: "F0602A", dark: "FF7A45")
+    static let bg = dynamic(light: "F6F3EC", dark: "141418")
+    static let ink = dynamic(light: "17161C", dark: "F3F2F0")
+    /// Ink (Batch K): marks and glyphs; `accentStrong` under white text; `accentText` for words.
+    static let accent = dynamic(light: "3441D5", dark: "949FFF")
+    static let accentStrong = dynamic(light: "303ECF", dark: "4551D3")
+    static let accentText = dynamic(light: "303AC0", dark: "9EA8FF")
     static let done = dynamic(light: "2FA35A", dark: "7ED69B")
-    static let aura = dynamic(light: "FFB38F", dark: "FF7A45")
+    static let aura = dynamic(light: "B8C0FF", dark: "3441D5")
 
     static func tint(light: String?, dark: String?) -> Color? {
         guard let light, let dark else { return nil }
@@ -33,7 +36,7 @@ enum WidgetPalette {
     }
 }
 
-/// The widgets' background: Folio's page colour with a soft ember glow, like the aura.
+/// The widgets' background: Folio's page colour with a soft accent glow, like the aura.
 struct WidgetBackground: View {
     var body: some View {
         ZStack(alignment: .topLeading) {

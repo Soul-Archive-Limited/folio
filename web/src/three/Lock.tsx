@@ -5,7 +5,7 @@ import { damp, flatShape, roundedRect, shadowTexture, slab, studioEnvironment } 
 import type { SceneInput } from './input.ts';
 
 /**
- * The privacy section's lock: an ember body and a steel shackle that swings shut as you scroll
+ * The privacy section's lock: an ink-blue body and a steel shackle that swings shut as you scroll
  * (`input.scroll` 0 = open, 1 = closed). Built from primitives; no model file.
  */
 const BW = 1.5;
@@ -70,15 +70,15 @@ export function Lock({ dark, input }: { dark: boolean; input: SceneInput }) {
     }
   });
 
-  const ember = dark ? '#f2622c' : '#e4521d';
+  const body = dark ? '#4551d3' : '#3441d5';
   return (
     <>
       <group ref={group}>
         <mesh geometry={parts.body}>
-          <meshStandardMaterial color={ember} roughness={0.42} metalness={0.05} envMapIntensity={0.55} />
+          <meshStandardMaterial color={body} roughness={0.42} metalness={0.05} envMapIntensity={0.55} />
         </mesh>
         <mesh geometry={parts.plate} position={[0, 0, 0.2801]}>
-          <meshStandardMaterial color={ember} roughness={0.55} metalness={0} envMapIntensity={0.5} />
+          <meshStandardMaterial color={body} roughness={0.55} metalness={0} envMapIntensity={0.5} />
         </mesh>
         {parts.keyhole.map((geometry, i) => (
           <mesh key={i} geometry={geometry} position={[0, 0, 0.2806]}>

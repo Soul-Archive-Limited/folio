@@ -10,7 +10,7 @@ struct AssemblingMonthArt: View {
     private static let count = 35
     /// Which tiles carry a photo, and which a category dot.
     private static let photoTiles: [Int: Int] = [3: 1, 9: 4, 12: 2, 18: 6, 23: 3, 27: 5, 31: 7]
-    private static let dotTiles: [Int: CategoryColor] = [1: .ocean, 6: .rose, 15: .sage, 20: .violet, 25: .ember, 29: .teal]
+    private static let dotTiles: [Int: CategoryColor] = [1: .ocean, 6: .rose, 15: .sage, 20: .violet, 25: .indigo, 29: .teal]
 
     var body: some View {
         let columns = Array(repeating: GridItem(.flexible(), spacing: 6), count: 7)

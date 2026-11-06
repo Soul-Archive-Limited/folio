@@ -1,9 +1,12 @@
 import SwiftUI
 
 /// The 12 category colours (SPEC §3.2). Stored on `Category.colorKey` by raw value, so
-/// raw values must never change once shipped.
+/// raw values must never change once shipped: Amber is still stored as "ember" (Batch K's
+/// rebrand renamed it and moved it down so the accent-like Indigo comes first).
 nonisolated enum CategoryColor: String, CaseIterable, Identifiable, Sendable {
-    case ember, coral, rose, plum, violet, indigo, ocean, teal, sage, olive, sand, graphite
+    case indigo, ocean, teal, sage, violet, plum, rose, coral
+    case amber = "ember"
+    case sand, olive, graphite
 
     var id: Self { self }
 
@@ -11,7 +14,7 @@ nonisolated enum CategoryColor: String, CaseIterable, Identifiable, Sendable {
 
     @MainActor var resource: ColorResource {
         switch self {
-        case .ember: .categoryEmber
+        case .amber: .categoryEmber
         case .coral: .categoryCoral
         case .rose: .categoryRose
         case .plum: .categoryPlum
@@ -28,7 +31,7 @@ nonisolated enum CategoryColor: String, CaseIterable, Identifiable, Sendable {
 
     var displayName: LocalizedStringResource {
         switch self {
-        case .ember: "Ember"
+        case .amber: "Amber"
         case .coral: "Coral"
         case .rose: "Rose"
         case .plum: "Plum"
