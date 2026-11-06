@@ -24,6 +24,9 @@ app.use(async (c, next) => {
   c.res.headers.set('referrer-policy', 'strict-origin-when-cross-origin');
   c.res.headers.set('strict-transport-security', 'max-age=63072000; includeSubDomains; preload');
   c.res.headers.set('x-frame-options', 'DENY');
+  // Batch L audit: API responses are JSON or encrypted bytes, never pages to render or embed.
+  c.res.headers.set('content-security-policy', "default-src 'none'; frame-ancestors 'none'");
+  c.res.headers.set('cross-origin-resource-policy', 'same-origin');
   if (!c.res.headers.has('cache-control')) c.res.headers.set('cache-control', 'no-store');
 });
 
