@@ -43,4 +43,19 @@ Raw axe results: `docs/reports/batch-l-axe.json` (64 page states).
 
 ## iPhone
 
-See the run recorded below (filled in by the audit at the end of this batch).
+Xcode's accessibility audit (`performAccessibilityAudit`, `FolioUITests/AccessibilityAuditUITests`) on 15 screens — calendar, privacy cover, collapsed calendar, Jump, composer, entry, task composer, Journal timeline/photos/Year in Pixels, search, To-do, Profile (guest, with the sign-in card), Categories, Recently Deleted — at the default text size and at AX5 (iPhone 17 Pro Max Simulator, iOS 26.5).
+
+**Fixed this batch**
+- "Continue with Apple" was disabled without the not-enabled trait (Apple's system button can't carry it). The sign-in buttons now stay active; before the 18+ box is ticked, a tap (or VoiceOver activation) highlights the box and announces why.
+- The 18+ box is a real `Toggle` (VoiceOver announces it as a switch with its state), and the Terms and Privacy Policy are separate 44-pt links beneath it — reachable on their own (they were inside the button's label).
+- The weekday strip was a 17-pt-tall element carrying an action (the marks key): the action moved to the month title button; the strip is hidden from VoiceOver (each day cell speaks its weekday).
+
+**Accepted, with reasons**
+- Contrast, clipped text, Dynamic Type and element detection on Liquid Glass are printed, not failed (DECISIONS 211: measured by hand, 5.5–17:1). iOS 26's new "Dynamic Type partially unsupported" is reported only for system toolbar items and the compact title, whose sizes the system caps.
+- Year in Pixels squares are smaller than 44 pt by design (365 days on a phone); every page they open is also reachable from the Calendar and Journal with full-size targets.
+- The search field's own clear (×) button is the system's.
+
+**Still open (needs a device check with Accessibility Inspector)**
+- On the calendar (and the collapsed calendar) the audit reports one too-small hit area for an element it can't resolve (no element in the snapshot). A probe listing every hittable element under 44 pt (`testListSmallTargets`) found only static images, text and system scroll indicators.
+- The audit reports one element without a description on the search screen (both text sizes) and one on the collapsed calendar, again without an element to name.
+
