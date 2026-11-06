@@ -678,3 +678,10 @@ kbd { font: 600 12px/1 ui-monospace, 'SF Mono', Menlo, monospace; padding: 3px 6
 .cell.drop-target { box-shadow: 0 0 0 2px var(--accent) inset; background: color-mix(in srgb, var(--accent) 14%, transparent); }
 body.dropping .sheet { box-shadow: 0 0 0 2px var(--accent), var(--glass-shadow); }
 @media (prefers-reduced-motion: reduce) { .mini-month span, .welcome-step { animation: fade 0.2s ease-out both; } }
+
+/* Sign-up consent (Batch L): unticked, required, and said plainly. */
+.consent { display: flex; gap: 12px; align-items: flex-start; text-align: left; font-size: 15px; line-height: 1.45; padding: 12px 14px; border-radius: 16px; background: color-mix(in srgb, var(--bg-elevated) 70%, transparent); border: 1px solid var(--hairline); cursor: pointer; }
+.consent input { flex: none; width: 22px; height: 22px; margin: 0; accent-color: var(--accent-strong); }
+.consent a { color: var(--accent-text); }
+.consent.nudge { border-color: var(--danger); }
+.gate .provider[aria-disabled='true'] { opacity: 0.55; }

@@ -27,7 +27,7 @@ async function emailCode(email: string): Promise<string> {
 }
 
 const verify = (email: string, code: string, invite?: string) =>
-  call('/auth/email/verify', { email, code, client: 'ios', deviceName: 'iPhone', ...(invite ? { invite } : {}) });
+  call('/auth/email/verify', { email, code, client: 'ios', deviceName: 'iPhone', adult: true, ...(invite ? { invite } : {}) });
 
 let owner: ReturnType<typeof makeUser> | undefined;
 
@@ -117,6 +117,6 @@ describe('invite-only sign-up', () => {
   it('with invites switched off, anyone can sign up (the existing behaviour)', async () => {
     const email = `f-${crypto.randomUUID()}@example.com`;
     const code = await emailCode(email);
-    expect((await call('/auth/email/verify', { email, code, client: 'ios', deviceName: 'iPhone' }, {}, { ...env, INVITES_REQUIRED: 'false' })).status).toBe(200);
+    expect((await call('/auth/email/verify', { email, code, client: 'ios', deviceName: 'iPhone', adult: true }, {}, { ...env, INVITES_REQUIRED: 'false' })).status).toBe(200);
   });
 });

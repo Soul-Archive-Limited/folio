@@ -7,6 +7,8 @@ enum SignInProblem: Equatable {
     case expired, googleUnavailable
     /// Batch J: a new account needs an invite code.
     case inviteRequired, inviteInvalid
+    /// Batch L: a new account needs "I'm 18 or older…" ticked.
+    case ageRequired
 
     var needsInvite: Bool { self == .inviteRequired || self == .inviteInvalid }
 
@@ -22,6 +24,7 @@ enum SignInProblem: Equatable {
         case .googleUnavailable: "Google sign-in isn't working on our side right now. Please use Apple or email, or try again later."
         case .inviteRequired: "Folio is invite-only for now. Enter the invite code you were given."
         case .inviteInvalid: "That invite code didn't work. It may be used, expired or mistyped."
+        case .ageRequired: "Folio accounts are for adults. Tick “I’m 18 or older” and try again."
         }
     }
 }
@@ -32,6 +35,7 @@ extension SignInProblem {
         self = switch oauthError {
         case "invite_required": .inviteRequired
         case "invite_invalid": .inviteInvalid
+        case "age_required": .ageRequired
         case "expired": .expired
         case "google_unavailable": .googleUnavailable
         case "account_deleting": .deleting
@@ -50,6 +54,7 @@ extension APIError {
         case .server(_, "reauth_mismatch"): .reauthMismatch
         case .server(403, "invite_required"): .inviteRequired
         case .server(403, "invite_invalid"): .inviteInvalid
+        case .server(403, "age_required"): .ageRequired
         default: .failed
         }
     }

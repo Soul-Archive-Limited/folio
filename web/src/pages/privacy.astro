@@ -1,53 +1,89 @@
 ---
 import Page from '../layouts/Page.astro';
 import { site } from '../config/site';
+const updated = '6 November 2026';
 ---
-<Page title="Privacy Policy" heading="Privacy" updated="29 October 2026"
-  description="How Folio handles your data: nothing leaves your iPhone without an account, and with one your diary is end-to-end encrypted so we can't read it."
-  lede="Plain English, because it’s your diary. The short version: we can’t read it.">
+<Page title="Privacy Policy" heading="Privacy" updated={updated}
+  description="How Folio handles personal data: nothing leaves your iPhone without an account; with one, your diary is end-to-end encrypted so we can't read it. Plain English, accurate to what the code does."
+  lede="Plain English, because it’s your diary. The short version: without an account we receive nothing, and with one we store your diary only in a form we can’t read.">
   <h2>Who we are</h2>
-  <p>Folio is made by {site.company.name}, a company registered in England and Wales (company no. {site.company.number}), registered office {site.company.office}. We are the controller of the little personal data described here. Questions: <a href={`mailto:${site.privacyEmail}`}>{site.privacyEmail}</a>.</p>
+  <p>Folio is made by {site.company.name}, a private limited company registered in England and Wales (company no. {site.company.number}), registered office {site.company.office}. We are the <strong>controller</strong> of the personal data described here (in India’s Digital Personal Data Protection Act 2023, the “Data Fiduciary”).</p>
+  <p><strong>Privacy contact</strong> (including our grievance contact for users in India): <a href={`mailto:${site.privacyEmail}`}>{site.privacyEmail}</a>. Post: {site.company.name}, {site.company.office}. We reply within one month.</p>
 
   <h2>Without an account</h2>
-  <p>Everything stays on your iPhone. We receive nothing: no diary content, no usage data, no identifiers.</p>
+  <p>The iPhone app works fully without an account. Everything stays on your iPhone and we receive nothing — no diary content, no usage data, no identifiers, no analytics.</p>
+  <p>This website sets no cookies, runs no analytics and loads nothing from other companies. Our hosting provider, Cloudflare, necessarily handles your IP address and the pages you request to deliver them (see “Who processes data for us”).</p>
+  <p>If you test Folio through Apple’s TestFlight and choose to send feedback or a crash report, Apple passes it to us with the email address you use for TestFlight. We use it only to fix the problem you reported.</p>
 
   <h2>With an account</h2>
-  <p>Accounts and sync are coming soon. When you choose to turn them on, we store:</p>
+  <p>An account is optional. It lets you use Folio on the web and on more than one device. When you have one, we store:</p>
+  <table>
+    <thead><tr><th>What</th><th>Why</th><th>How long</th></tr></thead>
+    <tbody>
+      <tr><td>Your email address, and the account ID Apple or Google gives us if you sign in with them</td><td>To sign you in and link sign-in methods with the same verified email</td><td>Until you delete your account</td></tr>
+      <tr><td>If you use Sign in with Apple: a refresh token, encrypted with a server key</td><td>Only to revoke Folio’s access at Apple when you delete your account</td><td>Until you delete your account</td></tr>
+      <tr><td>When your account was created, and when you confirmed you are 18 or older and accepted the Terms and this policy</td><td>To run the account and to show that sign-up met our age rule</td><td>Until you delete your account</td></tr>
+      <tr><td>For each signed-in device: its model and system version (for example “iPhone 17 Pro · iOS 26.5” or “Chrome on macOS”), when it was added and last seen, and a hash of its sign-in token. A name you give a device is end-to-end encrypted.</td><td>So you can see and sign out your devices</td><td>Until you sign that device out (sessions end after 30 days unused) or delete your account</td></tr>
+      <tr><td>Your diary — entries, photos, tasks, categories, mood and settings — <strong>only end-to-end encrypted</strong>, with the minimum metadata needed to sync it: record ID, type, version, size, the time it changed and whether it was deleted</td><td>To keep your devices in sync</td><td>Until you delete it or your account</td></tr>
+      <tr><td>A copy of your diary key, locked with your recovery key (which we never see)</td><td>So you can unlock a new device with your recovery key</td><td>Until you delete your account</td></tr>
+      <tr><td>Short-lived sign-in data: a keyed hash of an email code, sign-in “state” values, a one-time hand-off code, a device-link request</td><td>To complete a sign-in or link a device safely</td><td>10 minutes or less (link requests 5 minutes)</td></tr>
+      <tr><td>Counters of sign-in and code requests per network address — a keyed hash of the address, never the address itself</td><td>To stop abuse and guessing (legitimate interests)</td><td>Up to two days</td></tr>
+      <tr><td>If you make or use an invite: a keyed hash of the code, its last two characters, who made it and who used it</td><td>Invite-only sign-up</td><td>Until the account that made it is deleted</td></tr>
+      <tr><td>After you delete your account: a one-way hash of your former user ID and the time</td><td>To show the deletion happened</td><td>Kept as a record; it can’t be turned back into your ID or email</td></tr>
+    </tbody>
+  </table>
+  <p><strong>End-to-end encrypted</strong> means your diary is locked on your device, with a key only your devices hold, before it is sent. Our servers can’t read entry titles, text, photos, tasks, categories, moods, which day an entry belongs to, or your settings — and we can’t recover your diary without your devices or your recovery key. Because Apple’s App Store privacy labels have no category for data we can’t read, our label lists diary content as data we collect; it is still only stored in a form we can’t read.</p>
+
+  <h2>What we don’t do</h2>
   <ul>
-    <li>your email address and the IDs of the sign-in providers you use (Apple, Google or email), so you can sign in;</li>
-    <li>the model and system version of each signed-in device (for example “iPhone 15 Pro · iOS 27.1” or “Chrome on macOS”), when it was added and when it was last seen, so you can manage and sign them out. A name you give a device is end-to-end encrypted like your diary;</li>
-    <li>your diary — entries, photos, tasks, categories and settings — <strong>only in end-to-end encrypted form</strong>. It is encrypted on your device with a key only your devices hold. We can’t read it, and we can’t recover it without your devices or your recovery key. Because Apple’s App Store privacy labels have no category for end-to-end encrypted data, our label lists your photos and other diary content as data we collect — it is still only stored in a form we can’t read.</li>
+    <li>No advertising, no analytics, no tracking, no session recording and no third-party code in the iPhone app. We don’t sell or share personal data, and we don’t use it to train AI.</li>
+    <li>We never send marketing email. The only emails are sign-in codes and a confirmation when you delete your account.</li>
+    <li>Dictation and the ✦ writing tools run on your iPhone with Apple’s on-device models; audio and text don’t reach us, and audio is never stored. Search runs on your device or in your browser tab.</li>
+    <li>No location, contacts or calendar data is sent to us. If you turn on Apple Calendar events, they’re read on your iPhone only and never copied into Folio.</li>
+    <li>No automated decisions with legal or similar effects are made about you.</li>
   </ul>
-  <p>Our servers see only what they need to move encrypted data around: record IDs, sizes, version numbers and timestamps.</p>
+
+  <h2>Our lawful bases (UK and EU GDPR)</h2>
+  <ul>
+    <li><strong>Contract</strong> (Article 6(1)(b)): running your account and syncing your diary, which you ask us to do by signing up.</li>
+    <li><strong>Legitimate interests</strong> (Article 6(1)(f)): keeping the service secure — rate limits, the Cloudflare Turnstile check on the web email sign-in, and the deletion record.</li>
+    <li><strong>Legal obligation</strong> (Article 6(1)(c)): anything we must keep or disclose by law.</li>
+  </ul>
+  <p>For users in India, we process the personal data above for the purpose you give it to us — signing in and syncing — on the basis of your consent when you sign up, which you can withdraw at any time by deleting your account.</p>
 
   <h2>Who processes data for us</h2>
   <ul>
-    <li><strong>Cloudflare</strong> hosts this website, our servers, database and storage. Data may be processed anywhere in Cloudflare’s global network.</li>
-    <li><strong>Resend</strong> sends sign-in codes by email.</li>
-    <li><strong>Apple</strong> and <strong>Google</strong>, only if you choose to sign in with them.</li>
+    <li><strong>Cloudflare, Inc.</strong> hosts this website, the web app, our server, database and encrypted photo storage, and runs the Turnstile check on the web email sign-in. Data may be processed anywhere in Cloudflare’s global network, including the United States. Cloudflare acts as our processor under its Data Processing Addendum, which includes the EU Standard Contractual Clauses and the UK International Data Transfer Addendum, and Cloudflare participates in the EU–US Data Privacy Framework and its UK extension.</li>
+    <li><strong>Resend</strong> (Plus Five Five, Inc., United States) delivers sign-in codes and the deletion confirmation. It receives your email address and the message. Resend acts as our processor under its Data Processing Addendum, which includes the Standard Contractual Clauses for transfers outside the UK and EU.</li>
+    <li><strong>Apple</strong> and <strong>Google</strong>, only if you choose Sign in with Apple or Google. They act as independent controllers for their own sign-in, under their own privacy policies. From Google we receive only your account ID, email address and whether it is verified (scopes: openid, email, profile); we use Google user data only to sign you in, never for anything else.</li>
+    <li><strong>Apple</strong> distributes the iPhone app through the App Store and TestFlight under its own terms and privacy policy.</li>
   </ul>
-  <p>We don’t sell or share your data with anyone else, and there is no advertising.</p>
-
-  <h2>Dictation and writing tools</h2>
-  <p>Dictation and the ✦ writing tools run on your iPhone using Apple’s on-device models. Audio and text are not sent to us or to anyone else, and audio is never stored.</p>
-
-  <h2>Cookies</h2>
-  <p>This website sets no cookies and runs no analytics. The web app, when it launches, will use one strictly necessary cookie to keep you signed in — nothing for analytics or advertising, so there’s no cookie banner.</p>
 
   <h2>How long we keep things</h2>
   <ul>
-    <li>Account data: until you delete your account. Deletion is immediate for you; server clean-up, including backups, finishes within 30 days at most.</li>
+    <li>Account data: until you delete your account. Deletion is immediate for you; server clean-up of the database and encrypted photos completes within minutes, and Cloudflare’s backups of our database expire within 30 days.</li>
     <li>Items you delete in Folio go to <strong>Recently Deleted</strong> on your devices for 30 days, then they’re permanently deleted (sooner if you empty it).</li>
-    <li>To stop abuse, sign-in and code requests are counted per network address for up to two days. We store only a keyed hash of the address, never the address itself.</li>
-    <li>Support emails: up to 24 months.</li>
+    <li>Support emails: up to 24 months, then deleted.</li>
   </ul>
 
   <h2>Your rights</h2>
-  <p>Under UK GDPR and EU GDPR you can ask for access to your data, a copy of it, correction or deletion. The quickest copy is the in-app export (Profile → Your data → Export). You can delete your account in the app or on the web — see <a href="/delete-account">Delete your account</a>. You can also complain to the UK Information Commissioner’s Office (<a href="https://ico.org.uk" rel="noopener">ico.org.uk</a>).</p>
+  <p>Under UK GDPR and EU GDPR you can ask us for access to your personal data, a copy of it, to correct it, to delete it, to restrict or object to how we use it, and for data portability. Under India’s DPDP Act you can ask for a summary of your data and how it is processed, correction, completion or erasure, grievance redressal, and to nominate someone to act for you.</p>
+  <ul>
+    <li>The quickest copy of your diary is the export in Folio (Profile → Your data → Export as JSON + photos, or Export PDF), on iPhone and the web — it is decrypted only on your device.</li>
+    <li>Delete your account in the app or on the web: see <a href="/delete-account">Delete your account</a>.</li>
+    <li>For anything else, email <a href={`mailto:${site.privacyEmail}`}>{site.privacyEmail}</a>. Because we can’t read your diary, we can only ever give you its encrypted form; your own export is the readable copy.</li>
+  </ul>
+  <p>You can complain to the UK Information Commissioner’s Office (<a href="https://ico.org.uk/make-a-complaint/" rel="noopener">ico.org.uk/make-a-complaint</a>), to the data protection authority where you live in the EU, or, in India, to the Data Protection Board of India after first raising it with us. We’d appreciate the chance to put it right first.</p>
 
-  <h2>Children</h2>
-  <p>Folio is not directed at children under 13.</p>
+  <h2>Age</h2>
+  <p>Accounts are for people aged 18 or over: when you sign up you confirm you are 18 or older. The iPhone app without an account sends nothing to us, so anyone can use it that way. Folio is not directed at children. If we learn that an account belongs to someone under 18, we will delete it.</p>
+
+  <h2>Security</h2>
+  <p>Your diary is encrypted with AES-256-GCM on your device before upload; sign-in tokens and codes are stored only as hashes; everything travels over HTTPS. Our code is open source, so anyone can check this: <a href={site.githubUrl} rel="noopener">GitHub</a>. How it works, in plain English: <a href="/security">Privacy &amp; security</a>.</p>
+
+  <h2>Cookies and storage</h2>
+  <p>The website sets none. The web app uses one strictly necessary sign-in cookie and stores a few interface preferences in your browser — every item is listed in our <a href="/cookies">Cookie Policy</a>.</p>
 
   <h2>Changes</h2>
-  <p>If this policy changes, we’ll update the date at the top and, for meaningful changes, tell you in the app.</p>
+  <p>If this policy changes, we’ll update the date at the top and, for meaningful changes, tell you in the app before they apply.</p>
 </Page>

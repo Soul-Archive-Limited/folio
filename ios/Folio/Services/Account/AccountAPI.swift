@@ -23,6 +23,8 @@ nonisolated enum AccountAPI {
         let reauth: Bool
         /// Batch J: only when a new account needs one (left out of the JSON when nil).
         var invite: String?
+        /// Batch L: "I'm 18 or older and agree to the Terms and Privacy Policy" was ticked.
+        var adult: Bool?
     }
 
     struct EmailStart: Encodable, Sendable {
@@ -37,6 +39,7 @@ nonisolated enum AccountAPI {
         let deviceName: String
         let reauth: Bool
         var invite: String?
+        var adult: Bool?
     }
 
     struct Exchange: Encodable, Sendable {

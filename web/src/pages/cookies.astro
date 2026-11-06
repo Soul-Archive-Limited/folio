@@ -1,0 +1,46 @@
+---
+import Page from '../layouts/Page.astro';
+import { site } from '../config/site';
+---
+<Page title="Cookie Policy" heading="Cookies" updated="6 November 2026"
+  description="Every cookie and browser storage item Folio uses, what it's for and how long it lasts. The website sets none; the web app uses one sign-in cookie."
+  lede="Short, because there’s very little: the website sets nothing, and the web app keeps you signed in and remembers a few choices you make.">
+  <h2>This website</h2>
+  <p>The website (every page outside <code>/app</code>) sets <strong>no cookies</strong> and stores <strong>nothing</strong> in your browser. It has no analytics, no advertising and nothing from other companies. We checked this on the live site in November 2026: after visiting the main pages, the browser held no cookies, no local storage and no session storage, and every request went to folio.devilsense.com only.</p>
+
+  <h2>The web app (folio.devilsense.com/app)</h2>
+  <h3>Cookies</h3>
+  <table>
+    <thead><tr><th>Name</th><th>Set by</th><th>Purpose</th><th>Lasts</th></tr></thead>
+    <tbody>
+      <tr><td><code>__Host-folio_session</code></td><td>Folio</td><td>Keeps you signed in. A random token; we store only its hash. HttpOnly, Secure, SameSite=Lax, this site only.</td><td>30 days, renewed while you use Folio; removed when you sign out</td></tr>
+      <tr><td><code>__Host-folio_oauth</code></td><td>Folio</td><td>Only during Sign in with Apple or Google on the web: ties the round trip to your browser so nobody can finish it for you. HttpOnly, Secure.</td><td>10 minutes, removed when sign-in finishes</td></tr>
+    </tbody>
+  </table>
+  <h3>Storage in your browser</h3>
+  <table>
+    <thead><tr><th>Item</th><th>Where</th><th>Purpose</th><th>Lasts</th></tr></thead>
+    <tbody>
+      <tr><td><code>folio</code> (database, store <code>trust</code>)</td><td>IndexedDB</td><td>Only if you tick “Trust this browser for 30 days”: your diary key, sealed by a key that can’t leave this browser, so you don’t unlock every visit.</td><td>30 days, or until you choose Forget or sign out</td></tr>
+      <tr><td><code>folio.theme</code></td><td>localStorage</td><td>Your Light / Dark choice, so the page opens in it before your settings load.</td><td>Until you clear it</td></tr>
+      <tr><td><code>folio.signedIn</code></td><td>localStorage</td><td>“1” after you sign in here, so the first screen is “Opening your diary…” instead of sign-in. Removed on sign-out.</td><td>Until you sign out</td></tr>
+      <tr><td><code>folio.device</code></td><td>localStorage</td><td>Remembers that this browser already told Folio its name (for example “Safari on macOS”) for the Devices list.</td><td>Until you clear it</td></tr>
+      <tr><td><code>folio.welcomed.&lt;account&gt;</code></td><td>localStorage</td><td>That you’ve seen the welcome in this browser.</td><td>Until you clear it</td></tr>
+      <tr><td><code>folio.photoTiles</code>, <code>folio.showCompleted</code>, <code>folio.todoClosed</code>, <code>folio.journalFolds</code></td><td>localStorage</td><td>Choices you make on screen: photo tiles on the calendar, the Completed list, which To-do groups and Journal months are folded.</td><td>Until you clear them</td></tr>
+      <tr><td>App shell</td><td>Cache Storage (service worker, scope <code>/app</code>)</td><td>The web app’s own code, fonts and icons, so it opens quickly and shows a clear message offline. It never stores your diary, encrypted or not.</td><td>Replaced on each update</td></tr>
+    </tbody>
+  </table>
+  <p>Your diary itself is decrypted only in the tab’s memory and is gone when you close it.</p>
+
+  <h3>Cloudflare Turnstile</h3>
+  <p>When you choose <em>Continue with email</em> on the web, a Cloudflare Turnstile check loads from challenges.cloudflare.com to stop automated sign-up abuse. It loads only on that step, never on the website or inside your diary. In our test (Brave, November 2026) it set no cookies. Where Cloudflare does set a security cookie, it is used only to tell people from bots — Cloudflare says it does not use Turnstile data to identify, profile or target anyone (<a href="https://www.cloudflare.com/turnstile-privacy-policy/" rel="noopener">Turnstile Privacy Addendum</a>).</p>
+
+  <h2>Why there’s no cookie banner</h2>
+  <p>UK and EU law (the Privacy and Electronic Communications Regulations and the ePrivacy Directive) require consent for cookies and similar storage unless they are <strong>strictly necessary</strong> to provide a service you asked for. Everything above is: the sign-in cookies and the trusted-browser key are needed to sign you in and open your diary; the preferences remember choices you make yourself; the security check protects the sign-in you started. We use nothing for analytics or advertising, so there is nothing to ask consent for. If that ever changed, we would ask first.</p>
+
+  <h2>The iPhone app</h2>
+  <p>The iPhone app uses no cookies and no tracking. Your sign-in and diary key are kept in the iPhone’s Keychain; settings stay on the device unless they sync, encrypted, with your account.</p>
+
+  <h2>Questions</h2>
+  <p><a href={`mailto:${site.privacyEmail}`}>{site.privacyEmail}</a> · See also our <a href="/privacy">Privacy Policy</a>.</p>
+</Page>

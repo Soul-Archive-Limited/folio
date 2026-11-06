@@ -1,0 +1,25 @@
+---
+import Page from '../layouts/Page.astro';
+import { site } from '../config/site';
+---
+<Page title="Company details" heading="Company details" updated="6 November 2026"
+  description="Who makes Folio: Soul Archive Ltd, registered in England and Wales, company number 16186654, with its registered office and contact details."
+  lede="Who makes Folio, and how to reach us.">
+  <dl class="facts">
+    <div><dt>Company</dt><dd>{site.company.name}</dd></div>
+    <div><dt>Type</dt><dd>Private limited company, registered in England and Wales</dd></div>
+    <div><dt>Company number</dt><dd><a href={`https://find-and-update.company-information.service.gov.uk/company/${site.company.number}`} rel="noopener">{site.company.number}</a> (Companies House)</dd></div>
+    <div><dt>Registered office</dt><dd>{site.company.office}</dd></div>
+    <div><dt>Support</dt><dd><a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a></dd></div>
+    <div><dt>Privacy and data protection</dt><dd><a href={`mailto:${site.privacyEmail}`}>{site.privacyEmail}</a> (also our grievance contact for users in India)</dd></div>
+    <div><dt>Product</dt><dd>Folio — a private calendar diary for iPhone and the web</dd></div>
+  </dl>
+  <p>The registered office is our official address for post and legal notices. For anything about Folio, email is fastest.</p>
+</Page>
+<style>
+  .facts { margin: 0; border-top: 1px solid var(--hairline); }
+  .facts div { display: grid; grid-template-columns: 220px 1fr; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--hairline); }
+  .facts dt { color: var(--text-2); }
+  .facts dd { margin: 0; }
+  @media (max-width: 640px) { .facts div { grid-template-columns: 1fr; gap: 2px; } }
+</style>

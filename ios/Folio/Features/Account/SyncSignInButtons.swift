@@ -33,16 +33,16 @@ struct SyncSignInButtons: View {
     static let height: Double = 50
 
     var body: some View {
+        @Bindable var account = account
         VStack(spacing: Spacing.s) {
-            appleButton
-            googleButton
-            Button(action: onEmail) {
-                Label("Continue with email", systemImage: "envelope")
-                    .font(.body.weight(.medium))
-                    .frame(maxWidth: .infinity, minHeight: Self.height)
+            if !reauth { AgeConsentRow(isOn: $account.ageConfirmed) }
+            Group {
+                appleButton
+                googleButton
+                emailButton
             }
-            .buttonStyle(.glass)
-            .foregroundStyle(.ink)
+            .disabled(!reauth && !account.ageConfirmed)
+            .opacity(!reauth && !account.ageConfirmed ? 0.5 : 1)
         }
         .disabled(busy)
         .opacity(busy ? 0.6 : 1)
@@ -56,6 +56,16 @@ struct SyncSignInButtons: View {
                 }
             }
         }
+    }
+
+    private var emailButton: some View {
+            Button(action: onEmail) {
+                Label("Continue with email", systemImage: "envelope")
+                    .font(.body.weight(.medium))
+                    .frame(maxWidth: .infinity, minHeight: Self.height)
+            }
+            .buttonStyle(.glass)
+            .foregroundStyle(.ink)
     }
 
     private var appleButton: some View {
@@ -157,10 +167,41 @@ struct SyncSignInButtons: View {
     }
 }
 
-/// "By continuing you agree to the Terms and Privacy Policy" (SPEC §6.1).
+/// Batch L: accounts are 18+. An unticked box above the sign-in buttons; they wait for it.
+struct AgeConsentRow: View {
+    @Binding var isOn: Bool
+
+    var body: some View {
+        Button { isOn.toggle() } label: {
+            HStack(alignment: .firstTextBaseline, spacing: Spacing.s) {
+                Image(systemName: isOn ? "checkmark.square.fill" : "square")
+                    .font(.title3)
+                    .foregroundStyle(isOn ? AnyShapeStyle(.accentStrong) : AnyShapeStyle(.inkSecondary))
+                    .contentTransition(.symbolEffect(.replace))
+                Text("I’m 18 or older and agree to the [Terms](https://folio.devilsense.com/terms) and [Privacy Policy](https://folio.devilsense.com/privacy).")
+                    .font(.subheadline)
+                    .foregroundStyle(.ink)
+                    .tint(.accentText)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(Spacing.s)
+            .frame(minHeight: Spacing.minHitTarget)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("I’m 18 or older and agree to the Terms and Privacy Policy")
+        .accessibilityAddTraits(.isToggle)
+        .accessibilityValue(isOn ? "Ticked" : "Not ticked")
+        .accessibilityHint("Required to create an account.")
+    }
+}
+
+/// What signing in is for (SPEC §6.1, Batch L): plain purpose text, no marketing.
 struct LegalFooter: View {
     var body: some View {
-        Text("By continuing you agree to the [Terms](https://folio.devilsense.com/terms) and [Privacy Policy](https://folio.devilsense.com/privacy).")
+        Text("We use your email only to sign you in — never for marketing. Your diary is encrypted so only you can read it.")
             .font(.footnote)
             .foregroundStyle(.inkSecondary)
             .tint(.inkSecondary)

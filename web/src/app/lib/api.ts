@@ -80,6 +80,7 @@ export function friendly(error: unknown): string {
     case 'invite_required': return 'Folio is invite-only for now. Enter the invite code you were given.';
     case 'invite_invalid': return "That invite code didn't work. It may be used, expired or mistyped.";
     case 'turnstile': return 'Please complete the check above and try again.';
+    case 'age_required': return 'Folio accounts are for adults. Go back, tick “I’m 18 or older”, and try again.';
     case 'quota_photos': return 'Your photo storage is full (1 GB). Delete some photos to add more.';
     case 'quota_records': return 'Your diary has reached 50,000 items.';
     case 'reauth_required': return "Please confirm it's you again.";

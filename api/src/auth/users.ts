@@ -40,14 +40,18 @@ async function existingUser(env: Env, identity: Identity, email: string | null):
  * authorization code, an email code), a sign-in that would create an account without an open
  * invite. Existing accounts, the owner and App Review's address pass.
  */
-export async function checkInvite(env: Env, identity: Identity, inviteHash: string | null): Promise<void> {
+export async function checkInvite(env: Env, identity: Identity, inviteHash: string | null, adult = false): Promise<void> {
   const email = identity.email ? normaliseEmail(identity.email) : null;
-  if (!needsInvite(env, email) || (await existingUser(env, identity, email))) return;
+  if (await existingUser(env, identity, email)) return;
+  // Batch L: accounts are 18+. The person ticked "I'm 18 or older and agree to the Terms and
+  // Privacy Policy" on the sign-up screen; without it, no account is made (and nothing is spent).
+  if (!adult) fail(403, 'age_required');
+  if (!needsInvite(env, email)) return;
   if (!inviteHash) fail(403, 'invite_required');
   if (!(await inviteIsOpen(env, inviteHash))) fail(403, 'invite_invalid');
 }
 
-export async function resolveUser(env: Env, identity: Identity, inviteHash: string | null = null, now = Date.now()): Promise<{ userId: string; isNew: boolean }> {
+export async function resolveUser(env: Env, identity: Identity, inviteHash: string | null = null, now = Date.now(), adult = false): Promise<{ userId: string; isNew: boolean }> {
   const email = identity.email ? normaliseEmail(identity.email) : null;
   const existing = await env.DB.prepare(
     `SELECT a.user_id FROM accounts a JOIN users u ON u.id = a.user_id
@@ -76,11 +80,12 @@ export async function resolveUser(env: Env, identity: Identity, inviteHash: stri
   const statements: D1PreparedStatement[] = [];
   if (!userId) {
     userId = crypto.randomUUID();
+    if (!adult) fail(403, 'age_required');
     if (needsInvite(env, email)) {
       if (!inviteHash) fail(403, 'invite_required');
       await redeemInvite(env, inviteHash, userId, now);
     }
-    statements.push(env.DB.prepare('INSERT INTO users (id, email, created_at) VALUES (?1, ?2, ?3)').bind(userId, email, now));
+    statements.push(env.DB.prepare('INSERT INTO users (id, email, created_at, age_confirmed_at) VALUES (?1, ?2, ?3, ?3)').bind(userId, email, now));
   }
   statements.push(env.DB.prepare(
     `INSERT INTO accounts (id, user_id, provider, provider_user_id, email, refresh_token_enc, created_at)

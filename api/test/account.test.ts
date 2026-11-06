@@ -104,9 +104,9 @@ describe('signing in during a deletion', () => {
     const email = `again-${crypto.randomUUID()}@example.com`;
     const user = await makeUser(email);
     expect((await api('/account/delete', { method: 'POST', token: user.token, json: { confirm: 'DELETE' } })).status).toBe(200);
-    await expect(resolveUser(env, { provider: 'email', providerUserId: email, email, emailVerified: true })).rejects.toThrow();
+    await expect(resolveUser(env, { provider: 'email', providerUserId: email, email, emailVerified: true }, null, Date.now(), true)).rejects.toThrow();
     await finishWipe(user.userId);
-    const fresh = await resolveUser(env, { provider: 'email', providerUserId: email, email, emailVerified: true });
+    const fresh = await resolveUser(env, { provider: 'email', providerUserId: email, email, emailVerified: true }, null, Date.now(), true);
     expect(fresh.isNew).toBe(true);
     expect(fresh.userId).not.toBe(user.userId);
   });

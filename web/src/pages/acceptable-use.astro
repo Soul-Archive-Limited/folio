@@ -1,0 +1,26 @@
+---
+import Page from '../layouts/Page.astro';
+import { site } from '../config/site';
+---
+<Page title="Acceptable Use Policy" heading="Acceptable use" updated="6 November 2026"
+  description="The few rules for using Folio's service fairly: use it lawfully, don't attack it, and keep accounts to adults."
+  lede="Folio is a private diary, so what you write is yours. These rules are about how the service is used.">
+  <h2>Please do</h2>
+  <ul>
+    <li>Use Folio for your own diary, tasks and photos.</li>
+    <li>Keep your recovery key and devices safe.</li>
+    <li>Tell us about security problems at <a href={`mailto:${site.privacyEmail}`}>{site.privacyEmail}</a> — we welcome responsible disclosure.</li>
+  </ul>
+  <h2>Please don’t</h2>
+  <ul>
+    <li>Use Folio to break the law, including storing material that is illegal to possess where you are.</li>
+    <li>Create an account if you are under 18, or for someone else without their permission.</li>
+    <li>Try to get into another person’s account or data, or to get around our security, rate limits or invite rules.</li>
+    <li>Overload, probe or scan our servers, send automated traffic, or scrape the service.</li>
+    <li>Use Folio’s name, logo or app icon in a way that suggests we endorse you (the code’s open-source licence doesn’t cover them).</li>
+    <li>Resell or offer the service to others as your own.</li>
+  </ul>
+  <h2>What happens if these rules are broken</h2>
+  <p>Because your diary is end-to-end encrypted, we can’t see what you store and don’t monitor it. We act on what we can see — traffic, abuse of sign-in or storage, reports we receive — and may limit or suspend an account that breaks these rules, telling you why where we can. You can always export your diary from your own devices first.</p>
+  <p>These rules are part of our <a href="/terms">Terms of Use</a>.</p>
+</Page>

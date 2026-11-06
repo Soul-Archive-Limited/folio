@@ -15,7 +15,7 @@ extension AccountModel {
         }
         let code = credential.authorizationCode.flatMap { String(data: $0, encoding: .utf8) }
         let request = AccountAPI.AppleNative(identityToken: identityToken, rawNonce: rawNonce, authorizationCode: code,
-                                             deviceName: SignInSecrets.deviceName, reauth: reauth, invite: invite)
+                                             deviceName: SignInSecrets.deviceName, reauth: reauth, invite: invite, adult: ageConfirmed ? true : nil)
         if reauth {
             let _: AccountAPI.Reauthenticated = try await api.send("POST", "auth/apple/native", json: request)
             noteReauthenticated()
@@ -32,7 +32,7 @@ extension AccountModel {
     }
 
     func verifyEmailCode(_ code: String, email: String, reauth: Bool = false, invite: String? = nil) async throws(APIError) {
-        let request = AccountAPI.EmailVerify(email: email, code: code, deviceName: SignInSecrets.deviceName, reauth: reauth, invite: invite)
+        let request = AccountAPI.EmailVerify(email: email, code: code, deviceName: SignInSecrets.deviceName, reauth: reauth, invite: invite, adult: ageConfirmed ? true : nil)
         if reauth {
             let _: AccountAPI.Reauthenticated = try await api.send("POST", "auth/email/verify", json: request)
             noteReauthenticated()
@@ -54,6 +54,7 @@ extension AccountModel {
             URLQueryItem(name: "challenge", value: SignInSecrets.challenge(for: verifier)),
         ] + (reauth ? [URLQueryItem(name: "reauth", value: "1")] : [])
           + (invite.map { [URLQueryItem(name: "invite", value: $0)] } ?? [])
+          + (ageConfirmed && !reauth ? [URLQueryItem(name: "adult", value: "1")] : [])
         guard let start = components?.url else { throw .failed }
 
         let callback: URL

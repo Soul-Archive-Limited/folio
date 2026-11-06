@@ -21,7 +21,15 @@ export function SignIn({ error }: { error?: string }) {
   // Batch J: Apple or Google came back saying a new account needs an invite.
   const asksInvite = /invite_(required|invalid)/.test(location.search);
   const [invite, setInvite] = useState('');
-  const withInvite = (href: string) => (asksInvite && invite ? `${href}${href.includes('?') ? '&' : '?'}invite=${encodeURIComponent(invite)}` : href);
+  // Batch L: accounts are 18+. The box starts unticked and every way in waits for it; the server
+  // refuses a new account without it (existing accounts are never asked).
+  const [adult, setAdult] = useState(false);
+  const withInvite = (href: string) => {
+    const params = [adult ? 'adult=1' : '', asksInvite && invite ? `invite=${encodeURIComponent(invite)}` : ''].filter(Boolean).join('&');
+    return params ? `${href}${href.includes('?') ? '&' : '?'}${params}` : href;
+  };
+  const blocked = (event: React.MouseEvent) => { if (!adult) { event.preventDefault(); setNudge(true); } };
+  const [nudge, setNudge] = useState(false);
 
   return (
     <Gate>
@@ -32,17 +40,22 @@ export function SignIn({ error }: { error?: string }) {
           {error && <p className="error" role="alert">{error}</p>}
           <div style={{ display: 'grid', gap: 10, marginTop: 6 }}>
             {asksInvite && <InviteField value={invite} onChange={setInvite} />}
-            <a className="provider apple" href={withInvite('/api/auth/apple/start')} onClick={() => rememberSession(true)}><AppleLogo />Continue with Apple</a>
-            <a className="provider" href={withInvite('/api/auth/google/start?platform=web')} onClick={() => rememberSession(true)}><GoogleLogo />Continue with Google</a>
+            <label className={`consent${nudge && !adult ? ' nudge' : ''}`}>
+              <input type="checkbox" checked={adult} onChange={(e) => { setAdult(e.target.checked); setNudge(false); }} aria-describedby="consent-why" />
+              <span>I’m 18 or older and agree to the <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.</span>
+            </label>
+            {nudge && !adult && <p className="error" role="alert" id="consent-need">Tick the box to continue. Folio accounts are for adults.</p>}
+            <a className="provider apple" aria-disabled={!adult} href={withInvite('/api/auth/apple/start')} onClick={(e) => { blocked(e); if (adult) rememberSession(true); }}><AppleLogo />Continue with Apple</a>
+            <a className="provider" aria-disabled={!adult} href={withInvite('/api/auth/google/start?platform=web')} onClick={(e) => { blocked(e); if (adult) rememberSession(true); }}><GoogleLogo />Continue with Google</a>
             <div className="or">or</div>
-            <button className="provider" onClick={() => setStep('email')}>Continue with email</button>
+            <button className="provider" aria-disabled={!adult} onClick={(e) => { blocked(e); if (adult) setStep('email'); }}>Continue with email</button>
           </div>
-          <p className="fine">By continuing you agree to the <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>. One cookie keeps you signed in; nothing tracks you.</p>
+          <p className="fine" id="consent-why">Signing in keeps your diary in sync, encrypted so only you can read it. We use your email only to sign you in — never for marketing. One cookie keeps you signed in; nothing tracks you. Without an account, the iPhone app works fully on its own.</p>
         </>
       )}
       {step === 'email' && <EmailStep email={email} setEmail={setEmail} onSent={() => setStep('code')} onBack={() => setStep('choose')} />}
       {/* A fresh page load after sign-in: Turnstile's script never shares a page with the diary. */}
-      {step === 'code' && <CodeStep email={email} onDone={() => { rememberSession(true); location.replace(location.pathname); }} onBack={() => setStep('email')} />}
+      {step === 'code' && <CodeStep email={email} adult={adult} onDone={() => { rememberSession(true); location.replace(location.pathname); }} onBack={() => setStep('email')} />}
     </Gate>
   );
 }
@@ -119,7 +132,7 @@ function EmailStep({ email, setEmail, onSent, onBack }: { email: string; setEmai
   return (
     <form onSubmit={send} style={{ display: 'grid', gap: 14 }}>
       <h1>Continue with email</h1>
-      <p className="sub">We'll send a 6-digit code to sign you in.</p>
+      <p className="sub">We'll send a 6-digit code to this address to sign you in. It's used only for signing in.</p>
       <label className="sr-only" htmlFor="email">Email address</label>
       <input id="email" className="field" type="email" autoComplete="email" inputMode="email" placeholder="you@example.com"
         value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />
@@ -143,7 +156,7 @@ function InviteField({ value, onChange }: { value: string; onChange: (v: string)
   );
 }
 
-function CodeStep({ email, onDone, onBack }: { email: string; onDone: () => void; onBack: () => void }) {
+function CodeStep({ email, adult, onDone, onBack }: { email: string; adult: boolean; onDone: () => void; onBack: () => void }) {
   const [code, setCode] = useState('');
   const [asksInvite, setAsksInvite] = useState(false);
   const [invite, setInvite] = useState('');
@@ -160,7 +173,7 @@ function CodeStep({ email, onDone, onBack }: { email: string; onDone: () => void
     setBusy(true);
     setProblem('');
     try {
-      await api('POST', 'auth/email/verify', { email: email.trim(), code: value, client: 'web', ...(asksInvite ? { invite } : {}) });
+      await api('POST', 'auth/email/verify', { email: email.trim(), code: value, client: 'web', adult, ...(asksInvite ? { invite } : {}) });
       onDone();
     } catch (error) {
       setProblem(friendly(error));

@@ -233,7 +233,8 @@ Redesigned in Batch I after a study of Day One, Structured, Flighty, Stoic, Opal
    - **Continue with Google** (white button with the official Google "G" mark per Google's branding guidelines)
    - **Continue with email** → email field → 6-digit code screen (auto-fill from Mail via `.textContentType(.oneTimeCode)`, resend after 30 s, errors inline)
    - **Not now — keep it on this iPhone** (text button). Guest mode: everything works offline; Profile offers sign-in later.
-   - Footer: "By continuing you agree to the Terms and Privacy Policy" (links).
+   - **Above the buttons (Batch L):** an unticked box "I'm 18 or older and agree to the Terms and Privacy Policy" (links). Apple, Google and email stay disabled until it's ticked; the choice is sent with the sign-in (`adult`) and never stored on the device. Re-authentication (delete account) doesn't show it.
+   - Footer (Batch L): "We use your email only to sign you in — never for marketing. Your diary is encrypted so only you can read it."
 7. **Recovery key** (new account only) — §10.4. Must be saved before continuing.
 8. **Unlock** (existing account, new device) — automatic if the key is in iCloud Keychain; otherwise "Scan from your other device" (shows QR) or "Enter recovery key".
 9. → Greeting intro → **Tour** (§6.15).
@@ -407,6 +408,10 @@ Speech framework **`SpeechAnalyzer` + `DictationTranscriber`** (verify with Cont
 - **Linking:** same verified email across providers links to one user (Apple private-relay emails won't match — that's fine). Profile shows linked providers.
 - **Sessions:** 256-bit random opaque token; only its SHA-256 stored in D1; 30-day sliding expiry; per-device row (name, platform, last seen). iOS: Keychain, `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`, not synchronizable. Web: `__Host-folio_session` cookie, `HttpOnly; Secure; SameSite=Lax; Path=/`. CSRF: SameSite + Origin check on all state-changing requests.
 
+### 10.2b Accounts are 18+ (Batch L)
+- **A new account needs `adult: true`** (JSON on `apple/native` and `email/verify`, `adult=1` on the OAuth start, carried in `oauth_states.adult`). Without it the server answers `403 age_required` **before anything single-use is spent** (same place as the invite check) and creates nothing; with it, `users.age_confirmed_at` records the time (migration 0004). Existing accounts and re-authentication never need it. OAuth failures return `error=age_required` to the app or web app, which explain it. Guest mode on iPhone is open to everyone and sends nothing.
+- The Declared Age Range API (Texas SB 2420, in force since 4 June 2026) is planned before a public App Store release — `docs/COMPLIANCE.md` §5.
+
 ### 10.2a Invite-only sign-up (Batch J)
 - **New accounts need a one-time invite** (8 Crockford base32 characters shown as `ABCD-EFGH`; typing is forgiving: case, spaces, O/0, I/L/1). Valid **7 days, single use**. Stored only as an HMAC (`OTP_PEPPER`) plus its last two characters; table `invites` (migration 0003), which account deletion clears.
 - **Unaffected:** every existing account (any provider, or a verified email that links to one), the owner's own addresses and App Review's address (while `REVIEW_ENABLED`). Guest mode needs nothing. `INVITES_REQUIRED` (var in `wrangler.jsonc`) switches it: **"true" in production since Batch K (owner, 2026-11-06): Folio is private for the owner and one friend.** `OWNER_EMAILS` holds the owner's Apple address (Worker secret, never in a file). Setting it to "false" and redeploying reopens sign-up; with it off no one is asked for a code.
@@ -495,7 +500,7 @@ Every page: title, meta description, OG image, favicons, sitemap.xml, robots.txt
 - **Real-time:** WebSocket to `/api/live` while the tab is visible; pull on focus; optimistic updates with rollback.
 - **Photos:** synced display and full renditions are JPEG so every browser can show them (DECISIONS 193). Delete account (`/app/settings/account`) runs as its own page without unlocking the diary (DECISIONS 199).
 - **Storage:** session cookie (strictly necessary); diary content only in memory (or encrypted IndexedDB if "Trust this browser"); UI prefs in localStorage. No other cookies → **no cookie banner needed** (cookie use explained in the privacy policy).
-- **Security headers** (`web/public/_headers` and Worker responses): strict CSP (`default-src 'self'`; scripts self + `challenges.cloudflare.com` for Turnstile; connect-src self + `wss://folio.devilsense.com`; img-src self blob: data:; fonts Google Fonts; `frame-ancestors 'none'`), HSTS (preload), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: camera=(), microphone=(), geolocation=()`, `Cross-Origin-Opener-Policy: same-origin`.
+- **Security headers** (`web/public/_headers` and Worker responses): strict CSP (`default-src 'self'`; scripts self + `challenges.cloudflare.com` for Turnstile; connect-src self + `wss://folio.devilsense.com`; img-src self blob: data:; fonts self-hosted only (`font-src 'self'`; Batch L: no Google Fonts or other third-party requests anywhere except Turnstile on the email step); `frame-ancestors 'none'`), HSTS (preload), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: camera=(), microphone=(), geolocation=()`, `Cross-Origin-Opener-Policy: same-origin`.
 
 ---
 
@@ -541,6 +546,8 @@ Every page: title, meta description, OG image, favicons, sitemap.xml, robots.txt
 ---
 
 ## 14. Legal pages (drafts — owner must have them reviewed; not legal advice)
+
+**Batch L:** pages are `/privacy` (rewritten from the D1 schema: every stored item with purpose and retention, lawful bases, processors and transfers, UK/EU/India rights, ICO/EU/India complaints, 18+ accounts), `/terms` (18+, acceptable use, ending, changes, consumer protections), `/cookies` (every cookie and storage item; no banner — all strictly necessary), `/refunds` (free, nothing to buy), `/acceptable-use`, `/accessibility` (WCAG 2.2 AA statement), `/imprint` (company details) — all linked in every footer and in the app's Profile → About; the web app's Profile → About links the same. Analysis, sources, risk register and owner checklist: `docs/COMPLIANCE.md`.
 
 ### 14.1 Privacy Policy — plain English
 - Controller: Soul Archive Ltd (no. 16186654), registered office above; privacy@devilsense.com.

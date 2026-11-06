@@ -17,6 +17,9 @@ final class AccountModel {
     }
 
     private(set) var status: Status = .guest
+    /// Batch L: the sign-up screen's "I'm 18 or older and agree to the Terms and Privacy Policy"
+    /// box, for this sign-in only (never stored; the server records it on a new account).
+    var ageConfirmed = false
     private(set) var session: StoredSession?
     /// The recovery key being shown during set-up; cleared once it's confirmed.
     private(set) var pendingRecoveryKey: RecoveryKey?

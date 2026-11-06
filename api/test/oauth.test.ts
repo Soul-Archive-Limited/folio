@@ -43,7 +43,7 @@ describe('Sign in with Apple, iOS (SPEC §10.2)', () => {
 
   it('verifies the identity token and nonce, and keeps the refresh token encrypted', async () => {
     const token = await idToken('https://appleid.apple.com', 'com.devilsense.folio', { sub: 'apple-1', email: 'x@privaterelay.appleid.com', email_verified: 'true', nonce: await sha256Hex(raw) });
-    const response = await api('/auth/apple/native', { method: 'POST', json: { identityToken: token, rawNonce: raw, authorizationCode: 'c1', deviceName: 'iPhone' } });
+    const response = await api('/auth/apple/native', { method: 'POST', json: { identityToken: token, rawNonce: raw, authorizationCode: 'c1', deviceName: 'iPhone', adult: true } });
     expect(response.status).toBe(200);
     const row = await env.DB.prepare(`SELECT refresh_token_enc FROM accounts WHERE provider = 'apple' AND provider_user_id = 'apple-1'`).first<{ refresh_token_enc: string }>();
     expect(row?.refresh_token_enc).toBeTruthy();
@@ -57,14 +57,14 @@ describe('Sign in with Apple, iOS (SPEC §10.2)', () => {
     const forged = await new SignJWT({ sub: 'a2', nonce: await sha256Hex(raw) }).setProtectedHeader({ alg: 'RS256', kid: 'test' })
       .setIssuer('https://appleid.apple.com').setAudience('com.devilsense.folio').setExpirationTime('5m').sign(other);
     for (const token of [wrongNonce, wrongAud, forged]) {
-      const response = await api('/auth/apple/native', { method: 'POST', json: { identityToken: token, rawNonce: raw, deviceName: 'iPhone' } });
+      const response = await api('/auth/apple/native', { method: 'POST', json: { identityToken: token, rawNonce: raw, deviceName: 'iPhone', adult: true } });
       expect(response.status).toBe(401);
     }
   });
 
   it('re-authentication marks the current session instead of creating one', async () => {
     const first = await idToken('https://appleid.apple.com', 'com.devilsense.folio', { sub: 'apple-re', nonce: await sha256Hex(raw) });
-    const signedIn = await (await api('/auth/apple/native', { method: 'POST', json: { identityToken: first, rawNonce: raw, deviceName: 'iPhone' } })).json<{ token: string }>();
+    const signedIn = await (await api('/auth/apple/native', { method: 'POST', json: { identityToken: first, rawNonce: raw, deviceName: 'iPhone', adult: true } })).json<{ token: string }>();
     const again = await idToken('https://appleid.apple.com', 'com.devilsense.folio', { sub: 'apple-re', nonce: await sha256Hex(raw) });
     const response = await api('/auth/apple/native', { method: 'POST', token: signedIn.token, json: { identityToken: again, rawNonce: raw, deviceName: 'iPhone', reauth: true } });
     expect(await response.json()).toEqual({ reauthenticated: true });
@@ -80,7 +80,7 @@ describe('Google on iOS: one-time code handoff (SPEC §10.2)', () => {
   const verifier = 'v'.repeat(43);
 
   async function runFlow(sub: string) {
-    const startResponse = await api(`/auth/google/start?platform=ios&challenge=${await sha256Base64url(verifier)}`);
+    const startResponse = await api(`/auth/google/start?platform=ios&adult=1&challenge=${await sha256Base64url(verifier)}`);
     expect(startResponse.status).toBe(302);
     const location = new URL(startResponse.headers.get('location')!);
     expect(location.host).toBe('accounts.google.com');
@@ -134,7 +134,7 @@ describe('Google sign-in failures say why (Batch K)', () => {
   /** Start → Google → callback; returns where the callback sends the app. */
   async function callback(sub: string, email: string, code = 'abc') {
     await env.DB.prepare('DELETE FROM rate_limits').run();
-    const start = await api(`/auth/google/start?platform=ios&challenge=${await sha256Base64url(verifier)}`);
+    const start = await api(`/auth/google/start?platform=ios&adult=1&challenge=${await sha256Base64url(verifier)}`);
     const location = new URL(start.headers.get('location')!);
     const state = location.searchParams.get('state')!;
     expect(state.startsWith('i.')).toBe(true);
@@ -155,7 +155,7 @@ describe('Google sign-in failures say why (Batch K)', () => {
   });
 
   it('an expired iOS state goes back to the app, not a JSON page in the sign-in sheet', async () => {
-    const start = await api(`/auth/google/start?platform=ios&challenge=${await sha256Base64url(verifier)}`);
+    const start = await api(`/auth/google/start?platform=ios&adult=1&challenge=${await sha256Base64url(verifier)}`);
     const state = new URL(start.headers.get('location')!).searchParams.get('state')!;
     await env.DB.prepare('UPDATE oauth_states SET expires_at = 0').run();
     const response = await api(`/auth/callback/google?state=${state}&code=abc`);

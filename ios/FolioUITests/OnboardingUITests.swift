@@ -76,6 +76,10 @@ final class OnboardingUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Keep your diary in sync?"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["Continue with Apple"].firstMatch.exists)
         XCTAssertTrue(app.buttons["Continue with Google"].exists)
+        // Batch L: accounts are 18+ — the buttons wait for the unticked box.
+        XCTAssertFalse(app.buttons["Continue with email"].isEnabled, "sign-in waits for the 18+ box")
+        app.buttons["I’m 18 or older and agree to the Terms and Privacy Policy"].tap()
+        XCTAssertTrue(app.buttons["Continue with email"].isEnabled)
         app.buttons["Continue with email"].tap()
         XCTAssertTrue(app.textFields["Email address"].waitForExistence(timeout: 10), "email sign-in opens")
         Thread.sleep(forTimeInterval: pace)

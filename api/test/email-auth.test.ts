@@ -7,7 +7,7 @@ import { api, ORIGIN } from './helpers';
 const start = (email: string, extra: Record<string, unknown> = {}, ip = '203.0.113.1') =>
   api('/auth/email/start', { method: 'POST', json: { email, client: 'ios', ...extra }, headers: { 'cf-connecting-ip': ip } });
 const verify = (email: string, code: string, extra: Record<string, unknown> = {}, ip = '203.0.113.2') =>
-  api('/auth/email/verify', { method: 'POST', json: { email, code, client: 'ios', deviceName: 'iPhone 17 Pro', ...extra }, headers: { 'cf-connecting-ip': ip } });
+  api('/auth/email/verify', { method: 'POST', json: { email, code, client: 'ios', deviceName: 'iPhone 17 Pro', adult: true, ...extra }, headers: { 'cf-connecting-ip': ip } });
 
 function sentCode(email: string): string {
   const message = OutboxSender.sent.get(email);
@@ -114,7 +114,7 @@ describe('email sign-in (SPEC §10.2)', () => {
     await new Promise((r) => setTimeout(r, 10));
     const first = await (await verify(email, sentCode(email))).json<{ userId: string }>();
     const { resolveUser } = await import('../src/auth/users');
-    const again = await resolveUser(env, { provider: 'google', providerUserId: 'g-123', email: email.toUpperCase(), emailVerified: true });
+    const again = await resolveUser(env, { provider: 'google', providerUserId: 'g-123', email: email.toUpperCase(), emailVerified: true }, null, Date.now(), true);
     expect(again).toEqual({ userId: first.userId, isNew: false });
   });
 });

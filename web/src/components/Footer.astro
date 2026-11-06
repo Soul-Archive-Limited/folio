@@ -12,7 +12,9 @@ const columns = [
     { href: '/open-source', label: 'Open source' }, { href: site.githubUrl, label: 'GitHub' },
   ] },
   { title: 'Legal', links: [
-    { href: '/privacy', label: 'Privacy policy' }, { href: '/terms', label: 'Terms' }, { href: '/delete-account', label: 'Delete account' },
+    { href: '/privacy', label: 'Privacy policy' }, { href: '/terms', label: 'Terms' }, { href: '/cookies', label: 'Cookies' },
+    { href: '/acceptable-use', label: 'Acceptable use' }, { href: '/refunds', label: 'Refunds' }, { href: '/accessibility', label: 'Accessibility' },
+    { href: '/imprint', label: 'Company details' }, { href: '/delete-account', label: 'Delete account' },
   ] },
 ];
 ---
@@ -31,7 +33,7 @@ const columns = [
       ))}
     </div>
     <div class="legal">
-      <p>{site.company.name} · Registered in England and Wales · Company no. {site.company.number} · Registered office: {site.company.office}</p>
+      <p><a href="/imprint">{site.company.name}</a> · Registered in England and Wales · Company no. {site.company.number} · Registered office: {site.company.office} · <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a></p>
       <p>© {year} {site.company.name}</p>
     </div>
   </div>

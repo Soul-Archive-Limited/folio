@@ -55,6 +55,8 @@ async function recoveryKeyExists(c: Context<AppEnv>, userId: string): Promise<bo
 
 /** An invite typed on the sign-in screen (Batch J); tries are limited per IP. */
 const invite = z.string().max(20).optional();
+/** Batch L: the sign-up screen's "I'm 18 or older and agree…" box (required for a new account). */
+const adult = z.boolean().optional();
 
 async function inviteFrom(c: Context<AppEnv>, raw: string | undefined): Promise<string | null> {
   if (!raw) return null;
@@ -66,12 +68,12 @@ async function inviteFrom(c: Context<AppEnv>, raw: string | undefined): Promise<
  * The reason sent back when an OAuth round trip ends without a sign-in (Batch K): the app and
  * the web app show a specific message for each. Unexpected errors are logged and become `failed`.
  */
-type OAuthProblem = 'cancelled' | 'expired' | 'google_unavailable' | 'failed' | 'account_deleting' | 'invite_required' | 'invite_invalid';
+type OAuthProblem = 'cancelled' | 'expired' | 'google_unavailable' | 'failed' | 'account_deleting' | 'invite_required' | 'invite_invalid' | 'age_required';
 
 async function problemFrom(error: unknown, provider: 'apple' | 'google'): Promise<OAuthProblem> {
   if (error instanceof HTTPException) {
     const code = ((await error.getResponse().clone().json().catch(() => ({}))) as { error?: string }).error;
-    if (error.status === 403 && (code === 'invite_required' || code === 'invite_invalid')) return code;
+    if (error.status === 403 && (code === 'invite_required' || code === 'invite_invalid' || code === 'age_required')) return code;
     if (error.status === 409) return 'account_deleting';
     if (error.status === 429) return 'failed';
   }
@@ -86,6 +88,7 @@ function oauthFailure(c: Context<AppEnv>, platform: 'ios' | 'web', problem: OAut
 
 const appleNative = z.object({
   invite,
+  adult,
   identityToken: z.string().min(20).max(4096),
   rawNonce: z.string().min(16).max(128),
   authorizationCode: z.string().max(1024).optional(),
@@ -107,13 +110,13 @@ auth.post('/apple/native', async (c) => {
   const identity = { provider: 'apple' as const, providerUserId: claims.sub, email: claims.email, emailVerified: claims.emailVerified };
   const inviteHash = await inviteFrom(c, input.invite);
   // Before the authorization code is spent: a new account needs an open invite.
-  if (!input.reauth) await checkInvite(c.env, identity, inviteHash);
+  if (!input.reauth) await checkInvite(c.env, identity, inviteHash, input.adult);
   let sealed: string | null = null;
   if (input.authorizationCode && c.env.APPLE_PRIVATE_KEY) {
     const { refreshToken } = await exchangeAppleCode(c.env, input.authorizationCode, c.env.APPLE_BUNDLE_ID);
     if (refreshToken) sealed = await sealToken(c.env.TOKEN_ENCRYPTION_KEY, `${c.env.APPLE_BUNDLE_ID}|${refreshToken}`);
   }
-  const { userId, isNew } = await resolveUser(c.env, { ...identity, refreshTokenSealed: sealed }, inviteHash);
+  const { userId, isNew } = await resolveUser(c.env, { ...identity, refreshTokenSealed: sealed }, inviteHash, Date.now(), input.adult);
   return finish(c, userId, isNew, 'ios', input.deviceName, input.reauth ?? false);
 });
 
@@ -124,6 +127,7 @@ const startQuery = z.object({
   challenge: z.string().regex(/^[A-Za-z0-9_-]{43}$/).optional(),
   reauth: z.enum(['1']).optional(),
   invite,
+  adult: z.enum(['1']).optional(),
 });
 
 function oauthCookie(c: Context<AppEnv>, state: string) {
@@ -148,14 +152,14 @@ async function saveState(c: Context<AppEnv>, provider: 'apple' | 'google', query
   const state = `${query.platform === 'ios' ? 'i' : 'w'}.${randomToken(24)}`;
   const inviteHash = await inviteFrom(c, query.invite);
   await c.env.DB.prepare(
-    `INSERT INTO oauth_states (state_hash, provider, platform, code_verifier, nonce, app_challenge, reauth_session, expires_at, invite_hash)
-     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)`,
-  ).bind(await sha256Hex(state), provider, query.platform, verifier, nonce, query.challenge ?? null, reauthSession, Date.now() + OAUTH_TTL, inviteHash).run();
+    `INSERT INTO oauth_states (state_hash, provider, platform, code_verifier, nonce, app_challenge, reauth_session, expires_at, invite_hash, adult)
+     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)`,
+  ).bind(await sha256Hex(state), provider, query.platform, verifier, nonce, query.challenge ?? null, reauthSession, Date.now() + OAUTH_TTL, inviteHash, query.adult ? 1 : 0).run();
   if (query.platform === 'web') oauthCookie(c, state);
   return state;
 }
 
-interface StateRow { provider: string; platform: 'ios' | 'web'; code_verifier: string | null; nonce: string; app_challenge: string | null; reauth_session: string | null; expires_at: number; invite_hash: string | null }
+interface StateRow { provider: string; platform: 'ios' | 'web'; code_verifier: string | null; nonce: string; app_challenge: string | null; reauth_session: string | null; expires_at: number; invite_hash: string | null; adult: number }
 
 /**
  * Takes (and deletes) a state row; web flows must also present the matching cookie. Null for an
@@ -230,7 +234,7 @@ auth.get('/callback/google', async (c) => {
   }
   let resolved;
   try {
-    resolved = await resolveUser(c.env, { provider: 'google', providerUserId: claims.sub, email: claims.email, emailVerified: claims.emailVerified }, row.invite_hash);
+    resolved = await resolveUser(c.env, { provider: 'google', providerUserId: claims.sub, email: claims.email, emailVerified: claims.emailVerified }, row.invite_hash, Date.now(), row.adult === 1);
   } catch (error) {
     // A new account without an open invite goes back to the sign-in screen, which asks for one.
     return oauthFailure(c, row.platform, await problemFrom(error, 'google'));
@@ -296,7 +300,7 @@ auth.post('/callback/apple', async (c) => {
   try {
     ({ userId } = await resolveUser(c.env, {
       provider: 'apple', providerUserId: claims.sub, email: claims.email, emailVerified: claims.emailVerified, refreshTokenSealed: sealed,
-    }, row.invite_hash));
+    }, row.invite_hash, Date.now(), row.adult === 1));
   } catch (error) {
     return oauthFailure(c, 'web', await problemFrom(error, 'apple'));
   }
@@ -349,6 +353,7 @@ const emailVerify = z.object({
   deviceName: deviceName.optional(),
   reauth: z.boolean().optional(),
   invite,
+  adult,
 });
 
 auth.post('/email/verify', async (c) => {
@@ -370,9 +375,9 @@ auth.post('/email/verify', async (c) => {
   const identity = { provider: 'email' as const, providerUserId: email, email, emailVerified: true };
   const inviteHash = await inviteFrom(c, input.invite);
   // The code stays valid while the app asks for an invite (Batch J); it still counts attempts.
-  if (!input.reauth) await checkInvite(c.env, identity, inviteHash);
+  if (!input.reauth) await checkInvite(c.env, identity, inviteHash, input.adult);
   await c.env.DB.prepare('DELETE FROM verification_codes WHERE email = ?1').bind(email).run();
-  const { userId, isNew } = await resolveUser(c.env, identity, inviteHash);
+  const { userId, isNew } = await resolveUser(c.env, identity, inviteHash, Date.now(), input.adult);
   const device = input.deviceName ?? (input.client === 'web' ? browserName(c.req.header('user-agent')) : 'iPhone');
   return finish(c, userId, isNew, input.client, device, input.reauth ?? false);
 });

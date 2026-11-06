@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const dist = (p) => new URL(`../dist/${p}`, import.meta.url);
 const read = (p) => readFileSync(dist(p), 'utf8');
-const pages = ['index', 'features', 'how-it-works', 'security', 'about', 'faq', 'download', 'privacy', 'terms', 'support', 'open-source', 'changelog', 'delete-account', '404'];
+const pages = ['index', 'features', 'how-it-works', 'security', 'about', 'faq', 'download', 'privacy', 'terms', 'support', 'open-source', 'changelog', 'delete-account', 'cookies', 'refunds', 'acceptable-use', 'accessibility', 'imprint', '404'];
 let checks = 0;
 const check = (fn, label) => { fn(); checks += 1; process.stdout.write(`✓ ${label}\n`); };
 

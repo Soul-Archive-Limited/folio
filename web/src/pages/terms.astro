@@ -2,11 +2,17 @@
 import Page from '../layouts/Page.astro';
 import { site } from '../config/site';
 ---
-<Page title="Terms of Use" heading="Terms" updated="27 October 2026"
+<Page title="Terms of Use" heading="Terms" updated="6 November 2026"
   description="The terms for using Folio, the private calendar diary from Soul Archive Ltd."
   lede="The rules for using Folio, kept as short as we could.">
   <h2>Using Folio</h2>
-  <p>{site.company.name} gives you a personal, non-exclusive licence to use the Folio app, website and web app. By using them you agree to these terms.</p>
+  <p>{site.company.name} gives you a personal, non-exclusive, non-transferable licence to use the Folio app, website and web app. By using them you agree to these terms and our <a href="/acceptable-use">Acceptable Use Policy</a>. How we handle personal data is in our <a href="/privacy">Privacy Policy</a>.</p>
+
+  <h2>Accounts are for adults</h2>
+  <p>You need to be 18 or older to create a Folio account; you confirm this when you sign up. The iPhone app works fully without an account. You’re responsible for activity on your account, so keep your devices and sign-in methods secure.</p>
+
+  <h2>It’s free</h2>
+  <p>Folio costs nothing and has no purchases or subscriptions — see our <a href="/refunds">Refund Policy</a>.</p>
 
   <h2>Open source</h2>
   <p>Folio’s source code is published under the Apache License 2.0. That licence covers the code; it doesn’t give you rights to the Folio or Soul Archive names, logos or app icon.</p>
@@ -18,7 +24,13 @@ import { site } from '../config/site';
   <p>With sync, your diary is end-to-end encrypted. You are responsible for keeping your recovery key safe. If you lose every device and your recovery key, we can’t restore your diary.</p>
 
   <h2>Fair use</h2>
-  <p>Don’t use Folio to break the law, to attack or overload our service, or to try to get at other people’s data. We may suspend accounts that do.</p>
+  <p>Don’t use Folio to break the law, to attack or overload our service, or to try to get at other people’s data — the details are in the <a href="/acceptable-use">Acceptable Use Policy</a>. We may limit or suspend accounts that do, and will tell you why where we can.</p>
+
+  <h2>Ending things</h2>
+  <p>You can stop using Folio and delete your account at any time, in the app or on the web (<a href="/delete-account">how</a>). If we ever stopped running the service, we’d give you notice and time to export your diary.</p>
+
+  <h2>Changes to these terms</h2>
+  <p>If we change these terms, we’ll update the date above and tell you in the app before meaningful changes apply. If you don’t agree, you can delete your account.</p>
 
   <h2>The service</h2>
   <p>Folio is provided “as is”. We work to keep it available and your data safe, but we can’t promise it will always be uninterrupted or error-free. Keep an export of anything you can’t afford to lose.</p>
@@ -30,7 +42,7 @@ import { site } from '../config/site';
   <p>Deleted items stay in Recently Deleted for 30 days and are then permanently deleted.</p>
 
   <h2>Law</h2>
-  <p>These terms are governed by the law of England and Wales.</p>
+  <p>These terms are governed by the law of England and Wales, and the courts of England and Wales can hear disputes. If you live elsewhere in the UK or in the EU, you also keep the protection of your local consumer law and can bring a claim where you live.</p>
 
   <h2>Contact</h2>
   <p><a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a> · {site.company.name}, {site.company.office}.</p>

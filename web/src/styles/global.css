@@ -261,3 +261,11 @@ p { text-wrap: pretty; }
   *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
   .js-motion [data-reveal] { opacity: 1; transform: none; }
 }
+
+/* Legal tables (Batch L): what we store, cookies and storage. */
+.prose table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 15px; display: block; overflow-x: auto; }
+.prose th, .prose td { text-align: left; vertical-align: top; padding: 10px 12px 10px 0; border-bottom: 1px solid var(--hairline); }
+.prose th { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-2); }
+.prose td:first-child { min-width: 180px; }
+.prose code { font-family: var(--mono); font-size: 0.88em; padding: 1px 5px; border-radius: 5px; background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.footer .legal a { color: inherit; }

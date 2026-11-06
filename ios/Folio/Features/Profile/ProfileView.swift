@@ -79,7 +79,16 @@ struct ProfileView: View {
                         ProfileRowLabel(title: "Privacy Policy", systemImage: "hand.raised", external: true)
                     }
                     Link(destination: Self.url("terms")) {
-                        ProfileRowLabel(title: "Terms", systemImage: "doc.text", external: true)
+                        ProfileRowLabel(title: "Terms of Use", systemImage: "doc.text", external: true)
+                    }
+                    Link(destination: Self.url("acceptable-use")) {
+                        ProfileRowLabel(title: "Acceptable use", systemImage: "checkmark.shield", external: true)
+                    }
+                    Link(destination: Self.url("accessibility")) {
+                        ProfileRowLabel(title: "Accessibility", systemImage: "accessibility", external: true)
+                    }
+                    Link(destination: Self.url("imprint")) {
+                        ProfileRowLabel(title: "Company details", systemImage: "building.2", external: true)
                     }
                     Link(destination: Self.url("open-source")) {
                         ProfileRowLabel(title: "Open source licences", systemImage: "shippingbox", external: true)
@@ -96,7 +105,7 @@ struct ProfileView: View {
                 .listRowBackground(ProfileRowBackground())
 
                 Section {
-                    Text("Made by Soul Archive Ltd\n© 2026 Soul Archive Ltd")
+                    Text("Made by Soul Archive Ltd · registered in England and Wales, no. 16186654\n© 2026 Soul Archive Ltd")
                         .multilineTextAlignment(.center)
                         .folioFont(.caption)
                         .foregroundStyle(.inkSecondary)

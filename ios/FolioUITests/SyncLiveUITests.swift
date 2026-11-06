@@ -256,6 +256,8 @@ final class SyncLiveUITests: XCTestCase {
     @MainActor private func signIn(_ app: XCUIApplication) throws {
         let emailButton = app.buttons["Continue with email"]
         try scrollTo(emailButton, in: app)
+        let consent = app.buttons["I’m 18 or older and agree to the Terms and Privacy Policy"]
+        if consent.exists && !emailButton.isEnabled { consent.tap() }
         emailButton.tap()
         let field = app.textFields["Email address"]
         XCTAssertTrue(field.waitForExistence(timeout: 10))

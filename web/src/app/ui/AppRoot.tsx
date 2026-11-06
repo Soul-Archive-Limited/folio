@@ -28,6 +28,7 @@ const SIGN_IN_ERRORS: Record<string, string> = {
   account_deleting: 'This account is being deleted. Try again in a few minutes.',
   invite_required: 'Folio is invite-only for now. Enter the invite code you were given, then continue again.',
   invite_invalid: "That invite code didn't work. It may be used, expired or mistyped.",
+  age_required: 'Folio accounts are for adults. Tick “I’m 18 or older” and try again.',
 };
 
 /**

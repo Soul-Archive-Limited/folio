@@ -1,0 +1,14 @@
+---
+import Page from '../layouts/Page.astro';
+import { site } from '../config/site';
+---
+<Page title="Refund Policy" heading="Refunds" updated="6 November 2026"
+  description="Folio is free. There are no purchases, in-app purchases or subscriptions, so there is nothing to refund."
+  lede="Folio is free. There is nothing to buy, so there is nothing to refund.">
+  <h2>What Folio costs</h2>
+  <p>Nothing. The iPhone app, the web app and an account are free. There are <strong>no purchases, no in-app purchases and no subscriptions</strong>, and we never ask for payment details.</p>
+  <h2>If anyone asks you to pay for Folio</h2>
+  <p>It isn’t us. Folio is only distributed through Apple’s App Store and TestFlight and at folio.devilsense.com. Please tell us at <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>.</p>
+  <h2>If this ever changes</h2>
+  <p>If we ever offer something paid, we’ll update this policy before it goes on sale, purchases on iPhone would be handled by Apple under its refund process, and your statutory rights as a consumer would apply in full. Nothing that is free today would be taken away and sold back to you.</p>
+</Page>
