@@ -14,7 +14,7 @@ describe('blobs (SPEC §10.5)', () => {
     expect((await put(user.token, id, bytes)).status).toBe(200);
     expect(await env.BLOBS.head(`u/${user.userId}/${id}`)).not.toBeNull();
     const got = await api(`/blobs/${id}`, { token: user.token });
-    expect(got.headers.get('cache-control')).toBe('private, max-age=31536000, immutable');
+    expect(got.headers.get('cache-control')).toBe('private, no-store');
     expect(new Uint8Array(await got.arrayBuffer())).toEqual(bytes);
     const usage = await env.DB.prepare('SELECT blob_bytes FROM users WHERE id = ?1').bind(user.userId).first<{ blob_bytes: number }>();
     expect(usage?.blob_bytes).toBe(5000);

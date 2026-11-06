@@ -73,7 +73,7 @@ export function appleAuthorizeURL(env: Env, state: string, nonce: string): strin
     redirect_uri: `${env.APP_ORIGIN}/api/auth/callback/apple`,
     response_type: 'code',
     response_mode: 'form_post',
-    scope: 'name email',
+    scope: 'email', // Batch L: the name was never used
     state,
     nonce,
   }).toString();

@@ -22,6 +22,14 @@ struct SyncSignInButtons: View {
     /// Batch J: Apple or Google said this would be a new account and needs an invite.
     @State private var invitePrompt: InvitePrompt?
     @State private var appleRunner = AppleSignInRunner()
+    @State private var nudge = false
+
+    private var needsConsent: Bool { !reauth && !account.ageConfirmed }
+
+    private func askForConsent() {
+        withAnimation(FolioMotion.standard()) { nudge = true }
+        AccessibilityNotification.Announcement("Tick “I’m 18 or older” first. Folio accounts are for adults.").post()
+    }
 
     struct InvitePrompt: Identifiable {
         enum Provider { case apple, google }
@@ -33,16 +41,13 @@ struct SyncSignInButtons: View {
     static let height: Double = 50
 
     var body: some View {
-        @Bindable var account = account
         VStack(spacing: Spacing.s) {
-            if !reauth { AgeConsentRow(isOn: $account.ageConfirmed) }
-            Group {
-                appleButton
-                googleButton
-                emailButton
-            }
-            .disabled(!reauth && !account.ageConfirmed)
-            .opacity(!reauth && !account.ageConfirmed ? 0.5 : 1)
+            if !reauth { consentRow }
+            // Batch L: the buttons stay tappable; before the box is ticked a tap points at it and
+            // says why (spoken too), instead of a silent disabled state.
+            providerButtons
+                .opacity(needsConsent ? 0.55 : 1)
+            if nudge && needsConsent { consentNudge }
         }
         .disabled(busy)
         .opacity(busy ? 0.6 : 1)
@@ -58,8 +63,41 @@ struct SyncSignInButtons: View {
         }
     }
 
+    private var consentRow: some View {
+        @Bindable var account = account
+        return AgeConsentRow(isOn: $account.ageConfirmed, needsAttention: nudge)
+    }
+
+    private var providerButtons: some View {
+        VStack(spacing: Spacing.s) {
+            appleButton.overlay { if needsConsent { appleConsentCatcher } }
+            googleButton
+            emailButton
+        }
+    }
+
+    /// Over Apple's system button (which can't be told "not yet"): the tap and VoiceOver
+    /// activation ask for the box first.
+    private var appleConsentCatcher: some View {
+        Capsule().fill(.clear).contentShape(.capsule)
+            .onTapGesture(perform: askForConsent)
+            .accessibilityElement()
+            .accessibilityLabel(Text("Continue with Apple"))
+            .accessibilityHint(Text("Tick “I’m 18 or older” above first."))
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction(.default) { askForConsent() }
+    }
+
+    private var consentNudge: some View {
+        Text("Tick the box to continue. Folio accounts are for adults.")
+            .font(.footnote.weight(.medium))
+            .foregroundStyle(.danger)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .transition(.opacity)
+    }
+
     private var emailButton: some View {
-            Button(action: onEmail) {
+            Button { if needsConsent { askForConsent() } else { onEmail() } } label: {
                 Label("Continue with email", systemImage: "envelope")
                     .font(.body.weight(.medium))
                     .frame(maxWidth: .infinity, minHeight: Self.height)
@@ -91,7 +129,7 @@ struct SyncSignInButtons: View {
 
     private var googleButton: some View {
         let dark = colorScheme == .dark
-        return Button { google() } label: {
+        return Button { if needsConsent { askForConsent() } else { google() } } label: {
             HStack(spacing: Spacing.s) {
                 Image(.googleMark)
                     .resizable()
@@ -167,41 +205,63 @@ struct SyncSignInButtons: View {
     }
 }
 
-/// Batch L: accounts are 18+. An unticked box above the sign-in buttons; they wait for it.
+/// Batch L: accounts are 18+. An unticked box above the sign-in buttons; they wait for it. A real
+/// `Toggle` (VoiceOver announces it as a switch with its state), with the Terms and Privacy Policy
+/// as their own links underneath so they can be opened on their own (independent review).
 struct AgeConsentRow: View {
     @Binding var isOn: Bool
+    var needsAttention = false
 
     var body: some View {
-        Button { isOn.toggle() } label: {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            Toggle("I’m 18 or older and agree to the Terms and Privacy Policy", isOn: $isOn)
+                .toggleStyle(CheckboxToggleStyle())
+                .accessibilityHint("Required to create an account.")
+            HStack(spacing: Spacing.m) {
+                Link("Read the Terms", destination: URL(string: "https://folio.devilsense.com/terms")!)
+                    .frame(minWidth: Spacing.minHitTarget, minHeight: Spacing.minHitTarget).contentShape(.rect)
+                Link("Privacy Policy", destination: URL(string: "https://folio.devilsense.com/privacy")!)
+                    .frame(minWidth: Spacing.minHitTarget, minHeight: Spacing.minHitTarget).contentShape(.rect)
+            }
+            .font(.footnote.weight(.medium))
+            .foregroundStyle(.accentText)
+            .frame(minHeight: Spacing.minHitTarget)
+            .padding(.leading, 34)
+        }
+        .padding(Spacing.s)
+        .overlay {
+            RoundedRectangle(cornerRadius: Radius.dayCell, style: .continuous)
+                .strokeBorder(.danger, lineWidth: needsAttention && !isOn ? 1.5 : 0)
+        }
+    }
+}
+
+/// A square checkbox for the consent toggle; the whole row toggles it (≥ 44 pt tall).
+private struct CheckboxToggleStyle: ToggleStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        Button { configuration.isOn.toggle() } label: {
             HStack(alignment: .firstTextBaseline, spacing: Spacing.s) {
-                Image(systemName: isOn ? "checkmark.square.fill" : "square")
+                Image(systemName: configuration.isOn ? "checkmark.square.fill" : "square")
                     .font(.title3)
-                    .foregroundStyle(isOn ? AnyShapeStyle(.accentStrong) : AnyShapeStyle(.inkSecondary))
+                    .foregroundStyle(configuration.isOn ? AnyShapeStyle(.accentStrong) : AnyShapeStyle(.inkSecondary))
                     .contentTransition(.symbolEffect(.replace))
-                Text("I’m 18 or older and agree to the [Terms](https://folio.devilsense.com/terms) and [Privacy Policy](https://folio.devilsense.com/privacy).")
+                configuration.label
                     .font(.subheadline)
                     .foregroundStyle(.ink)
-                    .tint(.accentText)
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(Spacing.s)
             .frame(minHeight: Spacing.minHitTarget)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("I’m 18 or older and agree to the Terms and Privacy Policy")
-        .accessibilityAddTraits(.isToggle)
-        .accessibilityValue(isOn ? "Ticked" : "Not ticked")
-        .accessibilityHint("Required to create an account.")
     }
 }
 
 /// What signing in is for (SPEC §6.1, Batch L): plain purpose text, no marketing.
 struct LegalFooter: View {
     var body: some View {
-        Text("We use your email only to sign you in — never for marketing. Your diary is encrypted so only you can read it.")
+        Text("We use your email to sign you in and for account messages (codes, a deletion confirmation) — never for marketing. Your diary is encrypted so only you can read it.")
             .font(.footnote)
             .foregroundStyle(.inkSecondary)
             .tint(.inkSecondary)

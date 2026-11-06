@@ -6,7 +6,7 @@ _Prepared 6 November 2026 by the builder for Soul Archive Ltd. This is an engine
 
 - **Who:** Soul Archive Ltd, private limited company, England and Wales, no. 16186654; registered office 71-75 Shelton Street, Covent Garden, London WC2H 9JQ. Controller for Folio.
 - **Distribution today:** iPhone app through TestFlight (external group "Friends", public link), invite-only accounts (`INVITES_REQUIRED=true`); website and web app at folio.devilsense.com (worldwide). No App Store listing yet.
-- **What is processed** (from the D1 schema in `api/migrations/0001–0004`, checked line by line): account email; provider account IDs; encrypted Apple refresh token (revocation only); account creation time and, from Batch L, age-confirmation time; per session: device model + OS, platform, created/last seen, token **hash**, device label **encrypted**; diary records and photos **end-to-end encrypted** with metadata (id, type, version, size, client time, deleted); recovery-key envelope; short-lived sign-in state (≤ 10 min); rate-limit counters keyed by an **HMAC of the IP** (≤ 2 days); invites (HMAC + last 2 chars); deletion log (hashed id + time). Nothing else: no analytics, no logs of bodies or ciphertext, no IP addresses at rest.
+- **What is processed** (from the D1 schema in `api/migrations/0001–0004`, checked line by line): account email; provider account IDs; encrypted Apple refresh token (revocation only); account creation time and, from Batch L, age-confirmation time; per session: device model + OS, platform, created/last seen, token **hash**, device label **encrypted**; diary records and photos **end-to-end encrypted** with metadata (id, type, version, size, client time, deleted); recovery-key envelope; short-lived sign-in state (≤ 10 min); rate-limit counters keyed by an **HMAC of the IP** (≤ 2 days); invites (HMAC + last 2 chars); deletion log (hashed id + time). Nothing else: no analytics, no logs of bodies or ciphertext, no IP addresses at rest. **Operational logs** (Batch L review): Cloudflare Workers Logs keep only the structured events our code writes (event and error-class names, status codes — no IPs, emails, tokens or bodies); request-level invocation logs and traces are **off** (`api/wrangler.jsonc`), so URLs and request metadata are not stored by us.
 - **Third parties:** Cloudflare (hosting, D1, R2, Workers, Durable Objects, Turnstile), Resend (sign-in and deletion emails), Apple and Google (independent controllers for their sign-in; Apple for distribution). Measured on the live site (Batch L): marketing pages make requests to folio.devilsense.com only, set **no cookies and no local/session storage**; the web app's email step adds challenges.cloudflare.com (Turnstile) and nothing else; no cookies were set by Turnstile in that test (Brave, which restricts third-party cookies — see §5).
 
 ## 2. UK GDPR / Data Protection Act 2018 and EU GDPR
@@ -16,7 +16,7 @@ _Prepared 6 November 2026 by the builder for Soul Archive Ltd. This is an engine
 | Transparency (Arts 12–14) | Privacy Policy rewritten in plain English to match the schema: every stored item with purpose and retention, lawful bases, processors and transfers, rights, complaints. "Last updated" date. | `web/src/pages/privacy.astro` |
 | Lawful basis | Contract (account + sync), legitimate interests (security: rate limits, Turnstile, deletion log), legal obligation. No consent-based processing, no marketing. | Privacy Policy "Our lawful bases" |
 | Data minimisation (Art 5(1)(c)) | Reviewed in §6: nothing removable without losing a feature the user asked for. IPs only as keyed hashes; diary end-to-end encrypted. | §6 |
-| Storage limitation | Sessions 30 days sliding; codes/states ≤ 10 min; rate limits ≤ 2 days; account data until deletion; D1 Time Travel backups ≤ 30 days (7 on the free plan). | `api/src/index.ts` cron cleanup; policy |
+| Storage limitation | Sessions 30 days sliding; codes/states valid ≤ 10 min and deleted when used or at the nightly clean-up; abuse counters ≤ 3 days (keyed hashes for IPs and emails, account ids for per-account limits); account data until deletion; D1 Time Travel backups ≤ 30 days (7 on the free plan). | `api/src/index.ts` cron cleanup; policy |
 | Security (Art 32) | E2E AES-256-GCM, hashed tokens/codes, HSTS, strict CSP, rate limits. Audited in `docs/SECURITY_AUDIT.md`. | SECURITY_AUDIT.md |
 | Rights (Arts 15–22) | Export (iPhone and web, decrypted on device), deletion in app and web (Apple token revoked, R2/D1 wiped, confirmation email), email route for the rest. | §10.6 SPEC; `api/src/hub/UserHub.ts` |
 | International transfers (Ch. V) | Cloudflare: EU–US Data Privacy Framework + UK extension, SCCs (2021/914) + UK Addendum as fallback in its DPA. Resend (Plus Five Five, Inc.): DPA with EU SCCs and UK SCCs (EU SCCs + UK Addendum). | [Cloudflare DPA](https://www.cloudflare.com/dpa/), [Resend DPA](https://resend.com/legal/dpa) |
@@ -71,7 +71,7 @@ Nothing found to remove. The web app's `folio.device` localStorage marker avoids
 - **Apple 5.1.1** (data collection and storage): privacy policy linked in App Store Connect and in the app (Profile → About); account optional (guest mode); account deletion in app and on web with Sign in with Apple token revocation (5.1.1(v)); purpose strings only at use. **4.8 Login Services:** Sign in with Apple offered first, with equal prominence to Google. The system `SignInWithAppleButton` is used on iPhone; the web uses "Continue with Apple" with Apple's logo per Apple's web button rules (black/white, unmodified logo, same size as other options).
 - **Age rating:** stays **4+** — Apple's rating reflects content (none mature; diary content is private, not user-generated content shared with others). Restricting *accounts* to adults is a service rule, declared truthfully in the questionnaire's "Age Assurance" item only once the Declared Age Range API is adopted.
 - **App Privacy label** (`docs/APPSTORE.md`): Email; Photos or Videos; Other User Content; User ID; Other Data (device model + OS) — all App Functionality, linked, not tracking. Matches the policy and `PrivacyInfo.xcprivacy`. The new age-confirmation timestamp is account metadata, not a new data type.
-- **Google OAuth (API Services User Data Policy):** scopes `openid email profile` only (non-sensitive); homepage, privacy policy and terms URLs on the consent screen; the policy now states Google user data is used only to sign in. Verification of the consent screen (logo/branding) is in the owner checklist.
+- **Google OAuth (API Services User Data Policy):** scopes `openid email` only since Batch L (`profile` dropped — name and picture were never used; Apple's web flow likewise asks for email only); homepage, privacy policy and terms URLs on the consent screen; the policy now states Google user data is used only to sign in. Verification of the consent screen (logo/branding) is in the owner checklist.
 - **Trademarks:** "Sign in with Apple" / Apple logo only inside sign-in buttons; Google "G" mark unmodified in the white button per Google's branding guidelines; the site says "for iPhone" and "iPhone and the web" descriptively; no Apple product imagery other than our own simple phone frame around our own screenshots; the 3D phone is our own generic geometry. App Intent texts avoid Apple product names (DECISIONS 274).
 
 ## 8. Assets and licences
@@ -97,6 +97,15 @@ No Google Fonts, CDNs, embeds, external images or scripts anywhere except Turnst
 - **EU Digital Services Act trader status:** to declare at App Store public launch (APPSTORE.md). Owner action.
 - **Company details** (Companies Act 2006 / Company, LLP and Business Names Regulations 2015 — name, number, registered office on websites): in every footer and at `/imprint`; in the app at Profile → About → Company details.
 
+## 9a. Record of processing (UK GDPR Art 30, short form)
+
+| Processing | Data subjects | Data | Purpose / basis | Recipients | Retention |
+|---|---|---|---|---|---|
+| Accounts and sign-in | Account holders (18+) | Email, provider ids, encrypted Apple refresh token, created/age-confirmed times | Contract | Cloudflare (processor); Apple/Google (independent controllers for their sign-in); Resend (codes) | Until deletion |
+| Sync | Account holders | E2E-encrypted records and photos + sync metadata; device model/OS, last seen | Contract | Cloudflare | Until deletion (tombstone markers until the account is deleted) |
+| Security | Visitors who request codes or sign in | Keyed hashes of IP/email; account-id counters; Turnstile signals (Cloudflare) | Legitimate interests | Cloudflare | ≤ 3 days |
+| Support | People who email us | Email, message | Legitimate interests | Email provider | ≤ 24 months |
+
 ## 10. Risk register
 
 | # | Risk | Likelihood | Impact | Mitigation / status | Owner |
@@ -110,6 +119,12 @@ No Google Fonts, CDNs, embeds, external images or scripts anywhere except Turnst
 | R7 | Legal pages not lawyer-reviewed | Medium | Medium | Final review before public launch | Lawyer |
 | R8 | DPDP duties from 13 May 2027 (breach notice process, records) | Low today | Medium | Grievance contact published; write a breach-response note before May 2027 | Owner |
 | R9 | Export-control self-classification (US EAR, year-end) | Low | Low | Adviser question (DECISIONS 143) | Owner + adviser |
+| R10 | Existing accounts (owner + one friend) predate the 18+ rule and the updated Terms | Low | Low | Tell both in person/email that the Terms changed (6 Nov 2026); their `age_confirmed_at` stays empty | Owner |
+| R11 | Turnstile: Cloudflare may act as controller for some bot-detection signals | Low | Low | Lawyer to check the Turnstile Privacy Addendum's role wording; adjust the policy if needed | Lawyer |
+| R12 | Resend keeps delivery logs (codes in subject lines) for its plan's retention | Low | Low | Check the plan's log retention; consider putting the code in the body only | Owner |
+| R13 | Sign in with Apple server-to-server notifications (consent revoked, account deleted) not handled | Low | Low | Register an endpoint before public launch so a revoked Apple ID signs out its sessions | Builder, next batch |
+| R14 | This document is public on GitHub and lists open owner actions | — | Low | Owner decides whether to keep it public | Owner |
+| R15 | Email-code takeover by slow guessing | Low | High | Batch L: 20 checks per address per day, 10 codes per address per day, 5 tries per code | — |
 
 ## 11. Owner checklist (only a person can do these)
 
@@ -121,3 +136,7 @@ No Google Fonts, CDNs, embeds, external images or scripts anywhere except Turnst
 6. **Google OAuth consent screen:** check app name, logo, homepage, privacy and terms URLs; request branding verification if Google asks.
 7. **Before public App Store launch:** approve adding the Declared Age Range entitlement (Apple Developer → Identifiers → com.devilsense.folio → capabilities) so the builder can ship the age-range check (§5).
 8. Keep a short **breach-response note** (who decides, ICO within 72 hours, users without undue delay; India Board once DPDP duties apply).
+9. Tell your one friend (the only other account) that the Terms and Privacy Policy changed on 6 Nov 2026 (18+ accounts, Acceptable Use).
+10. Re-check the **App Store age-rating questionnaire** answers when the Declared Age Range check ships (the "Age Assurance" item).
+11. Decide whether `docs/COMPLIANCE.md` (with this checklist) should stay public in the open-source repository.
+12. Have the lawyer confirm the dated legal facts in §4–§5 (Texas SB 2420 timeline, ICO guidance date, whether the DUAA 2025 PECR preference exception has commenced).

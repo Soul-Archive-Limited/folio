@@ -8,6 +8,9 @@ export async function verifyTurnstile(env: Env, token: string | undefined, ip: s
     body: new URLSearchParams({ secret: env.TURNSTILE_SECRET, response: token, remoteip: ip }),
   });
   if (!response.ok) return false;
-  const result = await response.json<{ success?: boolean; hostname?: string }>();
+  const result = await response.json<{ success?: boolean; hostname?: string; action?: string }>();
+  // Batch L review: the token must come from our page and our email-code widget, not any site's.
+  if (env.TURNSTILE_HOSTNAME && result.hostname !== env.TURNSTILE_HOSTNAME) return false;
+  if (result.action !== undefined && result.action !== 'email-code') return false;
   return result.success === true;
 }

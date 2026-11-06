@@ -23,6 +23,8 @@ export interface Env {
   APPLE_PRIVATE_KEY?: string;
   GOOGLE_CLIENT_SECRET?: string;
   RESEND_API_KEY?: string;
+  /** Batch L: Turnstile tokens must come from this hostname (production only). */
+  TURNSTILE_HOSTNAME?: string;
   TURNSTILE_SECRET?: string;
   OTP_PEPPER: string;
   TOKEN_ENCRYPTION_KEY: string;

@@ -10,6 +10,8 @@ struct CalendarHeader: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Namespace private var glass
 
+    @State private var showsKey = false
+
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
             Button(action: onTitleTap) {
@@ -17,6 +19,10 @@ struct CalendarHeader: View {
             }
             .buttonStyle(.pressable)
             .accessibilityLabel(model.visibleMonth.firstDay.utcDate.formatted(Date.FormatStyle(timeZone: .gmt).month(.wide).year()))
+            // Batch L: the key to the marks for VoiceOver lives on this full-size control (it was on
+            // the 17-pt weekday strip, which the accessibility audit flagged as too small a target).
+            .accessibilityAction(named: "What do the marks mean?") { showsKey = true }
+            .sheet(isPresented: $showsKey) { MarkersKeyView() }
             .accessibilityHint(model.isCollapsed ? "Shows the whole month" : "Opens the month and year picker")
 
             Spacer(minLength: Spacing.s)

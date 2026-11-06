@@ -110,7 +110,7 @@ Expected result: **4+**.
 
 > Folio works fully without an account: on the first screens tap "Not now — keep it on this iPhone" and every feature is available.
 >
-> To test sync (optional): Profile → Continue with email → enter review@devilsense.com → enter the code ______ (no email is sent for this address). On a new account Folio shows a recovery key: tap Copy or Save, type its last 4 characters, Continue.
+> To test sync (optional): Profile → tick "I'm 18 or older and agree to the Terms and Privacy Policy" (accounts are for adults; the app without an account is open to everyone) → Continue with email → enter review@devilsense.com → enter the code ______ (no email is sent for this address). On a new account Folio shows a recovery key: tap Copy or Save, type its last 4 characters, Continue.
 >
 > Account deletion: Profile → Delete account → confirm with the same email code → type DELETE. This deletes the account and everything stored on our servers, and revokes Sign in with Apple when used.
 >

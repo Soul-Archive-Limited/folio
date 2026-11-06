@@ -21,8 +21,8 @@ export function SignIn({ error }: { error?: string }) {
   // Batch J: Apple or Google came back saying a new account needs an invite.
   const asksInvite = /invite_(required|invalid)/.test(location.search);
   const [invite, setInvite] = useState('');
-  // Batch L: accounts are 18+. The box starts unticked and every way in waits for it; the server
-  // refuses a new account without it (existing accounts are never asked).
+  // Batch L: accounts are 18+. The box starts unticked and every way in waits for it (we can't
+  // tell before sign-in whether an account exists); the server only requires it for a new account.
   const [adult, setAdult] = useState(false);
   const withInvite = (href: string) => {
     const params = [adult ? 'adult=1' : '', asksInvite && invite ? `invite=${encodeURIComponent(invite)}` : ''].filter(Boolean).join('&');
@@ -50,7 +50,7 @@ export function SignIn({ error }: { error?: string }) {
             <div className="or">or</div>
             <button className="provider" aria-disabled={!adult} onClick={(e) => { blocked(e); if (adult) setStep('email'); }}>Continue with email</button>
           </div>
-          <p className="fine" id="consent-why">Signing in keeps your diary in sync, encrypted so only you can read it. We use your email only to sign you in — never for marketing. One cookie keeps you signed in; nothing tracks you. Without an account, the iPhone app works fully on its own.</p>
+          <p className="fine" id="consent-why">Signing in keeps your diary in sync, encrypted so only you can read it. We use your email to sign you in and for account messages (sign-in codes, a deletion confirmation) — never for marketing. A sign-in cookie keeps you signed in; nothing tracks you. Without an account, the iPhone app works fully on its own.</p>
         </>
       )}
       {step === 'email' && <EmailStep email={email} setEmail={setEmail} onSent={() => setStep('code')} onBack={() => setStep('choose')} />}
@@ -132,7 +132,7 @@ function EmailStep({ email, setEmail, onSent, onBack }: { email: string; setEmai
   return (
     <form onSubmit={send} style={{ display: 'grid', gap: 14 }}>
       <h1>Continue with email</h1>
-      <p className="sub">We'll send a 6-digit code to this address to sign you in. It's used only for signing in.</p>
+      <p className="sub">We'll send a 6-digit code to this address to sign you in. We never use it for marketing.</p>
       <label className="sr-only" htmlFor="email">Email address</label>
       <input id="email" className="field" type="email" autoComplete="email" inputMode="email" placeholder="you@example.com"
         value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />

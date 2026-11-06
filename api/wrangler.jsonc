@@ -29,9 +29,10 @@
     "EMAIL_FROM": "Folio <no-reply@folio.devilsense.com>",
     "REVIEW_EMAIL": "review@devilsense.com",
     "REVIEW_ENABLED": "true",
-    "INVITES_REQUIRED": "true"
+    "INVITES_REQUIRED": "true",
+    "TURNSTILE_HOSTNAME": "folio.devilsense.com"
   },
   // Nightly clean-up of expired rows (D1 size is the free plan's tightest limit).
   "triggers": { "crons": ["17 3 * * *"] },
-  "observability": { "enabled": true, "head_sampling_rate": 1, "traces": { "enabled": true } }
+  "observability": { "enabled": true, "head_sampling_rate": 1, "logs": { "invocation_logs": false }, "traces": { "enabled": false } }
 }

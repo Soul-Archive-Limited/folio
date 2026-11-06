@@ -81,6 +81,13 @@ async function problemFrom(error: unknown, provider: 'apple' | 'google'): Promis
   return 'failed';
 }
 
+/** Re-authentication needs the session it re-authenticates (Batch L review: without one, a
+ *  "reauth" sign-in could otherwise create an account and spend an invite). */
+async function requireLiveSession(c: Context<AppEnv>) {
+  const presented = presentedToken(c);
+  if (!presented || !(await lookupSession(c.env, presented.token))) fail(401, 'unauthorized');
+}
+
 /** Back to whoever started the round trip, with a reason. */
 function oauthFailure(c: Context<AppEnv>, platform: 'ios' | 'web', problem: OAuthProblem) {
   return platform === 'ios' ? c.redirect(`folio://auth?error=${problem}`, 302) : c.redirect(`/app?error=${problem}`, 303);
@@ -99,6 +106,7 @@ const appleNative = z.object({
 auth.post('/apple/native', async (c) => {
   await limit(c.env, `oauth:${await ipKey(c.env, c.req.raw)}`, 30, 3600);
   const input = await body(c, appleNative);
+  if (input.reauth) await requireLiveSession(c);
   let claims;
   try {
     claims = await verifyAppleIdToken(input.identityToken, c.env.APPLE_BUNDLE_ID);
@@ -320,7 +328,11 @@ auth.post('/email/start', async (c) => {
   await limit(c.env, `email-start-ip:${await ipKey(c.env, c.req.raw)}`, 10, 3600);
   const input = await body(c, emailStart);
   const email = normaliseEmail(input.email);
-  await limit(c.env, `email-start:${await sha256Hex(email)}`, 3, 15 * 60);
+  // Counters are keyed by an HMAC of the address (Batch L review: a plain hash is reversible by
+  // guessing addresses). 3 codes per 15 minutes and 10 per day per address.
+  const emailKey = await hmacHex(c.env.OTP_PEPPER, `email|${email}`);
+  await limit(c.env, `email-start:${emailKey}`, 3, 15 * 60);
+  await limit(c.env, `email-day:${emailKey}`, 10, 86_400);
   // Any browser request (it carries an Origin) needs Turnstile, whatever `client` it claims.
   // Until the web app ships with Turnstile (Batch F) there's no secret, so it stays closed.
   const fromBrowser = input.client === 'web' || c.req.header('origin') !== undefined;
@@ -360,6 +372,10 @@ auth.post('/email/verify', async (c) => {
   await limit(c.env, `email-verify-ip:${await ipKey(c.env, c.req.raw)}`, 20, 3600);
   const input = await body(c, emailVerify);
   const email = normaliseEmail(input.email);
+  // Batch L review: at most 20 code checks per address per day, from any number of networks,
+  // so a 6-digit code can't be ground down over time (5 per code still applies).
+  await limit(c.env, `email-verify-day:${await hmacHex(c.env.OTP_PEPPER, `email|${email}`)}`, 20, 86_400);
+  if (input.reauth) await requireLiveSession(c);
   const row = await c.env.DB.prepare(
     `UPDATE verification_codes SET attempts = attempts + 1
      WHERE id = (SELECT id FROM verification_codes WHERE email = ?1 AND expires_at > ?2 ORDER BY created_at DESC LIMIT 1)

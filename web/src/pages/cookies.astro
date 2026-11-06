@@ -26,11 +26,11 @@ import { site } from '../config/site';
       <tr><td><code>folio.signedIn</code></td><td>localStorage</td><td>“1” after you sign in here, so the first screen is “Opening your diary…” instead of sign-in. Removed on sign-out.</td><td>Until you sign out</td></tr>
       <tr><td><code>folio.device</code></td><td>localStorage</td><td>Remembers that this browser already told Folio its name (for example “Safari on macOS”) for the Devices list.</td><td>Until you clear it</td></tr>
       <tr><td><code>folio.welcomed.&lt;account&gt;</code></td><td>localStorage</td><td>That you’ve seen the welcome in this browser.</td><td>Until you clear it</td></tr>
-      <tr><td><code>folio.photoTiles</code>, <code>folio.showCompleted</code>, <code>folio.todoClosed</code>, <code>folio.journalFolds</code></td><td>localStorage</td><td>Choices you make on screen: photo tiles on the calendar, the Completed list, which To-do groups and Journal months are folded.</td><td>Until you clear them</td></tr>
+      <tr><td><code>folio.photoTiles</code>, <code>folio.showCompleted</code>, <code>folio.todoClosed</code>, <code>folio.journalFolds</code></td><td>localStorage</td><td>Choices you make on screen: photo tiles on the calendar, the Completed list, which To-do groups and Journal months are folded (so it notes which months have pages, in this browser only).</td><td>Until you clear them</td></tr>
       <tr><td>App shell</td><td>Cache Storage (service worker, scope <code>/app</code>)</td><td>The web app’s own code, fonts and icons, so it opens quickly and shows a clear message offline. It never stores your diary, encrypted or not.</td><td>Replaced on each update</td></tr>
     </tbody>
   </table>
-  <p>Your diary itself is decrypted only in the tab’s memory and is gone when you close it.</p>
+  <p>Your diary itself is decrypted only in the tab’s memory and is gone when you close it. Encrypted photos are fetched with “no-store”, so the browser doesn’t keep them on disk. Signing out — here, from another device, or when a session ends — removes the trusted-browser key and every <code>folio.</code> item above except your theme.</p>
 
   <h3>Cloudflare Turnstile</h3>
   <p>When you choose <em>Continue with email</em> on the web, a Cloudflare Turnstile check loads from challenges.cloudflare.com to stop automated sign-up abuse. It loads only on that step, never on the website or inside your diary. In our test (Brave, November 2026) it set no cookies. Where Cloudflare does set a security cookie, it is used only to tell people from bots — Cloudflare says it does not use Turnstile data to identify, profile or target anyone (<a href="https://www.cloudflare.com/turnstile-privacy-policy/" rel="noopener">Turnstile Privacy Addendum</a>).</p>

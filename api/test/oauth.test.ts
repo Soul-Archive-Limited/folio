@@ -84,7 +84,7 @@ describe('Google on iOS: one-time code handoff (SPEC §10.2)', () => {
     expect(startResponse.status).toBe(302);
     const location = new URL(startResponse.headers.get('location')!);
     expect(location.host).toBe('accounts.google.com');
-    expect(location.searchParams.get('scope')).toBe('openid email profile');
+    expect(location.searchParams.get('scope')).toBe('openid email');
     expect(location.searchParams.get('code_challenge_method')).toBe('S256');
     const state = location.searchParams.get('state')!;
     const nonce = location.searchParams.get('nonce')!;

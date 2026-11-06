@@ -9,7 +9,7 @@ import { photoBytes } from './photos.ts';
 import type { DiaryStore } from './store.ts';
 import { zip, type ZipFile } from './zip.ts';
 
-export async function exportDiary(store: DiaryStore, key: DataKey, includeTrash: boolean, progress: (done: number, total: number) => void): Promise<Blob> {
+export async function exportDiary(store: DiaryStore, key: DataKey, includeTrash: boolean, progress: (done: number, total: number) => void): Promise<{ blob: Blob; missing: number }> {
   const trashed = store.trashed();
   const entries = [...store.entries(), ...(includeTrash ? trashed.entries : [])];
   const tasks = [...store.tasks(), ...store.tasks().flatMap((t) => store.subtasksOf(t.id)), ...(includeTrash ? trashed.tasks : [])];
@@ -17,7 +17,7 @@ export async function exportDiary(store: DiaryStore, key: DataKey, includeTrash:
   const files: ZipFile[] = [];
   const photos = entries.flatMap((e) => store.photosOf(e.id).map((p, i) => ({ entry: e, photo: p, index: i })));
   const names = new Map<string, string[]>();
-  let done = 0;
+  let done = 0, missing = 0;
   for (const { entry, photo, index } of photos) {
     const bytes = await photoBytes(key, store.userId, photo.id, 'full') ?? await photoBytes(key, store.userId, photo.id, 'display');
     if (bytes) {
@@ -25,7 +25,7 @@ export async function exportDiary(store: DiaryStore, key: DataKey, includeTrash:
       const name = `${entry.data.dayKey} ${entry.id.slice(0, 8)} ${index + 1}.${extension}`;
       files.push({ name: `Folio Photos/${name}`, data: bytes });
       names.set(entry.id, [...(names.get(entry.id) ?? []), name]);
-    }
+    } else missing++;
     progress(++done, photos.length);
   }
   const json = {
@@ -43,7 +43,8 @@ export async function exportDiary(store: DiaryStore, key: DataKey, includeTrash:
     })),
   };
   files.unshift({ name: 'Folio Export.json', data: new TextEncoder().encode(JSON.stringify(json, null, 2)) });
-  return zip(files);
+  // Batch L review: never hand over a silently incomplete export.
+  return { blob: zip(files), missing };
 }
 
 /** Hands a blob to the browser's own download (the person asked for it). */

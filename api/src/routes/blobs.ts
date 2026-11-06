@@ -117,7 +117,8 @@ blobs.get('/:id', async (c) => {
       'content-type': 'application/octet-stream',
       'content-disposition': 'attachment',
       'content-length': String(object.size),
-      'cache-control': 'private, max-age=31536000, immutable',
+      // Batch L review: not kept in the browser's disk cache after sign-out (the tab keeps its own copy).
+      'cache-control': 'private, no-store',
       etag: object.httpEtag,
     },
   });

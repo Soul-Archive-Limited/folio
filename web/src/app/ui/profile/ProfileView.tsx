@@ -177,8 +177,9 @@ function Main() {
         <button className="row" disabled={!!exporting} onClick={async () => {
           setExporting('Starting…');
           try {
-            const blob = await exportDiary(store, key, withTrash, (done, total) => setExporting(`Photos ${done} of ${total}`));
+            const { blob, missing } = await exportDiary(store, key, withTrash, (done, total) => setExporting(`Photos ${done} of ${total}`));
             save(blob, `Folio Export ${new Date().toISOString().slice(0, 10)}.zip`);
+            if (missing > 0) toast(`${missing} ${missing === 1 ? 'photo' : 'photos'} couldn't be downloaded, so the export is missing them. Check your connection and export again.`, undefined, 10);
           } catch { toast("Couldn't make the export. Please try again."); }
           setExporting(null);
         }}><Icon name="export" /><span className="grow">Export as JSON + photos<small className="ink3" style={{ display: 'block', fontSize: 13 }}>{exporting ?? 'A zip made in this browser, decrypted. Nothing is uploaded.'}</small></span><Icon name="download" small /></button>

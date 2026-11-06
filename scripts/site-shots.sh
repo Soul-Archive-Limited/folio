@@ -13,7 +13,7 @@ shot() { # name wait args...
   cwebp -quiet -q 80 -resize 720 0 "$tmp/$name.png" -o "$out/$name.webp"
 }
 # Fresh sample diary (no drafts left by the dictation demo); its dates are relative to today.
-reseed() { xcrun simctl terminate "$dev" com.devilsense.folio 2>/dev/null || true; xcrun simctl launch "$dev" com.devilsense.folio -FolioResetData YES -FolioSampleData YES -hasOnboarded YES >/dev/null; sleep 6; }
+reseed() { xcrun simctl terminate "$dev" com.devilsense.folio 2>/dev/null || true; xcrun simctl launch "$dev" com.devilsense.folio -FolioResetAccount YES -FolioResetData YES -FolioSampleData YES -hasOnboarded YES >/dev/null; sleep 6; }
 reseed
 xcrun simctl status_bar "$dev" override --time 9:41 --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3
 for mode in light dark; do

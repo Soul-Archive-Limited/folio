@@ -20,7 +20,7 @@ import { site } from '../config/site';
   </ul>
 
   <h2>How we test</h2>
-  <p>Every release is checked with automated tests (axe-core on every website and web-app page, Xcode’s accessibility audit on the main iPhone screens), with keyboard-only and screen-reader passes, and with contrast measured from our colour tokens at build time. The latest results are published with each release in our <a href={site.githubUrl} rel="noopener">source repository</a> (<code>docs/ACCESSIBILITY.md</code>).</p>
+  <p>Releases are checked with automated tests — axe-core on every website and web-app page in light and dark, Xcode’s accessibility audit on the main iPhone screens at the default and the largest text size — with a keyboard-only pass on the web, and with contrast measured from our colour tokens at build time. Screen-reader testing so far is on iPhone (VoiceOver labels and actions); a full web screen-reader pass is planned. Results are in our <a href={site.githubUrl} rel="noopener">source repository</a> (<code>docs/ACCESSIBILITY.md</code>).</p>
 
   <h2>Known limitations</h2>
   <ul>

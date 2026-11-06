@@ -8,14 +8,15 @@ export function googleRedirectURI(env: Env): string {
   return `${env.APP_ORIGIN}/api/auth/callback/google`;
 }
 
-/** Authorization code flow with PKCE; scopes `openid email profile` only (SPEC §10.2). */
+/** Authorization code flow with PKCE; scopes `openid email` only (SPEC §10.2; Batch L dropped
+ *  `profile`, which would send name and picture that Folio never uses). */
 export function googleAuthorizeURL(env: Env, state: string, codeChallenge: string, nonce: string): string {
   const url = new URL('https://accounts.google.com/o/oauth2/v2/auth');
   url.search = new URLSearchParams({
     client_id: env.GOOGLE_CLIENT_ID.trim(),
     redirect_uri: googleRedirectURI(env),
     response_type: 'code',
-    scope: 'openid email profile',
+    scope: 'openid email',
     state,
     nonce,
     code_challenge: codeChallenge,

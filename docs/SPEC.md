@@ -402,7 +402,7 @@ Speech framework **`SpeechAnalyzer` + `DictationTranscriber`** (verify with Cont
 ### 10.2 Sign-in flows
 - **Apple (iOS):** `ASAuthorizationAppleIDProvider` with a SHA-256 nonce → send identity token + raw nonce + authorization code to `POST /api/auth/apple/native` → Worker verifies JWT against Apple JWKS (aud = bundle ID), exchanges the code for a refresh token (stored encrypted at rest with a Worker secret — needed for revocation on deletion), creates/links user, returns session.
 - **Apple (web):** OAuth redirect with Services ID `com.devilsense.folio.web`, return URL `https://folio.devilsense.com/api/auth/callback/apple`.
-- **Google (iOS):** `ASWebAuthenticationSession` → `GET /api/auth/google/start?platform=ios` (PKCE, state) → Google → Worker callback → redirect to `folio://auth?code=<one-time code>` → app exchanges the one-time code (60 s, single use) for a session. Scopes: `openid email profile` only. No Google SDK.
+- **Google (iOS):** `ASWebAuthenticationSession` → `GET /api/auth/google/start?platform=ios` (PKCE, state) → Google → Worker callback → redirect to `folio://auth?code=<one-time code>` → app exchanges the one-time code (60 s, single use) for a session. Scopes: `openid email` only (Batch L dropped `profile`; Apple web asks for `email` only). No Google SDK.
 - **Google (web):** standard OAuth redirect.
 - **When an OAuth round trip fails (Batch K)** it always ends back in the app (`folio://auth?error=…`) or the web app (`/app?error=…`) with a reason, never an error page inside the sign-in sheet: `cancelled`, `expired` (state older than 10 min, a refused or used code, or the 60-s hand-off ran out — try again), `google_unavailable` (Google refused our client credentials — use Apple or email), `account_deleting`, `invite_required` / `invite_invalid`, else `failed`. The state carries its platform as a prefix (`i.` / `w.`) so even an unknown state returns to the right side. Each reason has its own message; the Worker logs Google's error code (never its description).
 - **Email:** `POST /api/auth/email/start {email}` → 6-digit code, hashed (SHA-256 + server pepper), 10-min expiry, max 5 attempts, then invalidated → `POST /api/auth/email/verify`. Identical response whether or not the email exists (no account enumeration).
@@ -442,7 +442,7 @@ Speech framework **`SpeechAnalyzer` + `DictationTranscriber`** (verify with Cont
 - **Recently Deleted:** `trashedAt` (and a category's `unassignedIDs`) travel **inside the encrypted payload** like any other field, so the server can't tell a trashed item from a live one. Trash and restore are ordinary updates (last-writer-wins). The 30-day purge is a permanent delete: `deleted: true` tombstone, R2 blobs removed. A device that sees a tombstone never recreates the record.
 - **Push:** `POST /api/sync/push` `{changes:[{id,type,ciphertext,nonce,clientUpdatedAt,baseVersion,deleted}]}` ≤ 200 changes / ≤ 1 MB per request. Server assigns a per-user monotonic `version`. Conflict (baseVersion behind server): **last-writer-wins by `clientUpdatedAt`**; loser returned so the client can update.
 - **Pull:** `GET /api/sync/pull?since=<cursor>&limit=500` → changes after cursor + next cursor.
-- **Blobs:** `PUT /api/blobs/photo/:photoId` (a photo's three renditions in one request, DECISIONS 190; the single `PUT /api/blobs/:id` remains, ≤ 4 MB, streamed to R2 via binding), `GET /api/blobs/:id` (streamed, `Cache-Control: private, max-age=31536000, immutable` — content is encrypted and immutable). Uploads max 2 concurrent; thumbnails first.
+- **Blobs:** `PUT /api/blobs/photo/:photoId` (a photo's three renditions in one request, DECISIONS 190; the single `PUT /api/blobs/:id` remains, ≤ 4 MB, streamed to R2 via binding), `GET /api/blobs/:id` (streamed, `Cache-Control: private, no-store` since Batch L — the browser keeps no copy on disk after sign-out; apps keep their own). Uploads max 2 concurrent; thumbnails first.
 - **Real-time:** while the app is in the foreground (or web tab visible), it opens one WebSocket to `UserHub` (`/api/live`). After any accepted push, the Worker pings the user's `UserHub`, which broadcasts `{"cursor": N}` to that user's other connections; they pull. Uses Hibernation so idle sockets cost nothing. Socket closes in background.
 - **When the iOS app syncs:** on launch/foreground (one pull), 2 s after the last local edit (debounced push), on WebSocket ping, and on `BGAppRefreshTask`. Exponential backoff with jitter on errors; honour `Retry-After`.
 - **Request budget target:** ≤ 10 Worker requests per active user per day on average (log a DEBUG counter to verify).
@@ -459,8 +459,8 @@ Web: same flow at `/app/settings/account`.
 Use the Workers **rate-limiting binding** if available on the current plan (verify), else counters in `UserHub`/D1.
 | Endpoint | Limit |
 |---|---|
-| email/start | 3 per email per 15 min; 10 per IP per hour; Turnstile on web |
-| email/verify | 5 attempts per code; 20 per IP per hour |
+| email/start | 3 per email per 15 min and 10 per email per day (keyed hash of the address, Batch L); 10 per IP per hour; Turnstile on web (hostname and action checked, Batch L) |
+| email/verify | 5 attempts per code; 20 per IP per hour; 20 per email per day across all networks (Batch L) |
 | OAuth start/callback | 30 per IP per hour |
 | sync push/pull | 120 per user per minute |
 | blobs PUT | one request per photo (3 renditions): 600 per user per hour, 3,000 per day (DECISIONS 190); 4 MB per rendition |

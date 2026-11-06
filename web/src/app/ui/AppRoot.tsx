@@ -74,8 +74,7 @@ export default function AppRoot() {
 
   async function signOut() {
     try { await api('POST', 'auth/sign-out', {}); } catch { /* the session ends here either way */ }
-    await forgetBrowser();
-    rememberSession(false);
+    await endLocalSession();
     history.replaceState(null, '', '/app');
     setPhase({ kind: 'signedOut' });
   }
@@ -98,7 +97,7 @@ export default function AppRoot() {
     case 'setupKey': return <Suspense fallback={fallback}><SetupKey me={phase.me} onDone={(raw, trust) => unlocked(phase.me, raw, trust)} onExists={() => setPhase({ kind: 'locked', me: phase.me })} onSignOut={signOut} /></Suspense>;
     case 'deleting': return <Suspense fallback={fallback}><DeleteAccount me={phase.me} onSignOut={signOut} /></Suspense>;
     case 'locked': return <Suspense fallback={fallback}><Unlock me={phase.me} onUnlocked={(raw, trust) => unlocked(phase.me, raw, trust)} onSignOut={signOut} /></Suspense>;
-    case 'ready': return <Suspense fallback={fallback}><Shell me={phase.me} dataKey={phase.key} onSignOut={signOut} onSessionEnded={() => setPhase({ kind: 'signedOut', error: 'You were signed out.' })} /></Suspense>;
+    case 'ready': return <Suspense fallback={fallback}><Shell me={phase.me} dataKey={phase.key} onSignOut={signOut} onSessionEnded={() => { void endLocalSession(); setPhase({ kind: 'signedOut', error: 'You were signed out.' }); }} /></Suspense>;
   }
 }
 
@@ -131,6 +130,15 @@ const HINT = 'folio.signedIn';
 function hadSession(): boolean {
   try { return localStorage.getItem(HINT) === '1'; } catch { return false; }
 }
+/** Every way of being signed out — here, from another device, or by expiry — forgets the
+ *  trusted-browser key and Folio's own local items except the theme (Batch L review). */
+async function endLocalSession() {
+  await forgetBrowser();
+  try {
+    for (const key of Object.keys(localStorage)) if (key.startsWith('folio.') && key !== 'folio.theme') localStorage.removeItem(key);
+  } catch { /* private mode */ }
+}
+
 export function rememberSession(yes: boolean) {
   try { if (yes) localStorage.setItem(HINT, '1'); else localStorage.removeItem(HINT); } catch { /* private mode */ }
 }
