@@ -39,9 +39,9 @@ struct NextTaskView: View {
                     Text(next.title).font(.headline).lineLimit(2).privacySensitive()
                     if let time = next.timeText { Text(time).font(.caption) }
                 } else {
-                    Text(entry.openCount == 0 ? String(localized: "All clear") : String(localized: "\(entry.openCount) tasks to do"))
+                    Text(entry.openCount == 0 ? String(localized: "All clear") : (entry.openCount == 1 ? String(localized: "1 task to do") : String(localized: "\(entry.openCount) tasks to do")))
                         .font(.headline)
-                    Text(entry.pagesToday == 0 ? String(localized: "No pages yet today") : String(localized: "\(entry.pagesToday) pages today"))
+                    Text(entry.pagesToday == 0 ? String(localized: "No pages yet today") : (entry.pagesToday == 1 ? String(localized: "1 page today") : String(localized: "\(entry.pagesToday) pages today")))
                         .font(.caption)
                 }
             }
@@ -74,6 +74,6 @@ struct TodayCountView: View {
             Text("\(entry.openCount)").monospacedDigit()
         }
         .gaugeStyle(.accessoryCircularCapacity)
-        .accessibilityLabel(String(localized: "\(entry.openCount) tasks left today"))
+        .accessibilityLabel(entry.openCount == 1 ? String(localized: "1 task left today") : String(localized: "\(entry.openCount) tasks left today"))
     }
 }

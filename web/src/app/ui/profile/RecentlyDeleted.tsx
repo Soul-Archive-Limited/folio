@@ -76,7 +76,7 @@ export default function RecentlyDeleted() {
                   onChange={(e) => { const s = new Set(selected); if (e.target.checked) s.add(item.id); else s.delete(item.id); setSelected(s); }} />}
                 <button className="grow" style={{ border: 0, background: 'none', textAlign: 'left', padding: '4px 0' }} onClick={() => kind === 'entry' && setPreview(preview === item.id ? null : item.id)} aria-expanded={kind === 'entry' ? preview === item.id : undefined}>
                   <span style={{ display: 'block' }}>{title(item.id)}</span>
-                  <span className="callout ink3">{[when(item.id), `${daysLeft(item.data.trashedAt!)} days left`].filter(Boolean).join(' · ')}</span>
+                  <span className="callout ink3">{[when(item.id), (daysLeft(item.data.trashedAt!) === 1 ? '1 day left' : `${daysLeft(item.data.trashedAt!)} days left`)].filter(Boolean).join(' · ')}</span>
                 </button>
                 {!selecting && <>
                   <button className="btn small" onClick={() => restore([item.id])}><Icon name="restore" small />Restore</button>

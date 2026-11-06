@@ -35,7 +35,9 @@ const SIGN_IN_ERRORS: Record<string, string> = {
  * account) → the diary. Nothing from the diary exists until the Data Key is in memory.
  */
 export default function AppRoot() {
-  const [phase, setPhase] = useState<Phase>({ kind: 'loading' });
+  // Batch L: no splash. A browser that wasn't signed in sees the sign-in page at once (the
+  // session check runs underneath); one that was shows the gate with a small inline loader.
+  const [phase, setPhase] = useState<Phase>(() => (hadSession() ? { kind: 'loading' } : { kind: 'signedOut', error: urlError() }));
 
   async function boot() {
     try {
@@ -44,8 +46,8 @@ export default function AppRoot() {
       await signedIn(await api<Me>('GET', 'account/me'));
     } catch (error) {
       if (error instanceof ApiError && error.status === 401) {
-        const code = new URLSearchParams(location.search).get('error');
-        setPhase({ kind: 'signedOut', error: code ? SIGN_IN_ERRORS[code] : undefined });
+        rememberSession(false);
+        setPhase({ kind: 'signedOut', error: urlError() });
       } else {
         setPhase({ kind: 'offline' });
       }
@@ -53,6 +55,7 @@ export default function AppRoot() {
   }
 
   async function signedIn(me: Me) {
+    rememberSession(true);
     void reportBrowserName(me.sessionId);
     // Deleting the account needs no key, so that page never unlocks the diary.
     if (location.pathname.startsWith('/app/settings/account')) return setPhase({ kind: 'deleting', me });
@@ -71,6 +74,7 @@ export default function AppRoot() {
   async function signOut() {
     try { await api('POST', 'auth/sign-out', {}); } catch { /* the session ends here either way */ }
     await forgetBrowser();
+    rememberSession(false);
     history.replaceState(null, '', '/app');
     setPhase({ kind: 'signedOut' });
   }
@@ -78,7 +82,7 @@ export default function AppRoot() {
   useEffect(() => { void boot(); }, []);
   useEffect(setUpInstall, []);
 
-  const fallback = <Splash />;
+  const fallback = <Opening />;
   switch (phase.kind) {
     case 'loading': return fallback;
     case 'offline':
@@ -111,13 +115,27 @@ export function Gate({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Splash() {
+/** While a signed-in browser's session and keys load: the gate itself, with one quiet line. */
+function Opening() {
   return (
-    <main className="gate" aria-busy="true">
-      <Mark className="mark" />
-      <span className="sr-only">Loading Folio</span>
-    </main>
+    <Gate>
+      <h1>Your days, kept.</h1>
+      <p className="loading-line" role="status"><span className="spinner" aria-hidden="true" />Opening your diary…</p>
+    </Gate>
   );
+}
+
+const HINT = 'folio.signedIn';
+/** Only a hint for which screen to draw first ("1" after a sign-in here); the cookie decides. */
+function hadSession(): boolean {
+  try { return localStorage.getItem(HINT) === '1'; } catch { return false; }
+}
+export function rememberSession(yes: boolean) {
+  try { if (yes) localStorage.setItem(HINT, '1'); else localStorage.removeItem(HINT); } catch { /* private mode */ }
+}
+function urlError(): string | undefined {
+  const code = new URLSearchParams(location.search).get('error');
+  return code ? SIGN_IN_ERRORS[code] : undefined;
 }
 
 /** Devices shows "Brave on macOS" — Brave's User-Agent says Chrome (DECISIONS 189). */

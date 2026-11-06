@@ -21,12 +21,12 @@ const plain = 'Train to Edinburgh. Four hours of fields, rain and a very good bo
       <div class="lock-stage" data-lock3d>
         <svg class="lock-poster" viewBox="0 0 200 220" aria-hidden="true">
           <defs>
-            <linearGradient id="lk-body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8a57" /><stop offset="1" stop-color="#e2541f" /></linearGradient>
+            <linearGradient id="lk-body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4150E0" /><stop offset="1" stop-color="#252FA6" /></linearGradient>
             <linearGradient id="lk-steel" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9c9a96" /><stop offset="0.5" stop-color="#f1efec" /><stop offset="1" stop-color="#8f8d89" /></linearGradient>
           </defs>
           <path d="M62 104V72a38 38 0 0 1 76 0v32" fill="none" stroke="url(#lk-steel)" stroke-width="16" stroke-linecap="round" />
           <rect x="30" y="96" width="140" height="112" rx="26" fill="url(#lk-body)" />
-          <circle cx="100" cy="145" r="10" fill="#1a0d08" /><rect x="96" y="148" width="8" height="24" rx="4" fill="#1a0d08" />
+          <circle cx="100" cy="145" r="10" fill="#0d0f2a" /><rect x="96" y="148" width="8" height="24" rx="4" fill="#0d0f2a" />
         </svg>
       </div>
       <div class="cipher glass" aria-hidden="true">
@@ -39,8 +39,8 @@ const plain = 'Train to Edinburgh. Four hours of fields, rain and a very good bo
 </section>
 
 <style>
-  .priv { margin-top: clamp(96px, 12vw, 160px); padding: clamp(72px, 10vw, 128px) 0; background: #121216; color: #f4f4f5; --text-2: rgb(244 244 245 / 0.68); --accent-text: #ff9a6e; --hairline: rgb(255 255 255 / 0.09); position: relative; overflow: clip; }
-  .priv::before { content: ''; position: absolute; inset: 0; background: radial-gradient(40% 50% at 78% 40%, rgb(255 122 69 / 0.22), transparent 70%), radial-gradient(40% 50% at 10% 90%, rgb(61 123 255 / 0.16), transparent 70%); pointer-events: none; }
+  .priv { margin-top: clamp(96px, 12vw, 160px); padding: clamp(72px, 10vw, 128px) 0; background: #121216; color: #f4f4f5; --text-2: rgb(244 244 245 / 0.68); --accent-text: #9ea8ff; --hairline: rgb(255 255 255 / 0.09); position: relative; overflow: clip; }
+  .priv::before { content: ''; position: absolute; inset: 0; background: radial-gradient(40% 50% at 78% 40%, rgb(65 80 224 / 0.3), transparent 70%), radial-gradient(40% 50% at 10% 90%, rgb(61 123 255 / 0.16), transparent 70%); pointer-events: none; }
   .priv-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: clamp(32px, 6vw, 80px); align-items: center; }
   .facts { list-style: none; margin: 0 0 24px; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--hairline); }
   .facts li { display: grid; grid-template-columns: 220px 1fr; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--hairline); }

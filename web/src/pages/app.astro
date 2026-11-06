@@ -3,6 +3,7 @@
 // React app routes itself. Not indexed (robots.txt, X-Robots-Tag).
 import '../app/app.css';
 import AppRoot from '../app/ui/AppRoot.tsx';
+import Mark from '../components/Mark.astro';
 ---
 <!doctype html>
 <html lang="en-GB">
@@ -20,12 +21,22 @@ import AppRoot from '../app/ui/AppRoot.tsx';
     <meta name="apple-mobile-web-app-title" content="Folio" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <script is:inline>try{var t=localStorage.getItem('folio.theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+    <script is:inline>try{var d=document.documentElement,t=localStorage.getItem('folio.theme');if(t)d.dataset.theme=t;if(localStorage.getItem('folio.signedIn')==='1')d.dataset.session=''}catch(e){}</script>
   </head>
   <body>
     <AppRoot client:only="react">
-      <main class="gate" slot="fallback" aria-busy="true">
-        <svg class="mark" width="64" height="64" viewBox="0 0 100 100" aria-label="Folio" role="img"><defs><linearGradient id="folio-ink" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4150E0"/><stop offset="1" stop-color="#252FA6"/></linearGradient></defs><rect width="100" height="100" rx="22.5" fill="url(#folio-ink)"/><path d="M10 30.5 C21 26.5 30 26 37 28.6 L37 41 C34.5 44.5 33 48 33.2 50.5 C33.3 52.5 33.6 53.6 34 54.6 L45.8 84.6 C36 79 22 77 10 79.5 Z" fill="#FFFDF9"/><path d="M 90 30.5 C 79 26.5 70 26 63 28.6 L 63 41 C 65.5 44.5 67 48 66.8 50.5 C 66.7 52.5 66.4 53.6 66 54.6 L 54.2 84.6 C 64 79 78 77 90 79.5 Z" fill="#FFFDF9"/><path transform="translate(50 83) scale(0.95)" d="M0 0 L-12 -30 C-13 -35 -12 -40 -9 -44 L-9 -53 Q-9 -58 -4 -58 L4 -58 Q9 -58 9 -53 L9 -44 C12 -40 13 -35 12 -30 Z M-1.15 -4 L1.15 -4 L1.15 -26.4 L-1.15 -26.4 Z M-3.6 -30 A3.6 3.6 0 1 0 3.6 -30 A3.6 3.6 0 1 0 -3.6 -30 Z" fill="#FFFDF9" fill-rule="evenodd"/></svg>
+      <!-- Batch L: the first paint is the gate itself (no full-screen splash); React replaces it in place. -->
+      <main class="gate boot" slot="fallback" aria-busy="true">
+        <div class="aura" aria-hidden="true"><i></i><i></i><i></i></div>
+        <a class="gate-home" href="/"><Mark />Folio</a>
+        <section class="gate-card glass">
+          <Mark />
+          <h1>Your days, kept.</h1>
+          <p class="sub when-guest">Sign in to read and write your diary in the browser. It's encrypted so only you can read it.</p>
+          <p class="loading-line" role="status"><span class="spinner" aria-hidden="true"></span><span class="when-session">Opening your diary…</span><span class="when-guest sr-only">Loading sign-in</span></p>
+        </section>
+        <p class="gate-foot"><a href="/security">How your privacy works</a> · <a href="/support">Help</a></p>
+        <div class="launch" aria-hidden="true"><Mark /></div>
       </main>
     </AppRoot>
   </body>

@@ -504,7 +504,25 @@ body:has(.gate) .aura { opacity: 0.5; }
 .gate .field { border-radius: 16px; }
 .gate-foot { font-size: 13px; color: var(--ink-secondary); text-align: center; }
 .gate-foot a { color: inherit; }
-@media (prefers-reduced-motion: no-preference) { .gate-card { animation: gateIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) both; } }
+/* Batch L: the card only rises in on the very first paint (the static page); React's card replaces
+   it in place without moving, so the sign-in page never appears twice. */
+@media (prefers-reduced-motion: no-preference) { .boot .gate-card { animation: gateIn 0.5s cubic-bezier(0.23, 1, 0.32, 1) both; } }
+.loading-line { display: inline-flex; align-items: center; justify-content: center; gap: 10px; color: var(--ink-secondary); font-size: 15px; margin: 6px 0 4px; min-height: 52px; }
+.spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--ink) 16%, transparent); border-top-color: var(--accent); animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2.4s; } }
+/* The static first paint: signed-out browsers see the sign-in words, signed-in ones "Opening…".
+   An installed app (standalone) keeps a short launch screen — the mark alone, like iOS. */
+.boot .when-session { display: none; }
+:root[data-session] .boot .when-session { display: inline-flex; }
+:root[data-session] .boot .when-guest { display: none; }
+.boot .launch { display: none; }
+@media (display-mode: standalone) {
+  .boot > :not(.launch, .aura) { display: none; }
+  .boot { grid-template-rows: 1fr; }
+  .boot .launch { display: grid; place-items: center; }
+  .boot .launch svg { width: 72px; height: 72px; }
+}
 @keyframes gateIn { from { opacity: 0; transform: translateY(12px) scale(0.98); } }
 
 @media (prefers-reduced-motion: reduce) {

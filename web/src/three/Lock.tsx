@@ -82,7 +82,7 @@ export function Lock({ dark, input }: { dark: boolean; input: SceneInput }) {
         </mesh>
         {parts.keyhole.map((geometry, i) => (
           <mesh key={i} geometry={geometry} position={[0, 0, 0.2806]}>
-            <meshBasicMaterial color="#1a0d08" />
+            <meshBasicMaterial color="#0d0f2a" />
           </mesh>
         ))}
         {/* The pivot sits on the left leg, so the shackle swings open the way a real one does. */}

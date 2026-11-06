@@ -54,7 +54,7 @@ export function YearPixels() {
             const opacity = d && byMood && mood ? mood.opacity : 1;
             return (
               <button key={key} className={`pixel${d ? ' written' : ''}${key > today ? ' future' : ''}${key === today ? ' today' : ''}`}
-                disabled={!d} aria-label={`${key}${d ? `, ${d.ids.length} pages${mood ? `, ${mood.title}` : ''}` : ', nothing written'}`}
+                disabled={!d} aria-label={`${key}${d ? `, ${d.ids.length === 1 ? '1 page' : `${d.ids.length} pages`}${mood ? `, ${mood.title}` : ''}` : ', nothing written'}`}
                 style={background ? { background, opacity } : undefined}
                 onClick={() => d && (d.ids.length === 1 ? openEntry(d.ids[0]!) : showDay(key))} />
             );

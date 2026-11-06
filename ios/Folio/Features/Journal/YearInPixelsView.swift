@@ -130,7 +130,7 @@ struct YearPixelGrid: View {
     private func label(day: DayKey, pixel: YearPixel?) -> String {
         let date = day.utcDate.formatted(Date.FormatStyle(timeZone: .gmt).day().month(.wide))
         guard let pixel else { return String(localized: "\(date), nothing written") }
-        let pages = String(localized: "\(pixel.entryIDs.count) pages")
+        let pages = pixel.entryIDs.count == 1 ? String(localized: "1 page") : String(localized: "\(pixel.entryIDs.count) pages")
         return [date, pages, pixel.mood?.title].compactMap { $0 }.joined(separator: ", ")
     }
 }

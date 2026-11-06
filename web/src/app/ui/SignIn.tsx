@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { turnstileKey } from '../../config/app.ts';
 import { api, ApiError, friendly } from '../lib/api.ts';
-import { Gate } from './AppRoot.tsx';
+import { Gate, rememberSession } from './AppRoot.tsx';
 import { AppleLogo, GoogleLogo } from './Icons.tsx';
 
 declare global {
@@ -32,8 +32,8 @@ export function SignIn({ error }: { error?: string }) {
           {error && <p className="error" role="alert">{error}</p>}
           <div style={{ display: 'grid', gap: 10, marginTop: 6 }}>
             {asksInvite && <InviteField value={invite} onChange={setInvite} />}
-            <a className="provider apple" href={withInvite('/api/auth/apple/start')}><AppleLogo />Continue with Apple</a>
-            <a className="provider" href={withInvite('/api/auth/google/start?platform=web')}><GoogleLogo />Continue with Google</a>
+            <a className="provider apple" href={withInvite('/api/auth/apple/start')} onClick={() => rememberSession(true)}><AppleLogo />Continue with Apple</a>
+            <a className="provider" href={withInvite('/api/auth/google/start?platform=web')} onClick={() => rememberSession(true)}><GoogleLogo />Continue with Google</a>
             <div className="or">or</div>
             <button className="provider" onClick={() => setStep('email')}>Continue with email</button>
           </div>
@@ -42,7 +42,7 @@ export function SignIn({ error }: { error?: string }) {
       )}
       {step === 'email' && <EmailStep email={email} setEmail={setEmail} onSent={() => setStep('code')} onBack={() => setStep('choose')} />}
       {/* A fresh page load after sign-in: Turnstile's script never shares a page with the diary. */}
-      {step === 'code' && <CodeStep email={email} onDone={() => location.replace(location.pathname)} onBack={() => setStep('email')} />}
+      {step === 'code' && <CodeStep email={email} onDone={() => { rememberSession(true); location.replace(location.pathname); }} onBack={() => setStep('email')} />}
     </Gate>
   );
 }

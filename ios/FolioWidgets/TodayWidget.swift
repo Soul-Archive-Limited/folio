@@ -103,7 +103,7 @@ struct CountsLine: View {
     private var summary: String {
         var parts: [String] = []
         if entry.openCount > 0 { parts.append(String(localized: "\(entry.openCount) to do")) }
-        if entry.pagesToday > 0 { parts.append(String(localized: "\(entry.pagesToday) pages")) }
+        if entry.pagesToday > 0 { parts.append(entry.pagesToday == 1 ? String(localized: "1 page") : String(localized: "\(entry.pagesToday) pages")) }
         return parts.isEmpty ? String(localized: "A clear day") : parts.joined(separator: " · ")
     }
 }
@@ -118,7 +118,7 @@ struct TaskList: View {
         VStack(alignment: .leading, spacing: 7) {
             if !entry.homeDetails || entry.snapshot?.showsDetails == false {
                 Spacer(minLength: 0)
-                Text("\(entry.openCount) tasks to do")
+                Text(entry.openCount == 1 ? String(localized: "1 task to do") : String(localized: "\(entry.openCount) tasks to do"))
                     .font(.headline)
                     .foregroundStyle(WidgetPalette.ink)
                 Text("Turn on details in Folio → Profile → Widgets.")
