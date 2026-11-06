@@ -2,7 +2,13 @@
 
 The next session starts here. Read this, then `CLAUDE.md`, `docs/SPEC.md`, `docs/PHASES.md` and the last entries of `docs/DECISIONS.md`. Updated at the end of every batch.
 
-_Last updated: 2026-11-06, end of Batch K (Google sign-in fix, invite-only on, day panel, photo refresh, rebrand; TestFlight 0.1.0 (107))._
+_Last updated: 2026-11-06, Batch L in progress._
+
+## Batch L status (resume here)
+Done and pushed: Part 1 (no splash on web sign-in; Ink widget + web screenshots; plural fixes), Part 3 (web app parity: calendar marks, To-do groups + natural quick add, Journal folds, welcome, shortcuts, drop photos, export zip + print PDF; sync matrix + DEBUG SyncProbe; shell settings bug fixed) — **live rerun of the matrix still to do**, Part 2 (website overhaul), Part 6 (18+ accounts server-enforced, API deployed 24c3f190 with migration 0004; legal pages; `docs/COMPLIANCE.md`). Decisions 286–292.
+**Next:** Part 4 iPad → Part 5 security audit (`docs/SECURITY_AUDIT.md`) → Part 7 accessibility (`docs/ACCESSIBILITY.md`, axe-core in scratchpad) → Part 8 crawl → Part 9 independent review agent → live sync matrix (needs the review code in the Keychain: owner runs `security add-generic-password -a folio -s folio-review-code -w`; scripts read it with `security find-generic-password -a folio -s folio-review-code -w`) → Part 10 ship + `docs/reports/batch-l.md`.
+- Live matrix recipe: build-for-testing (`ios/build/sim`), `scripts/sync-live-test.sh <sim> testA1SignInNewAccount` *without* FOLIO_API_BASE (production), copy key (`testCopyRecoveryKey`, `xcrun simctl pbpaste`), sign two Brave profiles in with the scratchpad `weblogin.mjs`, then `node scripts/sync-matrix.mjs --sim … --web https://folio.devilsense.com --api https://folio.devilsense.com/api/ --profiles A,B --out docs/reports/batch-l-sync-live.json --playwright <dir>`; delete the review account afterwards (Part 5 deletion check). Local results: `docs/reports/batch-l-sync-local.json`.
+
 
 ## Batch K status (resume here)
 All six parts done — report `docs/reports/batch-k.md`, DECISIONS 278–285, sheets `docs/screenshots/batch-k/`.
