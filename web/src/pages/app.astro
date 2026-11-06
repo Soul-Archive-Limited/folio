@@ -24,6 +24,7 @@ import Mark from '../components/Mark.astro';
     <script is:inline>try{var d=document.documentElement,t=localStorage.getItem('folio.theme');if(t)d.dataset.theme=t;if(localStorage.getItem('folio.signedIn')==='1')d.dataset.session=''}catch(e){}</script>
   </head>
   <body>
+    <!--email_off-->
     <AppRoot client:only="react">
       <!-- Batch L: the first paint is the gate itself (no full-screen splash); React replaces it in place. -->
       <main class="gate boot" slot="fallback" aria-busy="true">
@@ -39,5 +40,6 @@ import Mark from '../components/Mark.astro';
         <div class="launch" aria-hidden="true"><Mark /></div>
       </main>
     </AppRoot>
+    <!--/email_off-->
   </body>
 </html>

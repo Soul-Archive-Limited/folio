@@ -1,6 +1,6 @@
 # Batch L report
 
-Batch L = bugs (Part 1) · website overhaul (2) · web app parity + real-time sync (3) · iPad (4) · security audit (5) · privacy, legal and consumer compliance (6) · accessibility (7) · link and content check (8) · independent review (9) · ship (10). Shape per SPEC §18. Decisions 286–__. TestFlight: **__BUILD__**.
+Batch L = bugs (Part 1) · website overhaul (2) · web app parity + real-time sync (3) · iPad (4) · security audit (5) · privacy, legal and consumer compliance (6) · accessibility (7) · link and content check (8) · independent review (9) · ship (10). Shape per SPEC §18. Decisions 286–298. TestFlight: **__BUILD__**.
 
 Evidence documents: `docs/SECURITY_AUDIT.md`, `docs/COMPLIANCE.md`, `docs/ACCESSIBILITY.md`. Screenshots: `docs/screenshots/batch-l/` (contact sheets `00-*.png`).
 
@@ -24,7 +24,29 @@ Evidence documents: `docs/SECURITY_AUDIT.md`, `docs/COMPLIANCE.md`, `docs/ACCESS
 ### Latency — local API (wrangler dev), 2 browsers + iPhone 17 Pro Simulator
 | # | Change | From | Seen on (ms from the change) |
 |---|---|---|---|
-__LOCAL_TABLE__
+| E1 | create entry | webA | webB 470 ms · iPhone 482 ms |
+| E2 | rename entry | iPhone | webA 2316 ms · webB 2318 ms |
+| E3 | delete entry (to Recently Deleted) | webB | webA 716 ms · iPhone 683 ms |
+| E4 | restore entry | iPhone | webA 2104 ms · webB 2106 ms |
+| E5 | set mood (Good) | webA | webB 529 ms · iPhone 499 ms |
+| P1 | add photo (encrypted upload, 3 renditions) | iPhone | webA 2354 ms · webB 2408 ms |
+| P2 | replace photo | iPhone | webA 2395 ms |
+| P3 | remove photo | webB | webA 492 ms · iPhone 466 ms |
+| P4 | add photo from the web | webA | webB 882 ms · iPhone 866 ms |
+| T1 | create task (quick add "today") | webA | webB 443 ms · iPhone 426 ms |
+| T2 | tick task | iPhone | webA 2313 ms · webB 2314 ms |
+| T3 | untick task (in Completed) | webB | webA 455 ms · iPhone 422 ms |
+| T4 | add subtask | iPhone | webA 2273 ms · webB 2277 ms |
+| T5 | tick a daily repeating task → next one appears | iPhone | webA 2192 ms · webB 2194 ms |
+| T6 | tick on the web (1.2 s rule) — repeat spawns once | webA | iPhone 421 ms · webB 648 ms |
+| C1 | create category | iPhone | webA 2237 ms · webB 2238 ms |
+| C2 | rename category | iPhone | webA 2106 ms · webB 2108 ms |
+| S1 | profile picture (Folio avatar 7) | iPhone | webA 1 ms · webB 2 ms |
+| S2 | display name | iPhone | webA 2270 ms · webB 2313 ms |
+| S3 | theme → Dark | webA | webB 455 ms · iPhone 420 ms |
+| O1 | webB offline 5 s while webA writes; then online | webA | webB after online 42 ms · iPhone 1338 ms |
+| O2 | iPhone offline (sync paused) writes; then online | iPhone | webA after online 42 ms · webB after online 45 ms |
+| X1 | conflict: web edits, then iPhone edits offline → later wins | both | webA 250 ms · webB 259 ms · iPhone pushed 223 ms |
 
 Web-made changes arrive in ~0.4–0.9 s (the web's 0.4 s push delay + push + the hub's ping + pull); iPhone-made ones in ~2.1–2.4 s (SPEC §10.5's 2 s debounce). Coming back online catches up in ~45 ms; nothing leaks while offline; the later edit wins a conflict everywhere. S1's local number is not meaningful (the avatar was already set by an earlier run; the script now picks a different avatar each run).
 

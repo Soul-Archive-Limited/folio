@@ -41,12 +41,16 @@ const canonical = new URL(Astro.url.pathname.replace(/\.html$/, '').replace(/\/i
     <slot name="head" />
   </head>
   <body>
+    <!-- Batch L: Cloudflare's Email Obfuscation would turn our mailto links into /cdn-cgi links that
+         need its injected script (and break without JavaScript); these markers switch it off. -->
+    <!--email_off-->
     <a class="skip" href="#main">Skip to content</a>
     <Nav />
     <main id="main">
       <slot />
     </main>
     <Footer />
+    <!--/email_off-->
     <script>
       import '../scripts/page.ts';
     </script>
