@@ -101,6 +101,9 @@ nonisolated final class APIClient: Sendable {
 
     private func data(for request: URLRequest) async throws(APIError) -> Data {
         RequestBudget.count()
+        #if DEBUG
+        if SyncProbe.offline { throw .offline }
+        #endif
         let (data, response): (Data, URLResponse)
         do {
             (data, response) = try await session.data(for: request)

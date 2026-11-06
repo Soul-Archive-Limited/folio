@@ -40,6 +40,9 @@ extension SyncEngine {
             guard sealed.count == 3 else { continue }
             try await account.api.uploadPhoto(photo.id, thumb: sealed[0], display: sealed[1], full: sealed[2])
             photo.blobUploaded = true
+            #if DEBUG
+            if SyncProbe.enabled { SyncProbe.log("blob-up", String(photo.id.uuidString.lowercased().prefix(8))) }
+            #endif
             store.isApplyingRemote = true
             store.commit()
             store.isApplyingRemote = false
@@ -60,7 +63,11 @@ extension SyncEngine {
                 for photo in chunk {
                     guard let data = results[photo.id] else { continue }
                     switch rendition {
-                    case .thumb: photo.thumbData = data
+                    case .thumb:
+                        photo.thumbData = data
+                        #if DEBUG
+                        if SyncProbe.enabled { SyncProbe.log("blob-down", String(photo.id.uuidString.lowercased().prefix(8))) }
+                        #endif
                     case .display: photo.displayData = data
                     case .full: photo.imageData = data
                     }

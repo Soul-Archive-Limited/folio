@@ -87,6 +87,7 @@ struct AppRootView: View {
         .task { OnThisDayNotifier.shared.start(store: store) }
         #if DEBUG
         .task { calendarEvents.seedForScreenshots() }
+        .task { SyncProbe.start(store: store, sync: sync) }
         #endif
         // Widgets (Batch J): ticks made on a widget, then a fresh snapshot.
         .task { WidgetSnapshotWriter.shared.start(store: store) }

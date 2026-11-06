@@ -1,0 +1,218 @@
+{
+  "run": "1MIG",
+  "web": "http://localhost:8788",
+  "api": "http://127.0.0.1:8787/api/",
+  "date": "2026-11-06T11:26:43.298Z",
+  "rows": [
+    {
+      "id": "E1",
+      "change": "create entry",
+      "from": "webA",
+      "latency": {
+        "webB": 470,
+        "iPhone": 482
+      }
+    },
+    {
+      "id": "E2",
+      "change": "rename entry",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2316,
+        "webB": 2318
+      }
+    },
+    {
+      "id": "E3",
+      "change": "delete entry (to Recently Deleted)",
+      "from": "webB",
+      "latency": {
+        "webA": 716,
+        "iPhone": 683
+      }
+    },
+    {
+      "id": "E4",
+      "change": "restore entry",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2104,
+        "webB": 2106
+      }
+    },
+    {
+      "id": "E5",
+      "change": "set mood (Good)",
+      "from": "webA",
+      "latency": {
+        "webB": 529,
+        "iPhone": 499
+      }
+    },
+    {
+      "id": "P1",
+      "change": "add photo (encrypted upload, 3 renditions)",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2354,
+        "webB": 2408
+      }
+    },
+    {
+      "id": "P2",
+      "change": "replace photo",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2395
+      }
+    },
+    {
+      "id": "P3",
+      "change": "remove photo",
+      "from": "webB",
+      "latency": {
+        "webA": 492,
+        "iPhone": 466
+      }
+    },
+    {
+      "id": "P4",
+      "change": "add photo from the web",
+      "from": "webA",
+      "latency": {
+        "webB": 882,
+        "iPhone": 866
+      }
+    },
+    {
+      "id": "T1",
+      "change": "create task (quick add \"today\")",
+      "from": "webA",
+      "latency": {
+        "webB": 443,
+        "iPhone": 426
+      }
+    },
+    {
+      "id": "T2",
+      "change": "tick task",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2313,
+        "webB": 2314
+      }
+    },
+    {
+      "id": "T3",
+      "change": "untick task (in Completed)",
+      "from": "webB",
+      "latency": {
+        "webA": 455,
+        "iPhone": 422
+      }
+    },
+    {
+      "id": "T4",
+      "change": "add subtask",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2273,
+        "webB": 2277
+      }
+    },
+    {
+      "id": "T5",
+      "change": "tick a daily repeating task → next one appears",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2192,
+        "webB": 2194
+      }
+    },
+    {
+      "id": "T6",
+      "change": "tick on the web (1.2 s rule) — repeat spawns once",
+      "from": "webA",
+      "latency": {
+        "iPhone": 421,
+        "webB": 648
+      }
+    },
+    {
+      "id": "C1",
+      "change": "create category",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2237,
+        "webB": 2238
+      }
+    },
+    {
+      "id": "C2",
+      "change": "rename category",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2106,
+        "webB": 2108
+      }
+    },
+    {
+      "id": "S1",
+      "change": "profile picture (Folio avatar 7)",
+      "from": "iPhone",
+      "latency": {
+        "webA": 1,
+        "webB": 2
+      }
+    },
+    {
+      "id": "S2",
+      "change": "display name",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2270,
+        "webB": 2313
+      }
+    },
+    {
+      "id": "S3",
+      "change": "theme → Dark",
+      "from": "webA",
+      "latency": {
+        "webB": 455,
+        "iPhone": 420
+      }
+    },
+    {
+      "id": "O1",
+      "change": "webB offline 5 s while webA writes; then online",
+      "from": "webA",
+      "latency": {
+        "webB after online": 42,
+        "iPhone": 1338
+      },
+      "note": "nothing reached B while offline"
+    },
+    {
+      "id": "O2",
+      "change": "iPhone offline (sync paused) writes; then online",
+      "from": "iPhone",
+      "latency": {
+        "webA after online": 42,
+        "webB after online": 45
+      },
+      "note": "nothing left the iPhone while paused"
+    },
+    {
+      "id": "X1",
+      "change": "conflict: web edits, then iPhone edits offline → later wins",
+      "from": "both",
+      "latency": {
+        "webA": 250,
+        "webB": 259,
+        "iPhone pushed": 223
+      },
+      "note": "\"SYNC-1MIG-X-web\" is gone everywhere"
+    }
+  ]
+}

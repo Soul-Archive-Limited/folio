@@ -220,6 +220,9 @@ final class SyncEngine {
 
     private func remoteCursor(_ cursor: Int64) {
         guard let userID = account.userID else { return }
+        #if DEBUG
+        if SyncProbe.enabled { SyncProbe.log("ping", "\(cursor)") }
+        #endif
         if cursor != SyncState.cursor(for: userID) {
             requestSync(pull: true)
         } else if running == nil && !store.hasDirtyRecords {

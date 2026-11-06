@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import type { Me } from '../lib/api.ts';
 import type { DataKey } from '../lib/crypto.ts';
 import { todayKey } from '../lib/days.ts';
@@ -50,6 +50,10 @@ const tabOf = (path: string): Tab =>
 export default function Shell({ me, dataKey, onSignOut, onSessionEnded }: { me: Me; dataKey: DataKey; onSignOut: () => void; onSessionEnded: () => void }) {
   const store = useMemo(() => new DiaryStore(me.userId), [me.userId]);
   const engine = useMemo(() => new SyncEngine(store, dataKey), [store, dataKey]);
+  // The shell reads the synced settings itself (theme, font, sidebar name and picture), so it
+  // re-renders on every store change — a change from another device shows at once (Batch L
+  // sync matrix: without this the sidebar and theme waited for some other re-render).
+  useSyncExternalStore(store.subscribe, store.getRevision);
   const [route, setRoute] = useState(location.pathname + location.search);
   const [composer, setComposer] = useState<ComposerRequest | null>(null);
   const [task, setTask] = useState<TaskRequest | null>(null);

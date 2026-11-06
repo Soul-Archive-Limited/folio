@@ -37,6 +37,9 @@ extension SyncEngine {
                 guard let item = byID[accepted.id] else { continue }
                 if let photo = item.record as? EntryPhoto, photo.isTombstone { await deleteBlobs(of: photo.id) }
                 store.markSynced(item.record, version: accepted.version, sentUpdatedAt: item.change.clientUpdatedAt)
+                #if DEBUG
+                if SyncProbe.enabled { SyncProbe.log("pushed", "\(item.change.type) \(item.change.id.uuidString.lowercased().prefix(8)) v\(accepted.version)") }
+                #endif
             }
             // The server copy won (newer `updatedAt`, or deleted): take it.
             for conflict in result.conflicts { apply(conflict, userID: userID, key: key) }
@@ -55,6 +58,9 @@ extension SyncEngine {
             if plaintext == nil { logger.error("A record didn't decrypt (wrong key or tampered); skipped") }
         }
         store.applyRemote(remote, type: type, plaintext: plaintext)
+        #if DEBUG
+        if SyncProbe.enabled { SyncProbe.log("applied", SyncProbe.summary(type: remote.type, id: remote.id.uuidString.lowercased(), deleted: remote.deleted, plaintext: plaintext)) }
+        #endif
     }
 
     struct Outgoing {
