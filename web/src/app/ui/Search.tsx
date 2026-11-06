@@ -83,7 +83,7 @@ function SearchBody({ tasksOnly: initialTasksOnly }: { tasksOnly: boolean }) {
         <Empty icon="search" text={query.trim() ? `No matches for “${query.trim()}”.` : 'Nothing matches these filters.'} />
       ) : (
         <div className="search-results" aria-live="polite">
-          {entries.length > 0 && <h3 className="section-label">Pages · {entries.length}</h3>}
+          {entries.length > 0 && <h2 className="section-label">Pages · {entries.length}</h2>}
           {entries.slice(0, 300).map((d) => (
             <button key={d.id} className="card" onClick={() => open(d)}>
               {d.firstPhotoID && <span className="thumb"><PhotoImg id={d.firstPhotoID} rendition="thumb" /></span>}
@@ -95,7 +95,7 @@ function SearchBody({ tasksOnly: initialTasksOnly }: { tasksOnly: boolean }) {
               </span>
             </button>
           ))}
-          {tasks.length > 0 && <h3 className="section-label">Tasks · {tasks.length}</h3>}
+          {tasks.length > 0 && <h2 className="section-label">Tasks · {tasks.length}</h2>}
           {tasks.slice(0, 300).map((d) => (
             <button key={d.id} className="card" onClick={() => open(d)}>
               <span aria-label={d.isCompleted ? 'Done' : 'Open'}><Icon name={d.isCompleted ? 'check' : 'todo'} /></span>

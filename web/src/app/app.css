@@ -78,7 +78,14 @@ img { display: block; }
 .caption { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.6px; }
 .micro { font-size: 10px; font-weight: 600; }
 .ink2 { color: var(--ink-secondary); }
-.ink3 { color: var(--ink-tertiary); }
+:root { --ink-quiet: color-mix(in srgb, var(--ink) 66%, var(--bg)); --ink-label: color-mix(in srgb, var(--ink) 74%, var(--bg)); --danger-text: color-mix(in srgb, var(--danger) 84%, var(--ink)); }
+/* Dark: glass is translucent over the Ink/violet aura, so quiet labels need more weight to keep
+   4.5:1 even where a blob sits right behind them. */
+:root[data-theme='dark'] { --ink-quiet: color-mix(in srgb, var(--ink) 84%, var(--bg)); --ink-label: color-mix(in srgb, var(--ink) 86%, var(--bg)); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) { --ink-quiet: color-mix(in srgb, var(--ink) 84%, var(--bg)); --ink-label: color-mix(in srgb, var(--ink) 86%, var(--bg)); } }
+/* Batch L (WCAG 2.2 AA): quiet text is a solid mix that keeps 4.5:1 on paper and charcoal; the
+   34–36 % tertiary ink stays for marks and outlines only. */
+.ink3 { color: var(--ink-quiet); }
 h1, h2, h3, p { margin: 0; }
 
 /* MARK: Controls */
@@ -92,9 +99,9 @@ h1, h2, h3, p { margin: 0; }
 @media (hover: hover) and (pointer: fine) { .btn:hover { background: color-mix(in srgb, var(--bg-elevated) 80%, transparent); } }
 .btn:active { transform: scale(0.96); }
 .btn:disabled { opacity: 0.45; cursor: default; transform: none; }
-.btn.primary { background: var(--accent); color: #fff; border-color: transparent; box-shadow: 0 8px 24px -10px var(--accent); }
-@media (hover: hover) and (pointer: fine) { .btn.primary:hover { background: var(--accent-strong); } }
-.btn.danger { color: var(--danger); }
+.btn.primary { background: var(--accent-strong); color: #fff; border-color: transparent; box-shadow: 0 8px 24px -10px var(--accent); }
+@media (hover: hover) and (pointer: fine) { .btn.primary:hover { background: color-mix(in srgb, var(--accent-strong) 88%, #000); } }
+.btn.danger { color: var(--danger-text); }
 .btn.solid-danger { background: var(--danger); color: #fff; border-color: transparent; }
 .btn.wide { width: 100%; }
 .btn.small { min-height: 36px; padding: 0 14px; font-size: 14px; }
@@ -144,7 +151,8 @@ svg.i.sm { width: 18px; height: 18px; }
   border: 0; background: none; font-size: 15px; font-weight: 600; color: var(--ink-secondary); text-align: left;
 }
 @media (hover: hover) and (pointer: fine) { .nav-item:hover { background: color-mix(in srgb, var(--ink) 5%, transparent); } }
-.nav-item[aria-current='page'] { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent-text); }
+.nav-item[aria-current='page'] { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--ink); }
+.nav-item[aria-current='page'] svg { color: var(--accent-text); }
 .sidebar .new { margin-top: 10px; }
 .sidebar .me { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 14px; border: 0; background: none; text-align: left; }
 @media (hover: hover) and (pointer: fine) { .sidebar .me:hover { background: color-mix(in srgb, var(--ink) 5%, transparent); } }
@@ -215,7 +223,7 @@ svg.i.sm { width: 18px; height: 18px; }
 }
 @media (hover: hover) and (pointer: fine) { .cell:hover { background: color-mix(in srgb, var(--ink) 5%, transparent); } }
 .cell .n { font-size: 17px; font-weight: 500; line-height: 1; position: relative; z-index: 2; }
-.cell.out .n { color: var(--ink-tertiary); }
+.cell.out .n { color: var(--ink-quiet); }
 .cell.today .n { color: var(--accent); font-weight: 700; }
 /* Batch L: the iPhone's marks (SPEC §6.2) — today = accent number + 1.5 px accent outline, selected
    = accentStrong square with a white number, tasks = one small mark in the top-right corner
@@ -576,7 +584,7 @@ body:has(.gate) .aura { opacity: 0.5; }
 .pixels-head h2 { margin: 0; min-width: 3.2ch; text-align: center; }
 .pixel-grid { display: grid; grid-template-columns: 18px repeat(12, minmax(0, 1fr)); gap: 3px; max-width: 560px; }
 .pixel-month { text-align: center; font-weight: 600; }
-.pixel-day { font-size: 9px; color: var(--ink-tertiary); text-align: right; padding-right: 3px; line-height: 16px; }
+.pixel-day { font-size: 9px; color: var(--ink-quiet); text-align: right; padding-right: 3px; line-height: 16px; }
 .pixel { height: 16px; border: 0; padding: 0; border-radius: 3.5px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
 .pixel.written { background: color-mix(in srgb, var(--ink) 22%, transparent); cursor: pointer; }
 .pixel.future { background: color-mix(in srgb, var(--ink) 3%, transparent); }
@@ -685,3 +693,15 @@ body.dropping .sheet { box-shadow: 0 0 0 2px var(--accent), var(--glass-shadow);
 .consent a { color: var(--accent-text); }
 .consent.nudge { border-color: var(--danger); }
 .gate .provider[aria-disabled='true'] { opacity: 0.55; }
+
+.grid-row { display: contents; }
+.weekdays.ink3 { color: var(--ink-label); }
+.row.danger, .menu .danger, .text-btn.danger { color: var(--danger-text); }
+
+/* Batch L (WCAG 2.4.11 / 2.5.8): on wider screens the quick-add bar sits under the list, not over
+   it, so it never covers a row or a focused control. Phones keep the floating bar. */
+.todo-pane { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.todo-pane > .scroll { flex: 1; min-height: 0; height: auto; }
+.quick-wrap { padding-top: 0 !important; padding-bottom: 16px !important; flex: none; }
+@media (min-width: 768px) { .quick-wrap .quick-add { position: relative; bottom: auto; margin-top: 8px; } }
+.search h2.section-label { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-quiet); }

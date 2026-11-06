@@ -23,6 +23,9 @@ final class AccessibilityAuditUITests: XCTestCase {
         Screen(name: "task-composer", args: ["-FolioOpen", "taskComposer"]),
         Screen(name: "journal", args: ["-FolioTab", "journal"]),
         Screen(name: "journal-photos", args: ["-FolioTab", "journal", "-FolioJournalMode", "photos"]),
+        // Batch L: Year in Pixels, search, and the sign-in card with the 18+ box (Profile, guest).
+        Screen(name: "journal-year", args: ["-FolioTab", "journal", "-FolioJournalMode", "year"]),
+        Screen(name: "search", args: ["-FolioTab", "journal", "-FolioSearch", "river"]),
         Screen(name: "todo", args: ["-FolioTab", "todo"]),
         Screen(name: "profile", args: ["-FolioTab", "profile"]),
         Screen(name: "categories", args: ["-FolioTab", "profile", "-FolioOpen", "categories"]),

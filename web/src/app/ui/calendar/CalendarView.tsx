@@ -60,6 +60,7 @@ export default function CalendarView({ selected, onSelect, composing }: { select
 
   return (
     <div className="calendar">
+      <h1 className="sr-only">Calendar</h1>
       <section className="cal-main" aria-label="Month">
         <header className="cal-head">
           <div style={{ position: 'relative' }}>
@@ -103,10 +104,15 @@ export default function CalendarView({ selected, onSelect, composing }: { select
             if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(e.clientY - start.y) * 1.5) go(dx < 0 ? 1 : -1);
           }}>
           <div key={`${month.year}-${month.month}`} className={`grid${direction ? ` slide-${direction}` : ''}`} role="grid" aria-label={`${monthName(month)} ${month.year}`} onKeyDown={onGridKey}>
-            {days.map((day) => (
+            {/* Batch L: grid → rows → cells for screen readers; the rows don't take part in the layout. */}
+            {Array.from({ length: 6 }, (_, week) => (
+              <div key={week} role="row" className="grid-row">
+            {days.slice(week * 7, week * 7 + 7).map((day) => (
               <DayCell key={day} day={day} month={month} today={today} selected={selected === day} index={index.get(day)} filter={filter} showTiles={showTiles}
                 onSelect={() => select(day)} onMenu={(x, y) => setMenu({ day, x, y })}
                 onDropFiles={composing ? undefined : (files) => { select(day); openComposer({ dayKey: day, files }); }} />
+            ))}
+              </div>
             ))}
           </div>
         </div>

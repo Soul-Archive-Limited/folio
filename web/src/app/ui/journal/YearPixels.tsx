@@ -39,7 +39,7 @@ export function YearPixels() {
           <button aria-pressed={!byMood} onClick={() => setByMood(false)}>Category</button>
         </div>
       </div>
-      <div className="pixel-grid" role="grid">
+      <div className="pixel-grid" role="group" aria-label={`${year}, one square per day`}>
         <span />
         {monthLetters.map((l, i) => <span key={i} className="caption ink3 pixel-month">{l}</span>)}
         {Array.from({ length: 31 }, (_, r) => r + 1).flatMap((dayNumber) => [

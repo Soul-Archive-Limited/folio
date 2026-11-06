@@ -1,0 +1,278 @@
+[
+  {
+    "name": "site / light",
+    "violations": []
+  },
+  {
+    "name": "site /features light",
+    "violations": []
+  },
+  {
+    "name": "site /how-it-works light",
+    "violations": []
+  },
+  {
+    "name": "site /security light",
+    "violations": []
+  },
+  {
+    "name": "site /about light",
+    "violations": []
+  },
+  {
+    "name": "site /faq light",
+    "violations": []
+  },
+  {
+    "name": "site /download light",
+    "violations": []
+  },
+  {
+    "name": "site /privacy light",
+    "violations": []
+  },
+  {
+    "name": "site /terms light",
+    "violations": []
+  },
+  {
+    "name": "site /cookies light",
+    "violations": []
+  },
+  {
+    "name": "site /refunds light",
+    "violations": []
+  },
+  {
+    "name": "site /acceptable-use light",
+    "violations": []
+  },
+  {
+    "name": "site /accessibility light",
+    "violations": []
+  },
+  {
+    "name": "site /imprint light",
+    "violations": []
+  },
+  {
+    "name": "site /support light",
+    "violations": []
+  },
+  {
+    "name": "site /open-source light",
+    "violations": []
+  },
+  {
+    "name": "site /changelog light",
+    "violations": []
+  },
+  {
+    "name": "site /delete-account light",
+    "violations": []
+  },
+  {
+    "name": "site /404 light",
+    "violations": []
+  },
+  {
+    "name": "app sign-in light",
+    "violations": []
+  },
+  {
+    "name": "app email step light",
+    "violations": []
+  },
+  {
+    "name": "site / dark",
+    "violations": []
+  },
+  {
+    "name": "site /features dark",
+    "violations": []
+  },
+  {
+    "name": "site /how-it-works dark",
+    "violations": []
+  },
+  {
+    "name": "site /security dark",
+    "violations": []
+  },
+  {
+    "name": "site /about dark",
+    "violations": []
+  },
+  {
+    "name": "site /faq dark",
+    "violations": []
+  },
+  {
+    "name": "site /download dark",
+    "violations": []
+  },
+  {
+    "name": "site /privacy dark",
+    "violations": []
+  },
+  {
+    "name": "site /terms dark",
+    "violations": []
+  },
+  {
+    "name": "site /cookies dark",
+    "violations": []
+  },
+  {
+    "name": "site /refunds dark",
+    "violations": []
+  },
+  {
+    "name": "site /acceptable-use dark",
+    "violations": []
+  },
+  {
+    "name": "site /accessibility dark",
+    "violations": []
+  },
+  {
+    "name": "site /imprint dark",
+    "violations": []
+  },
+  {
+    "name": "site /support dark",
+    "violations": []
+  },
+  {
+    "name": "site /open-source dark",
+    "violations": []
+  },
+  {
+    "name": "site /changelog dark",
+    "violations": []
+  },
+  {
+    "name": "site /delete-account dark",
+    "violations": []
+  },
+  {
+    "name": "site /404 dark",
+    "violations": []
+  },
+  {
+    "name": "app sign-in dark",
+    "violations": []
+  },
+  {
+    "name": "app email step dark",
+    "violations": []
+  },
+  {
+    "name": "app calendar light",
+    "violations": []
+  },
+  {
+    "name": "app entry light",
+    "violations": []
+  },
+  {
+    "name": "app composer light",
+    "violations": []
+  },
+  {
+    "name": "app journal light",
+    "violations": []
+  },
+  {
+    "name": "app year light",
+    "violations": []
+  },
+  {
+    "name": "app photos light",
+    "violations": []
+  },
+  {
+    "name": "app todo light",
+    "violations": []
+  },
+  {
+    "name": "app profile light",
+    "violations": []
+  },
+  {
+    "name": "app shortcuts light",
+    "violations": []
+  },
+  {
+    "name": "app recently-deleted light",
+    "violations": []
+  },
+  {
+    "name": "app search light",
+    "violations": [
+      {
+        "id": "heading-order",
+        "impact": "moderate",
+        "help": "Heading levels should only increase by one",
+        "nodes": 1,
+        "targets": [
+          "h3"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "app calendar dark",
+    "violations": []
+  },
+  {
+    "name": "app entry dark",
+    "violations": []
+  },
+  {
+    "name": "app composer dark",
+    "violations": []
+  },
+  {
+    "name": "app journal dark",
+    "violations": []
+  },
+  {
+    "name": "app year dark",
+    "violations": []
+  },
+  {
+    "name": "app photos dark",
+    "violations": []
+  },
+  {
+    "name": "app todo dark",
+    "violations": []
+  },
+  {
+    "name": "app profile dark",
+    "violations": []
+  },
+  {
+    "name": "app shortcuts dark",
+    "violations": []
+  },
+  {
+    "name": "app recently-deleted dark",
+    "violations": []
+  },
+  {
+    "name": "app search dark",
+    "violations": [
+      {
+        "id": "heading-order",
+        "impact": "moderate",
+        "help": "Heading levels should only increase by one",
+        "nodes": 1,
+        "targets": [
+          "h3"
+        ]
+      }
+    ]
+  }
+]

@@ -69,6 +69,7 @@ export default function TodoView() {
 
   const trashCount = store.trashed().tasks.length;
   return (
+    <div className="todo-pane">
     <div className="scroll">
       <div className="page">
         <div className="page-title"><h1 className="title1">To-do</h1></div>
@@ -97,13 +98,16 @@ export default function TodoView() {
           </section>
         )}
         {trashCount > 0 && <p style={{ textAlign: 'center', marginTop: 24 }}><button className="link" onClick={() => navigate('/app/profile/deleted')}>Recently Deleted · {trashCount}</button></p>}
+      </div>
+    </div>
+    <div className="page quick-wrap">
         <form className="quick-add glass" onSubmit={quickAdd}>
           <label className="sr-only" htmlFor="quick-add">Add a task</label>
           <input id="quick-add" placeholder="Add a task…" value={text} maxLength={200} onChange={(e) => setText(e.target.value)} />
           <button className="icon-btn accent" aria-label="Add task" disabled={!parsed?.title}><Icon name="plus" /></button>
           {chip && <span className="quick-chip glass" aria-live="polite"><Icon name="calendar" small />{chip}</span>}
         </form>
-      </div>
+    </div>
     </div>
   );
 }
