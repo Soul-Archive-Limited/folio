@@ -2,12 +2,26 @@
 
 The next session starts here. Read this, then `CLAUDE.md`, `docs/SPEC.md`, `docs/PHASES.md` and the last entries of `docs/DECISIONS.md`. Updated at the end of every batch.
 
-_Last updated: 2026-11-05, end of Batch J (search, lock, widgets, memories, scan/share/calendar, PDF, invites, PWA; TestFlight 0.1.0 (91)) (owner's test fixes, avatars, onboarding, seasons, smarter tasks; TestFlight 0.1.0 (74) uploaded)._
+_Last updated: 2026-11-06, end of Batch K (Google sign-in fix, invite-only on, day panel, photo refresh, rebrand; TestFlight 0.1.0 (107))._
 
-## Batch J status (resume here)
+## Batch K status (resume here)
+All six parts done — report `docs/reports/batch-k.md`, DECISIONS 278–285, sheets `docs/screenshots/batch-k/`.
+- Part 1 Google: root cause was a wrong `GOOGLE_CLIENT_SECRET` (`invalid_client`); the owner put a new one; failures now carry reasons (`expired`, `google_unavailable`, …). Part 2: **invite-only is ON** in production (`INVITES_REQUIRED` "true", `OWNER_EMAILS` secret = the owner's Apple relay address). Part 3 day panel, Part 4 photo refresh, Part 5 rebrand (Nib book mark, `.icon` app icon, Ink accent, custom symbols), Part 6 ship.
+- **API deployed** (version 97fa6013). TestFlight **0.1.0 (107)** uploaded 2026-11-06 — add it to Friends in App Store Connect if not done (see the report).
+- **Next session:** the owner's notes on 0.1.0 (107) and the report's "Only you can test" (real Google/Apple/email sign-ins, a friend's invite); refresh `web/public/img/app/widgets-*` and `web-entry-*` (still orange); then DECISION 253's device hitch check and the public-release list in `docs/reports/batch-g.md`.
+
+### Batch K tools
+- Brand: `python3 scripts/brand/generate.py` (mark SVGs, `AppMark`, favicon, PWA/touch icons, `web/src/components/brand-mark.ts`); `swift scripts/brand/symbols.swift` (25 symbol templates into the app and widget catalogs + `web/src/icons/folio-icons.ts`; it checks the three masters match). Then `cd ios && xcodegen generate`.
+- Colours: edit `shared/design-tokens.json`, run `python3 scripts/generate-ios-colors.py`; the web regenerates on build; copy the hexes into `ios/FolioWidgets/WidgetPalette.swift` and `DiaryPDFStyle`. Code tokens are `accent` / `accentStrong` / `accentText` (brand name "Ink"); the global tint asset is `AppTint` (an `AccentColor` asset would clash with `.accent`).
+- App icon: `ios/Folio/AppIcon.icon` (Icon Composer). Render any appearance: `"/Applications/Xcode.app/Contents/Applications/Icon Composer.app/Contents/Executables/ictool" ios/Folio/AppIcon.icon --export-image --output-file out.png --platform iOS --rendition Default|Dark|TintedLight|TintedDark|ClearLight|ClearDark --width 512 --height 512 --scale 1`.
+- Screenshots: `scripts/brand-shots.sh <sim> <folder>` (before/after set), `scripts/site-shots.sh <sim>` (website app shots; reseeds sample data), `node scripts/og/render.mjs <playwright-core dir>` (OG images; playwright-core in the scratchpad, Brave).
+- OAuth debugging: `npx wrangler tail folio-api --format json` (in `api/`) while probing `/api/auth/google/start?platform=ios&challenge=<43 chars>` then the callback with a fake code: `invalid_grant` = credentials fine, `invalid_client` = wrong secret.
+- Gotcha: a blind `\bember\b` rename also hit regex text (`(?:ember)` in Sept/Nov/Dec) — renames of short words need a compile *and* a test run.
+
+## Batch J status
 All nine parts done — report `docs/reports/batch-j.md`, DECISIONS 255–272, screenshots and recordings `docs/screenshots/batch-j/`. TestFlight **0.1.0 (94)** uploaded 2026-11-05, in Friends (Testing) (91 was replaced: extensions' privacy manifests, DECISION 273).
 - Part 1: owner said all good. 2 search · 3 Lock Folio · 4 widgets/controls/Siri · 5 mood, On this day, Year in Pixels (schema v5) · 6 scan, share extension, Apple Calendar · 7 PDF export · 8 invite-only sign-up + installable web app · 9 tests, /vibesec, website, TestFlight.
-- **API deployed 2026-11-06** (version 5e6922a0, DECISION 277). **Sign-up stays open** (owner, DECISION 276): `INVITES_REQUIRED` is "false" in `api/wrangler.jsonc`. To go invite-only later: set it to "true", `npx wrangler secret put OWNER_EMAILS`, `npx wrangler deploy` (in `api/`).
+- API deployed 2026-11-06 (version 5e6922a0, DECISION 277); superseded by Batch K (invite-only on, DECISION 279).
 - **Next session:** the owner's notes on 0.1.0 (94) and the "Only you can test" list in the Batch J report; the device hitch check (DECISION 253); then the public-release list at the end of `docs/reports/batch-g.md`.
 
 ### Batch J tools
@@ -83,16 +97,17 @@ All seven parts done — report `docs/reports/batch-i.md`, DECISIONS 224–252, 
 | 14 Release | ✅ Batch G Part 3 (TestFlight external beta; public-release list in the Batch G report). |
 | Website rebuild | ✅ Batch H (story + 3D; live). |
 | Batch I | ✅ Owner's test fixes, avatars, onboarding, seasons, reminders/repeats/subtasks, own test run; TestFlight 0.1.0 (74). |
-| Batch J | ✅ Search, Lock Folio, widgets/controls/Siri, mood + On this day + Year in Pixels, scan/share/Apple Calendar, PDF, invite-only sign-up, installable web app; TestFlight 0.1.0 (94). API deploy waits for the owner. |
+| Batch J | ✅ Search, Lock Folio, widgets/controls/Siri, mood + On this day + Year in Pixels, scan/share/Apple Calendar, PDF, invite-only sign-up, installable web app; TestFlight 0.1.0 (94). |
+| Batch K | ✅ Google sign-in fix, invite-only on, day panel cleanup, photo refresh, rebrand (Nib book, Ink, custom symbols); TestFlight 0.1.0 (107). |
 
-Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8, Batch D = C fixes + Recently Deleted + 11 + Xcode Cloud, Batch E = D fixes + 9 + 10 + TestFlight, Batch F = improvements + 12 + TestFlight, Batch G = 13 + 14 + external TestFlight, Batch H = website rebuild, Batch I = owner's test of 56 + avatars + onboarding + seasons + smarter tasks, Batch J = the remaining features (search … PWA).
+Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8, Batch D = C fixes + Recently Deleted + 11 + Xcode Cloud, Batch E = D fixes + 9 + 10 + TestFlight, Batch F = improvements + 12 + TestFlight, Batch G = 13 + 14 + external TestFlight, Batch H = website rebuild, Batch I = owner's test of 56 + avatars + onboarding + seasons + smarter tasks, Batch J = the remaining features (search … PWA), Batch K = Google fix + invite-only + rebrand.
 
 ## Repo map
 
 - `ios/project.yml` → XcodeGen. Targets: Folio, FolioWidgets (widget extension), FolioShare (share extension), FolioCrypto + tests; `ios/Shared/` is compiled into the app and both extensions (App Group `group.com.devilsense.folio`). The `.xcodeproj` is git-ignored: after adding/removing files or editing the yml, run `cd ios && xcodegen generate`.
 - `ios/Folio/{App,DesignSystem,Models,Features/*,Services/*}`; tests in `ios/FolioTests` (Swift Testing), `ios/FolioUITests` (XCTest), `ios/FolioCryptoTests`.
 - `ios/Folio/Services/Store/DiaryStore.swift` is the single `@Observable` store (all queries, CRUD, markers, export inputs).
-- `shared/` design tokens + Markdown/crypto fixtures (used by iOS and later the web app).
+- `shared/` design tokens, brand SVGs (`shared/brand`), Markdown/crypto/search fixtures.
 - `web/` Astro site: `src/config/site.ts` (all CTAs + nav), `src/data/faq.ts`, `src/components/home/*` (home sections), `src/three/*` (3D phone + lock, lazy), `src/scripts/*` (motion, 3D gate, aura), `public/_headers`. Copy source: `docs/WEBSITE_COPY.md`. Web app: `src/app/{lib,ui}`, `src/pages/app.astro`, `src/config/app.ts` (Turnstile site key).
 - `api/` Worker (Hono, D1, R2, UserHub). `cd api && npm test`.
 - `scripts/`: `sim-shot.sh` (screenshot), `contact-sheet.swift`, `setup-hooks.sh` (gitleaks hook, run once per clone), `write-build-number.sh` (XcodeGen preGenCommand), `testflight.sh` (fallback upload only).

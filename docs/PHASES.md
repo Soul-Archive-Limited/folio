@@ -223,3 +223,11 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - `/app` sign-in and unlock screens restyled to the site's look (no logic changes).
 - Lighthouse (mobile, home): 99 / 100 / 100 / 100; desktop 100 / 100 / 100 / 100; CLS 0 everywhere; home first-view JS 26 KB gzip.
 
+
+### Batch K — Google fix, invite-only, day panel, photo refresh, rebrand (2026-11-06)
+- Google sign-in: root cause a refused client secret (`invalid_client`); new secret in place; every OAuth failure now returns a specific reason; tests.
+- Invite-only on in production (owner + App Review exempt; Invite a friend for the owner).
+- Day panel: no + beside the date; an empty day is one line with Add task (iPhone + web; web FAB long-press menu).
+- Replaced photos show at once (photo views follow the photo id; web retries).
+- Rebrand: "Nib book" mark, Icon Composer app icon (light/dark/tinted/clear), "Ink" accent and warmer neutrals from the shared tokens, 25 custom SF Symbol templates + the same set on the web; website screenshots and OG images.
+- TestFlight 0.1.0 (107).
