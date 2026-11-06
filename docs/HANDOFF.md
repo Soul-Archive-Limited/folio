@@ -6,7 +6,7 @@ _Last updated: 2026-11-06, end of Batch L (website + web app overhaul, real-time
 
 ## Batch L status (resume here)
 Parts 1–9 done and pushed — report `docs/reports/batch-l.md`, DECISIONS 286–298, evidence `docs/SECURITY_AUDIT.md`, `docs/COMPLIANCE.md`, `docs/ACCESSIBILITY.md`, screenshots `docs/screenshots/batch-l/`. API deployed **5499d15a** (migration 0004 applied).
-- **Still open:** the **live** sync matrix (needs the review code in the Keychain: the owner runs `security add-generic-password -a folio -s folio-review-code -w`; the scripts read it with `security find-generic-password -a folio -s folio-review-code -w`, never a file) — then delete the review account (deletion check on production); adding the TestFlight build to Friends (App Store Connect was **not** signed in in the browser pane); updating App Review notes in App Store Connect for the 18+ box (text in `docs/APPSTORE.md`).
+- **Still open:** the **live** sync matrix (needs the review code in the Keychain: the owner runs `security add-generic-password -a folio -s folio-review-code -w`; the scripts read it with `security find-generic-password -a folio -s folio-review-code -w`, never a file) — then delete the review account (deletion check on production); adding TestFlight **0.1.0 (124)** (uploaded 2026-11-06) to Friends (App Store Connect was **not** signed in in the browser pane); updating App Review notes in App Store Connect for the 18+ box (text in `docs/APPSTORE.md`).
 - **Before public launch:** Declared Age Range API + `RESCIND_CONSENT` handling (Texas SB 2420; COMPLIANCE §5, risk R3); Sign in with Apple server-to-server notifications (R13); the owner checklist in COMPLIANCE §11.
 
 ### Batch L tools

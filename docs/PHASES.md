@@ -231,3 +231,11 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - Replaced photos show at once (photo views follow the photo id; web retries).
 - Rebrand: "Nib book" mark, Icon Composer app icon (light/dark/tinted/clear), "Ink" accent and warmer neutrals from the shared tokens, 25 custom SF Symbol templates + the same set on the web; website screenshots and OG images.
 - TestFlight 0.1.0 (107).
+
+### Batch L — polish, web parity, iPad, audits, compliance (2026-11-06)
+- No full-screen splash before sign-in (inline loader; the installed web app keeps a short launch); orange screenshots replaced.
+- Website overhaul in the app's Ink look (ruled hero, season layer, real screenshots only; unsupported claims removed); legal pages Cookies, Refunds, Acceptable Use, Accessibility, Imprint in every footer and Profile → About.
+- Web app parity: welcome, natural-language quick add, To-do groups, marks key, keyboard shortcuts, photo drag-and-drop, export zip and PDF book; real-time sync proved locally with a scripted matrix (web → other devices ≈ 0.4–0.9 s, iPhone → ≈ 2.1–2.4 s). The live-API run waits for the review code.
+- iPad: sidebar layout, readable widths, ⌘ shortcuts, pointer hover; iPad screenshots.
+- 18+ accounts (unticked box on iPhone and web, enforced by the API, migration 0004); `docs/SECURITY_AUDIT.md`, `docs/COMPLIANCE.md`, `docs/ACCESSIBILITY.md` (axe 0 serious on 64 states); crawler 0 problems; independent review — 15 findings fixed (DECISIONS 286–298).
+- TestFlight 0.1.0 (124).
