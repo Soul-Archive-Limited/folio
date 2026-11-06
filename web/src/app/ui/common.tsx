@@ -1,6 +1,7 @@
 import { createContext, type ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import { categoryColor } from '../lib/payloads.ts';
 import { photoURL, type Rendition } from '../lib/photos.ts';
+import { photoLoadFor, type PhotoLoad } from '../lib/photo-load.ts';
 import { useDiary, type Toast } from './context.tsx';
 import { Icon } from './Icons.tsx';
 
@@ -91,20 +92,27 @@ export function Toasts({ toasts, dismiss }: { toasts: Toast[]; dismiss: (id: num
 export function PhotoImg({ id, rendition, alt = '', className, fallback = true }: { id: string; rendition: Rendition; alt?: string; className?: string; fallback?: boolean }) {
   const { key, me } = useDiary();
   const order: Rendition[] = rendition === 'full' ? ['full', 'display', 'thumb'] : rendition === 'display' ? ['display', 'thumb'] : ['thumb'];
-  const [step, setStep] = useState(0);
+  // The fallback step and retries belong to one photo: a card whose photo was replaced starts
+  // over for the new one (Batch K) instead of inheriting the old photo's state.
+  const [load, setLoad] = useState<PhotoLoad>({ id, step: 0, attempt: 0 });
+  const current = photoLoadFor(load, id);
   const [url, setUrl] = useState<string | null>(null);
   useEffect(() => {
     let live = true;
+    let retry: ReturnType<typeof setTimeout> | undefined;
     setUrl(null);
-    void photoURL(key, me.userId, id, order[step]!).then((u) => {
+    void photoURL(key, me.userId, id, order[current.step]!).then((u) => {
       if (!live) return;
       if (u) setUrl(u);
-      else if (fallback && step < order.length - 1) setStep(step + 1);
+      else if (fallback && current.step < order.length - 1) setLoad({ ...current, step: current.step + 1 });
+      // A photo synced from another device can arrive before its bytes: try again a little later.
+      else if (current.attempt < 3) retry = setTimeout(() => setLoad({ id, step: 0, attempt: current.attempt + 1 }), 4000 * (current.attempt + 1));
     });
-    return () => { live = false; };
-  }, [id, step]);
+    return () => { live = false; clearTimeout(retry); };
+  }, [id, current.step, current.attempt]);
   if (!url) return <span className="ph" aria-hidden="true" />;
-  return <img className={className} src={url} alt={alt} decoding="async" onError={() => fallback && step < order.length - 1 && setStep(step + 1)} />;
+  return <img className={className} src={url} alt={alt} decoding="async"
+    onError={() => fallback && current.step < order.length - 1 && setLoad({ ...current, step: current.step + 1 })} />;
 }
 
 export function CategoryChip({ id }: { id?: string }) {

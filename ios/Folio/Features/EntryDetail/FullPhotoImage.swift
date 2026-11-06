@@ -11,7 +11,7 @@ struct FullPhotoImage: View {
     var cornerRadius: Double = 0
 
     @Environment(DiaryStore.self) private var store
-    @State private var image: UIImage?
+    @State private var shown = ShownPhoto()
 
     var body: some View {
         // A shape carries the size, so the view is exactly the frame it's given; a ZStack
@@ -21,7 +21,7 @@ struct FullPhotoImage: View {
             .fill(.clear)
             .overlay { PhotoTile(photoID: photoID, cornerRadius: cornerRadius) }
             .overlay {
-                if let image {
+                if let image = shown.image {
                     Image(uiImage: image)
                         .resizable()
                         .scaledToFill()
@@ -31,12 +31,11 @@ struct FullPhotoImage: View {
             }
             .clipShape(.rect(cornerRadius: cornerRadius))
             .contentShape(.rect(cornerRadius: cornerRadius))
-        .animation(.easeOut(duration: 0.2), value: image != nil)
+        .animation(.easeOut(duration: 0.2), value: shown.image != nil)
         .task(id: PhotoLoadKey(id: photoID, revision: store.photoBytesRevision)) {
-            image = DisplayImageCache.shared.cached(photoID, rendition: rendition, maxPixel: maxPixel) ?? image
-            if image == nil {
-                image = await DisplayImageCache.shared.image(for: photoID, rendition: rendition, maxPixel: maxPixel, store: store)
-            }
+            let id = photoID
+            guard shown.begin(id, cached: DisplayImageCache.shared.cached(id, rendition: rendition, maxPixel: maxPixel)) else { return }
+            shown.finish(id, image: await DisplayImageCache.shared.image(for: id, rendition: rendition, maxPixel: maxPixel, store: store))
         }
         .accessibilityHidden(true)
     }

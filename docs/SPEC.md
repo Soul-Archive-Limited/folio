@@ -136,6 +136,7 @@ Selection on day tap and month change; `.success` on task complete, entry save, 
 
 ### 3.8 Iconography & imagery
 SF Symbols only. Photos: radius 22 with 1 px inner hairline. Empty states: one large SF Symbol on glass + one sentence.
+**Photo views follow the photo, not the entry (Batch K):** every photo view (calendar cell, day panel and Journal cards, entry detail, composer, web) remembers which photo id its image belongs to; when the same card is given a different photo (a replaced photo) it drops the old image and loads the new one at once. Caches are keyed by photo id (+ rendition and size); a photo's bytes never change under the same id. The widget snapshot names thumbnails by photo id. On the web a photo whose bytes haven't arrived yet (synced from another device a moment ago) is retried three times.
 
 ### 3.9 Accessibility
 ≥ 44 pt hit areas · day cells read e.g. "Tuesday 14 October, 2 entries, 1 task done" + rotor "Days with entries" · Reduce Transparency → `bgElevated` cards · Increase Contrast → stronger hairlines/secondary text · Dynamic Type to AX5 (calendar switches to week rows at AX sizes) · colour never the only signal.

@@ -7,13 +7,13 @@ struct PhotoTile: View {
     var cornerRadius: Double = Radius.dayCell
 
     @Environment(DiaryStore.self) private var store
-    @State private var image: UIImage?
+    @State private var shown = ShownPhoto()
 
     var body: some View {
         Rectangle()
             .fill(.hairline)
             .overlay {
-                if let image {
+                if let image = shown.image {
                     Image(uiImage: image)
                         .resizable()
                         .scaledToFill()
@@ -24,11 +24,12 @@ struct PhotoTile: View {
             .overlay {
                 RoundedRectangle(cornerRadius: cornerRadius).strokeBorder(.hairline, lineWidth: 1)
             }
-            .animation(.easeOut(duration: 0.2), value: image != nil)
+            .animation(.easeOut(duration: 0.2), value: shown.image != nil)
             // Re-runs when synced photo bytes arrive (Phase 10).
             .task(id: PhotoLoadKey(id: photoID, revision: store.photoBytesRevision)) {
-                image = ThumbnailCache.shared.cachedImage(for: photoID) ?? image
-                if image == nil { image = await ThumbnailCache.shared.image(for: photoID, store: store) }
+                let id = photoID
+                guard shown.begin(id, cached: ThumbnailCache.shared.cachedImage(for: id)) else { return }
+                shown.finish(id, image: await ThumbnailCache.shared.image(for: id, store: store))
             }
             .accessibilityHidden(true)
     }
