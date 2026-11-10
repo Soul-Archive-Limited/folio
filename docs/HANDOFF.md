@@ -13,6 +13,7 @@ Done and pushed — report `docs/reports/batch-m.md`, DECISIONS 299–303, scree
 
 ### Batch M tools
 - Age check in the Simulator: `-FolioAgeCheck adult|minor|network|notSetUp` (DEBUG) pretends the region requires it and Apple answered so. On the iOS 26.5 Simulator `requiredRegulatoryFeatures` lists every duty while `isEligibleForAgeFeatures` is false (so both must agree), and the real age request fails or hangs (so it has a 2-minute limit).
+- CI runs **Xcode 26.6**, this Mac 27.1: 26.6 is stricter about captured non-`Sendable` locals and crashed on a method reference passed as a `Binding` setter — use closure literals (DECISIONS 299).
 - Apple notifications: tests sign JWTs with a local key served as Apple's JWKS (`api/test/apple-notifications.test.ts`). Apple has no test button; revoking a test account's token (`auth/revoke`) produces a real `consent-revoked`.
 
 ## Batch L status

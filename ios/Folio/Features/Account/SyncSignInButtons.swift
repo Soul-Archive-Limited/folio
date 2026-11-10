@@ -75,7 +75,7 @@ struct SyncSignInButtons: View {
     }
 
     private var consentRow: some View {
-        AgeConsentRow(isOn: Binding(get: { account.ageConfirmed }, set: setAgeConfirmed), needsAttention: nudge, checking: checkingAge)
+        AgeConsentRow(isOn: Binding(get: { account.ageConfirmed }, set: { setAgeConfirmed($0) }), needsAttention: nudge, checking: checkingAge)
     }
 
     /// Batch M: where the law requires it, ticking the box asks Apple for the age range first
