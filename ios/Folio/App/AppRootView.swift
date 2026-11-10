@@ -94,6 +94,8 @@ struct AppRootView: View {
         // Widgets (Batch J): ticks made on a widget, then a fresh snapshot.
         .task { WidgetSnapshotWriter.shared.start(store: store) }
         .task { await account.checkAppleCredential() }
+        // Batch M: is Apple's age check required here? Asked once at launch (≤ 3 s), ready for sign-in.
+        .task(priority: .utility) { _ = await AgeAssurance.requirement.value }
         // Batch M: where the law requires it, people signed in before the age check get it once.
         .task(id: account.userID) { await account.checkAgeIfRequired(with: requestAgeRange) }
     }

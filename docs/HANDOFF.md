@@ -12,7 +12,7 @@ Done and pushed — report `docs/reports/batch-m.md`, DECISIONS 299–303, scree
 - Still open from Batch L: the live sync matrix (review code in the Keychain).
 
 ### Batch M tools
-- Age check in the Simulator: `-FolioAgeCheck adult|minor|network|notSetUp` (DEBUG) pretends the region requires it and Apple answered so. The real `requiredRegulatoryFeatures` never returns on the iOS 26.5 Simulator — that's why there's a 3-second limit.
+- Age check in the Simulator: `-FolioAgeCheck adult|minor|network|notSetUp` (DEBUG) pretends the region requires it and Apple answered so. On the iOS 26.5 Simulator `requiredRegulatoryFeatures` lists every duty while `isEligibleForAgeFeatures` is false (so both must agree), and the real age request fails or hangs (so it has a 2-minute limit).
 - Apple notifications: tests sign JWTs with a local key served as Apple's JWKS (`api/test/apple-notifications.test.ts`). Apple has no test button; revoking a test account's token (`auth/revoke`) produces a real `consent-revoked`.
 
 ## Batch L status

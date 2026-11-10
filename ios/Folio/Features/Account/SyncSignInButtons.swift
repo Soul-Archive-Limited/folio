@@ -63,7 +63,7 @@ struct SyncSignInButtons: View {
         .opacity(busy ? 0.6 : 1)
         .overlay { if busy { ProgressView().controlSize(.large) } }
         .folioHaptic(.success, trigger: signedIn)
-        .task { if !reauth { ageCheckRequired = await AgeAssurance.isRequired() } }
+        .task { if !reauth { ageCheckRequired = await AgeAssurance.requirement.value } }
         .sheet(item: $invitePrompt) { prompt in
             InviteCodeSheet(problem: prompt.problem) { code in
                 switch prompt.provider {
@@ -93,9 +93,7 @@ struct SyncSignInButtons: View {
         checkingAge = true
         Task {
             defer { checkingAge = false }
-            let required: Bool
-            if let ageCheckRequired { required = ageCheckRequired } else { required = await AgeAssurance.isRequired() }
-            guard required else {
+            guard await AgeAssurance.requirement.value else {
                 account.ageConfirmed = true
                 return
             }

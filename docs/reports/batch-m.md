@@ -14,9 +14,11 @@ Built:
   the iPhone. Entitlement com.apple.developer.declared-age-range (via project.yml).
 - iPhone, people signed in before this (DECISIONS 300): checked once per account per device at
   launch where required; under 18 → signed out on that device, diary kept as a guest.
-- iPhone, robustness: iOS has 3 seconds to say whether the check is required (on the iOS 26.5
-  Simulator it never answers — the box would have been stuck disabled); no answer = "can't tell"
-  = the box alone. Only error cases that exist on iOS 26 are matched by name (naming iOS 27's
+- iPhone, robustness: the check is asked only when both of iOS's signals agree (on the iOS 26.5
+  Simulator `requiredRegulatoryFeatures` lists every duty while `isEligibleForAgeFeatures` is
+  false); iOS has 3 seconds at launch to say whether it's required ("can't tell" = the box
+  alone), and Apple's age request gives up after 2 minutes (once in the Simulator it never came
+  back, leaving the box disabled). Only error cases that exist on iOS 26 are matched by name (naming iOS 27's
   new ones stopped the app launching on iOS 26).
 - API, Sign in with Apple server-to-server notifications (SPEC §10.2c, DECISIONS 301):
   POST /api/auth/apple/notifications verifies Apple's signed JWT (RS256, issuer, App ID or
@@ -50,7 +52,7 @@ Tests: API 95/95 (8 new: consent-revoked keeps newer sessions and survives a rep
   Services ID audience; forged key, wrong audience, wrong issuer, future iat, missing sub, junk
   and a wrong body all refused with nothing changed). iOS 251 unit tests (3 new decision tests)
   pass; UI: AgeCheckUITests 3/3 (under 18, no answer, adult) in light and dark,
-  OnboardingUITests passes (it caught the Simulator hang). Web 114 unit + 28 build checks.
+  OnboardingUITests passes (it caught the Simulator's mismatched signals and the hang). Web 114 unit + 28 build checks.
   Release build: 0 warnings. Live API smoke: /health 200; junk payload 400; bad body 400.
 
 Security: gitleaks pre-commit clean; no secrets added (the endpoint needs none — Apple's public

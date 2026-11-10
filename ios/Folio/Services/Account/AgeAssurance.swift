@@ -6,11 +6,13 @@ import Synchronization
 /// app-store laws; `docs/COMPLIANCE.md` §5). Folio accounts are for adults (SPEC §10.2b); guest
 /// mode sends nothing and stays open to everyone, so only signing in is checked.
 ///
-/// - **Where it's required** (`requiredRegulatoryFeatures` contains `.declaredAgeRangeRequired`;
-///   `isEligibleForAgeFeatures` before iOS 26.4): ticking "I'm 18 or older" asks Apple for the
-///   age range with an 18 gate. Under 18 → no account; Apple couldn't answer → try again.
+/// - **Where it's required** — iOS says so for this person: `isEligibleForAgeFeatures` (per
+///   person: "location and account settings"), and on iOS 26.4+ also `requiredRegulatoryFeatures`
+///   containing `.declaredAgeRangeRequired` — ticking "I'm 18 or older" asks Apple for the age
+///   range with an 18 gate. Under 18 → no account; Apple couldn't answer → try again.
 /// - **Elsewhere:** nothing is asked; the self-declared box is the rule, as before.
-/// - If iOS can't tell whether it's required (an error), Folio doesn't ask: the box still applies.
+/// - If iOS can't tell whether it's required (an error, or no answer in time), Folio doesn't
+///   ask: the box still applies.
 enum AgeAssurance {
     /// What Apple answered, reduced to what Folio needs.
     enum Answer: Equatable {
@@ -54,42 +56,44 @@ enum AgeAssurance {
         }
     }
 
-    /// Whether the law where this person is requires the check. iOS has to answer within
-    /// `timeout`: on the iOS 26.5 Simulator `requiredRegulatoryFeatures` never returns, and a
-    /// hang there would leave the 18+ box untickable. No answer in time counts as "can't tell".
+    /// Started at launch (`AppRootView`), so the answer is ready long before anyone reaches a
+    /// sign-in screen; a new launch asks again (someone may have travelled).
+    nonisolated static let requirement = Task { await isRequired() }
+
+    /// Whether the law where this person is requires the check; no answer within `timeout`
+    /// counts as "can't tell".
     @concurrent nonisolated static func isRequired(timeout: Duration = .seconds(3)) async -> Bool {
         #if DEBUG
         if simulatedAnswer != nil { return true }
         #endif
-        let answered = Mutex(false)
-        return await withCheckedContinuation { continuation in
-            // Unstructured on purpose: a task group would wait for a call that never returns.
-            Task { @concurrent in
-                let required = await regionRequiresCheck()
-                if answered.withLock({ done in defer { done = true }; return !done }) { continuation.resume(returning: required) }
-            }
-            Task { @concurrent in
-                try? await Task.sleep(for: timeout)
-                if answered.withLock({ done in defer { done = true }; return !done }) { continuation.resume(returning: false) }
-            }
-        }
+        return await first(within: timeout, otherwise: false) { await regionRequiresCheck() }
     }
 
-    /// Off the main actor: Apple's service isn't `Sendable`, and its getters are nonisolated.
+    /// Both of iOS's signals must agree. On the iOS 26.5 Simulator `requiredRegulatoryFeatures`
+    /// lists every duty while `isEligibleForAgeFeatures` is false; Texas applies to new Apple
+    /// Accounts only, which only the per-person flag reflects. Off the main actor: Apple's
+    /// service isn't `Sendable`, and its getters are nonisolated.
     @concurrent nonisolated private static func regionRequiresCheck() async -> Bool {
-        guard #available(iOS 26.2, *) else { return false }
+        guard #available(iOS 26.2, *), (try? await AgeRangeService.shared.isEligibleForAgeFeatures) == true else { return false }
         if #available(iOS 26.4, *), let features = try? await AgeRangeService.shared.requiredRegulatoryFeatures {
             return features.contains(.declaredAgeRangeRequired)
         }
-        return (try? await AgeRangeService.shared.isEligibleForAgeFeatures) ?? false
+        return true
     }
 
-    /// Asks Apple (the system shows its own sheet the first time) and decides.
+    /// Asks Apple (the system shows its own sheet the first time) and decides. Two minutes at
+    /// most: once in the Simulator the request never came back, which would have left the box
+    /// disabled for good.
     @MainActor
     static func check(with request: DeclaredAgeRangeAction) async -> Decision {
         #if DEBUG
         if let simulatedAnswer { return decide(simulatedAnswer) }
         #endif
+        return await first(within: .seconds(120), otherwise: .couldNotCheck(.network)) { @MainActor in await ask(request) }
+    }
+
+    @MainActor
+    private static func ask(_ request: DeclaredAgeRangeAction) async -> Decision {
         do {
             switch try await request(ageGates: adultAge) {
             case .sharing(let range): return decide(.shared(lowerBound: range.lowerBound))
@@ -103,6 +107,35 @@ enum AgeAssurance {
             // iOS 27 SDK declares them without availability, and iOS 26 doesn't have them, so
             // naming them stops the app launching there. A retry is the useful advice anyway.
             return decide(.failed(.network))
+        }
+    }
+
+    /// Whichever comes first: `operation`'s answer or `fallback` after `timeout`. Unstructured
+    /// on purpose: a task group would wait for a call that never returns.
+    private nonisolated static func first<Value: Sendable>(within timeout: Duration, otherwise fallback: Value,
+                                                            _ operation: @escaping @Sendable () async -> Value) async -> Value {
+        let once = FirstAnswer()
+        return await withCheckedContinuation { continuation in
+            Task {
+                let value = await operation()
+                if once.claim() { continuation.resume(returning: value) }
+            }
+            Task {
+                try? await Task.sleep(for: timeout)
+                if once.claim() { continuation.resume(returning: fallback) }
+            }
+        }
+    }
+
+    /// True for the first caller only, so the continuation resumes exactly once.
+    private nonisolated final class FirstAnswer: Sendable {
+        private let taken = Mutex(false)
+
+        func claim() -> Bool {
+            taken.withLock { taken in
+                defer { taken = true }
+                return !taken
+            }
         }
     }
 

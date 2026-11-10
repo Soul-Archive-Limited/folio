@@ -131,7 +131,7 @@ extension AccountModel {
     func checkAgeIfRequired(with request: DeclaredAgeRangeAction) async {
         guard isSignedIn, let userID, let store = sync?.store else { return }
         let key = "folio.ageChecked.\(userID.uuidString)"
-        guard !UserDefaults.standard.bool(forKey: key), await AgeAssurance.isRequired() else { return }
+        guard !UserDefaults.standard.bool(forKey: key), await AgeAssurance.requirement.value else { return }
         switch await AgeAssurance.check(with: request) {
         case .adult:
             UserDefaults.standard.set(true, forKey: key)
