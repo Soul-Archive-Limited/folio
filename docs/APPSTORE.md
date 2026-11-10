@@ -91,7 +91,7 @@ The diary content is declared even though it reaches the server only end-to-end 
 ## Age rating (iOS 26 questionnaire)
 
 Answer **None / No** to everything:
-- In-app controls: Parental Controls — No; Age Assurance — No.
+- In-app controls: Parental Controls — No; Age Assurance — **Yes from the first build with Batch M's age check** (Declared Age Range on sign-up where the law requires it; accounts are 18+), No for older builds.
 - Capabilities: Unrestricted Web Access — No (links open Safari; the Google sign-in sheet is only for signing in); User-Generated Content — **No** (entries are seen only by the person who wrote them, never shared or published); Social Media — No; Messaging and Chat — No; Advertising — No.
 - Mature themes, Medical or Wellness, Sexuality or Nudity, Violence, Chance-Based Activities (gambling, simulated gambling, contests, loot boxes) — None.
 

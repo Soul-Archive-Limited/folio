@@ -1,7 +1,7 @@
 ---
 import Page from '../layouts/Page.astro';
 import { site } from '../config/site';
-const updated = '6 November 2026';
+const updated = '10 November 2026';
 ---
 <Page title="Privacy Policy" heading="Privacy" updated={updated}
   description="How Folio handles personal data: nothing leaves your iPhone without an account; with one, your diary is end-to-end encrypted so we can't read it. Plain English, accurate to what the code does."
@@ -57,7 +57,7 @@ const updated = '6 November 2026';
     <li><strong>Cloudflare, Inc.</strong> hosts this website, the web app, our server, database and encrypted photo storage, and runs the Turnstile check on the web email sign-in. Data may be processed anywhere in Cloudflare’s global network, including the United States. Cloudflare acts as our processor under its Data Processing Addendum, which includes the EU Standard Contractual Clauses and the UK International Data Transfer Addendum, and Cloudflare participates in the EU–US Data Privacy Framework and its UK extension.</li>
     <li><strong>Resend</strong> (Plus Five Five, Inc., United States) delivers sign-in codes and the deletion confirmation. It receives your email address and the message and keeps delivery logs for a limited period under its own retention settings. Resend acts as our processor under its Data Processing Addendum, which includes the Standard Contractual Clauses for transfers outside the UK and EU.</li>
     <li><strong>Apple iCloud Keychain</strong>, if you use it: your diary key is kept in your iPhone’s Keychain and syncs, end-to-end encrypted by Apple, to your other Apple devices, so they can unlock without the recovery key. It never passes through us.</li>
-    <li><strong>Apple</strong> and <strong>Google</strong>, only if you choose Sign in with Apple or Google. They act as independent controllers for their own sign-in, under their own privacy policies. From Google we ask for and receive only your account ID, email address and whether it is verified (scopes: openid and email); from Apple only your account ID and email (or a private relay address). We use this data only to sign you in, link your sign-in methods and email you about your account — never for anything else.</li>
+    <li><strong>Apple</strong> and <strong>Google</strong>, only if you choose Sign in with Apple or Google. They act as independent controllers for their own sign-in, under their own privacy policies. From Google we ask for and receive only your account ID, email address and whether it is verified (scopes: openid and email); from Apple only your account ID and email (or a private relay address). We use this data only to sign you in, link your sign-in methods and email you about your account — never for anything else. If you stop using Sign in with Apple for Folio, Apple tells our server and we sign out your devices. If you delete your Apple Account, Apple tells us too: we remove the Apple sign-in, and if it was your only way into Folio, we delete your Folio account and its encrypted diary, since no one could open it again (copies on your devices stay). We don’t store these messages.</li>
     <li><strong>Apple</strong> distributes the iPhone app through the App Store and TestFlight under its own terms and privacy policy.</li>
   </ul>
 
@@ -78,7 +78,7 @@ const updated = '6 November 2026';
   <p>You can complain to the UK Information Commissioner’s Office (<a href="https://ico.org.uk/make-a-complaint/" rel="noopener">ico.org.uk/make-a-complaint</a>), to the data protection authority where you live in the EU, or, in India, to the Data Protection Board of India after first raising it with us. We’d appreciate the chance to put it right first.</p>
 
   <h2>Age</h2>
-  <p>Accounts are for people aged 18 or over: when you sign up you confirm you are 18 or older. The iPhone app without an account sends nothing to us, so anyone can use it that way. Folio is not directed at children. If we learn that an account belongs to someone under 18, we will delete it.</p>
+  <p>Accounts are for people aged 18 or over: when you sign up you confirm you are 18 or older. Where the law requires an age check (for example in Texas), the iPhone app also asks Apple for your age range when you tick that box; the answer is used on your iPhone only and isn’t sent to us. The iPhone app without an account sends nothing to us, so anyone can use it that way. Folio is not directed at children. If we learn that an account belongs to someone under 18, we will delete it.</p>
 
   <h2>Security</h2>
   <p>Your diary is encrypted with AES-256-GCM on your device before upload; sign-in tokens and codes are stored only as hashes; everything travels over HTTPS. Our code is open source, so anyone can check this: <a href={site.githubUrl} rel="noopener">GitHub</a>. How it works, in plain English: <a href="/security">Privacy &amp; security</a>.</p>

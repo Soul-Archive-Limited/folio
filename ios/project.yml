@@ -50,6 +50,8 @@ targets:
         com.apple.developer.applesignin: [Default]
         # Widgets and the share extension read/write small local files here (Batch J).
         com.apple.security.application-groups: [group.com.devilsense.folio]
+        # Apple's age check on sign-up where the law requires it (Batch M, AgeAssurance).
+        com.apple.developer.declared-age-range: true
     info:
       path: Folio/Resources/Info.plist
       properties:

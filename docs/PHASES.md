@@ -239,3 +239,9 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - iPad: sidebar layout, readable widths, ⌘ shortcuts, pointer hover; iPad screenshots.
 - 18+ accounts (unticked box on iPhone and web, enforced by the API, migration 0004); `docs/SECURITY_AUDIT.md`, `docs/COMPLIANCE.md`, `docs/ACCESSIBILITY.md` (axe 0 serious on 64 states); crawler 0 problems; independent review — 15 findings fixed (DECISIONS 286–298).
 - TestFlight 0.1.0 (124).
+
+### Batch M — Apple's age check, Sign in with Apple notifications (2026-11-10)
+- Declared Age Range on the 18+ box where the law requires it (iPhone), and a one-time check for people already signed in; the age range never leaves the iPhone.
+- `POST /api/auth/apple/notifications`: consent-revoked ends existing sessions; account-deleted unlinks Apple or, if it was the only way in, wipes the account; email events store nothing.
+- No `RESCIND_CONSENT` endpoint (Apple blocks the app; Folio holds nothing tied to a child) — DECISIONS 302.
+- API deployed 5517f68b. No TestFlight build (owner ships everything at the end).

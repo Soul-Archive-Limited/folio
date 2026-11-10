@@ -1,4 +1,5 @@
 import AuthenticationServices
+import DeclaredAgeRange
 import FolioCrypto
 import Foundation
 
@@ -122,6 +123,25 @@ extension AccountModel {
         guard let appleUserID = session?.appleUserID else { return }
         let state = try? await ASAuthorizationAppleIDProvider().credentialState(forUserID: appleUserID)
         if state == .revoked { sessionEnded() }
+    }
+
+    /// Batch M: someone signed in before the age check existed, where the law requires it, is
+    /// checked once per account on this device. Under 18 → signed out here, diary kept on the
+    /// iPhone as a guest. If Apple can't answer, it asks again at the next launch.
+    func checkAgeIfRequired(with request: DeclaredAgeRangeAction) async {
+        guard isSignedIn, let userID, let store = sync?.store else { return }
+        let key = "folio.ageChecked.\(userID.uuidString)"
+        guard !UserDefaults.standard.bool(forKey: key), await AgeAssurance.isRequired() else { return }
+        switch await AgeAssurance.check(with: request) {
+        case .adult:
+            UserDefaults.standard.set(true, forKey: key)
+        case .notAdult:
+            await signOut(keepLocalData: true, store: store)
+            sync?.toasts?.show(ToastMessage(text: "Signed out: Folio accounts are for adults. Your diary is still on this iPhone.",
+                                            systemImage: "person.crop.circle.badge.xmark"))
+        case .couldNotCheck:
+            break
+        }
     }
 
     private func finishSignOut(keepLocalData: Bool, store: DiaryStore) {

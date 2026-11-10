@@ -3,6 +3,7 @@ import { getCookie, setCookie, deleteCookie } from 'hono/cookie';
 import { z } from 'zod';
 import type { AppEnv } from '../env';
 import { appleAuthorizeURL, exchangeAppleCode, verifyAppleIdToken } from '../auth/apple';
+import { applyAppleEvent, verifyAppleNotification } from '../auth/apple-notifications';
 import { exchangeGoogleCode, googleAuthorizeURL, verifyGoogleIdToken } from '../auth/google';
 import { verifyTurnstile } from '../auth/turnstile';
 import { checkInvite, normaliseEmail, resolveUser } from '../auth/users';
@@ -313,6 +314,24 @@ auth.post('/callback/apple', async (c) => {
     return oauthFailure(c, 'web', await problemFrom(error, 'apple'));
   }
   return finishWeb(c, userId, row.reauth_session);
+});
+
+// Batch M: Sign in with Apple server-to-server notifications (consent revoked, Apple Account
+// deleted, Hide My Email forwarding). Apple's servers post `{"payload": "<JWT>"}`, no cookie
+// or Origin; the signature is the authentication. Registered on the App ID in the developer
+// portal (owner step).
+auth.post('/apple/notifications', async (c) => {
+  await limit(c.env, `apple-notify:${await ipKey(c.env, c.req.raw)}`, 120, 3600);
+  const input = await body(c, z.object({ payload: z.string().min(1).max(8192) }));
+  let event;
+  try {
+    event = await verifyAppleNotification(c.env, input.payload);
+  } catch {
+    log('warn', 'apple_notification_rejected');
+    fail(400, 'invalid_notification');
+  }
+  await applyAppleEvent(c.env, event);
+  return c.json({ ok: true });
 });
 
 // MARK: Email code

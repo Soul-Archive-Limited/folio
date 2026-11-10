@@ -1,4 +1,5 @@
 import Combine
+import DeclaredAgeRange
 import SwiftUI
 
 /// The window root: onboarding on first launch, then the app, the greeting on cold launch,
@@ -9,6 +10,7 @@ struct AppRootView: View {
     @Environment(AccountModel.self) private var account
     @Environment(SyncEngine.self) private var sync
     @Environment(CalendarEvents.self) private var calendarEvents
+    @Environment(\.requestAgeRange) private var requestAgeRange
     @AppStorage(PreferenceKeys.hasOnboarded) private var hasOnboarded = false
     @State private var greeting: GreetingIntroModel?
     @State private var tour = TourModel()
@@ -92,6 +94,8 @@ struct AppRootView: View {
         // Widgets (Batch J): ticks made on a widget, then a fresh snapshot.
         .task { WidgetSnapshotWriter.shared.start(store: store) }
         .task { await account.checkAppleCredential() }
+        // Batch M: where the law requires it, people signed in before the age check get it once.
+        .task(id: account.userID) { await account.checkAgeIfRequired(with: requestAgeRange) }
     }
 
     @ViewBuilder private var content: some View {

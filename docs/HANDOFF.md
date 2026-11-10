@@ -2,9 +2,20 @@
 
 The next session starts here. Read this, then `CLAUDE.md`, `docs/SPEC.md`, `docs/PHASES.md` and the last entries of `docs/DECISIONS.md`. Updated at the end of every batch.
 
-_Last updated: 2026-11-06, end of Batch L (website + web app overhaul, real-time sync matrix, iPad, security/privacy/legal/accessibility audits)._
+_Last updated: 2026-11-10, end of Batch M (Apple's age check, Sign in with Apple server notifications)._
 
-## Batch L status (resume here)
+## Batch M status (resume here)
+Done and pushed — report `docs/reports/batch-m.md`, DECISIONS 299–303, screenshots `docs/screenshots/batch-m/`. API deployed **5517f68b** (no migration).
+- **Owner can't sign in to App Store Connect / the developer portal for now** (no phone network for Apple's codes). Everything Apple-account-side waits for one final ship pass: add TestFlight **0.1.0 (124)** (or a newer build) to Friends, App Review notes (18+ line), the **Sign in with Apple notification URL** on the App ID (`https://folio.devilsense.com/api/auth/apple/notifications`), check **Declared Age Range** on the App ID, age-rating "Age Assurance — Yes". Don't ask the owner to sign in before then.
+- **Next TestFlight archive** carries the new entitlement `com.apple.developer.declared-age-range`; automatic signing should add the capability. `scripts/testflight.sh` must run with the sandbox off (Xcode's account needs the network) and **without piping into `head`** (closing the pipe killed the script after the archive in Batch L).
+- Add a changelog entry (web `changelog.astro`) for the age check when that build ships.
+- Still open from Batch L: the live sync matrix (review code in the Keychain).
+
+### Batch M tools
+- Age check in the Simulator: `-FolioAgeCheck adult|minor|network|notSetUp` (DEBUG) pretends the region requires it and Apple answered so. The real `requiredRegulatoryFeatures` never returns on the iOS 26.5 Simulator — that's why there's a 3-second limit.
+- Apple notifications: tests sign JWTs with a local key served as Apple's JWKS (`api/test/apple-notifications.test.ts`). Apple has no test button; revoking a test account's token (`auth/revoke`) produces a real `consent-revoked`.
+
+## Batch L status
 Parts 1–9 done and pushed — report `docs/reports/batch-l.md`, DECISIONS 286–298, evidence `docs/SECURITY_AUDIT.md`, `docs/COMPLIANCE.md`, `docs/ACCESSIBILITY.md`, screenshots `docs/screenshots/batch-l/`. API deployed **5499d15a** (migration 0004 applied).
 - **Still open:** the **live** sync matrix (needs the review code in the Keychain: the owner runs `security add-generic-password -a folio -s folio-review-code -w`; the scripts read it with `security find-generic-password -a folio -s folio-review-code -w`, never a file) — then delete the review account (deletion check on production); adding TestFlight **0.1.0 (124)** (uploaded 2026-11-06) to Friends (App Store Connect was **not** signed in in the browser pane); updating App Review notes in App Store Connect for the 18+ box (text in `docs/APPSTORE.md`).
 - **Before public launch:** Declared Age Range API + `RESCIND_CONSENT` handling (Texas SB 2420; COMPLIANCE §5, risk R3); Sign in with Apple server-to-server notifications (R13); the owner checklist in COMPLIANCE §11.
@@ -111,8 +122,10 @@ All seven parts done — report `docs/reports/batch-i.md`, DECISIONS 224–252, 
 | Batch I | ✅ Owner's test fixes, avatars, onboarding, seasons, reminders/repeats/subtasks, own test run; TestFlight 0.1.0 (74). |
 | Batch J | ✅ Search, Lock Folio, widgets/controls/Siri, mood + On this day + Year in Pixels, scan/share/Apple Calendar, PDF, invite-only sign-up, installable web app; TestFlight 0.1.0 (94). |
 | Batch K | ✅ Google sign-in fix, invite-only on, day panel cleanup, photo refresh, rebrand (Nib book, Ink, custom symbols); TestFlight 0.1.0 (107). |
+| Batch L | ✅ No splash, website overhaul, web app parity + sync matrix (local), iPad, security/compliance/accessibility audits, 18+ accounts, independent review; TestFlight 0.1.0 (124) uploaded (not yet in Friends). |
+| Batch M | ✅ Apple's age check (Declared Age Range) on sign-up where required, Sign in with Apple server notifications; API 5517f68b; no TestFlight build. |
 
-Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8, Batch D = C fixes + Recently Deleted + 11 + Xcode Cloud, Batch E = D fixes + 9 + 10 + TestFlight, Batch F = improvements + 12 + TestFlight, Batch G = 13 + 14 + external TestFlight, Batch H = website rebuild, Batch I = owner's test of 56 + avatars + onboarding + seasons + smarter tasks, Batch J = the remaining features (search … PWA), Batch K = Google fix + invite-only + rebrand.
+Order so far: Batch A = Phases 1–3, Batch B = 4–6, Batch C = B fixes + 7–8, Batch D = C fixes + Recently Deleted + 11 + Xcode Cloud, Batch E = D fixes + 9 + 10 + TestFlight, Batch F = improvements + 12 + TestFlight, Batch G = 13 + 14 + external TestFlight, Batch H = website rebuild, Batch I = owner's test of 56 + avatars + onboarding + seasons + smarter tasks, Batch J = the remaining features (search … PWA), Batch K = Google fix + invite-only + rebrand, Batch L = polish + parity + iPad + audits, Batch M = age check + Apple notifications.
 
 ## Repo map
 

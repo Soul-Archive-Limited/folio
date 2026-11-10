@@ -1,4 +1,5 @@
 import AuthenticationServices
+import DeclaredAgeRange
 import SwiftUI
 
 /// The three sign-in buttons (SPEC §6.1 step 5, §6.9 guest Account card, §10.6 re-auth),
@@ -16,6 +17,7 @@ struct SyncSignInButtons: View {
     @Environment(ToastCenter.self) private var toasts
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.webAuthenticationSession) private var webAuthenticationSession
+    @Environment(\.requestAgeRange) private var requestAgeRange
     @State private var rawNonce = ""
     @State private var busy = false
     @State private var signedIn = 0
@@ -23,6 +25,12 @@ struct SyncSignInButtons: View {
     @State private var invitePrompt: InvitePrompt?
     @State private var appleRunner = AppleSignInRunner()
     @State private var nudge = false
+    /// Batch M: Apple's age check is running, or it said no (the sentence shown under the box).
+    @State private var checkingAge = false
+    @State private var ageProblem: String?
+    /// Whether the law here requires Apple's age check; worked out when the buttons appear, so
+    /// elsewhere the box ticks the moment it's tapped.
+    @State private var ageCheckRequired: Bool?
 
     private var needsConsent: Bool { !reauth && !account.ageConfirmed }
 
@@ -43,16 +51,19 @@ struct SyncSignInButtons: View {
     var body: some View {
         VStack(spacing: Spacing.s) {
             if !reauth { consentRow }
+            // Batch M: right under the box, where the eye already is.
+            if let ageProblem { ageProblemText(ageProblem) }
             // Batch L: the buttons stay tappable; before the box is ticked a tap points at it and
             // says why (spoken too), instead of a silent disabled state.
             providerButtons
                 .opacity(needsConsent ? 0.55 : 1)
-            if nudge && needsConsent { consentNudge }
+            if nudge && needsConsent && ageProblem == nil { consentNudge }
         }
         .disabled(busy)
         .opacity(busy ? 0.6 : 1)
         .overlay { if busy { ProgressView().controlSize(.large) } }
         .folioHaptic(.success, trigger: signedIn)
+        .task { if !reauth { ageCheckRequired = await AgeAssurance.isRequired() } }
         .sheet(item: $invitePrompt) { prompt in
             InviteCodeSheet(problem: prompt.problem) { code in
                 switch prompt.provider {
@@ -64,8 +75,47 @@ struct SyncSignInButtons: View {
     }
 
     private var consentRow: some View {
-        @Bindable var account = account
-        return AgeConsentRow(isOn: $account.ageConfirmed, needsAttention: nudge)
+        AgeConsentRow(isOn: Binding(get: { account.ageConfirmed }, set: setAgeConfirmed), needsAttention: nudge, checking: checkingAge)
+    }
+
+    /// Batch M: where the law requires it, ticking the box asks Apple for the age range first
+    /// (`AgeAssurance`); elsewhere the box ticks at once, as before.
+    private func setAgeConfirmed(_ on: Bool) {
+        ageProblem = nil
+        guard on else {
+            account.ageConfirmed = false
+            return
+        }
+        if ageCheckRequired == false {
+            account.ageConfirmed = true
+            return
+        }
+        checkingAge = true
+        Task {
+            defer { checkingAge = false }
+            let required: Bool
+            if let ageCheckRequired { required = ageCheckRequired } else { required = await AgeAssurance.isRequired() }
+            guard required else {
+                account.ageConfirmed = true
+                return
+            }
+            let decision = await AgeAssurance.check(with: requestAgeRange)
+            account.ageConfirmed = decision == .adult
+            if let message = decision.message {
+                withAnimation(FolioMotion.standard()) { ageProblem = message }
+                AccessibilityNotification.Announcement(message).post()
+            }
+        }
+    }
+
+    private func ageProblemText(_ message: String) -> some View {
+        Text(message)
+            .font(.footnote.weight(.medium))
+            .foregroundStyle(.inkSecondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .fixedSize(horizontal: false, vertical: true)
+            .transition(.opacity)
+            .accessibilityIdentifier("ageProblem")
     }
 
     private var providerButtons: some View {
@@ -211,11 +261,14 @@ struct SyncSignInButtons: View {
 struct AgeConsentRow: View {
     @Binding var isOn: Bool
     var needsAttention = false
+    /// Apple's age check is running (Batch M).
+    var checking = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             Toggle("I’m 18 or older and agree to the Terms and Privacy Policy", isOn: $isOn)
-                .toggleStyle(CheckboxToggleStyle())
+                .toggleStyle(CheckboxToggleStyle(checking: checking))
+                .disabled(checking)
                 .accessibilityHint("Required to create an account.")
             HStack(spacing: Spacing.m) {
                 Link("Read the Terms", destination: URL(string: "https://folio.devilsense.com/terms")!)
@@ -238,6 +291,8 @@ struct AgeConsentRow: View {
 
 /// A square checkbox for the consent toggle; the whole row toggles it (≥ 44 pt tall).
 private struct CheckboxToggleStyle: ToggleStyle {
+    var checking = false
+
     func makeBody(configuration: Configuration) -> some View {
         Button { configuration.isOn.toggle() } label: {
             HStack(alignment: .firstTextBaseline, spacing: Spacing.s) {
@@ -245,6 +300,8 @@ private struct CheckboxToggleStyle: ToggleStyle {
                     .font(.title3)
                     .foregroundStyle(configuration.isOn ? AnyShapeStyle(.accentStrong) : AnyShapeStyle(.inkSecondary))
                     .contentTransition(.symbolEffect(.replace))
+                    .opacity(checking ? 0 : 1)
+                    .overlay { if checking { ProgressView().controlSize(.small) } }
                 configuration.label
                     .font(.subheadline)
                     .foregroundStyle(.ink)
