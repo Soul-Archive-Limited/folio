@@ -15,8 +15,10 @@ struct OnboardingView: View {
     var body: some View {
         NavigationStack(path: $model.path) {
             OnboardingWelcomeStep { model.go(to: .firstLine) }
+                .modifier(ScrollsAtAccessibilitySizes())
                 .navigationDestination(for: OnboardingStep.self) { step in
                     stepView(step)
+                        .modifier(ScrollsAtAccessibilitySizes())
                         // Steps never resize for the keyboard, so nothing jumps under a swipe;
                         // fields sit high enough to stay above it.
                         .ignoresSafeArea(.keyboard)

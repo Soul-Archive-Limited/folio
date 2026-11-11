@@ -54,10 +54,13 @@ struct JournalMonthHeader: View {
                     .textCase(.uppercase)
                     .folioFont(.caption)
                     .foregroundStyle(.inkSecondary)
+                    // Batch O: the hairline took half the row at large sizes ("OC-TO-BER").
+                    .layoutPriority(1)
                 Text(count, format: .number)
                     .folioFont(.caption)
                     .foregroundStyle(.inkTertiary)
                     .monospacedDigit()
+                    .fixedSize()
                 Rectangle().fill(.hairline).frame(height: 1).alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] }
                 Image(systemName: "chevron.down")
                     .font(.caption2.weight(.semibold))

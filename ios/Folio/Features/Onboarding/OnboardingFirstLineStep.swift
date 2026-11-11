@@ -25,10 +25,13 @@ struct OnboardingFirstLineStep: View {
             // The field sits above the month, so it stays clear of the keyboard; the month below
             // is where the line lands once the keyboard has gone.
             if landed {
-                Label("It's on your calendar.", systemImage: "checkmark.circle.fill")
+                Label {
+                    Text("It's on your calendar.").foregroundStyle(.ink)
+                } icon: {
+                    // Ink, not the system blue of the multicolour symbol (Batch O review).
+                    Image(systemName: "checkmark.circle.fill").foregroundStyle(.accent)
+                }
                     .folioFont(.headline)
-                    .foregroundStyle(.ink)
-                    .symbolRenderingMode(.multicolor)
                     .frame(minHeight: 56)
                     .transition(.opacity)
             } else {
@@ -55,7 +58,9 @@ struct OnboardingFirstLineStep: View {
             .padding(.horizontal, Spacing.xxl)
         }
         .padding(.bottom, Spacing.l)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        // Batch O (independent review): pinned to the top, so when the keyboard still shrinks the
+        // step the title stays put and only the bottom buttons go behind the keyboard.
+        .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
         // A tap outside the field puts the keyboard away; it lives behind the step, so it never
         // takes a tap meant for the field or a button.
         .background {
@@ -87,7 +92,7 @@ struct OnboardingFirstLineStep: View {
                 .contentShape(.rect)
                 .focused($focused)
                 .submitLabel(.done)
-                .onSubmit { focused = false }
+                .onSubmit { if canAdd { add() } else { focused = false } }
                 .folioFont(.body)
                 .accessibilityIdentifier("onboarding.firstLine")
             PhotosPicker(selection: $photoItem, matching: .images) { PhotoPickerGlyph() }

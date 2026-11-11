@@ -77,7 +77,8 @@ private struct ThemeSwatch: View {
                 HStack(spacing: 3) {
                     ForEach(0..<4, id: \.self) { i in
                         RoundedRectangle(cornerRadius: 3)
-                            .fill(i == 2 ? Color(red: 0.94, green: 0.38, blue: 0.16) : ink.opacity(0.18))
+                            // Ink, as in shared/design-tokens.json (the orange was the pre-Batch K accent).
+                            .fill(i == 2 ? (dark ? Color(red: 0x94 / 255, green: 0x9F / 255, blue: 1) : Color(red: 0x34 / 255, green: 0x41 / 255, blue: 0xD5 / 255)) : ink.opacity(0.18))
                             .frame(width: 9, height: 9)
                     }
                 }

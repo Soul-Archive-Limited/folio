@@ -6,11 +6,17 @@ struct ProfileHeaderCard: View {
     let onEdit: () -> Void
 
     @Environment(DiaryStore.self) private var store
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         let name = store.settings().displayName
         let stats = store.profileStatsValue
-        HStack(spacing: Spacing.s) {
+        // Batch O: at accessibility sizes "Edit profile" beside the name split into letters;
+        // it moves below the name there.
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.s))
+            : AnyLayout(HStackLayout(spacing: Spacing.s))
+        layout {
             Button(action: onEdit) { ProfileAvatar(size: 56) }
                 .buttonStyle(.pressable)
                 .accessibilityLabel("Profile picture")
@@ -27,7 +33,7 @@ struct ProfileHeaderCard: View {
                     .lineLimit(2)
             }
             .accessibilityElement(children: .combine)
-            Spacer(minLength: Spacing.xs)
+            if !dynamicTypeSize.isAccessibilitySize { Spacer(minLength: Spacing.xs) }
             Button("Edit profile", action: onEdit)
                 .folioFont(.callout)
                 .fontWeight(.semibold)

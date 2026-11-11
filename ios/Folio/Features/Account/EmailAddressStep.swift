@@ -14,7 +14,11 @@ struct EmailAddressStep: View {
         AccountStepLayout(systemImage: "envelope", title: "Continue with email",
                           subtitle: "We'll email you a 6-digit code. No password needed.") {
             VStack(alignment: .leading, spacing: Spacing.xs) {
-                TextField("you@example.com", text: $email)
+                // Batch O: as a localized key the placeholder was read as a link and drawn in link
+                // blue, so it looked like a filled-in address. Verbatim, in the placeholder colour.
+                TextField(text: $email, prompt: Text(verbatim: "you@example.com").foregroundStyle(.inkTertiary)) {
+                    Text("Email address")
+                }
                     .textContentType(.emailAddress)
                     .keyboardType(.emailAddress)
                     .textInputAutocapitalization(.never)

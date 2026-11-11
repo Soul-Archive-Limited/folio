@@ -17,7 +17,7 @@ Mobile: a full-screen glass sheet with the same links, large, plus the two butto
 
 ### Hero (Batch L)
 - Visual: the page is a diary page — faint ruling and an Ink margin line — with the season drifting at the top (same seasons and regions as the app). On the right, the real web app window (calendar) with the 3D iPhone in front.
-- Pill: **New: the web app matches the iPhone →** (links to the changelog; change the words with each release, always something true).
+- Pill: **New in 1.0: places on your pages →** (links to the changelog; change the words with each release, always something true).
 - H1: **Your days, *kept.*** — an ink stroke draws once under "kept."
 - Lede: A calendar diary for iPhone and the web. Write about today or any day back to 1900 — words, photos and tasks on one calendar, encrypted so only you can read them.
 - Buttons: **Get started** · store button when set. Small print: Free · no account needed on iPhone · no ads, no tracking

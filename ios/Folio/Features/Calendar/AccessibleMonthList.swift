@@ -35,7 +35,7 @@ struct AccessibleMonthList: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(Spacing.m)
                             .folioGlass(in: .rect(cornerRadius: Radius.card), interactive: true,
-                                        solidFill: day == model.selectedDay ? .accent : nil)
+                                        solidFill: day == model.selectedDay ? .accentStrong : nil)
                     }
                     .buttonStyle(.pressable)
                     .padding(.horizontal, Spacing.sideMargin)
@@ -49,8 +49,8 @@ struct AccessibleMonthList: View {
         .scrollEdgeFade()
         .padding(.bottom, FloatingButtonMetrics.clearance)
         // Open on the selected day (today by default), not day 1 (owner review, Batch A).
-        .onAppear { proxy.scrollTo(model.selectedDay, anchor: .top) }
-        .onChange(of: model.visibleMonth) { proxy.scrollTo(model.selectedDay, anchor: .top) }
+        .onAppear { proxy.scrollTo(model.selectedDay, anchor: .center) }
+        .onChange(of: model.visibleMonth) { proxy.scrollTo(model.selectedDay, anchor: .center) }
         }
     }
 

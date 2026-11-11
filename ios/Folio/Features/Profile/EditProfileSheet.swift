@@ -8,6 +8,7 @@ struct EditProfileSheet: View {
     @Environment(DiaryStore.self) private var store
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var name = ""
     @State private var avatar: String?
     @State private var photo: Data?
@@ -35,7 +36,10 @@ struct EditProfileSheet: View {
                         .padding(.top, Spacing.m)
                     GlassEffectContainer(spacing: Spacing.xs) {
                         VStack(spacing: Spacing.xs) {
-                            HStack(spacing: Spacing.xs) {
+                            // Batch O: side by side split the words into letters at accessibility sizes.
+                            (dynamicTypeSize.isAccessibilitySize
+                                ? AnyLayout(VStackLayout(spacing: Spacing.xs))
+                                : AnyLayout(HStackLayout(spacing: Spacing.xs))) {
                                 Button("Choose photo", image: .folioPhoto) { showsPhotoPicker = true }
                                     .accessibilityIdentifier("editProfile.photo")
                                 Button("Folio avatars", systemImage: "face.smiling") { showsAvatars = true }

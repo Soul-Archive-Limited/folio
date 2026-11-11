@@ -41,7 +41,9 @@ struct OnboardingYouStep: View {
             .padding(.horizontal, Spacing.xxl)
             .padding(.bottom, Spacing.l)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        // Batch O (independent review): pinned to the top, so when the keyboard still shrinks the
+        // step the title stays put and only the bottom buttons go behind the keyboard.
+        .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
         // A tap outside the field puts the keyboard away; it never follows to the next step.
         .background { Color.clear.contentShape(.rect).onTapGesture { focused = false } }
         .onDisappear { focused = false }

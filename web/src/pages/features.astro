@@ -56,8 +56,10 @@ const groups = [
         {g.items.map((it, i) => (
           <li class="item tilt" data-tilt data-reveal style={`--d:${i * 60}ms`}>
             <Shot name={it.shot} alt={it.alt} width={220} />
-            <h3>{it.title}</h3>
-            <p>{it.text}</p>
+            <div class="copy">
+              <h3>{it.title}</h3>
+              <p>{it.text}</p>
+            </div>
           </li>
         ))}
       </ul>
@@ -94,7 +96,7 @@ const groups = [
   .item h3 { font: 400 26px/1.1 var(--serif); margin: 0 0 8px; }
   .item p { margin: 0; color: var(--text-2); font-size: 16px; }
   .items:has(> :only-child) { grid-template-columns: 1fr; }
-  .items:has(> :only-child) .item { display: grid; grid-template-columns: auto minmax(0, 40ch); align-items: center; gap: clamp(24px, 5vw, 64px); }
+  .items:has(> :only-child) .item { display: grid; grid-template-columns: auto minmax(0, 40ch); justify-content: start; align-items: center; gap: clamp(24px, 5vw, 64px); }
   .items:has(> :only-child) .item :global(.phone) { margin: 0; }
   .places { list-style: none; margin: 0 0 32px; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--hairline); }
   .places li { padding: 20px 20px 20px 0; display: grid; gap: 4px; }

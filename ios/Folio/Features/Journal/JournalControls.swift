@@ -6,13 +6,19 @@ struct JournalControls: View {
     @Bindable var model: JournalModel
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Namespace private var toggle
 
     var body: some View {
+        // Batch O: at accessibility sizes the title beside the four-mode toggle split into
+        // "Jour-nal"; there the toggle goes under the title, and its icons stop growing.
+        let header = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.s))
+            : AnyLayout(HStackLayout(alignment: .center))
         VStack(alignment: .leading, spacing: Spacing.s) {
-            HStack(alignment: .center) {
+            header {
                 CompactTitleText(title: "Journal")
-                Spacer()
+                if !dynamicTypeSize.isAccessibilitySize { Spacer() }
                 GlassEffectContainer(spacing: Spacing.xs) {
                     HStack(spacing: 4) {
                         ForEach(JournalModel.Mode.allCases) { mode in
@@ -38,6 +44,7 @@ struct JournalControls: View {
                     .padding(2)
                     .glassEffect(.regular, in: .capsule)
                 }
+                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             }
             .padding(.horizontal, Spacing.sideMargin)
             if model.mode != .year { CategoryFilterBar(selection: $model.filter) }

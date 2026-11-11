@@ -7,7 +7,12 @@ struct OnboardingUsesStep: View {
     @Environment(OnboardingModel.self) private var model
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private let columns = [GridItem(.flexible(), spacing: Spacing.s), GridItem(.flexible(), spacing: Spacing.s)]
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    /// Two columns; one at accessibility sizes, where two split words letter by letter.
+    private var columns: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: Spacing.s), count: dynamicTypeSize.isAccessibilitySize ? 1 : 2)
+    }
 
     var body: some View {
         VStack(spacing: Spacing.l) {
@@ -29,9 +34,14 @@ struct OnboardingUsesStep: View {
                             Text(use.title)
                                 .folioFont(.headline)
                                 .foregroundStyle(isOn ? AnyShapeStyle(.white) : AnyShapeStyle(.ink))
+                                // Batch O: on a 375-pt iPhone "Memories" was hyphenated mid-word;
+                                // one line that shrinks a little reads better (wraps at AX sizes).
+                                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
+                                .minimumScaleFactor(dynamicTypeSize.isAccessibilitySize ? 1 : 0.75)
                             Spacer(minLength: 0)
                         }
-                        .padding(.horizontal, Spacing.m)
+                        .padding(.leading, Spacing.m)
+                        .padding(.trailing, Spacing.s)
                         .frame(minHeight: 60)
                         .background {
                             RoundedRectangle(cornerRadius: Radius.card).fill(.accentStrong).opacity(isOn ? 1 : 0)

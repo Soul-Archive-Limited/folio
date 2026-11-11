@@ -26,6 +26,7 @@ final class TourModel {
     /// Where to go once the user closes a composer the tour couldn't close for them.
     @ObservationIgnored private var afterComposerCloses: TourStep?
     @ObservationIgnored private var pending: Task<Void, Never>?
+    @ObservationIgnored private var autoAdvancedAt: ContinuousClock.Instant?
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let settle: Duration
 
@@ -75,6 +76,13 @@ final class TourModel {
     func next() {
         guard let current else { return }
         if let step = current.next { go(to: step) } else { stop() }
+    }
+
+    /// Next on the card. Batch O (independent review): a tap that lands just after a look-only
+    /// step moved on by itself skipped the following step too; it's ignored for a moment.
+    func nextTapped() {
+        if let autoAdvancedAt, ContinuousClock.now - autoAdvancedAt < .milliseconds(800) { return }
+        next()
     }
 
     func back() {
@@ -166,6 +174,7 @@ final class TourModel {
         guard autoAdvances else { return }
         try? await Task.sleep(for: Self.autoAdvanceDelay)
         guard !Task.isCancelled, visible == step, autoAdvances else { return }
+        autoAdvancedAt = .now
         next()
     }
 

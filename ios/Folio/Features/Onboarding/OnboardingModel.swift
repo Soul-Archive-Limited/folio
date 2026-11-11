@@ -138,9 +138,26 @@ struct OnboardingHeading: View {
                 .foregroundStyle(.inkSecondary)
         }
         .multilineTextAlignment(.center)
+        // Batch O: on an iPhone SE the subtitle was cut ("You can alwa…"); words never truncate.
+        .fixedSize(horizontal: false, vertical: true)
         .padding(.horizontal, Spacing.xl)
         // Taps on the words count as "outside", so they put the keyboard away.
         .contentShape(.rect)
         .onTapGesture { KeyboardDismissal.dismiss() }
+    }
+}
+
+/// Batch O: at accessibility text sizes an onboarding step is taller than the screen (on an
+/// iPhone SE every title was cut), so the step scrolls instead of squeezing its words.
+struct ScrollsAtAccessibilitySizes: ViewModifier {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    func body(content: Content) -> some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            ScrollView { content.padding(.bottom, Spacing.l) }
+                .scrollBounceBehavior(.basedOnSize)
+        } else {
+            content
+        }
     }
 }

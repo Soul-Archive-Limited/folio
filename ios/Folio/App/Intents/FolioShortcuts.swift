@@ -27,5 +27,5 @@ struct FolioShortcuts: AppShortcutsProvider {
         ], shortTitle: "On This Day", systemImageName: "clock.arrow.circlepath")
     }
 
-    static let shortcutTileColor: ShortcutTileColor = .orange
+    static let shortcutTileColor: ShortcutTileColor = .navy // Ink (was orange before the Batch K rebrand)
 }

@@ -58,6 +58,9 @@ struct ComposerToolRow: View {
         }
         .labelStyle(.iconOnly)
         .font(.title3)
+        // Batch O: at accessibility sizes the glyphs outgrew their 44 pt squares and overlapped.
+        // Icon-only bars stop growing, like the system's toolbars; each tool keeps its label.
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .buttonStyle(.borderless)
         .foregroundStyle(.ink)
         .tint(.ink)

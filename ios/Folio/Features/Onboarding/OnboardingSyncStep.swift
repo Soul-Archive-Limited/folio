@@ -15,14 +15,37 @@ struct OnboardingSyncStep: View {
     }
 
     var body: some View {
-        VStack(spacing: Spacing.xl) {
-            Spacer()
-            Image("folio.sync")
-                .font(.system(size: 56, weight: .regular))
-                .foregroundStyle(.accent)
-                .frame(width: 112, height: 112)
-                .folioGlass(in: .circle)
-                .accessibilityHidden(true)
+        // Batch O: on an iPhone SE the full layout was taller than the screen, so the title and
+        // subtitle were cut and the icon touched the progress bar. A smaller icon first, then a
+        // scroll view at the largest text sizes.
+        ViewThatFits(in: .vertical) {
+            content(icon: 112, spacing: Spacing.xl)
+            content(icon: 64, spacing: Spacing.m)
+            // iPhone SE: no icon, so "Not now — keep it on this iPhone" (guest mode) stays on screen.
+            content(icon: 0, spacing: Spacing.s)
+            ScrollView { content(icon: 0, spacing: Spacing.s) }
+        }
+        .fullScreenCover(item: $flow) { start in
+            AccountFlowView(startsWithEmail: start == .email) {
+                flow = nil
+                // Signed in (even if the key comes later from Profile): onboarding is done.
+                if account.isSignedIn { onGuest() }
+            }
+            .privacyCovered()
+        }
+    }
+
+    private func content(icon: CGFloat, spacing: CGFloat) -> some View {
+        VStack(spacing: spacing) {
+            Spacer(minLength: 0)
+            if icon > 0 {
+                Image("folio.sync")
+                    .font(.system(size: icon / 2, weight: .regular))
+                    .foregroundStyle(.accent)
+                    .frame(width: icon, height: icon)
+                    .folioGlass(in: .circle)
+                    .accessibilityHidden(true)
+            }
             VStack(spacing: Spacing.s) {
                 Text("Keep your diary in sync?")
                     .folioFont(.title1)
@@ -33,8 +56,9 @@ struct OnboardingSyncStep: View {
                     .foregroundStyle(.inkSecondary)
             }
             .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
             .padding(.horizontal, Spacing.xxl)
-            Spacer()
+            Spacer(minLength: 0)
             VStack(spacing: Spacing.m) {
                 SyncSignInButtons(onEmail: { flow = .email }, onDone: { flow = .afterProvider })
                 Button("Not now — keep it on this iPhone", action: onGuest)
@@ -45,14 +69,6 @@ struct OnboardingSyncStep: View {
             }
             .padding(.horizontal, Spacing.xxl)
             .padding(.bottom, Spacing.l)
-        }
-        .fullScreenCover(item: $flow) { start in
-            AccountFlowView(startsWithEmail: start == .email) {
-                flow = nil
-                // Signed in (even if the key comes later from Profile): onboarding is done.
-                if account.isSignedIn { onGuest() }
-            }
-            .privacyCovered()
         }
     }
 }

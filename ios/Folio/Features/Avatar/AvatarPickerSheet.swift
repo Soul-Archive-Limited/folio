@@ -28,6 +28,9 @@ struct AvatarPickerSheet: View {
                                 Text(FolioAvatar.name(number))
                                     .folioFont(.caption)
                                     .foregroundStyle(.inkSecondary)
+                                    // Batch O: names split into letters at accessibility sizes.
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.5)
                             }
                         }
                         .buttonStyle(.pressable)

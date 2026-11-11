@@ -49,7 +49,7 @@ struct TourCard: View {
                             .buttonStyle(.glass)
                     }
                     Spacer()
-                    Button(step.isLast ? "Done" : "Next", action: tour.next)
+                    Button(step.isLast ? "Done" : "Next", action: tour.nextTapped)
                         .buttonStyle(.glassProminent)
                         .tint(.accentStrong)
                 }
@@ -57,7 +57,12 @@ struct TourCard: View {
         }
         .padding(Spacing.m)
         .frame(maxWidth: 400)
+        // Batch O (independent review): the clear glass let the screen's text show through the
+        // card's words, and taps on the card's padding reached the content underneath (opening
+        // an entry mid-tour). A solid surface under the glass, and the whole card takes touches.
+        .background(SheetSurface().clipShape(.rect(cornerRadius: Radius.card)))
         .folioGlass(in: .rect(cornerRadius: Radius.card))
+        .contentShape(.rect(cornerRadius: Radius.card))
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("tour.card")
         .task(id: step) {
