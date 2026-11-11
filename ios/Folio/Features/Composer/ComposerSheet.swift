@@ -9,7 +9,8 @@ struct ComposerSheet: View {
     var opensDatePicker = false
     /// "Dictate an entry" (long-press "+"): opens listening (SPEC §8).
     var startsDictation = false
-    let onSaved: (Entry) -> Void
+    /// The saved entry, and whether it was the first page kept for its day (Batch N).
+    let onSaved: (Entry, Bool) -> Void
 
     @Environment(DiaryStore.self) private var store
     @Environment(\.dismiss) private var dismiss
@@ -32,7 +33,7 @@ struct ComposerSheet: View {
     enum Field { case title, body }
 
     init(model: ComposerModel, calendar: CalendarModel?, startsLarge: Bool = false, opensDatePicker: Bool = false,
-         startsDictation: Bool = false, onSaved: @escaping (Entry) -> Void) {
+         startsDictation: Bool = false, onSaved: @escaping (Entry, Bool) -> Void) {
         self.startsDictation = startsDictation
         _model = State(initialValue: model)
         self.calendar = calendar
@@ -229,7 +230,7 @@ struct ComposerSheet: View {
             let entry = try model.save(to: store, context: fontContext)
             saveCount += 1
             calendar?.select(model.day, reduceMotion: reduceMotion)
-            onSaved(entry)
+            onSaved(entry, model.keptFirstPageForDay)
             dismiss()
         } catch {
             errorMessage = error == .titleTooLong
@@ -245,7 +246,7 @@ struct ComposerSheet: View {
     Color.bg.sheet(isPresented: .constant(true)) {
         ComposerSheet(model: ComposerModel(day: store.today, categoryID: nil, writingFont: .newYork,
                                            drafts: DraftStore(directory: .temporaryDirectory)),
-                      calendar: nil, onSaved: { _ in })
+                      calendar: nil, onSaved: { _, _ in })
     }
     .environment(store)
 }

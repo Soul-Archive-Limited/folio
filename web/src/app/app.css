@@ -767,3 +767,33 @@ body.dropping .sheet { box-shadow: 0 0 0 2px var(--accent), var(--glass-shadow);
 .search h2.section-label { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-quiet); }
 
 @keyframes fade-in { from { opacity: 0; } }
+
+/* Gentle celebrations (Batch N Part 4): a soft Ink bloom for a kept day, a page settling for a
+   past one, a sparkle when a day's tasks are done. Under a second; reduced motion = a fade. */
+.cell { --bloom: color-mix(in srgb, var(--accent) 70%, transparent); }
+.cell.celebrate-bloom::after, .cell.celebrate-settle::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; border: 2px solid var(--accent);
+  box-shadow: inset 0 0 10px var(--bloom); pointer-events: none; z-index: 2; animation: cell-bloom 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.cell.celebrate-settle::after { opacity: 0.6; }
+.cell.celebrate-settle { animation: cell-settle 0.7s cubic-bezier(0.34, 1.3, 0.64, 1) both; transform-origin: bottom left; }
+.cell.celebrate-tasksDone .ring { animation: ring-fill 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.cell.celebrate-tasksDone::before {
+  content: ''; position: absolute; top: 0; right: 0; width: 16px; height: 16px; pointer-events: none; z-index: 2;
+  background:
+    linear-gradient(var(--accent), var(--accent)) 50% 0 / 1.5px 4px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) 50% 100% / 1.5px 4px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) 0 50% / 4px 1.5px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) 100% 50% / 4px 1.5px no-repeat;
+  animation: cell-sparkle 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes cell-bloom { 0% { transform: scale(0.6); opacity: 0; } 20% { opacity: 0.8; } 100% { transform: scale(1); opacity: 0; } }
+@keyframes cell-settle { 0% { transform: none; } 25% { transform: translateY(-5px) rotate(-2.5deg); box-shadow: 0 6px 12px rgb(0 0 0 / 0.18); } 100% { transform: none; box-shadow: none; } }
+@keyframes ring-fill { 0% { transform: scale(0.4); opacity: 0; } 100% { transform: none; opacity: 1; } }
+@keyframes cell-sparkle { 0% { transform: scale(0.4) rotate(45deg); opacity: 0; } 20% { opacity: 1; } 100% { transform: scale(1.25) rotate(45deg); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .cell.celebrate-bloom::after, .cell.celebrate-settle::after { animation: cell-fade 0.6s ease-out both; }
+  .cell.celebrate-settle, .cell.celebrate-tasksDone .ring { animation: none; }
+  .cell.celebrate-tasksDone::before { animation: cell-fade 0.6s ease-out both; transform: rotate(45deg); }
+}
+@keyframes cell-fade { 0% { opacity: 0; } 30% { opacity: 0.5; } 100% { opacity: 0; } }

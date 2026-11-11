@@ -9,6 +9,8 @@ struct TaskCornerMark: View {
     let isPhoto: Bool
     let isSelected: Bool
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     static let inset: Double = 2.5
     static let size: Double = 9
 
@@ -16,19 +18,23 @@ struct TaskCornerMark: View {
         if let marker, marker.hasTasks {
             Group {
                 if marker.allTasksDone {
+                    // Batch N: the ring fills into the check (scale + fade), not a cut.
                     Image(systemName: "checkmark")
                         .font(.system(size: 6, weight: .heavy))
                         .foregroundStyle(.white)
                         .frame(width: Self.size + 1, height: Self.size + 1)
                         .background(.done, in: .circle)
                         .overlay { if isPhoto { Circle().strokeBorder(.white.opacity(0.9), lineWidth: 0.75) } }
+                        .transition(reduceMotion ? .opacity : .scale(scale: 0.4).combined(with: .opacity))
                 } else {
                     Circle()
                         .strokeBorder(ringStyle, lineWidth: 1.5)
                         .frame(width: Self.size - 1, height: Self.size - 1)
                         .shadow(color: isPhoto ? .black.opacity(0.5) : .clear, radius: 1)
+                        .transition(.opacity)
                 }
             }
+            .animation(FolioMotion.confirm(reduceMotion: reduceMotion), value: marker.allTasksDone)
             .padding(Self.inset)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
             .accessibilityHidden(true)

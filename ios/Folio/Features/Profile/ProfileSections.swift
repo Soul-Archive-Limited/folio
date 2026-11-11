@@ -4,6 +4,7 @@ import SwiftUI
 struct ProfileAppearanceSection: View {
     @Environment(DiaryStore.self) private var store
     @AppStorage(SeasonEffectSetting.key) private var seasonEffect: SeasonEffectSetting = .auto
+    @AppStorage(Celebration.settingKey) private var celebrations = true
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -43,6 +44,12 @@ struct ProfileAppearanceSection: View {
             } label: {
                 ProfileRowLabel(title: "Season effect", systemImage: "leaf")
             }
+            // Device-only (Batch N): small, quiet moments — never streaks or counters.
+            Toggle(isOn: $celebrations) {
+                ProfileRowLabel(title: "Celebrations", image: "folio.sparkle")
+            }
+            .accessibilityHint("A soft bloom when you keep a day's page, and a small sparkle when a day's tasks are done")
+            .accessibilityIdentifier("profile.celebrations")
         } header: {
             Text("Appearance")
         } footer: {

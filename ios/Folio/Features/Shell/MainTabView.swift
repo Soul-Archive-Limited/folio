@@ -61,6 +61,8 @@ struct MainTabView: View {
         .tabViewStyle(.sidebarAdaptable)
         .tabBarMinimizeBehavior(selection.minimisesTabBar ? .onScrollDown : .never)
         .overlay { SheetBackdropDim(isVisible: requester.pending != nil) }
+        // A light tap with every celebration (Batch N), wherever it happens.
+        .sensoryFeedback(.impact(weight: .light, intensity: 0.7), trigger: store.celebration?.id)
         .tourHost(.main, tour)
         .onAppear {
             connectTour()

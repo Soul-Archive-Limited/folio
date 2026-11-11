@@ -28,6 +28,8 @@ final class DiaryStore {
     @ObservationIgnored var isApplyingRemote = false
 
     @ObservationIgnored var profileStatsCache: (revision: Int, stats: ProfileStats)?
+    /// The celebration playing now, if any (Batch N); day cells watch it.
+    var celebration: Celebration?
     /// The Profile numbers on screen; `refreshProfileStats()` keeps them current.
     var profileStatsValue = ProfileStats()
     @ObservationIgnored private var markerCache: [MarkerCacheKey: [DayKey: DayMarker]] = [:]
@@ -435,7 +437,10 @@ final class DiaryStore {
         task.completedAt = completed ? now() : nil
         task.markChanged(at: now())
         commit()
-        if completed { addNextOccurrence(of: task) }
+        if completed {
+            celebrateIfDayDone(after: task)
+            addNextOccurrence(of: task)
+        }
     }
 
     func reschedule(_ task: TaskItem, to day: DayKey?, minutesFromMidnight: Int? = nil) {

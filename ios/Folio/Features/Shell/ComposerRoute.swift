@@ -55,7 +55,20 @@ struct ComposerRoute: View {
         WritingFont(rawValue: store.settings().writingFont) ?? .newYork
     }
 
-    private func saved(_ entry: Entry) {
-        toasts.show(ToastMessage(text: "Entry saved"))
+    /// The first page kept for a day gets a quiet line and a moment on its calendar day
+    /// (Batch N): a bloom for today or a coming day, a settle for a past one. Other saves keep
+    /// the plain "Entry saved".
+    private func saved(_ entry: Entry, firstForDay: Bool) {
+        guard firstForDay, Celebration.isEnabled, let day = entry.day else {
+            toasts.show(ToastMessage(text: "Entry saved"))
+            return
+        }
+        let today = store.today
+        toasts.show(ToastMessage(text: Celebration.savedLine(for: day, today: today), systemImage: "sparkle"))
+        // After the sheet has started to slide away, so the day is in view.
+        Task {
+            try? await Task.sleep(for: .milliseconds(280))
+            store.celebrate(day < today ? .settle : .bloom, on: day)
+        }
     }
 }

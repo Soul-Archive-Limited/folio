@@ -37,6 +37,8 @@ export class DiaryStore {
   revision = 0;
   private listeners = new Set<() => void>();
   onChange: (() => void) | null = null;
+  /** Batch N: called when a tick leaves no open task on that day (the ring fills). */
+  onDayTasksDone: ((day: string) => void) | null = null;
 
   constructor(readonly userId: string) {}
 
@@ -168,6 +170,11 @@ export class DiaryStore {
   setTaskDone(id: string, done: boolean) {
     this.put('task', { isCompleted: done, completedAt: done ? Date.now() : undefined }, id);
     const task = this.get('task', id)?.data;
+    if (done && task && !task.parentID && task.dayKey) {
+      const day = task.dayKey;
+      const sameDay = this.tasks().filter((t) => t.data.dayKey === day);
+      if (sameDay.length > 0 && sameDay.every((t) => t.data.isCompleted)) this.onDayTasksDone?.(day);
+    }
     const rule = done && task && !task.parentID ? parseRule(task.repeatRule) : undefined;
     if (!task || !rule) return;
     const base = task.dayKey ?? todayKey();

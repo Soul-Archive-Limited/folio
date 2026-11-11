@@ -11,6 +11,7 @@ import { MoodPicker, moodOf } from './Mood.tsx';
 import { cleanPlace } from '../lib/place.ts';
 import type { PlaceData } from '../lib/payloads.ts';
 import { PlaceField } from './Place.tsx';
+import { celebrate, celebrationsOn, savedLine } from './celebrate.ts';
 
 type PhotoItem = { id: string; existing: true } | { id: string; existing: false; prepared: PreparedPhoto };
 
@@ -124,6 +125,9 @@ function ComposerBody({ request, day, onDayChange, dirty }: { request: ComposerR
   function save() {
     if (!editor || !canSave) return;
     setBusy(true);
+    // Batch N: the first page kept for its day (new, or moved to an empty day) is celebrated.
+    const firstForDay = (!existing || existing.data.dayKey !== dayKey)
+      && !store.entries().some((e) => e.data.dayKey === dayKey && (!existing || e.id !== existing.id));
     const entryId = store.put('entry', {
       title: title.trim().slice(0, 120), bodyMarkdown: editorMarkdown(editor), dayKey, minutesFromMidnight: minutes,
       categoryID: categoryId ?? undefined, mood, place, ...(existing ? {} : { createdAt: Date.now() }),
@@ -146,7 +150,13 @@ function ComposerBody({ request, day, onDayChange, dirty }: { request: ComposerR
       }
     });
     dirty.current = false;
-    toast(existing ? 'Saved' : `Saved to ${formatShort(dayKey)}`);
+    if (firstForDay && celebrationsOn()) {
+      const today = todayKey();
+      toast(savedLine(dayKey, today));
+      window.setTimeout(() => celebrate(dayKey < today ? 'settle' : 'bloom', dayKey), 260);
+    } else {
+      toast(existing ? 'Saved' : `Saved to ${formatShort(dayKey)}`);
+    }
     close();
   }
 

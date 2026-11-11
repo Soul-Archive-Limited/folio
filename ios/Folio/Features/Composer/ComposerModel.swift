@@ -18,6 +18,8 @@ final class ComposerModel {
     var place: Place? { didSet { if place != oldValue { markEdited() } } }
     /// "Add <place>?" from a just-added photo's location; nil when there's nothing to offer.
     private(set) var placeOffer: Place?
+    /// Set by `save`: this was the first page kept for its day (a new entry, or one moved there).
+    @ObservationIgnored private(set) var keptFirstPageForDay = false
     /// One offer per composer: declined or accepted, it doesn't come back for the next photo.
     @ObservationIgnored private var hasOfferedPlace = false
     var photos: [ComposerPhoto] = [] { didSet { if photos != oldValue { markEdited() } } }
@@ -282,6 +284,9 @@ final class ComposerModel {
     /// Saves to the store (local-first) and clears the draft.
     @discardableResult
     func save(to store: DiaryStore, context: Font.Context) throws(StoreError) -> Entry {
+        // The first page kept for its day earns a gentle celebration (Batch N).
+        let dayWasEmpty = store.entries(on: day).allSatisfy { $0.id == entryID }
+        let movedDay = entryID.flatMap { store.entry(id: $0)?.day } != day
         let markdown = RichTextBridge.markdown(from: body, context: context, writingFont: writingFont)
         let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let entry: Entry
@@ -307,6 +312,7 @@ final class ComposerModel {
             }
         }
         store.setPhotoOrder(entry, ids: order)
+        keptFirstPageForDay = dayWasEmpty && (isNew || movedDay)
         finish()
         return entry
     }

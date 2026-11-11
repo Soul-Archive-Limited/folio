@@ -9,6 +9,18 @@ struct DayCell: View {
     let onTap: () -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(DiaryStore.self) private var store: DiaryStore?
+    /// How many times each celebration has played on this day (Batch N); a change plays it.
+    @State private var bloomPlays = 0
+    @State private var settlePlays = 0
+    @State private var sparklePlays = 0
+    @State private var bloomStrength = 0.55
+
+    /// The latest celebration, if it's for this day.
+    private var celebrationID: UUID? {
+        guard let celebration = store?.celebration, celebration.day == state.day else { return nil }
+        return celebration.id
+    }
 
     var body: some View {
         Button(action: onTap) {
@@ -26,12 +38,22 @@ struct DayCell: View {
                     .opacity(markerOpacity)
                 if state.hasEvents { eventMark }
                 selectionStroke
+                CelebrationOverlay(bloomPlays: bloomPlays, bloomStrength: bloomStrength, sparklePlays: sparklePlays, size: size)
             }
+            .modifier(PageSettle(trigger: settlePlays))
             .frame(width: size, height: size)
             .contentShape(.rect(cornerRadius: Radius.dayCell))
         }
         .buttonStyle(.pressable)
         .animation(FolioMotion.standard(reduceMotion: reduceMotion), value: state.matchesFilter)
+        .onChange(of: celebrationID) { _, id in
+            guard id != nil, let kind = store?.celebration?.kind else { return }
+            switch kind {
+            case .bloom: bloomStrength = 0.55; bloomPlays += 1
+            case .settle: bloomStrength = 0.35; bloomPlays += 1; settlePlays += 1
+            case .tasksDone: sparklePlays += 1
+            }
+        }
         .accessibilityLabel(DayCellAccessibility.label(for: state))
         .accessibilityAddTraits(state.isSelected ? .isSelected : [])
     }

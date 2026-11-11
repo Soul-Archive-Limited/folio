@@ -51,6 +51,15 @@ struct CalendarScreen: View {
         .sheet(isPresented: $model.showsSearch) { SearchSheet() }
         #if DEBUG
         .task { if DebugLaunchOptions.searchText != nil, DebugLaunchOptions.string("FolioTab") == nil { model.showsSearch = true } }
+        // `-FolioCelebrate bloom|settle|tasksDone` plays one on the selected day, every 2.5 s (recordings, Batch N).
+        .task {
+            guard let raw = DebugLaunchOptions.string("FolioCelebrate") else { return }
+            let kind: Celebration.Kind = raw == "settle" ? .settle : raw == "tasksDone" ? .tasksDone : .bloom
+            for _ in 0..<4 {
+                try? await Task.sleep(for: .milliseconds(2500))
+                store.celebrate(kind, on: model.selectedDay)
+            }
+        }
         #endif
     }
 
