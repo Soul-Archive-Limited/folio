@@ -12,6 +12,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, renameSync, writeFileSync, mkdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join, dirname } from 'node:path';
+import { tmpdir } from 'node:os';
 
 const args = Object.fromEntries(process.argv.slice(2).reduce((list, value, i, all) => (value.startsWith('--') ? [...list, [value.slice(2), all[i + 1]]] : list), []));
 const require = createRequire(join(args.playwright ?? process.cwd(), 'noop.js'));
@@ -160,7 +161,8 @@ t0 = phone(`entry.photo.replace ${renamed}`);
 record({ id: 'P2', change: 'replace photo', from: 'iPhone', latency: { webA: lat(await webSees(A, cardPhoto, { title: renamed, not: firstSrc }), t0) } });
 t0 = await webEdit(B, renamed, async (p) => { await p.locator('.sheet .photo-strip .x').first().click(); });
 record({ id: 'P3', change: 'remove photo', from: 'webB', latency: { webA: lat(await webSees(A, cardPhoto, { title: renamed, want: 'none' }), t0), iPhone: lat(await phoneSees(/applied entryPhoto .* deleted=true|applied entryPhoto [0-9a-f]{8}$/, t0), t0) } });
-const png = join(dirname(args.out), `sync-photo-${RUN}.jpg`);
+// A copy in the system temp folder, never next to the report (Batch N).
+const png = join(tmpdir(), `sync-photo-${RUN}.jpg`);
 execFileSync('cp', [join(dirname(new URL(import.meta.url).pathname), '..', 'ios', 'FolioTests', 'Resources', 'sample-diary-page.jpg'), png]);
 t0 = await webEdit(A, renamed, async (p) => { await p.setInputFiles('.sheet .toolbar input[type=file]', png); await p.waitForSelector('.sheet .photo-strip img'); });
 record({ id: 'P4', change: 'add photo from the web', from: 'webA', latency: { webB: lat(await webSees(B, cardPhoto, { title: renamed }), t0), iPhone: lat(await phoneSees(/blob-down /, t0, 90000), t0) } });
