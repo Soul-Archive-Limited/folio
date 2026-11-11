@@ -3,7 +3,7 @@ import SwiftData
 import UIKit
 
 /// The diary as a typeset PDF (Batch J): a cover (name, picture, range), a divider page for
-/// each month, then every page of the diary in order — date, mood, title, formatted text,
+/// each month, then every page of the diary in order — date, mood, title, place, formatted text,
 /// photos — with the day's tasks if asked. Made on the device, off the main thread, with
 /// progress; nothing leaves the device until the person shares it.
 nonisolated enum DiaryPDF {
@@ -43,6 +43,7 @@ nonisolated enum DiaryPDF {
         let markdown: String
         let minutes: Int?
         let mood: Int?
+        var place: Place? = nil
         let photos: [Data]
     }
 
@@ -64,7 +65,7 @@ nonisolated enum DiaryPDF {
             guard let day = entry.day else { continue }
             let photos = options.includesPhotos ? entry.orderedPhotos.map { $0.displayData ?? $0.imageData } : []
             days[day, default: Day(day: day)].entries.append(
-                EntryPage(title: entry.title, markdown: entry.bodyMarkdown, minutes: entry.minutesFromMidnight, mood: entry.mood, photos: photos))
+                EntryPage(title: entry.title, markdown: entry.bodyMarkdown, minutes: entry.minutesFromMidnight, mood: entry.mood, place: entry.place, photos: photos))
         }
         if options.includesTasks {
             // Compared in Swift: optional comparisons inside #Predicate don't translate to SQL safely.

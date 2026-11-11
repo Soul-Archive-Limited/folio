@@ -19,7 +19,7 @@ struct JournalControls: View {
                             Button {
                                 withAnimation(FolioMotion.standard(reduceMotion: reduceMotion)) { model.mode = mode }
                             } label: {
-                                Label(mode.title, systemImage: mode.symbol)
+                                Label { Text(mode.title) } icon: { mode.icon }
                                     .labelStyle(.iconOnly)
                                     .padding(.horizontal, Spacing.s)
                                     .frame(minWidth: Spacing.minHitTarget, minHeight: 36)
@@ -51,6 +51,7 @@ extension JournalModel.Mode {
         case .timeline: "Timeline"
         case .photos: "Photos"
         case .year: "Year in Pixels"
+        case .places: "Places"
         }
     }
 
@@ -59,6 +60,12 @@ extension JournalModel.Mode {
         case .timeline: "list.bullet.below.rectangle"
         case .photos: "square.grid.3x3"
         case .year: "square.grid.4x3.fill"
+        case .places: "map"
         }
+    }
+
+    /// Places uses Folio's own map glyph (Batch N); the others keep their SF Symbols.
+    var icon: Image {
+        self == .places ? Image(.folioMap) : Image(systemName: symbol)
     }
 }

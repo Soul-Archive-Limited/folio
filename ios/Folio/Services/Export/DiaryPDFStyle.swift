@@ -121,6 +121,11 @@ nonisolated enum DiaryPDFStyle {
                 text.append(NSAttributedString(string: entry.title + "\n", attributes: [
                     .font: serif(17, .bold), .foregroundColor: ink, .paragraphStyle: paragraph(after: 6, lineHeight: 1.15)]))
             }
+            if let place = entry.place {
+                // Batch N: where it was written, quietly under the title.
+                text.append(NSAttributedString(string: place.line + "\n", attributes: [
+                    .font: sans(9, .regular), .foregroundColor: secondary, .paragraphStyle: paragraph(after: 6)]))
+            }
             text.append(body(entry.markdown))
             for data in entry.photos {
                 guard let image = DiaryPDF.printImage(data) else { continue }

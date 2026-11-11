@@ -36,7 +36,8 @@ extension DiaryStore {
         case let entry as Entry:
             return try encoder.encode(RecordPayload.Entry(
                 title: entry.title, bodyMarkdown: entry.bodyMarkdown, dayKey: entry.dayKey, minutesFromMidnight: entry.minutesFromMidnight,
-                categoryID: entry.categoryID, createdAt: entry.createdAt, trashedAt: entry.trashedAt, mood: entry.mood))
+                categoryID: entry.categoryID, createdAt: entry.createdAt, trashedAt: entry.trashedAt, mood: entry.mood,
+                place: entry.place))
         case let photo as EntryPhoto:
             return try encoder.encode(RecordPayload.EntryPhoto(
                 entryID: photo.entryID, sortIndex: photo.sortIndex, pixelWidth: photo.pixelWidth, pixelHeight: photo.pixelHeight,
@@ -187,6 +188,8 @@ extension DiaryStore {
         entry.trashedAt = p.trashedAt
         // A synced value outside the scale (a crafted record) is dropped, not trusted.
         entry.mood = p.mood.flatMap { Mood(rawValue: $0) }?.rawValue
+        // `place`'s setter validates: a nameless place or an off-globe coordinate is dropped.
+        entry.place = p.place
         return entry
     }
 

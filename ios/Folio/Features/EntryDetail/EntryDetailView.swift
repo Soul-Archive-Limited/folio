@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// One entry (SPEC §6.5): photos, date, category, title and body, plus Edit, Share and
+/// One entry (SPEC §6.5): photos, date, category, title, body and place, plus Edit, Share and
 /// a menu with Change date, Duplicate and Delete.
 struct EntryDetailView: View {
     let entryID: UUID
@@ -60,6 +60,9 @@ struct EntryDetailView: View {
                         .accessibilityAddTraits(.isHeader)
                 }
                 EntryBodyText(markdown: entry.bodyMarkdown, writingFont: writingFont)
+                if let place = entry.place {
+                    EntryPlaceCard(place: place)
+                }
                 if let day = entry.day {
                     SameDayOtherYears(day: day, excluding: entry.id)
                 }

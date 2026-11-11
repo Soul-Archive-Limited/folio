@@ -218,6 +218,21 @@ let icons: [Icon] = [
     Icon(name: "folio.devices", width: 110, pieces: [
         rrect(6, 14, 70, 50, 10), line([(28, 82), (54, 82)]), line([(41, 64), (41, 82)]), rrect(80, 34, 24, 52, 8),
     ]),
+    // Batch N: places on entries and the Journal's Places map
+    Icon(name: "folio.place", width: 84, pieces: [
+        // One open polyline from the tip round the head and back (fixed points at every weight).
+        smooth(segments: 12) { p in
+            p.move(to: CGPoint(x: 42, y: 92)); p.addCurve(to: CGPoint(x: 10, y: 40), control1: CGPoint(x: 28, y: 76), control2: CGPoint(x: 10, y: 60))
+            p.addCurve(to: CGPoint(x: 42, y: 8), control1: CGPoint(x: 10, y: 22.33), control2: CGPoint(x: 24.33, y: 8))
+            p.addCurve(to: CGPoint(x: 74, y: 40), control1: CGPoint(x: 59.67, y: 8), control2: CGPoint(x: 74, y: 22.33))
+            p.addCurve(to: CGPoint(x: 42, y: 92), control1: CGPoint(x: 74, y: 60), control2: CGPoint(x: 56, y: 76))
+        },
+        dot(42, 40, 9),
+    ]),
+    Icon(name: "folio.map", pieces: [
+        line([(8, 20), (36, 8), (64, 20), (92, 8), (92, 80), (64, 92), (36, 80), (8, 92)], closed: true),
+        line([(36, 8), (36, 80)]), line([(64, 20), (64, 92)]),
+    ]),
     Icon(name: "folio.invite", width: 108, pieces: [
         circle(40, 34, 18),
         curve { p in p.move(to: CGPoint(x: 8, y: 90)); p.addCurve(to: CGPoint(x: 72, y: 90), control1: CGPoint(x: 12, y: 58), control2: CGPoint(x: 68, y: 58)) },

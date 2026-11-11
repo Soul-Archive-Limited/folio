@@ -257,6 +257,36 @@ final class DiaryStore {
         commit()
     }
 
+    /// Sets or removes where it was written (Batch N). Only ever called from the person's choice.
+    func setPlace(_ entry: Entry, _ place: Place?) {
+        let clean = place?.validated()
+        guard entry.place != clean else { return }
+        entry.place = clean
+        entry.markChanged(at: now())
+        commit()
+    }
+
+    /// The places used most recently, newest first, one per place (Batch N). Read from the
+    /// entries themselves, so recents need no storage of their own and leave with the diary.
+    func recentPlaces(limit: Int = 6) -> [Place] {
+        var descriptor = FetchDescriptor<Entry>(predicate: #Predicate { $0.placeName != nil && !$0.isTombstone && $0.trashedAt == nil },
+                                                sortBy: [SortDescriptor(\.updatedAt, order: .reverse)])
+        descriptor.fetchLimit = 200
+        var places: [Place] = []
+        for entry in fetch(descriptor) {
+            guard let place = entry.place, !places.contains(where: { $0.isSame(as: place) }) else { continue }
+            places.append(place)
+            if places.count == limit { break }
+        }
+        return places
+    }
+
+    /// Live entries with a mapped place, for the Journal's Places map (Batch N).
+    func entriesWithPlaces() -> [Entry] {
+        fetch(FetchDescriptor<Entry>(predicate: #Predicate { $0.placeLatitude != nil && !$0.isTombstone && $0.trashedAt == nil },
+                                     sortBy: [SortDescriptor(\.dayKey, order: .reverse)]))
+    }
+
     /// Moves an entry to another day. Only an explicit move ever changes an item's day.
     func move(_ entry: Entry, to day: DayKey, minutesFromMidnight: Int?) {
         entry.dayKey = day.rawValue
@@ -344,6 +374,8 @@ final class DiaryStore {
         let minutesFromMidnight: Int?
         let categoryID: UUID?
         let photos: [ProcessedPhoto]
+        var mood: Int?
+        var place: Place?
     }
 
     func snapshot(of entry: Entry) -> EntrySnapshot? {
@@ -354,7 +386,9 @@ final class DiaryStore {
             photos: entry.orderedPhotos.map {
                 ProcessedPhoto(imageData: $0.imageData, thumbnailData: $0.thumbData, pixelWidth: $0.pixelWidth,
                                pixelHeight: $0.pixelHeight, imageType: "public.heic", displayData: $0.displayData ?? Data())
-            }
+            },
+            mood: entry.mood,
+            place: entry.place
         )
     }
 
@@ -364,6 +398,11 @@ final class DiaryStore {
                                            minutesFromMidnight: snapshot.minutesFromMidnight,
                                            categoryID: category(id: snapshot.categoryID)?.id) else { return nil }
         for photo in snapshot.photos { _ = try? addPhoto(photo, to: entry) }
+        if snapshot.mood != nil || snapshot.place != nil {
+            entry.mood = snapshot.mood.flatMap(Mood.init(rawValue:))?.rawValue
+            entry.place = snapshot.place
+            commit()
+        }
         return entry
     }
 

@@ -31,6 +31,11 @@ final class Entry: TrashableRecord {
     var trashedAt: Date?
     /// How the day felt, 1 (heavy) … 5 (bright); nil = not set. Added in schema v5 (Batch J).
     var mood: Int?
+    /// Where it was written (Batch N, schema v6): see `place`. All nil = no place.
+    var placeName: String?
+    var placeAddress: String?
+    var placeLatitude: Double?
+    var placeLongitude: Double?
 
     init(id: UUID = UUID(), title: String, bodyMarkdown: String, day: DayKey, minutesFromMidnight: Int? = nil,
          categoryID: UUID? = nil, now: Date) {
@@ -48,6 +53,22 @@ final class Entry: TrashableRecord {
     }
 
     var day: DayKey? { DayKey(rawValue: dayKey) }
+
+    /// The entry's place, stored as four optional attributes so the migration is lightweight
+    /// and the Places map can read coordinates without decoding anything.
+    var place: Place? {
+        get {
+            guard let placeName else { return nil }
+            return Place(name: placeName, address: placeAddress, latitude: placeLatitude, longitude: placeLongitude)
+        }
+        set {
+            let clean = newValue?.validated()
+            placeName = clean?.name
+            placeAddress = clean?.address
+            placeLatitude = clean?.latitude
+            placeLongitude = clean?.longitude
+        }
+    }
 
     /// Live photos in display order.
     var orderedPhotos: [EntryPhoto] {

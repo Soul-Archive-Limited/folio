@@ -33,6 +33,10 @@ nonisolated struct ExportEntry: Codable, Sendable {
     let createdAt: Date
     let updatedAt: Date
     var trashedAt: Date?
+    /// Batch N: 1…5, as stored (the web export already had it).
+    var mood: Int?
+    /// Batch N: name, short address and coordinates, as stored.
+    var place: Place?
 }
 
 nonisolated struct ExportTask: Codable, Sendable {

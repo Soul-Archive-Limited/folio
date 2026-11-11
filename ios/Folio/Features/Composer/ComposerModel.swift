@@ -1,3 +1,4 @@
+import CoreLocation
 import PhotosUI
 import SwiftUI
 
@@ -12,6 +13,13 @@ final class ComposerModel {
     var selection = AttributedTextSelection()
     var categoryID: UUID? { didSet { if categoryID != oldValue { markEdited() } } }
     var mood: Mood? { didSet { if mood != oldValue { markEdited() } } }
+    /// Where it was written (Batch N). Only set by the person: the Place sheet, or accepting
+    /// the offer made from a photo's location.
+    var place: Place? { didSet { if place != oldValue { markEdited() } } }
+    /// "Add <place>?" from a just-added photo's location; nil when there's nothing to offer.
+    private(set) var placeOffer: Place?
+    /// One offer per composer: declined or accepted, it doesn't come back for the next photo.
+    @ObservationIgnored private var hasOfferedPlace = false
     var photos: [ComposerPhoto] = [] { didSet { if photos != oldValue { markEdited() } } }
     private(set) var hasChanges = false
     private(set) var isProcessingPhotos = false
@@ -56,6 +64,7 @@ final class ComposerModel {
         body = RichTextBridge.attributedString(fromMarkdown: entry.bodyMarkdown, writingFont: writingFont)
         categoryID = entry.categoryID
         mood = entry.mood.flatMap(Mood.init(rawValue:))
+        place = entry.place
         photos = entry.orderedPhotos.map { .stored($0.id) }
         self.writingFont = writingFont
         self.drafts = drafts
@@ -64,6 +73,7 @@ final class ComposerModel {
                                  photos: entry.orderedPhotos.map { DraftPhoto(id: $0.id, storedPhotoID: $0.id) },
                                  savedAt: .distantPast)
         baseline.mood = entry.mood
+        baseline.place = entry.place
         if let draft = drafts.load(), draft.entryID == entry.id, !draft.isEmpty {
             // A leftover draft that only repeats what's saved isn't unsaved work: drop it quietly.
             if draft.hasSameContent(as: baseline) { drafts.clear() } else { pendingDraft = draft }
@@ -137,6 +147,7 @@ final class ComposerModel {
                       },
                       savedAt: AppClock.now)
             .withMood(mood?.rawValue)
+            .withPlace(place)
     }
 
     func restoreDraft() {
@@ -147,6 +158,7 @@ final class ComposerModel {
         body = RichTextBridge.attributedString(fromMarkdown: draft.bodyMarkdown, writingFont: writingFont)
         categoryID = draft.categoryID
         mood = draft.mood.flatMap(Mood.init(rawValue:))
+        place = draft.place
         let original = Set(photos.compactMap(\.storedPhotoID))
         photos = draft.photos.compactMap { kept in
             if let stored = kept.storedPhotoID { return original.contains(stored) ? .stored(stored) : nil }
@@ -170,11 +182,37 @@ final class ComposerModel {
         isProcessingPhotos = true
         defer { isProcessingPhotos = false }
         let processor = PhotoProcessor()
+        var coordinate: (latitude: Double, longitude: Double)?
         for item in items.prefix(remainingPhotoSlots) {
-            guard let data = try? await item.loadTransferable(type: Data.self),
-                  let processed = try? await processor.process(data) else { continue }
+            guard let data = try? await item.loadTransferable(type: Data.self) else { continue }
+            // Read before processing: the stored photo is re-encoded without any metadata.
+            if coordinate == nil { coordinate = PhotoProcessor.capturedCoordinate(in: data) }
+            guard let processed = try? await processor.process(data) else { continue }
             photos.append(.new(processed))
         }
+        if let coordinate { await offerPlace(latitude: coordinate.latitude, longitude: coordinate.longitude) }
+    }
+
+    // MARK: Place
+
+    /// Looks the photo's location up with Apple Maps and offers it — only when the entry has
+    /// no place yet and nothing was offered in this composer.
+    func offerPlace(latitude: Double, longitude: Double) async {
+        guard place == nil, !hasOfferedPlace else { return }
+        hasOfferedPlace = true
+        let location = CLLocation(latitude: latitude, longitude: longitude)
+        guard let found = await PlaceResolver.place(at: location, approximate: false), place == nil else { return }
+        placeOffer = found
+    }
+
+    func acceptPlaceOffer() {
+        guard let placeOffer else { return }
+        place = placeOffer
+        self.placeOffer = nil
+    }
+
+    func declinePlaceOffer() {
+        placeOffer = nil
     }
 
     func addPhoto(data: Data) async {
@@ -259,6 +297,7 @@ final class ComposerModel {
                                           minutesFromMidnight: minutesFromMidnight, categoryID: categoryID)
         }
         store.setMood(entry, mood)
+        store.setPlace(entry, place)
         var order: [UUID] = []
         for photo in photos {
             if let stored = photo.storedPhotoID {

@@ -25,7 +25,7 @@ struct SchemaMigrationTests {
             try container.mainContext.save()
         }
 
-        let schema = Schema(versionedSchema: FolioSchemaV5.self)
+        let schema = Schema(versionedSchema: FolioSchemaV6.self)
         let container = try ModelContainer(for: schema, migrationPlan: FolioMigrationPlan.self,
                                            configurations: ModelConfiguration(schema: schema, url: url))
         let store = DiaryStore(context: container.mainContext, calendar: TestCalendar.london, now: { .now })
@@ -55,7 +55,7 @@ struct SchemaMigrationTests {
             try context.save()
         }
 
-        let schema = Schema(versionedSchema: FolioSchemaV5.self)
+        let schema = Schema(versionedSchema: FolioSchemaV6.self)
         let container = try ModelContainer(for: schema, migrationPlan: FolioMigrationPlan.self,
                                            configurations: ModelConfiguration(schema: schema, url: url))
         let store = DiaryStore(context: container.mainContext, calendar: TestCalendar.london, now: { .now })
@@ -86,7 +86,7 @@ struct SchemaMigrationTests {
             try context.save()
         }
 
-        let schema = Schema(versionedSchema: FolioSchemaV5.self)
+        let schema = Schema(versionedSchema: FolioSchemaV6.self)
         let container = try ModelContainer(for: schema, migrationPlan: FolioMigrationPlan.self,
                                            configurations: ModelConfiguration(schema: schema, url: url))
         let store = DiaryStore(context: container.mainContext, calendar: TestCalendar.london, now: { .now })
@@ -111,12 +111,36 @@ struct SchemaMigrationTests {
             try container.mainContext.save()
         }
 
-        let schema = Schema(versionedSchema: FolioSchemaV5.self)
+        let schema = Schema(versionedSchema: FolioSchemaV6.self)
         let container = try ModelContainer(for: schema, migrationPlan: FolioMigrationPlan.self,
                                            configurations: ModelConfiguration(schema: schema, url: url))
         let store = DiaryStore(context: container.mainContext, calendar: TestCalendar.london, now: { .now })
         let entry = try #require(store.entry(id: entryID))
         #expect(entry.title == "Harbour" && entry.bodyMarkdown == "Gulls" && entry.dayKey == "2025-11-05")
         #expect(entry.mood == nil)
+    }
+
+    @Test("A v5 store opens as v6: entries keep their mood, place is empty")
+    func v5ToV6() throws {
+        let url = URL.temporaryDirectory.appending(path: "migration-\(UUID().uuidString).store")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let entryID = UUID()
+
+        do {
+            let schema = Schema(versionedSchema: FolioSchemaV5.self)
+            let container = try ModelContainer(for: schema, configurations: ModelConfiguration(schema: schema, url: url))
+            let entry = FolioSchemaV5.Entry(id: entryID, title: "Harbour", bodyMarkdown: "Gulls", dayKey: "2025-11-05", now: .now)
+            entry.mood = 4
+            container.mainContext.insert(entry)
+            try container.mainContext.save()
+        }
+
+        let schema = Schema(versionedSchema: FolioSchemaV6.self)
+        let container = try ModelContainer(for: schema, migrationPlan: FolioMigrationPlan.self,
+                                           configurations: ModelConfiguration(schema: schema, url: url))
+        let store = DiaryStore(context: container.mainContext, calendar: TestCalendar.london, now: { .now })
+        let entry = try #require(store.entry(id: entryID))
+        #expect(entry.title == "Harbour" && entry.mood == 4)
+        #expect(entry.place == nil)
     }
 }

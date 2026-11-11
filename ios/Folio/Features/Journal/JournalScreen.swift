@@ -73,6 +73,8 @@ struct JournalScreen: View {
                     JournalTimeline(sections: model.sections(store: store), model: model, today: store.today, zoom: zoom)
                 } else if model.mode == .year {
                     YearInPixelsView(model: model)
+                } else if model.mode == .places {
+                    JournalPlacesView(model: model)
                 } else {
                     JournalPhotoGrid(photos: model.photos(store: store), zoom: zoom)
                         .padding(.horizontal, Spacing.sideMargin)

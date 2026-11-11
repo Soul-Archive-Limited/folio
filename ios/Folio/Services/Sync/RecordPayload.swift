@@ -15,6 +15,8 @@ nonisolated enum RecordPayload {
         var trashedAt: Date?
         /// Batch J (schema v5): 1…5; older apps leave it out.
         var mood: Int?
+        /// Batch N (schema v6): where it was written; older apps leave it out.
+        var place: Place?
     }
 
     /// Photo metadata; the image bytes are three encrypted blobs in R2.

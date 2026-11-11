@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// An entry in the day panel (SPEC §6.2): 64 pt photo, title, two-line preview,
-/// category and time.
+/// category, place and time.
 struct EntryCard: View {
     let entry: Entry
     let category: Category?
@@ -12,6 +12,11 @@ struct EntryCard: View {
             if let photo = entry.orderedPhotos.first {
                 FullPhotoImage(photoID: photo.id, rendition: .display, maxPixel: 240, cornerRadius: 14)
                     .frame(width: 64, height: 64)
+            } else if let coordinate = entry.place?.coordinate {
+                // No photo: a small map of where it was written (Batch N).
+                PlaceSnapshot(coordinate: coordinate, span: 0.02)
+                    .frame(width: 64, height: 64)
+                    .clipShape(.rect(cornerRadius: 14))
             }
             VStack(alignment: .leading, spacing: Spacing.xxs) {
                 Text(entry.title.isEmpty ? String(localized: "Untitled") : entry.title)
@@ -29,6 +34,7 @@ struct EntryCard: View {
                         MoodGlyph(mood: mood, size: 12).accessibilityLabel(mood.title)
                     }
                     if let category { CategoryTag(category: category) }
+                    if let place = entry.place { PlaceLine(place: place).layoutPriority(-1) }
                     if let time { Text(time, format: .dateTime.hour().minute()).folioFont(.caption).foregroundStyle(.inkSecondary) }
                 }
             }

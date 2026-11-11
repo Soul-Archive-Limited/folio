@@ -65,6 +65,21 @@ enum PreviewData {
         (1000, "Winter", "Long dark evenings, candles and tea.", nil, 1080, 0),
     ]
 
+    /// Sample places by entry title (Batch N): real, well-known public places, so the Places map
+    /// and cards have something to show.
+    static let places: [String: Place] = [
+        "Weekend in Bath": Place(name: "Thermae Bath Spa", address: "Hot Bath St, Bath", latitude: 51.3807, longitude: -2.3615),
+        "Lisbon": Place(name: "Pastéis de Belém", address: "Belém, Lisbon", latitude: 38.6975, longitude: -9.2032),
+        "Autumn colours": Place(name: "Regent's Park", address: "London", latitude: 51.5313, longitude: -0.1570),
+        "New running shoes": Place(name: "Victoria Park", address: "Hackney, London", latitude: 51.5362, longitude: -0.0405),
+        "Dinner with the team": Place(name: "Borough Market", address: "Southwark, London", latitude: 51.5055, longitude: -0.0910),
+        "Festival": Place(name: "Glastonbury", address: "Pilton, Somerset", latitude: 51.1531, longitude: -2.5850),
+        "Mountains": Place(name: "Snowdon", address: "Gwynedd, Wales", latitude: 53.0685, longitude: -4.0763),
+        "Beach": Place(name: "Porthcurno Beach", address: "Cornwall", latitude: 50.0430, longitude: -5.6540),
+        "Concert": Place(name: "Royal Albert Hall", address: "Kensington, London", latitude: 51.5009, longitude: -0.1774),
+        "Old friends": Place(name: "The Eagle", address: "Cambridge"),
+    ]
+
     /// (day offset or nil for undated, title, notes, category index, completed)
     static let tasks: [(Int?, String, String?, Int?, Bool)] = [
         (0, "Post the letter to Ana", nil, 1, false),
@@ -114,6 +129,7 @@ enum PreviewData {
             ) else { continue }
             // Most sample pages have a mood (Batch J), a few don't.
             if index % 6 != 5 { store.setMood(entry, Mood(rawValue: (index * 7 + 3) % 5 + 1)) }
+            if let place = places[title] { store.setPlace(entry, place) }
             for photoIndex in 0..<photoCount {
                 if let jpeg = SampleImageRenderer.jpeg(seed: index * 3 + photoIndex),
                    let processed = try? processor.processSynchronously(jpeg) {

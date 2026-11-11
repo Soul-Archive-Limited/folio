@@ -35,10 +35,13 @@ struct DataExporter {
                 photoNames.append(name)
                 await Task.yield()
             }
-            entries.append(ExportEntry(id: entry.id, day: entry.dayKey, minutesFromMidnight: entry.minutesFromMidnight,
+            var exported = ExportEntry(id: entry.id, day: entry.dayKey, minutesFromMidnight: entry.minutesFromMidnight,
                                        title: entry.title, bodyMarkdown: entry.bodyMarkdown, categoryID: entry.categoryID,
                                        photos: photoNames, createdAt: entry.createdAt, updatedAt: entry.updatedAt,
-                                       trashedAt: entry.trashedAt))
+                                       trashedAt: entry.trashedAt)
+            exported.mood = entry.mood
+            exported.place = entry.place
+            entries.append(exported)
         }
         let settings = store.settings()
         let document = ExportDocument(

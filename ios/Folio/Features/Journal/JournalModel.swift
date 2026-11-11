@@ -5,7 +5,7 @@ import Foundation
 @Observable
 final class JournalModel {
     enum Mode: String, CaseIterable, Identifiable {
-        case timeline, photos, year
+        case timeline, photos, year, places
         var id: Self { self }
     }
 
@@ -47,6 +47,12 @@ final class JournalModel {
         // Back to the default: forget the override, so the list keeps up as months go by.
         foldOverrides[month.id] = open == Self.opensByDefault(month, today: today) ? nil : open
         defaults.set(Dictionary(uniqueKeysWithValues: foldOverrides.map { (String($0.key), $0.value) }), forKey: Self.foldKey)
+    }
+
+    /// Pages with a mapped place, filtered by the category chips (Batch N).
+    func placeEntries(store: DiaryStore) -> [Entry] {
+        let entries = store.entriesWithPlaces()
+        return filter.isEmpty ? entries : entries.filter { $0.categoryID.map(filter.contains) == true }
     }
 
     struct MonthSection: Identifiable {

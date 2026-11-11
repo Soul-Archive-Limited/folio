@@ -37,6 +37,8 @@ actor SearchIndexer {
             hasher.combine(photos.first?.id)
             hasher.combine(photos.count)
             hasher.combine(entry.mood)
+            hasher.combine(entry.placeName)
+            hasher.combine(entry.placeAddress)
             let signature = hasher.finalize()
             if let cached = entryCache[entry.id], cached.signature == signature {
                 fresh[entry.id] = cached
@@ -48,7 +50,8 @@ actor SearchIndexer {
                 id: entry.id, kind: .entry, dayKey: entry.dayKey, minutesFromMidnight: entry.minutesFromMidnight,
                 categoryID: entry.categoryID, title: entry.title, text: text, subtasks: [],
                 firstPhotoID: photos.first?.id, photoCount: photos.count, isCompleted: false, mood: entry.mood,
-                vocabulary: SearchText.vocabulary(of: [entry.title, text])
+                // The place's name and address match too (Batch N): "Lisbon" finds the trip.
+                vocabulary: SearchText.vocabulary(of: [entry.title, text, entry.placeName ?? "", entry.placeAddress ?? ""])
             )
             fresh[entry.id] = CachedEntry(signature: signature, document: document)
             documents.append(document)

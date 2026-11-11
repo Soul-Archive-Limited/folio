@@ -17,6 +17,9 @@ struct JournalEntryCard: View {
                     VStack(alignment: .leading, spacing: 2) {
                         dateLine.foregroundStyle(.white)
                         Text(displayTitle).folioFont(.title2).foregroundStyle(.white).lineLimit(2)
+                        if let place = entry.place {
+                            PlaceLine(place: place).foregroundStyle(.white.opacity(0.9))
+                        }
                     }
                     .padding(Spacing.m)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -28,6 +31,26 @@ struct JournalEntryCard: View {
                 .accessibilityElement(children: .combine)
                 .accessibilityIdentifier("entry-card")
         } else {
+            HStack(alignment: .top, spacing: Spacing.s) {
+                textColumn
+                if let coordinate = entry.place?.coordinate {
+                    // A text card with a place shows a small map of it (Batch N).
+                    PlaceSnapshot(coordinate: coordinate, span: 0.02)
+                        .frame(width: 72, height: 72)
+                        .clipShape(.rect(cornerRadius: 14))
+                }
+            }
+            .padding(Spacing.m)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            // Behind the content and not interactive: either would take the long press
+            // from the card's context menu.
+            .folioGlass(in: .rect(cornerRadius: Radius.card), behindContent: true)
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("entry-card")
+        }
+    }
+
+    private var textColumn: some View {
             VStack(alignment: .leading, spacing: Spacing.xxs) {
                 dateLine.foregroundStyle(.inkSecondary)
                 Text(displayTitle).folioFont(.headline).foregroundStyle(.ink)
@@ -38,15 +61,9 @@ struct JournalEntryCard: View {
                     MoodGlyph(mood: mood, size: 12).accessibilityLabel(mood.title)
                 }
                 if let category = store.category(id: entry.categoryID) { CategoryTag(category: category) }
+                if let place = entry.place { PlaceLine(place: place) }
             }
-            .padding(Spacing.m)
             .frame(maxWidth: .infinity, alignment: .leading)
-            // Behind the content and not interactive: either would take the long press
-            // from the card's context menu.
-            .folioGlass(in: .rect(cornerRadius: Radius.card), behindContent: true)
-            .accessibilityElement(children: .combine)
-                .accessibilityIdentifier("entry-card")
-        }
     }
 
     private var displayTitle: String {

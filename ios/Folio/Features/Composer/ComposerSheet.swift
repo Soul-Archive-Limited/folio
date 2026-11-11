@@ -52,6 +52,9 @@ struct ComposerSheet: View {
                 if !model.photos.isEmpty || model.isProcessingPhotos {
                     ComposerPhotoStrip(model: model)
                 }
+                if model.place != nil || model.placeOffer != nil {
+                    ComposerPlaceRow(model: model)
+                }
                 ComposerCategoryRow(selection: $model.categoryID)
                 ComposerBodyEditor(model: model, placeholder: placeholder)
                     .focused($focus, equals: .body)

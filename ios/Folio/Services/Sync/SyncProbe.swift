@@ -51,6 +51,7 @@ enum SyncProbe {
         for key in ["isCompleted", "mood", "avatar", "appearance", "writingFont", "dayKey", "parentID", "repeatRule"] {
             if let value = object[key] { parts.append("\(key)=\(value)") }
         }
+        if let place = object["place"] as? [String: Any], let name = place["name"] { parts.append("place=\(name)") }
         if object["trashedAt"] != nil { parts.append("trashed") }
         return parts.joined(separator: " ")
     }
@@ -88,6 +89,14 @@ enum SyncProbe {
         case "entry.restore": if let e = entry(argument, in: store) { store.restoreFromTrash(e) }
         case "entry.mood":
             if let (title, value) = pair(argument), let e = entry(title, in: store) { store.setMood(e, Int(value).flatMap(Mood.init(rawValue:))) }
+        case "entry.place":
+            // "entry.place <title>|<name>|<lat>|<lon>" — an empty name removes it (Batch N).
+            let parts = argument.split(separator: "|", omittingEmptySubsequences: false).map(String.init)
+            if parts.count >= 2, let e = entry(parts[0], in: store) {
+                let place = parts[1].isEmpty ? nil : Place(name: parts[1], latitude: parts.count > 2 ? Double(parts[2]) : nil,
+                                                           longitude: parts.count > 3 ? Double(parts[3]) : nil)
+                store.setPlace(e, place)
+            }
         case "entry.photo.add", "entry.photo.replace":
             guard let e = entry(argument, in: store), let photo = samplePhoto(hue: name.hasSuffix("replace") ? 0.6 : 0.08) else { break }
             if name.hasSuffix("replace"), let old = e.orderedPhotos.first { store.delete(old) }

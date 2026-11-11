@@ -75,6 +75,23 @@ nonisolated struct PhotoProcessor: Sendable {
         return jpeg
     }
 
+    /// Where a photo was taken, read from its GPS metadata *before* processing strips it
+    /// (Batch N). Used only to offer "Add <place>?"; never stored unless the person accepts,
+    /// and the stored image never carries it.
+    static func capturedCoordinate(in data: Data) -> (latitude: Double, longitude: Double)? {
+        guard let source = CGImageSourceCreateWithData(data as CFData, [kCGImageSourceShouldCache: false] as CFDictionary),
+              let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
+              let gps = properties[kCGImagePropertyGPSDictionary] as? [CFString: Any],
+              let latitude = gps[kCGImagePropertyGPSLatitude] as? Double,
+              let longitude = gps[kCGImagePropertyGPSLongitude] as? Double else { return nil }
+        let north = (gps[kCGImagePropertyGPSLatitudeRef] as? String)?.uppercased() != "S"
+        let east = (gps[kCGImagePropertyGPSLongitudeRef] as? String)?.uppercased() != "W"
+        let lat = north ? latitude : -latitude
+        let lon = east ? longitude : -longitude
+        guard (-90.0...90.0).contains(lat), (-180.0...180.0).contains(lon), lat != 0 || lon != 0 else { return nil }
+        return (lat, lon)
+    }
+
     /// An ISO-BMFF `ftyp` box with a HEIF brand.
     static func isHEIF(_ data: Data) -> Bool {
         guard data.count >= 12, data[data.startIndex + 4 ..< data.startIndex + 8] == Data("ftyp".utf8) else { return false }

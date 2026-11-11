@@ -45,6 +45,8 @@
 	<string>Folio uses the camera only when you take a photo for an entry, scan a paper diary page or scan a code to link another device.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Folio asks for Face ID to unlock your diary when Lock Folio is on, and before showing your recovery key or letting another device read it.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Folio uses your location only when you tap Current location to add a place to an entry. It's looked up once, and the place is kept end-to-end encrypted with your diary.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Folio uses the microphone only while you dictate. Audio is processed on your iPhone and never stored or sent anywhere.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
