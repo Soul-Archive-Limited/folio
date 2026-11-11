@@ -64,8 +64,9 @@ export default function CalendarView({ selected, onSelect, composing }: { select
       <section className="cal-main" aria-label="Month">
         <header className="cal-head">
           <div style={{ position: 'relative' }}>
-            <button className="month-title" onClick={() => setJumpOpen(!jumpOpen)} aria-expanded={jumpOpen} aria-label={`${monthName(month)} ${month.year}. Jump to a month`}>
-              <span className="title1">{monthName(month)}</span><span className="y">{month.year}</span><Icon name="chevronDown" small />
+            <button className="month-title" onClick={() => setJumpOpen(!jumpOpen)} aria-expanded={jumpOpen}>
+              {/* The visible words are the name (WCAG 2.5.3), the hint follows for screen readers. */}
+              <span className="title1">{monthName(month)}</span>{' '}<span className="y">{month.year}</span><span className="sr-only">. Jump to a month</span><Icon name="chevronDown" small />
             </button>
             {jumpOpen && <JumpPopover month={month} index={index} onPick={(m) => { setDirection(''); setMonth(m); setJumpOpen(false); }}
               onToday={() => { setJumpOpen(false); setDirection(''); setMonth(monthOf(today)); onSelect(today); }} onClose={() => setJumpOpen(false)} />}

@@ -25,13 +25,13 @@ export function PlacesList({ entries }: { entries: Rec<EntryData>[] }) {
               <h2 className="callout">{place.name}</h2>
               {place.address && <span className="caption ink3">{place.address}</span>}
             </span>
-            <a className="caption place-open" href={appleMapsURL(place)} target="_blank" rel="noopener noreferrer">Apple Maps<span className="sr-only"> for {place.name} (opens a new tab)</span></a>
+            <a className="callout place-open" href={appleMapsURL(place)} target="_blank" rel="noopener noreferrer">Apple Maps<span className="sr-only"> for {place.name} (opens a new tab)</span></a>
           </header>
           <ul>
             {pages.map((e) => (
               <li key={e.id}>
                 <button onClick={() => openEntry(e.id)}>
-                  <span className="caption ink3">{formatShort(e.data.dayKey)}</span>
+                  <span className="caption place-date">{formatShort(e.data.dayKey)}</span>
                   <span>{e.data.title || 'Untitled'}</span>
                 </button>
               </li>

@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { expect, type ConsoleMessage, type Page } from '@playwright/test';
+import { type Browser, type BrowserContext, type BrowserContextOptions, expect, type ConsoleMessage, type Page, type TestInfo } from '@playwright/test';
 
 export const REVIEW_EMAIL = 'review@devilsense.com';
 
@@ -36,8 +36,10 @@ export async function signInNewAccount(page: Page, { trust }: { trust: boolean }
   if (trust) await page.getByRole('checkbox', { name: /Trust this browser/ }).check();
   await page.getByRole('button', { name: 'Continue' }).click();
   // The first-run welcome: skip it.
+  // The first-run welcome arrives a moment later: wait for it, then skip it.
   const skip = page.getByRole('button', { name: /^Skip/ });
-  if (await skip.isVisible({ timeout: 8_000 }).catch(() => false)) await skip.click();
+  if (await skip.waitFor({ state: 'visible', timeout: 10_000 }).then(() => true, () => false)) await skip.click();
+  await expect(skip).toBeHidden();
   return key;
 }
 
@@ -55,7 +57,8 @@ export const recoveryKey = () => readFileSync(new URL('../.auth/recovery-key.txt
 
 /** Unlocks with the recovery key when the browser asks (the saved session cookie skips sign-in). */
 export async function unlock(page: Page) {
-  await page.getByRole('button', { name: 'Use recovery key' }).click();
+  const tab = page.getByRole('button', { name: 'Use recovery key' });
+  if ((await tab.getAttribute('aria-pressed')) !== 'true') await tab.click();
   await page.getByLabel('Recovery key').fill(recoveryKey());
   await page.getByRole('button', { name: 'Unlock' }).click();
 }
@@ -70,7 +73,7 @@ export async function openDiary(page: Page, path = '/app') {
   if (await locked.isVisible()) await unlock(page);
   await expect(main).toBeVisible({ timeout: 30_000 });
   const skip = page.getByRole('button', { name: /^Skip/ });
-  if (await skip.isVisible({ timeout: 1_500 }).catch(() => false)) await skip.click();
+  if (await skip.waitFor({ state: 'visible', timeout: 1_500 }).then(() => true, () => false)) await skip.click();
 }
 
 /** In-app navigation (the diary key lives in memory; reloads re-open it from the trusted copy). */
@@ -79,6 +82,15 @@ export async function go(page: Page, path: string) {
     history.pushState({}, '', to);
     dispatchEvent(new PopStateEvent('popstate'));
   }, path);
+}
+
+/** Waits until the diary has reached the server (the sidebar says "Up to date"), so a new
+ *  browser context — the next test — sees this one's changes. Desktop layout only. */
+export async function synced(page: Page) {
+  await page.waitForTimeout(800);
+  const status = page.locator('.sidebar .me');
+  if (await status.isVisible()) await expect(status).toContainText('Up to date', { timeout: 20_000 });
+  else await page.waitForTimeout(3_000); // phones: no status on screen; the push follows within a second
 }
 
 /** Waits until no sheet is open (each closes with a short animation). */
@@ -116,4 +128,13 @@ export async function addTask(page: Page, title: string) {
 /** Selects a day of the shown month by its day number (1–28). */
 export async function selectDay(page: Page, n: number) {
   await page.locator('.cell:not(.out)').nth(n - 1).click();
+}
+
+/** A context like this project's (viewport, touch, mobile, base URL, saved session). */
+export async function projectContext(browser: Browser, info: TestInfo, extra: BrowserContextOptions = {}): Promise<BrowserContext> {
+  const use = info.project.use;
+  return browser.newContext({
+    baseURL: use.baseURL, viewport: use.viewport, userAgent: use.userAgent, deviceScaleFactor: use.deviceScaleFactor,
+    isMobile: use.isMobile, hasTouch: use.hasTouch, storageState: '.auth/state.json', ...extra,
+  });
 }

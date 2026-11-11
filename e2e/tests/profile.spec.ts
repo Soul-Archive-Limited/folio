@@ -14,7 +14,8 @@ test.describe('Profile', () => {
     for (const title of pages) {
       await page.locator('.profile-rows').getByRole('button', { name: title }).click();
       await expect(page.getByRole('heading', { name: title, level: 1 }).last()).toBeVisible();
-      if (info.project.name === 'phone') await page.getByRole('button', { name: 'Back to Profile' }).click();
+      // Phones show one column; from 768 px the rows stay beside the page.
+      if (await page.locator('.profile-root').isHidden()) await page.getByRole('button', { name: 'Back to Profile' }).click();
     }
     await page.screenshot({ path: `test-results/profile-${info.project.name}.png` });
     expect(problems).toEqual([]);
@@ -26,6 +27,7 @@ test.describe('Profile', () => {
     await page.getByPlaceholder('Search settings').fill('dark');
     await page.getByRole('group', { name: 'Matching settings' }).getByRole('button', { name: /Theme/ }).click();
     await expect(page.getByRole('heading', { name: 'Appearance', level: 1 })).toBeVisible();
+    await go(page, '/app/profile');
     await page.getByPlaceholder('Search settings').fill('zzzz');
     await expect(page.getByText('No settings match “zzzz”.')).toBeVisible();
   });

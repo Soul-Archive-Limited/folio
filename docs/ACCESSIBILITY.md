@@ -14,6 +14,15 @@ _6 November 2026. Website, web app and iPhone app. Public statement: `/accessibi
 
 Raw axe results: `docs/reports/batch-l-axe.json` (64 page states).
 
+## Batch N — web app, automated in CI
+
+The Playwright suite (`e2e/`, `.github/workflows/e2e.yml`) runs axe-core 4.14 (WCAG 2.0/2.1/2.2 A + AA tags) on **20 web-app states × light and dark × desktop, phone and iPad widths** (100 runs; iPad dark skipped as covered) and fails on any serious or critical finding. Result on 2026-11-11: **0 serious or critical**. Found and fixed on the way:
+- `label-content-name-mismatch` (2.5.3): the month title's `aria-label` didn't contain its visible words ("November" + "2026" in two spans with no space) — the visible text is now the name, with ". Jump to a month" as screen-reader-only text.
+- `target-size` (2.5.8): Year in Pixels days were 16 px tall with 3 px gaps; now 21 px with 4 px gaps (25 px pitch), passing by the spacing rule.
+- `color-contrast` (1.4.3): the new Places list's day buttons kept the browser's default button background (grey in dark mode, 3.56 : 1) — reset to transparent, dates in the `--ink-label` token.
+- Keyboard: the shortcut guard ignored keys during a sheet's 0.2 s closing animation; it now skips closing sheets. A keyboard-only test walks days, months, tabs, the shortcuts sheet and the Profile rows and checks a visible focus ring.
+Lighthouse on `/app` (sign-in): Accessibility 100 (mobile and desktop).
+
 ## Findings and fixes (this batch)
 
 1. **Tertiary text below 4.5:1** (web app: weekday row, out-of-month day numbers, captions, "Writing since", small row notes, Year in Pixels day numbers). The 34–36 % tertiary ink is fine for marks but not for words. New `--ink-quiet` (a solid mix: 66 % ink on paper, 84 % on charcoal) for quiet text, `--ink-label` for the weekday row; the tertiary token stays for outlines and dots. In dark mode axe measures text on translucent glass against the aura blobs' full colour, so labels carry more weight there to pass even in that worst case.

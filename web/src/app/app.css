@@ -501,7 +501,7 @@ svg.i.sm { width: 18px; height: 18px; }
 .profile-layout { max-width: 720px; }
 .profile-root, .profile-detail { min-width: 0; }
 .profile-layout.has-detail .profile-root { display: none; }
-@media (min-width: 900px) {
+@media (min-width: 768px) {
   .profile-layout.has-detail { max-width: 1120px; display: grid; grid-template-columns: minmax(300px, 360px) minmax(0, 1fr); gap: 28px; align-items: start; }
   .profile-layout.has-detail .profile-root { display: block; position: sticky; top: 0; }
   .profile-layout.has-detail .profile-detail .back-btn { display: none; }
@@ -641,10 +641,11 @@ body:has(.gate) .aura { opacity: 0.5; }
 .on-this-day button span { flex: 1; min-width: 0; color: var(--ink-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pixels-head { display: flex; align-items: center; gap: 8px; margin: 8px 0 14px; }
 .pixels-head h2 { margin: 0; min-width: 3.2ch; text-align: center; }
-.pixel-grid { display: grid; grid-template-columns: 18px repeat(12, minmax(0, 1fr)); gap: 3px; max-width: 560px; }
+.pixel-grid { display: grid; grid-template-columns: 18px repeat(12, minmax(0, 1fr)); gap: 4px 3px; max-width: 560px; }
 .pixel-month { text-align: center; font-weight: 600; }
-.pixel-day { font-size: 9px; color: var(--ink-quiet); text-align: right; padding-right: 3px; line-height: 16px; }
-.pixel { height: 16px; border: 0; padding: 0; border-radius: 3.5px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.pixel-day { font-size: 9px; color: var(--ink-quiet); text-align: right; padding-right: 3px; line-height: 21px; }
+/* 21 px + 4 px gap: a 25 px pitch, so each day passes WCAG 2.2 target size by spacing (Batch N). */
+.pixel { height: 21px; border: 0; padding: 0; border-radius: 3.5px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
 .pixel.written { background: color-mix(in srgb, var(--ink) 22%, transparent); cursor: pointer; }
 .pixel.future { background: color-mix(in srgb, var(--ink) 3%, transparent); }
 .pixel.today { outline: 1.5px solid var(--accent); outline-offset: -1.5px; }
@@ -797,3 +798,5 @@ body.dropping .sheet { box-shadow: 0 0 0 2px var(--accent), var(--glass-shadow);
   .cell.celebrate-tasksDone::before { animation: cell-fade 0.6s ease-out both; transform: rotate(45deg); }
 }
 @keyframes cell-fade { 0% { opacity: 0; } 30% { opacity: 0.5; } 100% { opacity: 0; } }
+.place-group .place-date { color: var(--ink-label); }
+.place-group li button { color: var(--ink); background: none; border: 0; border-top: 1px solid var(--hairline); border-radius: 0; cursor: pointer; }

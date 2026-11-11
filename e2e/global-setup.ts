@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { chromium, type FullConfig } from '@playwright/test';
-import { addTask, selectDay, signInNewAccount, writeEntry } from './tests/helpers.ts';
+import { addTask, selectDay, signInNewAccount, synced, writeEntry } from './tests/helpers.ts';
 import type { Page } from '@playwright/test';
 
 /**
@@ -20,7 +20,15 @@ export default async function globalSetup(config: FullConfig) {
   const recoveryKey = await signInNewAccount(page, { trust: true });
   writeFileSync('.auth/recovery-key.txt', recoveryKey);
   await page.locator('.main').waitFor({ timeout: 30_000 });
-  await seed(page);
+  try {
+    await seed(page);
+  } catch (error) {
+    await page.screenshot({ path: 'test-results/seed-failure.png' });
+    throw error;
+  }
+  // Tests unlock with the recovery key: open the unlock screen on it (no device-link request,
+  // which the API limits to 10 an hour).
+  await page.evaluate(() => localStorage.setItem('folio.unlockMode', 'recovery'));
   await context.storageState({ path: '.auth/state.json', indexedDB: true });
   await browser.close();
 }
@@ -38,4 +46,5 @@ async function seed(page: Page) {
   await page.getByRole('button', { name: 'More' }).click();
   await page.getByRole('menuitem', { name: 'Delete' }).click();
   await page.locator('.sheet').waitFor({ state: 'detached' });
+  await synced(page);
 }

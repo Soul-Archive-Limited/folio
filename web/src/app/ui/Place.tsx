@@ -25,7 +25,7 @@ export function PlaceCard({ place }: { place: PlaceData }) {
         <span className="callout">{place.name}</span>
         {place.address && <span className="caption ink3">{place.address}</span>}
       </span>
-      <span className="caption accent-text place-open">Open in Apple Maps<span className="sr-only"> (opens a new tab)</span></span>
+      <span className="callout place-open">Open in Apple Maps<span className="sr-only"> (opens a new tab)</span></span>
     </a>
   );
 }

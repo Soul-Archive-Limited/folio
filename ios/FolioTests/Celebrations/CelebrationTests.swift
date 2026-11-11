@@ -83,6 +83,8 @@ struct CelebrationTests {
     func line() {
         let today = DayKey(rawValue: "2026-11-11")!
         #expect(String(localized: Celebration.savedLine(for: today, today: today)) == "Today's page is kept.")
-        #expect(String(localized: Celebration.savedLine(for: DayKey(rawValue: "2026-11-04")!, today: today)).hasPrefix("Kept on Wednesday 4 November"))
+        // The date follows the device's region (CI runs en_US, the owner en_GB).
+        let past = String(localized: Celebration.savedLine(for: DayKey(rawValue: "2026-11-04")!, today: today))
+        #expect(past.hasPrefix("Kept on ") && past.contains("Wednesday") && past.contains("4") && past.contains("November"))
     }
 }

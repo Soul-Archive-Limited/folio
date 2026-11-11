@@ -3,7 +3,6 @@ import { go, openDiary, watchConsole } from './helpers.ts';
 
 // Batch N Part 4: gentle celebrations — the first page for a day blooms, finishing a day's
 // tasks fills its ring with a sparkle; no streaks or counters; off switch in Appearance.
-const today = () => new Date().toISOString().slice(0, 10);
 const cell = (page: Page, day: string) => page.locator(`.cell[data-day="${day}"]`).first();
 
 async function writePage(page: Page, title: string) {
@@ -18,9 +17,11 @@ test.describe.serial('Celebrations', () => {
     test.skip(info.project.name !== 'desktop', 'keyboard shortcuts');
     const problems = watchConsole(page);
     await openDiary(page);
-    const day = await page.locator('.cell.today').first().getAttribute('data-day') ?? today();
+    // A day with nothing on it yet (the seed wrote today's page).
+    await page.locator('.cell:not(.out)').nth(19).click();
+    const day = (await page.locator('.cell.selected').first().getAttribute('data-day'))!;
     await writePage(page, 'First light');
-    await expect(page.getByText("Today's page is kept.")).toBeVisible();
+    await expect(page.getByText(/^(Today's page is kept\.|Kept on .+\.)$/)).toBeVisible();
     await expect(cell(page, day)).toHaveClass(/celebrate-bloom/);
     await expect(cell(page, day)).not.toHaveClass(/celebrate-bloom/, { timeout: 3_000 });
     await writePage(page, 'Second thought');
@@ -31,7 +32,9 @@ test.describe.serial('Celebrations', () => {
   test("ticking a day's last task fills the ring with a sparkle", async ({ page }, info) => {
     test.skip(info.project.name !== 'desktop', 'keyboard shortcuts');
     await openDiary(page);
-    const day = await page.locator('.cell.today').first().getAttribute('data-day') ?? today();
+    // A day with no tasks yet (the seed put two open ones on today).
+    await page.locator('.cell:not(.out)').nth(20).click();
+    const day = (await page.locator('.cell.selected').first().getAttribute('data-day'))!;
     for (const title of ['Post the letter', 'Water the herbs']) {
       await page.keyboard.press('t');
       await page.getByLabel('Title').last().fill(title);

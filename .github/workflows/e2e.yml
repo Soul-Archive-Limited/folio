@@ -1,0 +1,76 @@
+name: Web app end to end
+
+# Batch N Part 5: the Playwright suite (e2e/) against a local stack — the API under
+# `wrangler dev` with a local D1, and the built site served with its real headers (CSP).
+# Every value in api/.dev.vars here is generated for this run and thrown away; the Turnstile
+# secret is Cloudflare's published always-pass test secret, not a real one.
+on:
+  push:
+    paths: ["api/**", "web/**", "shared/**", "e2e/**", "scripts/web-local-server.mjs", ".github/workflows/e2e.yml"]
+  pull_request:
+    paths: ["api/**", "web/**", "shared/**", "e2e/**", "scripts/web-local-server.mjs", ".github/workflows/e2e.yml"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      CI: "true"
+      WRANGLER_SEND_METRICS: "false"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: lts/*
+      - name: Install (lockfiles only, no install scripts)
+        run: |
+          (cd api && npm ci --ignore-scripts)
+          (cd web && npm ci --ignore-scripts)
+          (cd e2e && npm ci --ignore-scripts)
+      - name: Throwaway local configuration
+        run: |
+          code=$(shuf -i 100000-999999 -n 1)
+          echo "::add-mask::$code"
+          echo "REVIEW_CODE=$code" >> "$GITHUB_ENV"
+          {
+            echo "OTP_PEPPER=$(openssl rand -hex 32)"
+            echo "TOKEN_ENCRYPTION_KEY=$(openssl rand -hex 32)"
+            echo "REVIEW_CODE=$code"
+            echo "TURNSTILE_SECRET=1x0000000000000000000000000000000AA"
+            echo "TURNSTILE_HOSTNAME="
+            echo "EMAIL_OUTBOX=memory"
+            echo "OWNER_EMAILS=review@devilsense.com"
+          } > api/.dev.vars
+      - name: Local database
+        working-directory: api
+        run: npx wrangler d1 migrations apply folio-db --local
+      - name: Build the site
+        working-directory: web
+        run: npm run build
+      - name: Start the API and the site
+        run: |
+          (cd api && npx wrangler dev --ip 127.0.0.1 --port 8787 > ../api.log 2>&1 &)
+          (cd web && node ../scripts/web-local-server.mjs dist 8788 > ../web.log 2>&1 &)
+          for i in $(seq 1 60); do
+            curl -sf http://127.0.0.1:8787/api/auth/session -o /dev/null && curl -sf http://localhost:8788/app -o /dev/null && exit 0
+            sleep 2
+          done
+          cat api.log web.log; exit 1
+      - name: Browser
+        working-directory: e2e
+        run: npx playwright install --with-deps chromium
+      - name: End-to-end tests
+        working-directory: e2e
+        run: npx playwright test
+      - name: Server logs on failure
+        if: failure()
+        run: tail -n 200 api.log web.log

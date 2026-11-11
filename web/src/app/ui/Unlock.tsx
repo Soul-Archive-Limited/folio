@@ -11,8 +11,18 @@ interface Props { me: Me; onUnlocked: (raw: Uint8Array, trust: boolean) => void;
  * Unlock (SPEC §10.4, §11.3): "Scan with your iPhone" by default — the iPhone seals the Data
  * Key to this page's X25519 key and the server only relays it — or the recovery key.
  */
+const MODE_KEY = 'folio.unlockMode';
+
 export default function Unlock({ me, onUnlocked, onSignOut }: Props) {
-  const [mode, setMode] = useState<'qr' | 'recovery'>('qr');
+  // Batch N: opens on the way this browser unlocked last time. Someone who uses the recovery key
+  // here doesn't get a device-link request (and QR) made each visit for nothing.
+  const [mode, setModeState] = useState<'qr' | 'recovery'>(() => {
+    try { return localStorage.getItem(MODE_KEY) === 'recovery' ? 'recovery' : 'qr'; } catch { return 'qr'; }
+  });
+  const setMode = (next: 'qr' | 'recovery') => {
+    setModeState(next);
+    try { localStorage.setItem(MODE_KEY, next); } catch { /* private mode */ }
+  };
   const [trust, setTrust] = useState(false);
   return (
     <Gate>

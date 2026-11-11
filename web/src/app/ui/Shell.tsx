@@ -94,7 +94,7 @@ export default function Shell({ me, dataKey, onSignOut, onSessionEnded }: { me: 
         setSearching(true);
         return;
       }
-      if (typing || event.metaKey || event.ctrlKey || event.altKey || document.querySelector('.sheet, .modal, .menu, .print-book, .welcome')) return;
+      if (typing || event.metaKey || event.ctrlKey || event.altKey || document.querySelector('.sheet:not(.closing), .modal, .menu, .print-book, .welcome')) return;
       const paths: Record<string, string> = { '1': '/app', '2': '/app/journal', '3': '/app/todo', '4': '/app/profile' };
       const key = event.key;
       if (paths[key]) navigate(paths[key]);
