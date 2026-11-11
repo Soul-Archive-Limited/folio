@@ -2,9 +2,21 @@
 
 The next session starts here. Read this, then `CLAUDE.md`, `docs/SPEC.md`, `docs/PHASES.md` and the last entries of `docs/DECISIONS.md`. Updated at the end of every batch.
 
-_Last updated: 2026-11-11, end of Batch N (places, Profile redesign, Edit profile, celebrations, web app pass)._
+_Last updated: 2026-11-12, Batch O (version 1.0, full audit, App Store submission) — in progress._
 
-## Batch N status (resume here)
+## Batch O status (resume here)
+Version **1.0.0**. Done and pushed: App Store screenshots retaken at Apple's required sizes (`scripts/appstore-shots.sh`), 1.0 listing/privacy/age-rating/review notes in `docs/APPSTORE.md`, website changelog 1.0 + Features (Places, celebrations) + fresh app shots, and the owner-requested **full hands-on audit** (`docs/reports/full-audit.md`: findings, design review, costs and limits; DECISIONS 313–316).
+- Owner's answers: build 139 all good; **no real-iPhone Instruments pass now** (still open); App Store name **Folio**; availability **every country except France** (and China mainland, which needs an ICP filing) → EU trader declaration first.
+- Part 4 (App Store Connect) needs the owner's 2FA sign-in in the browser pane.
+
+### Batch O tools
+- `scripts/appstore-shots.sh <udid> iphone|ipad [out]` — App Store JPEGs (iPhone 17 Pro = 1206 × 2622; iPad Pro 13" landscape = 2752 × 2064; rotate the iPad with the Simulator tool first).
+- `scripts/audit-shots.sh <udid> <out> <label> <light|dark> <simctl content size>` — 44-screen audit matrix (onboarding to Profile pages). On a busy Mac the iPad needs ~8 s per launch.
+- iPhone SE Simulator "Folio SE" (7676367B-…) and "Folio Review" (7460B69E-…) exist now.
+- Live-sync tests: `testDeleteAccount` opens Profile → Account & Sync (`-FolioProfilePage account`) since the Batch N redesign.
+- Photos (iOS 26.5) ignores synthetic taps in the share sheet; the share-extension UI test can't drive it any more.
+
+## Batch N status
 Done and pushed — report `docs/reports/batch-n.md`, DECISIONS 304–311, screenshots + recordings `docs/screenshots/batch-n/`, sync matrix `docs/reports/batch-n-sync-local.json`. API unchanged (no deploy); the website/web app deploys from main (live checked).
 - **TestFlight:** see "TestFlight this batch" below for the build number and state.
 - **Final shipping pass** (owner signs in to App Store Connect then): the list at the end of `docs/reports/batch-n.md` — Friends group, **App Privacy → Precise Location** (before any build with places goes to review), App Review 18+ note, Sign in with Apple notification URL, Declared Age Range capability + "Age Assurance — Yes", website changelog, the live sync matrix + deleting the review account, COMPLIANCE §11.

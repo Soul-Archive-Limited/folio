@@ -91,3 +91,17 @@ Result: no vulnerabilities found; one hardening change.
 ## Summary
 
 No secrets anywhere; no trackers or third-party SDKs; auth, CSRF, rate limits, OAuth and deletion behave as specified; every id-taking route is scoped to the session's user (new IDOR tests); the server holds only ciphertext. Fixes this batch: the 18+ gate (Part 6), API CSP + CORP headers, and six IDOR tests. API tests 85/85; npm audit 0/0; gitleaks clean.
+
+## 9. Batch O — final pass before 1.0 (11 Nov 2026)
+
+| Check | Command / evidence | Result |
+|---|---|---|
+| Changes since §8 | `git diff --stat ed299a3..HEAD -- api web/src` | API: none. Web: copy and two plain-text strings rendered by React (`savedLine`, composer placeholder); no new inputs, endpoints, `innerHTML` or third-party scripts |
+| Secrets in git history | `gitleaks git --redact` | 142 commits, no leaks (pre-commit hook clean on every Batch O commit) |
+| Secrets / source maps in the built site | grep `web/dist` for key patterns and `*.map` | None |
+| Dependencies | `npm audit` in `api`, `web`, `e2e` (prod and all) | 0 vulnerabilities |
+| Live headers | `curl -I` on `/`, `/app`, `/api/health` | HSTS preload, CSP (site: hashed scripts; API: `default-src 'none'; frame-ancestors 'none'`), nosniff, `X-Frame-Options: DENY`, Referrer-Policy, COOP / CORP |
+| Account deletion | Local API: delete → users, sessions, records, blobs, key envelopes all 0 | ✔ |
+| iOS | Email placeholder now verbatim text (it had been auto-linked); no other security-relevant change | ✔ |
+
+No findings.
