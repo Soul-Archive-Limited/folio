@@ -17,6 +17,9 @@ const args = Object.fromEntries(process.argv.slice(2).reduce((list, value, i, al
 const require = createRequire(join(args.playwright ?? process.cwd(), 'noop.js'));
 const { chromium } = require('playwright-core');
 const SIM = args.sim, WEB = args.web, API = args.api;
+// Batch N: an optional second Simulator on the same account (linked), launched in a far-west
+// time zone (--tz2, default Pacific/Pago_Pago) so day labels are checked across zones.
+const SIM2 = args.sim2, TZ2 = args.tz2 ?? 'Pacific/Pago_Pago';
 const [profileA, profileB] = args.profiles.split(',');
 const BRAVE = '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser';
 const RUN = Date.now().toString(36).slice(-4).toUpperCase();
@@ -26,26 +29,31 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // MARK: iPhone
 const simctl = (...a) => execFileSync('xcrun', ['simctl', ...a]).toString().trim();
-function phoneLaunch() {
-  try { simctl('terminate', SIM, 'com.devilsense.folio'); } catch { /* not running */ }
-  simctl('launch', SIM, 'com.devilsense.folio', '-FolioAPIBase', API, '-FolioSyncProbe', 'YES', '-hasOnboarded', 'YES', '-FolioSkipGreeting', 'YES',
-    '-com.apple.TipKit.HideAllTips', '1', '-FolioTab', 'journal');
+function phoneLaunch(sim = SIM, tz) {
+  try { simctl('terminate', sim, 'com.devilsense.folio'); } catch { /* not running */ }
+  execFileSync('xcrun', ['simctl', 'launch', sim, 'com.devilsense.folio', '-FolioAPIBase', API, '-FolioSyncProbe', 'YES', '-hasOnboarded', 'YES', '-FolioSkipGreeting', 'YES',
+    '-com.apple.TipKit.HideAllTips', '1', '-FolioTab', 'journal'], { env: tz ? { ...process.env, SIMCTL_CHILD_TZ: tz } : process.env });
 }
-const container = () => simctl('get_app_container', SIM, 'com.devilsense.folio', 'data');
-const probeLog = () => join(container(), 'Documents', 'sync-probe.log');
-function phone(line) {
-  const docs = join(container(), 'Documents');
+const container = (sim = SIM) => simctl('get_app_container', sim, 'com.devilsense.folio', 'data');
+const probeLog = (sim = SIM) => join(container(sim), 'Documents', 'sync-probe.log');
+/** Probe log lines on a Simulator after `since` matching `pattern` (for reading values). */
+function probeLines(sim, pattern, since) {
+  if (!existsSync(probeLog(sim))) return [];
+  return readFileSync(probeLog(sim), 'utf8').split('\n').filter((line) => Number(line.split(' ')[0]) >= since && pattern.test(line));
+}
+function phone(line, sim = SIM) {
+  const docs = join(container(sim), 'Documents');
   const tmp = join(docs, `probe-in-${Date.now()}.tmp`);
   writeFileSync(tmp, `${line}\n`);
   renameSync(tmp, join(docs, 'probe-in.txt'));
   return Date.now();
 }
 /** Waits for a probe log line after `since` matching `pattern`; returns its timestamp. */
-async function phoneSees(pattern, since, timeout = 60000) {
+async function phoneSees(pattern, since, timeout = 60000, sim = SIM) {
   const end = Date.now() + timeout;
   while (Date.now() < end) {
-    if (existsSync(probeLog())) {
-      for (const line of readFileSync(probeLog(), 'utf8').split('\n')) {
+    if (existsSync(probeLog(sim))) {
+      for (const line of readFileSync(probeLog(sim), 'utf8').split('\n')) {
         const [ms, ...rest] = line.split(' ');
         if (Number(ms) >= since && pattern.test(rest.join(' '))) return Number(ms);
       }
@@ -81,6 +89,7 @@ const chipNamed = new Function('name', `return [...document.querySelectorAll('.c
 const sidebarName = new Function('name', `return document.querySelector('.sidebar .me')?.textContent.includes(name)`);
 const avatarIs = new Function('n', `return !!document.querySelector('.sidebar .me img')?.getAttribute('src')?.includes('avatar-' + n)`);
 const themeIs = new Function('t', `return document.documentElement.dataset.theme === t`);
+const cardPlace = new Function('a', `const c = (${cardWith.toString()})(a.title); return !!c && (a.name ? !!c.querySelector('[aria-label="Place, ' + a.name + '"]') : !c.querySelector('.place-line'))`);
 
 async function webCreateEntry(b, title) {
   await b.page.locator('.sidebar .btn.new').click();
@@ -116,6 +125,9 @@ const lat = (t1, t0) => (t1 === null ? null : t1 - t0);
 mkdirSync(dirname(args.out), { recursive: true });
 phoneLaunch();
 await phoneSees(/probe-start/, Date.now() - 5000, 30000);
+if (SIM2) { phoneLaunch(SIM2, TZ2); await phoneSees(/probe-start/, Date.now() - 5000, 30000, SIM2); }
+/** Latency on the second Simulator, when there is one. */
+const second = async (pattern, t0, timeout) => (SIM2 ? { iPhone2: lat(await phoneSees(pattern, t0, timeout, SIM2), t0) } : {});
 const A = await openBrowser(profileA, 'webA');
 const B = await openBrowser(profileB, 'webB');
 await sleep(4000);
@@ -192,11 +204,52 @@ const name = `SYNC ${RUN}`;
 t0 = phone(`settings.name ${name}`);
 record({ id: 'S2', change: 'display name', from: 'iPhone', latency: { webA: lat(await webSees(A, sidebarName, name), t0), webB: lat(await webSees(B, sidebarName, name), t0) } });
 await tab(A, 'Profile');
-await A.page.locator('select').first().selectOption('dark');
+// Batch N: Theme lives on Profile → Appearance.
+await A.page.locator('.profile-rows').getByRole('button', { name: 'Appearance' }).click();
+const theme = A.page.getByRole('combobox', { name: /Theme/ });
+await theme.selectOption('dark');
 t0 = Date.now();
 record({ id: 'S3', change: 'theme → Dark', from: 'webA', latency: { webB: lat(await webSees(B, themeIs, 'dark'), t0), iPhone: lat(await phoneSees(/applied settings .*appearance=dark/, t0), t0) } });
-await A.page.locator('select').first().selectOption('system');
+await theme.selectOption('system');
 await tab(A, 'Calendar'); await tab(B, 'Calendar');
+
+// Batch N: places, Edit profile from the web, day labels across time zones
+let placeEntry = T('PL');
+t0 = await webCreateEntry(A, placeEntry);
+await webSees(B, hasCard, placeEntry);
+await phoneSees(new RegExp(`applied entry .*"${placeEntry}"`), t0);
+t0 = phone(`entry.place ${placeEntry}|Tate Modern|51.5076|-0.0994`);
+record({ id: 'PL1', change: 'add place with coordinates', from: 'iPhone', latency: { webA: lat(await webSees(A, cardPlace, { title: placeEntry, name: 'Tate Modern' }), t0), webB: lat(await webSees(B, cardPlace, { title: placeEntry, name: 'Tate Modern' }), t0), ...(await second(new RegExp(`applied entry .*"${placeEntry}".*place=Tate Modern`), t0)) } });
+t0 = await webEdit(A, placeEntry, async (p) => {
+  await p.locator('.sheet').getByRole('button', { name: 'Place, Tate Modern. Change' }).click();
+  await p.locator('.sheet').getByLabel('Place name').fill('Borough Market');
+  await p.locator('.sheet').getByRole('button', { name: 'Add', exact: true }).click();
+});
+record({ id: 'PL2', change: 'change place by name on the web', from: 'webA', latency: { webB: lat(await webSees(B, cardPlace, { title: placeEntry, name: 'Borough Market' }), t0), iPhone: lat(await phoneSees(new RegExp(`applied entry .*"${placeEntry}".*place=Borough Market`), t0), t0), ...(await second(new RegExp(`applied entry .*"${placeEntry}".*place=Borough Market`), t0)) } });
+t0 = phone(`entry.place ${placeEntry}|`);
+record({ id: 'PL3', change: 'remove place', from: 'iPhone', latency: { webA: lat(await webSees(A, cardPlace, { title: placeEntry }), t0), webB: lat(await webSees(B, cardPlace, { title: placeEntry }), t0) } });
+
+const profileName = `SYNC ${RUN} web`;
+const webAvatar = String(2 + ((parseInt(RUN, 36) + 7) % 23)).padStart(2, '0');
+await tab(A, 'Profile');
+await A.page.getByRole('button', { name: 'Edit profile' }).last().click();
+await A.page.locator('.sheet').getByRole('button', { name: 'Folio avatars' }).click();
+await A.page.locator('.sheet').getByRole('option', { name: `Avatar ${Number(webAvatar)}`, exact: true }).click();
+await A.page.locator('.sheet').getByPlaceholder('Your name').fill(profileName);
+t0 = Date.now();
+await A.page.locator('.sheet').getByRole('button', { name: 'Save', exact: true }).click();
+record({ id: 'S4', change: `Edit profile on the web (name + avatar ${webAvatar})`, from: 'webA', latency: { webB: lat(await webSees(B, sidebarName, profileName), t0), iPhone: lat(await phoneSees(new RegExp(`applied settings .*"${profileName}".*avatar=folio:${webAvatar}`), t0), t0), ...(await second(new RegExp(`applied settings .*"${profileName}"`), t0)) } });
+await tab(A, 'Calendar');
+
+if (SIM2) {
+  const tzEntry = T('TZ');
+  t0 = phone(`entry.create ${tzEntry}`);
+  const seen2 = await phoneSees(new RegExp(`applied entry .*"${tzEntry}"`), t0, 60000, SIM2);
+  await phoneSees(new RegExp(`"${tzEntry}".*dayKey=`), t0); // the creating iPhone logs it after its push echoes back
+  const day1 = probeLines(SIM, new RegExp(`"${tzEntry}".*dayKey=`), t0)[0]?.match(/dayKey=(\S+)/)?.[1];
+  const day2 = probeLines(SIM2, new RegExp(`applied entry .*"${tzEntry}".*dayKey=`), t0)[0]?.match(/dayKey=(\S+)/)?.[1];
+  record({ id: 'TZ1', change: `day label across zones (iPhone2 in ${TZ2})`, from: 'iPhone', latency: { iPhone2: lat(seen2, t0), webA: lat(await webSees(A, hasCard, tzEntry), t0) }, note: day1 && day1 === day2 ? `same day on both: ${day1}` : `day differs: ${day1} vs ${day2}` });
+}
 
 // Offline → online
 const off = T('O1');

@@ -57,7 +57,8 @@ final class OnboardingUITests: XCTestCase {
         // Back with the system swipe: a clean landing on the name step, nothing lost (bug 2).
         let edge = app.coordinate(withNormalizedOffset: CGVector(dx: 0.01, dy: 0.5))
         edge.press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.8, dy: 0.5)))
-        XCTAssertTrue(app.staticTexts["What should we call you?"].waitForExistence(timeout: 5))
+        // 10 s: in a full run on a busy Simulator the swipe's landing took over 5 s once (Batch N).
+        XCTAssertTrue(app.staticTexts["What should we call you?"].waitForExistence(timeout: 10))
         Thread.sleep(forTimeInterval: 0.8)
         XCTAssertEqual(name.value as? String, "Sam")
         XCTAssertFalse(app.staticTexts["Your look"].exists, "nothing left half-way between steps")

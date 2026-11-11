@@ -245,3 +245,9 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - `POST /api/auth/apple/notifications`: consent-revoked ends existing sessions; account-deleted unlinks Apple or, if it was the only way in, wipes the account; email events store nothing.
 - No `RESCIND_CONSENT` endpoint (Apple blocks the app; Folio holds nothing tied to a child) — DECISIONS 302.
 - API deployed 5517f68b. No TestFlight build (owner ships everything at the end).
+
+### Batch N — places, Profile redesign, Edit profile, celebrations, web app pass (2026-11-11)
+- Places on entries (iPhone: Apple Maps search, current location once, photo-location offer, recents; schema v6, encrypted, synced; map snapshots, Journal Places map with clusters; web: by name + Apple Maps link + Places list). Privacy Policy, COMPLIANCE, APPSTORE (Precise Location for the final pass), privacy manifest.
+- Profile redesigned iPhone-Settings style (search, card, one stats row, nine pages; fits an iPhone 15 Pro screen), iPad split view, same on the web; Edit profile sheet (photo, Folio avatars, remove, name).
+- Gentle celebrations (bloom, page settle, task ring + sparkle; Reduce Motion fade; Appearance switch) on iPhone and web.
+- Web app: Playwright end-to-end suite in CI (every screen × 3 widths × light/dark, console clean, axe 0 serious, all main flows); fixes it found; Lighthouse /app 98–100.

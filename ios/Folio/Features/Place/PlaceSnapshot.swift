@@ -64,7 +64,8 @@ struct PlaceSnapshot: View {
             snapshot = try await snapshotter.start()
             withExtendedLifetime(snapshotter) {}
         } catch {
-            PlaceSnapshotCache.logger.debug("Map snapshot failed: \(error.localizedDescription, privacy: .public)")
+            // The code only: nothing about the place reaches the log.
+            PlaceSnapshotCache.logger.debug("Map snapshot failed: \((error as NSError).code, privacy: .public)")
             return
         }
         PlaceSnapshotCache.shared.store(snapshot.image, for: key)

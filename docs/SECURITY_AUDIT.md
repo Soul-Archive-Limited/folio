@@ -76,6 +76,18 @@ Each item: **check performed → command / output → result → fix**. Producti
 - **Client storage:** new localStorage keys hold interface choices only; the diary key stays in memory or the opt-in non-extractable IndexedDB key. Pass.
 - **Export/print:** decrypted only in the tab; the zip is handed to the browser's download; the print layer is removed after printing; nothing is uploaded. Pass.
 
+## 8. /vibesec review of Batch N changes (2026-11-11)
+
+Scope: `git diff e9f7d68..HEAD` — places (iPhone + web), Profile and Edit profile, celebrations, the unlock-method memory, the e2e suite and its CI workflow. The API is unchanged.
+- **Links:** every new `href`/`openURL` is `maps.apple.com` built with `URL`/`URLComponents` (the place name only as the `q` value), our own pages, or Settings — no user-controlled scheme or host; external links use `noopener noreferrer`. No open redirect.
+- **XSS:** place names, addresses and settings search results render through React/SwiftUI text only (no `innerHTML`/`dangerouslySetInnerHTML`); the celebration selector uses `CSS.escape`; synced places are length-limited and validated on both platforms (`Place.validated()`, `cleanPlace`).
+- **Uploads:** the web Edit profile photo is decoded by `createImageBitmap` and re-encoded by canvas to a 256 px JPEG (no metadata, no original bytes), then still passes `Avatar`'s base64 + 400 KB guard and the JPEG-only `data:` URL.
+- **Location privacy:** when-in-use only, one fix; a photo's GPS is never stored with the image (unit-tested); place text never logged — the one new log line now records only a MapKit error code (fixed in this review).
+- **Storage:** new localStorage keys hold only `"recovery"`/`"qr"` and `"on"`/`"off"`, compared to literals, cleared at sign-out, listed on /cookies.
+- **CI:** `e2e.yml` has `permissions: contents: read`, `persist-credentials: false`, SHA-pinned actions, no repository secrets; it generates throwaway `.dev.vars` per run and masks the review code. `pull_request` (not `pull_request_target`), so forks get no secrets.
+- **Dependencies:** e2e adds `@playwright/test` 1.64.1 and `@axe-core/playwright` 4.14.0 (dev only, ≥ 2 weeks old, `npm audit` 0).
+Result: no vulnerabilities found; one hardening change.
+
 ## Summary
 
 No secrets anywhere; no trackers or third-party SDKs; auth, CSRF, rate limits, OAuth and deletion behave as specified; every id-taking route is scoped to the session's user (new IDOR tests); the server holds only ciphertext. Fixes this batch: the 18+ gate (Part 6), API CSP + CORP headers, and six IDOR tests. API tests 85/85; npm audit 0/0; gitleaks clean.

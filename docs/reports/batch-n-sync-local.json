@@ -1,0 +1,267 @@
+{
+  "run": "Z625",
+  "web": "http://localhost:8788",
+  "api": "http://127.0.0.1:8787/api/",
+  "date": "2026-11-11T04:19:33.684Z",
+  "rows": [
+    {
+      "id": "E1",
+      "change": "create entry",
+      "from": "webA",
+      "latency": {
+        "webB": 1410,
+        "iPhone": 1380
+      }
+    },
+    {
+      "id": "E2",
+      "change": "rename entry",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2327,
+        "webB": 2328
+      }
+    },
+    {
+      "id": "E3",
+      "change": "delete entry (to Recently Deleted)",
+      "from": "webB",
+      "latency": {
+        "webA": 478,
+        "iPhone": 449
+      }
+    },
+    {
+      "id": "E4",
+      "change": "restore entry",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2299,
+        "webB": 2302
+      }
+    },
+    {
+      "id": "E5",
+      "change": "set mood (Good)",
+      "from": "webA",
+      "latency": {
+        "webB": 499,
+        "iPhone": 471
+      }
+    },
+    {
+      "id": "P1",
+      "change": "add photo (encrypted upload, 3 renditions)",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2572,
+        "webB": 2573
+      }
+    },
+    {
+      "id": "P2",
+      "change": "replace photo",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2667
+      }
+    },
+    {
+      "id": "P3",
+      "change": "remove photo",
+      "from": "webB",
+      "latency": {
+        "webA": 473,
+        "iPhone": 446
+      }
+    },
+    {
+      "id": "P4",
+      "change": "add photo from the web",
+      "from": "webA",
+      "latency": {
+        "webB": 735,
+        "iPhone": 745
+      }
+    },
+    {
+      "id": "T1",
+      "change": "create task (quick add \"today\")",
+      "from": "webA",
+      "latency": {
+        "webB": 466,
+        "iPhone": 436
+      }
+    },
+    {
+      "id": "T2",
+      "change": "tick task",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2124,
+        "webB": 2127
+      }
+    },
+    {
+      "id": "T3",
+      "change": "untick task (in Completed)",
+      "from": "webB",
+      "latency": {
+        "webA": 454,
+        "iPhone": 420
+      }
+    },
+    {
+      "id": "T4",
+      "change": "add subtask",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2317,
+        "webB": 2319
+      }
+    },
+    {
+      "id": "T5",
+      "change": "tick a daily repeating task \u2192 next one appears",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2152,
+        "webB": 2154
+      }
+    },
+    {
+      "id": "T6",
+      "change": "tick on the web (1.2 s rule) \u2014 repeat spawns once",
+      "from": "webA",
+      "latency": {
+        "iPhone": 422,
+        "webB": 623
+      }
+    },
+    {
+      "id": "C1",
+      "change": "create category",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2312,
+        "webB": 2313
+      }
+    },
+    {
+      "id": "C2",
+      "change": "rename category",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2154,
+        "webB": 2155
+      }
+    },
+    {
+      "id": "S1",
+      "change": "profile picture (Folio avatar 18)",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2069,
+        "webB": 2071
+      }
+    },
+    {
+      "id": "S2",
+      "change": "display name",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2150,
+        "webB": 2153
+      }
+    },
+    {
+      "id": "S3",
+      "change": "theme \u2192 Dark",
+      "from": "webA",
+      "latency": {
+        "webB": 457,
+        "iPhone": 424
+      }
+    },
+    {
+      "id": "PL1",
+      "change": "add place with coordinates",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2235,
+        "webB": 2237,
+        "iPhone2": 2204
+      }
+    },
+    {
+      "id": "PL2",
+      "change": "change place by name on the web",
+      "from": "webA",
+      "latency": {
+        "webB": 487,
+        "iPhone": 459,
+        "iPhone2": 452
+      }
+    },
+    {
+      "id": "PL3",
+      "change": "remove place",
+      "from": "iPhone",
+      "latency": {
+        "webA": 2069,
+        "webB": 2072
+      }
+    },
+    {
+      "id": "S4",
+      "change": "Edit profile on the web (name + avatar 02)",
+      "from": "webA",
+      "latency": {
+        "webB": 487,
+        "iPhone": 448,
+        "iPhone2": 447
+      }
+    },
+    {
+      "id": "TZ1",
+      "change": "day label across zones (iPhone2 in Pacific/Pago_Pago)",
+      "from": "iPhone",
+      "latency": {
+        "iPhone2": 2160,
+        "webA": 2678
+      },
+      "note": "same day on both: 2026-11-11 (iPhone in London, iPhone2 in Pacific/Pago_Pago where it was still 10 Nov) \u2014 read from both probe logs; the run read iPhone A's line before it was written (script fixed)"
+    },
+    {
+      "id": "O1",
+      "change": "webB offline 5 s while webA writes; then online",
+      "from": "webA",
+      "latency": {
+        "webB after online": 44,
+        "iPhone": 1328
+      },
+      "note": "nothing reached B while offline"
+    },
+    {
+      "id": "O2",
+      "change": "iPhone offline (sync paused) writes; then online",
+      "from": "iPhone",
+      "latency": {
+        "webA after online": 208,
+        "webB after online": 210
+      },
+      "note": "nothing left the iPhone while paused"
+    },
+    {
+      "id": "X1",
+      "change": "conflict: web edits, then iPhone edits offline \u2192 later wins",
+      "from": "both",
+      "latency": {
+        "webA": 126,
+        "webB": 128,
+        "iPhone pushed": 104
+      },
+      "note": "\"SYNC-Z625-X-web\" is gone everywhere"
+    }
+  ]
+}
