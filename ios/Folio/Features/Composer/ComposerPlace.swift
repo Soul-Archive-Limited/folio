@@ -14,6 +14,13 @@ struct ComposerPlaceButton: View {
         }
         .accessibilityIdentifier("composer.place")
         .sheet(isPresented: $showsSheet) { PlaceSheet(place: $model.place) }
+        #if DEBUG
+        .task {
+            guard model.debugOpensPlaceSheet else { return }
+            try? await Task.sleep(for: .milliseconds(600))
+            showsSheet = true
+        }
+        #endif
     }
 }
 

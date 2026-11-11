@@ -12,6 +12,7 @@ struct PlaceSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @State private var search = PlaceSearch()
+    @State private var leaned = false
     @State private var locator: LocationOnce?
     @State private var showsExplainer = false
     @State private var showsDenied = false
@@ -29,6 +30,8 @@ struct PlaceSheet: View {
                 }
             }
             .scrollContentBackground(.hidden)
+            .listRowBackground(ProfileRowBackground())
+            .environment(\.defaultMinListRowHeight, Spacing.minHitTarget)
             .searchable(text: $search.query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search places")
             .navigationTitle("Place")
             .navigationBarTitleDisplayMode(.inline)
@@ -37,8 +40,16 @@ struct PlaceSheet: View {
             }
             .sensoryFeedback(.selection, trigger: place)
         }
+        .onAppear {
+            // Lean suggestions towards where the person last was (their newest mapped place).
+            guard !leaned else { return }
+            leaned = true
+            if let near = (place ?? store.recentPlaces().first { $0.hasCoordinate })?.coordinate { search = PlaceSearch(near: near) }
+        }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
+        // Its own solid layer over the composer, like every Folio sheet.
+        .presentationBackground { SheetSurface() }
         .sheet(isPresented: $showsExplainer) {
             PermissionExplainer(
                 systemImage: "location",
@@ -75,14 +86,19 @@ struct PlaceSheet: View {
             }
         } footer: {
             Text("Searches go to Apple Maps. The place is kept end-to-end encrypted with this entry.")
+                .font(.footnote).foregroundStyle(.inkSecondary)
         }
+        .listRowBackground(ProfileRowBackground())
         let recents = store.recentPlaces().filter { recent in place.map { !recent.isSame(as: $0) } ?? true }
         if !recents.isEmpty {
-            Section("Recent") {
+            Section {
                 ForEach(recents, id: \.self) { recent in
                     Button { choose(recent) } label: { PlaceRowLabel(name: recent.name, detail: recent.address) }
                 }
+            } header: {
+                Text("Recent").font(.footnote.weight(.semibold)).foregroundStyle(.inkSecondary)
             }
+            .listRowBackground(ProfileRowBackground())
         }
         if let place {
             Section {
@@ -92,6 +108,7 @@ struct PlaceSheet: View {
                 }
                 .accessibilityHint(Text("Removes \(place.name) from this entry"))
             }
+            .listRowBackground(ProfileRowBackground())
         }
     }
 

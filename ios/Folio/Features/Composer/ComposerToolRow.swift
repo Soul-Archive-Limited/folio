@@ -15,14 +15,34 @@ struct ComposerToolRow: View {
     @Environment(TourModel.self) private var tour: TourModel?
 
     var body: some View {
-        HStack(spacing: Spacing.xxs) {
+        // Eight 44 pt tools (Batch N added Place) are wider than an iPhone with the usual
+        // spacing and margins: tighten first, and on the narrowest screens let the row scroll,
+        // so the tools never widen the sheet (which clipped the title before).
+        ViewThatFits(in: .horizontal) {
+            bar(spacing: Spacing.xxs, inset: Spacing.s, margin: Spacing.sideMargin)
+            bar(spacing: 0, inset: Spacing.xs, margin: Spacing.s)
+            ScrollView(.horizontal) { tools(spacing: 0, flexible: false) }
+                .scrollIndicators(.hidden)
+                .contentMargins(.horizontal, Spacing.xs, for: .scrollContent)
+                .modifier(ToolRowChrome(inset: 0, margin: Spacing.s))
+        }
+        .tourAnchor(.composerTools, tour)
+        .padding(.bottom, Spacing.xs)
+    }
+
+    private func bar(spacing: Double, inset: Double, margin: Double) -> some View {
+        tools(spacing: spacing, flexible: true).modifier(ToolRowChrome(inset: inset, margin: margin))
+    }
+
+    private func tools(spacing: Double, flexible: Bool) -> some View {
+        HStack(spacing: spacing) {
             FormatButton(model: model)
             ComposerPhotoPickerButton(model: model)
             ComposerCameraButton(model: model)
             ComposerCategoryMenu(selection: $model.categoryID)
             ComposerMoodButton(mood: $model.mood)
             ComposerPlaceButton(model: model)
-            Spacer(minLength: 0)
+            if flexible { Spacer(minLength: 0) }
             if let onDictate {
                 // The 44 pt frame sits inside the label so the whole square is the hit area.
                 Button(action: onDictate) {
@@ -41,12 +61,20 @@ struct ComposerToolRow: View {
         .buttonStyle(.borderless)
         .foregroundStyle(.ink)
         .tint(.ink)
-        .padding(.horizontal, Spacing.s)
-        .frame(minHeight: 52)
-        .folioGlass(in: .capsule)
-        .tourAnchor(.composerTools, tour)
-        .padding(.horizontal, Spacing.sideMargin)
-        .padding(.bottom, Spacing.xs)
+    }
+}
+
+/// The glass capsule around the tool row.
+private struct ToolRowChrome: ViewModifier {
+    let inset: Double
+    let margin: Double
+
+    func body(content: Content) -> some View {
+        content
+            .padding(.horizontal, inset)
+            .frame(minHeight: 52)
+            .folioGlass(in: .capsule)
+            .padding(.horizontal, margin)
     }
 }
 

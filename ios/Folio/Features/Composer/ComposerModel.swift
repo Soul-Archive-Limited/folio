@@ -217,6 +217,13 @@ final class ComposerModel {
         placeOffer = nil
     }
 
+    #if DEBUG
+    /// Screenshots: show the photo offer without a photo.
+    func debugOfferPlace(_ place: Place) { placeOffer = place }
+    /// Screenshots: the Place button opens its sheet on appear.
+    var debugOpensPlaceSheet = false
+    #endif
+
     func addPhoto(data: Data) async {
         guard remainingPhotoSlots > 0 else { return }
         isProcessingPhotos = true

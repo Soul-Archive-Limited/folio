@@ -21,10 +21,16 @@ final class PlaceSearch: NSObject, MKLocalSearchCompleterDelegate {
 
     @ObservationIgnored private let completer = MKLocalSearchCompleter()
 
-    override init() {
+    /// `near`: a coordinate to lean results towards (the last place used) — without one, Apple
+    /// Maps answers worldwide and "Tate M" found Florida first. Nothing about the device's own
+    /// location is used here.
+    init(near: CLLocationCoordinate2D? = nil) {
         super.init()
         completer.delegate = self
         completer.resultTypes = [.pointOfInterest, .address]
+        if let near {
+            completer.region = MKCoordinateRegion(center: near, latitudinalMeters: 600_000, longitudinalMeters: 600_000)
+        }
     }
 
     nonisolated func completerDidUpdateResults(_: MKLocalSearchCompleter) {

@@ -201,6 +201,13 @@ struct ComposerSheet: View {
         case "tasks": writingTool = .tasks
         default: break
         }
+        // `-FolioComposerPlace chip|offer|sheet` (screenshots, Batch N).
+        switch DebugLaunchOptions.string("FolioComposerPlace") {
+        case "chip": model.place = Place(name: "Tate Modern", address: "Bankside, London", latitude: 51.5076, longitude: -0.0994)
+        case "offer": model.debugOfferPlace(Place(name: "Regent's Park", address: "London", latitude: 51.5313, longitude: -0.157))
+        case "sheet": model.debugOpensPlaceSheet = true
+        default: break
+        }
         #endif
         // No auto-focus: the keyboard would lift the sheet and hide the calendar that's meant
         // to stay visible above it (SPEC §6.4). Tapping the page starts writing.
