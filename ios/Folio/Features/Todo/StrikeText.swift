@@ -6,12 +6,14 @@ struct StrikeText: View {
     let isStruck: Bool
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         Text(text)
             .folioFont(.body)
             .foregroundStyle(.ink)
-            .lineLimit(2)
+            // Batch O (independent review): at accessibility sizes two lines cut most titles.
+            .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
             .overlay(alignment: .leading) {
                 Capsule()
                     .fill(.inkSecondary)

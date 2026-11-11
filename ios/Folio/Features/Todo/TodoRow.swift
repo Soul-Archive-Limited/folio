@@ -10,6 +10,8 @@ struct TodoRow: View {
     let calendar: Calendar
     let onToggle: () -> Void
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     var body: some View {
         HStack(alignment: .top, spacing: Spacing.xs) {
             TaskCheckbox(isOn: isTicked, tint: tint, action: onToggle)
@@ -17,7 +19,7 @@ struct TodoRow: View {
             VStack(alignment: .leading, spacing: 3) {
                 StrikeText(text: task.title, isStruck: isTicked)
                 if let notes = task.notes, !notes.isEmpty {
-                    Text(notes).folioFont(.callout).foregroundStyle(.inkSecondary).lineLimit(1)
+                    Text(notes).folioFont(.callout).foregroundStyle(.inkSecondary).lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 1)
                 }
                 HStack(spacing: Spacing.xs) {
                     TaskDateChip(task: task, today: today, calendar: calendar)

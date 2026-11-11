@@ -28,6 +28,8 @@ struct Celebration: Equatable, Sendable {
     static func savedLine(for day: DayKey, today: DayKey) -> LocalizedStringResource {
         if day == today { return "Today's page is kept." }
         let date = day.utcDate.formatted(Date.FormatStyle(timeZone: .gmt).weekday(.wide).day().month(.wide))
+        // Batch O (independent review): a page written ahead isn't "kept" yet.
+        if day > today { return "Saved for \(date)." }
         return "Kept on \(date)."
     }
 }

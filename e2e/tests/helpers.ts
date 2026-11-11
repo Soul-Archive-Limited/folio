@@ -104,7 +104,7 @@ export async function writeEntry(page: Page, { title, body, mood, place }: { tit
   const sheet = page.locator('.sheet');
   await sheet.getByLabel('Title').fill(title);
   if (body) {
-    await sheet.getByRole('textbox', { name: /What (happened|do you remember)/ }).click();
+    await sheet.getByRole('textbox', { name: /What (happened|do you remember|'s planned)/ }).click();
     await page.keyboard.type(body);
   }
   if (mood) await sheet.getByRole('radio', { name: mood }).click();

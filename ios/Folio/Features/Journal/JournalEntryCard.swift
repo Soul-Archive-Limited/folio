@@ -66,12 +66,13 @@ struct JournalEntryCard: View {
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private var displayTitle: String {
-        entry.title.isEmpty ? String(localized: "Untitled") : entry.title
-    }
+    /// The title, else the first line of the words (Batch O: no "Untitled" over words).
+    private var displayTitle: String { entry.displayTitle }
 
     private var preview: String {
-        MarkdownCodec.document(from: entry.bodyMarkdown).plainText.replacing("\n", with: " ")
+        let lines = MarkdownCodec.document(from: entry.bodyMarkdown).plainText.split(whereSeparator: \.isNewline)
+        // With no title the first line is already the heading.
+        return lines.dropFirst(entry.title.isEmpty ? 1 : 0).joined(separator: " ")
     }
 
     @ViewBuilder private var dateLine: some View {

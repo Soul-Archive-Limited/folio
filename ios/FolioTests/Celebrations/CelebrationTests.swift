@@ -86,5 +86,8 @@ struct CelebrationTests {
         // The date follows the device's region (CI runs en_US, the owner en_GB).
         let past = String(localized: Celebration.savedLine(for: DayKey(rawValue: "2026-11-04")!, today: today))
         #expect(past.hasPrefix("Kept on ") && past.contains("Wednesday") && past.contains("4") && past.contains("November"))
+        // Batch O: a page written ahead is saved for that day, not "kept".
+        let future = String(localized: Celebration.savedLine(for: DayKey(rawValue: "2026-11-19")!, today: today))
+        #expect(future.hasPrefix("Saved for ") && future.contains("Thursday") && future.contains("19"))
     }
 }

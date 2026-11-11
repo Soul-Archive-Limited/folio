@@ -19,11 +19,20 @@ struct EntryCard: View {
                     .clipShape(.rect(cornerRadius: 14))
             }
             VStack(alignment: .leading, spacing: Spacing.xxs) {
-                Text(entry.title.isEmpty ? String(localized: "Untitled") : entry.title)
-                    .folioFont(.headline)
-                    .foregroundStyle(.ink)
-                    .lineLimit(1)
-                if !preview.isEmpty {
+                // Batch O (independent review): a page with no title showed a bold "Untitled"
+                // over its words, while the page itself shows none; its words lead instead.
+                if !entry.title.isEmpty || preview.isEmpty {
+                    Text(entry.title.isEmpty ? String(localized: "Untitled") : entry.title)
+                        .folioFont(.headline)
+                        .foregroundStyle(.ink)
+                        .lineLimit(1)
+                }
+                if entry.title.isEmpty, !preview.isEmpty {
+                    Text(preview)
+                        .folioFont(.callout)
+                        .foregroundStyle(.ink)
+                        .lineLimit(3)
+                } else if !preview.isEmpty {
                     Text(preview)
                         .folioFont(.callout)
                         .foregroundStyle(.inkSecondary)

@@ -21,7 +21,7 @@ test.describe.serial('Celebrations', () => {
     await page.locator('.cell:not(.out)').nth(19).click();
     const day = (await page.locator('.cell.selected').first().getAttribute('data-day'))!;
     await writePage(page, 'First light');
-    await expect(page.getByText(/^(Today's page is kept\.|Kept on .+\.)$/)).toBeVisible();
+    await expect(page.getByText(/^(Today's page is kept\.|Kept on .+\.|Saved for .+\.)$/)).toBeVisible();
     await expect(cell(page, day)).toHaveClass(/celebrate-bloom/);
     await expect(cell(page, day)).not.toHaveClass(/celebrate-bloom/, { timeout: 3_000 });
     await writePage(page, 'Second thought');

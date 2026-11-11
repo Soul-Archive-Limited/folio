@@ -55,7 +55,7 @@ function ComposerBody({ request, day, onDayChange, dirty }: { request: ComposerR
   const [busy, setBusy] = useState(false);
   const [dragging, setDragging] = useState<number | null>(null);
   const opened = useRef(day);
-  const placeholder = dayKey < todayKey() ? 'What do you remember about this day?' : 'What happened today?';
+  const placeholder = dayKey < todayKey() ? 'What do you remember about this day?' : dayKey > todayKey() ? "What's planned for this day?" : 'What happened today?';
   const editor = useFolioEditor(existing?.data.bodyMarkdown ?? '', placeholder, () => {
     dirty.current = true;
     setBodyEmpty(editor?.isEmpty ?? true);

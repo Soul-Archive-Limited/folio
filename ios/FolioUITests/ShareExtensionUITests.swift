@@ -22,10 +22,12 @@ final class ShareExtensionUITests: XCTestCase {
             let inApp = photos.buttons[label]
             if inApp.exists { inApp.tap() }
         }
-        // The newest photo is the last cell.
+        // The newest photo is the last cell that's on screen (Batch O: iOS 26.5's Photos also
+        // lists off-screen layout images such as "PXGGridLayout-Info", which can't be tapped).
         let cells = photos.images
         XCTAssertTrue(cells.firstMatch.waitForExistence(timeout: 10))
-        cells.element(boundBy: cells.count - 1).tap()
+        let photo = (0..<cells.count).reversed().map { cells.element(boundBy: $0) }.first { $0.isHittable }
+        try XCTUnwrap(photo, "No photo on screen in Photos").tap()
         let share = photos.buttons["Share"]
         XCTAssertTrue(share.waitForExistence(timeout: 10))
         share.tap()

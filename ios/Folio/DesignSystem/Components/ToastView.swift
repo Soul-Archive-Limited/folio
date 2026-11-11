@@ -21,6 +21,9 @@ struct ToastView: View {
         }
         .padding(.horizontal, Spacing.l)
         .frame(minHeight: 52)
+        // Batch O (independent review): rows behind the clear glass read through the toast's
+        // words ("Book dentist" under "Kept on…"); a solid surface under the glass.
+        .background(SheetSurface().clipShape(.capsule))
         .folioGlass(in: .capsule)
         .accessibilityElement(children: .contain)
     }

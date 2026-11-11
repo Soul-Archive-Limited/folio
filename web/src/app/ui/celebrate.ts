@@ -34,5 +34,7 @@ export function celebrate(kind: CelebrationKind, day: string) {
 export function savedLine(day: string, today: string): string {
   if (day === today) return "Today's page is kept.";
   const date = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' }).format(new Date(`${day}T00:00:00Z`));
+  // A page written ahead isn't "kept" yet (Batch O, same as the iPhone).
+  if (day > today) return `Saved for ${date}.`;
   return `Kept on ${date}.`;
 }

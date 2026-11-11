@@ -39,6 +39,13 @@ struct OnboardingUsesStep: View {
                                 .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
                                 .minimumScaleFactor(dynamicTypeSize.isAccessibilitySize ? 1 : 0.75)
                             Spacer(minLength: 0)
+                            // Batch O (independent review): selection isn't shown by colour alone.
+                            if isOn {
+                                Image(systemName: "checkmark")
+                                    .font(.footnote.weight(.bold))
+                                    .foregroundStyle(.white)
+                                    .accessibilityHidden(true)
+                            }
                         }
                         .padding(.leading, Spacing.m)
                         .padding(.trailing, Spacing.s)

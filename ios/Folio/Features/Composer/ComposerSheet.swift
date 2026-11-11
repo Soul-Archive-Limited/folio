@@ -173,7 +173,10 @@ struct ComposerSheet: View {
     }
 
     private var placeholder: LocalizedStringKey {
-        model.isPastDay(today: store.today) ? "What do you remember about this day?" : "What happened today?"
+        if model.isPastDay(today: store.today) { return "What do you remember about this day?" }
+        // Batch O (independent review): a future day had "What happened today?".
+        if model.day > store.today { return "What's planned for this day?" }
+        return "What happened today?"
     }
 
     private var hasPendingDraft: Binding<Bool> {
