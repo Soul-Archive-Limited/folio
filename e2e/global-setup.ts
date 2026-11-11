@@ -1,7 +1,8 @@
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { chromium, type FullConfig } from '@playwright/test';
-import { signInNewAccount } from './tests/helpers.ts';
+import { addTask, selectDay, signInNewAccount, writeEntry } from './tests/helpers.ts';
+import type { Page } from '@playwright/test';
 
 /**
  * Signs a fresh review account in through the real sign-in page (email + the local review code),
@@ -18,7 +19,23 @@ export default async function globalSetup(config: FullConfig) {
   const page = await context.newPage();
   const recoveryKey = await signInNewAccount(page, { trust: true });
   writeFileSync('.auth/recovery-key.txt', recoveryKey);
-  await page.getByRole('heading', { name: /calendar|november|december|january/i }).first().waitFor({ timeout: 30_000 }).catch(() => {});
+  await page.locator('.main').waitFor({ timeout: 30_000 });
+  await seed(page);
   await context.storageState({ path: '.auth/state.json', indexedDB: true });
   await browser.close();
+}
+
+/** A small diary through the real UI, so every screen has something to show. */
+async function seed(page: Page) {
+  await writeEntry(page, { title: 'Harbour walk', body: 'Gulls over the water, tea from a flask.', mood: 'Good', place: 'Tate Modern' });
+  await addTask(page, 'Post the letter to Ana');
+  await addTask(page, 'Book dentist');
+  await selectDay(page, 3);
+  await writeEntry(page, { title: 'Lisbon', body: 'Pastéis de nata for breakfast.', mood: 'Bright', place: 'Belém' });
+  await selectDay(page, 2);
+  await writeEntry(page, { title: 'To be deleted', body: 'This one goes to Recently Deleted.' });
+  await page.locator('.day-panel').getByRole('button', { name: /To be deleted/ }).click();
+  await page.getByRole('button', { name: 'More' }).click();
+  await page.getByRole('menuitem', { name: 'Delete' }).click();
+  await page.locator('.sheet').waitFor({ state: 'detached' });
 }

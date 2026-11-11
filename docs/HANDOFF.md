@@ -2,9 +2,25 @@
 
 The next session starts here. Read this, then `CLAUDE.md`, `docs/SPEC.md`, `docs/PHASES.md` and the last entries of `docs/DECISIONS.md`. Updated at the end of every batch.
 
-_Last updated: 2026-11-10, end of Batch M (Apple's age check, Sign in with Apple server notifications)._
+_Last updated: 2026-11-11, mid Batch N (stopped at the usage limit during Part 5)._
 
-## Batch M status (resume here)
+## Batch N status (resume here)
+Brief: the owner's Batch N message (places, Profile redesign, Edit profile, celebrations, perfect web app, test + ship). App Store Connect stays signed out until the final pass.
+- ✅ **Part 1 Places** (iPhone + web + privacy docs): commits c0ad7ac, 6cc641a. DECISIONS 304–306, COMPLIANCE R16/R17 + checklist 13, APPSTORE Precise Location (owner publishes in final pass), Privacy Policy "Places on entries".
+- ✅ **Parts 2–3 Profile redesign + Edit profile** (iPhone, iPad split view, web): a69e2ce. DECISIONS 307–308. Root checked to fit the **iPhone 15 Pro** Simulator (created as "iPhone 15 Pro (Folio)").
+- ✅ **Part 4 Celebrations** (iPhone + web): dd36886. DECISIONS 309, SPEC §6.22.
+- ⏳ **Part 5 Perfect web app — in progress.** `e2e/` (Playwright 1.64.1 + @axe-core/playwright 4.14.0, `npm install` needs the sandbox off) has passing `profile.spec.ts` (3) and `celebrations.spec.ts` (4). Uncommitted-then-committed WIP: `global-setup.ts` now **seeds** a diary through the UI (`seed()`), but it times out at the first `writeEntry`: after sign-in the `n` shortcut doesn't open the composer (likely the welcome card still open or focus in an input — check `signInNewAccount`'s Skip step and press `Escape`/click `.main` first). Then write: `screens.spec.ts` (every screen × desktop/phone/ipad, console errors+warnings = 0, axe 0 serious via a `bypassCSP` context, light+dark screenshots), `flows.spec.ts` (entry CRUD + Recently Deleted restore/delete now, quick add "tomorrow 6pm", tick + undo, search, mood, Year in Pixels, invites, PDF with `window.print` stubbed, theme switch, keyboard-only, wrong + right recovery key), `place.spec.ts` (add by name, recent chip, Apple Maps link, remove, search by place). Add a CI job (ubuntu: generate throwaway `api/.dev.vars` incl. `TURNSTILE_HOSTNAME=` blank, Cloudflare's always-pass test secret, `EMAIL_OUTBOX=memory`, `OWNER_EMAILS=review@devilsense.com`; `wrangler d1 migrations apply --local`; build web; start both servers; `npx playwright install --with-deps chromium`; `REVIEW_CODE` env). Lighthouse ≥ 95 on `/app` (lighthouse in the scratchpad, Brave). Visual match pass vs iPhone screenshots.
+- ⏳ **Part 6** not started: all tests, two-Simulator + web sync matrix for place/avatar/profile (SyncProbe has `entry.place <title>|<name>|<lat>|<lon>`), time zones, offline; /vibesec; Release 0 warnings; CI green; deploy web (Pages builds on push; API unchanged this batch so far); `scripts/testflight.sh` (sandbox off, no pipe to `head`) — tell the owner the build number, don't add to Friends; report `docs/reports/batch-n.md` with screenshots, contact sheet, celebrations + Place recordings, final-pass list; PHASES + HANDOFF.
+
+### Batch N tools and gotchas
+- Local stack: API `cd api && npx wrangler dev --ip 127.0.0.1 --port 8787` **with the sandbox off** (Turnstile siteverify needs the network) and `TURNSTILE_HOSTNAME=` (blank) in the git-ignored `api/.dev.vars` (Cloudflare's test secret answers with a dummy hostname). Web: `cd web && npm run build && node ../scripts/web-local-server.mjs dist 8788`.
+- e2e: `cd e2e && npx playwright test` (sandbox off). `global-setup.ts` runs `reset-local.sh` (empties the **local** D1 only), signs in review@devilsense.com with the local review code, saves the recovery key to `e2e/.auth/` (git-ignored). A trusted-browser key can't be carried in storageState (non-extractable CryptoKey), so `openDiary()` unlocks with the recovery key. The email code field submits itself at 6 digits. Wait for `.sheet` count 0 between sheets (exit animation).
+- DEBUG flags: `-FolioProfilePage <page>`, `-FolioOpen editProfile|avatars|avatarCrop`, `-FolioProfileSearch "…"`, `-FolioJournalMode places`, `-FolioCelebrate bloom|settle|tasksDone` (plays on the selected day every 2.5 s, 4 times — use for the recording).
+- SwiftUI: `keyframeAnimator(trigger:)` doesn't play when inserted with its trigger; `NavigationStack(path:)` needs `NavigationPath` for mixed typed destinations; `MKMapSnapshotter` must stay referenced until `start()` returns.
+
+## Batch M status
+_(Batch M ended 2026-11-10.)_
+
 Done and pushed — report `docs/reports/batch-m.md`, DECISIONS 299–303, screenshots `docs/screenshots/batch-m/`. API deployed **5517f68b** (no migration).
 - **Owner can't sign in to App Store Connect / the developer portal for now** (no phone network for Apple's codes). Everything Apple-account-side waits for one final ship pass: add TestFlight **0.1.0 (124)** (or a newer build) to Friends, App Review notes (18+ line), the **Sign in with Apple notification URL** on the App ID (`https://folio.devilsense.com/api/auth/apple/notifications`), check **Declared Age Range** on the App ID, age-rating "Age Assurance — Yes". Don't ask the owner to sign in before then.
 - **Next TestFlight archive** carries the new entitlement `com.apple.developer.declared-age-range`; automatic signing should add the capability. `scripts/testflight.sh` must run with the sandbox off (Xcode's account needs the network) and **without piping into `head`** (closing the pipe killed the script after the archive in Batch L).

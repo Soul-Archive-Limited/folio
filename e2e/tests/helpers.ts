@@ -80,3 +80,40 @@ export async function go(page: Page, path: string) {
     dispatchEvent(new PopStateEvent('popstate'));
   }, path);
 }
+
+/** Waits until no sheet is open (each closes with a short animation). */
+export async function sheetsClosed(page: Page) {
+  await expect(page.locator('.sheet')).toHaveCount(0);
+}
+
+/** A page through the real composer: title, text, optional mood and place. */
+export async function writeEntry(page: Page, { title, body, mood, place }: { title: string; body?: string; mood?: string; place?: string }) {
+  await page.keyboard.press('n');
+  const sheet = page.locator('.sheet');
+  await sheet.getByLabel('Title').fill(title);
+  if (body) {
+    await sheet.getByRole('textbox', { name: /What (happened|do you remember)/ }).click();
+    await page.keyboard.type(body);
+  }
+  if (mood) await sheet.getByRole('radio', { name: mood }).click();
+  if (place) {
+    await sheet.getByRole('button', { name: 'Add place' }).click();
+    await sheet.getByLabel('Place name').fill(place);
+    await sheet.getByRole('button', { name: 'Add', exact: true }).click();
+  }
+  await sheet.getByRole('button', { name: 'Save' }).click();
+  await sheetsClosed(page);
+}
+
+/** A task through the task sheet (T). */
+export async function addTask(page: Page, title: string) {
+  await page.keyboard.press('t');
+  await page.locator('.sheet').getByLabel('Title').fill(title);
+  await page.locator('.sheet').getByRole('button', { name: 'Save' }).click();
+  await sheetsClosed(page);
+}
+
+/** Selects a day of the shown month by its day number (1–28). */
+export async function selectDay(page: Page, n: number) {
+  await page.locator('.cell:not(.out)').nth(n - 1).click();
+}
