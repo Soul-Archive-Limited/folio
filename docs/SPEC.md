@@ -547,7 +547,7 @@ Every page: title, meta description, OG image, favicons, sitemap.xml, robots.txt
 - [ ] `ITSAppUsesNonExemptEncryption`: the app uses only standard OS encryption (CryptoKit) for data protection → generally exempt; confirm with Apple's current export-compliance questions and record in DECISIONS.md.
 - [ ] Age rating questionnaire → lowest rating (no user-to-user content).
 - [ ] EU DSA: Soul Archive Ltd declared as **trader**.
-- [ ] Google OAuth consent screen: app name, logo, privacy + terms URLs, authorised domain `devilsense.com`, scopes `openid email profile`.
+- [ ] Google OAuth consent screen: app name, logo, privacy + terms URLs, authorised domain `devilsense.com`, scopes `openid email` (DECISIONS 297: data minimisation).
 - [ ] Accessibility Inspector clean on main screens.
 - [ ] Works offline, in airplane mode, signed out, after account deletion.
 - [ ] "© 2026 Soul Archive Ltd".

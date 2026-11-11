@@ -100,7 +100,7 @@ The diary content is declared even though it reaches the server only end-to-end 
 
 ## Age rating (iOS 26 questionnaire)
 
-Answer **None / No** to everything:
+Answer **None / No** to everything except Age Assurance (Yes, below):
 - In-app controls: Parental Controls — No; Age Assurance — **Yes** (1.0 carries Batch M's age check: Declared Age Range on sign-up where the law requires it; accounts are 18+).
 - Capabilities: Unrestricted Web Access — No (links open Safari; the Google sign-in sheet is only for signing in); User-Generated Content — **No** (entries are seen only by the person who wrote them, never shared or published); Social Media — No; Messaging and Chat — No; Advertising — No.
 - Mature themes, Medical or Wellness, Sexuality or Nudity, Violence, Chance-Based Activities (gambling, simulated gambling, contests, loot boxes) — None.
@@ -161,11 +161,11 @@ Evidence so far (DECISIONS 211): Dark Interface ✔, Larger Text ✔ (to AX5; th
 
 ## Before a public App Store release
 
-1. Final name (rename everywhere; App Store Connect name and subtitle).
-2. Final app icon (Icon Composer, light/dark/tinted; the current one is a placeholder).
+1. ~~Final name~~ — done in Batch O: **Folio** (the in-app name was already Folio).
+2. ~~Final app icon~~ — done in Batch K (Nib book, Icon Composer, light/dark/tinted/clear).
 3. Legal review of the Privacy Policy and Terms (drafts, not legal advice).
 4. US encryption year-end self-classification — ask your adviser (DECISIONS 143).
 5. VoiceOver walk-through on your iPhone before declaring accessibility labels.
 6. A device run of Instruments (Animation Hitches) — the Simulator can't run it (DECISIONS 205).
-7. Google OAuth consent screen verified (app name, logo, privacy + terms URLs, `devilsense.com`, scopes `openid email profile`).
+7. Google OAuth consent screen verified (app name, logo, privacy + terms URLs, `devilsense.com`, scopes `openid email` (DECISIONS 297: data minimisation)).
 8. Decide when to switch `REVIEW_ENABLED` off.

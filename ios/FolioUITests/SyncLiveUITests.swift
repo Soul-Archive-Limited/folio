@@ -183,7 +183,8 @@ final class SyncLiveUITests: XCTestCase {
     /// Devices list, then delete the account — re-authenticating with an email code — keeping
     /// this iPhone's copy.
     @MainActor func testDeleteAccount() throws {
-        let app = try launch(["-FolioTab", "profile"])
+        // Batch O: since the Batch N Profile redesign these rows live on Account & Sync.
+        let app = try launch(["-FolioTab", "profile", "-FolioProfilePage", "account"])
         let devices = app.buttons["Devices"]
         try scrollTo(devices, in: app)
         devices.tap()
