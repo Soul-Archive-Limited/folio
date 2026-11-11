@@ -93,9 +93,8 @@ Deviations from SPEC:
 Manual steps needed from the owner: none this batch (all Apple-account steps wait for the
   final pass, listed below).
 
-Open questions for the Architect:
-1. Web place search: proxy Apple's Maps Server API through our Worker (needs a MapKit key from
-   the developer portal; keeps the browser free of third parties), or keep name-only?
+Open questions for the Architect: none. (Web place search: the owner chose name-only, so no
+   readable search ever passes through our server — DECISIONS 312.)
 
 Known issues:
 1. TestFlight build 137 was archived before the composer tool-row fix (the title was clipped on

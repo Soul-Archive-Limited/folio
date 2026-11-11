@@ -8,7 +8,7 @@ _Last updated: 2026-11-11, end of Batch N (places, Profile redesign, Edit profil
 Done and pushed — report `docs/reports/batch-n.md`, DECISIONS 304–311, screenshots + recordings `docs/screenshots/batch-n/`, sync matrix `docs/reports/batch-n-sync-local.json`. API unchanged (no deploy); the website/web app deploys from main (live checked).
 - **TestFlight:** see "TestFlight this batch" below for the build number and state.
 - **Final shipping pass** (owner signs in to App Store Connect then): the list at the end of `docs/reports/batch-n.md` — Friends group, **App Privacy → Precise Location** (before any build with places goes to review), App Review 18+ note, Sign in with Apple notification URL, Declared Age Range capability + "Age Assurance — Yes", website changelog, the live sync matrix + deleting the review account, COMPLIANCE §11.
-- Open question: web place search through an Apple Maps Server API proxy on the Worker (needs a MapKit key) or keep name-only (DECISIONS 304).
+- Web place search stays **name-only** (owner's decision, DECISIONS 312): no server-side Apple Maps search, so the server never sees readable content.
 
 ### Batch N tools and gotchas
 - Local stack: API `cd api && npx wrangler dev --ip 127.0.0.1 --port 8787` **with the sandbox off** (Turnstile siteverify needs the network) and `TURNSTILE_HOSTNAME=` (blank) in the git-ignored `api/.dev.vars` (Cloudflare's test secret answers with a dummy hostname). Web: `cd web && npm run build && node ../scripts/web-local-server.mjs dist 8788`.
