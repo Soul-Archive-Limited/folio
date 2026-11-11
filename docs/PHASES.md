@@ -251,3 +251,8 @@ Phases 3–7 follow the owner's playbook order (confirmed 2026-10-26). Phases 1�
 - Profile redesigned iPhone-Settings style (search, card, one stats row, nine pages; fits an iPhone 15 Pro screen), iPad split view, same on the web; Edit profile sheet (photo, Folio avatars, remove, name).
 - Gentle celebrations (bloom, page settle, task ring + sparkle; Reduce Motion fade; Appearance switch) on iPhone and web.
 - Web app: Playwright end-to-end suite in CI (every screen × 3 widths × light/dark, console clean, axe 0 serious, all main flows); fixes it found; Lighthouse /app 98–100.
+
+### Batch O — version 1.0, App Store submission (2026-11-11)
+- Owner's test of build 139: all good. Real-iPhone Instruments pass: skipped at the owner's request (still open).
+- Version 1.0.0 (iPhone + web Profile); App Store screenshots retaken at Apple's required sizes (iPhone 1206 × 2622, iPad 2752 × 2064) with `scripts/appstore-shots.sh`; website Features (Places, celebrations), changelog 1.0 and app screenshots refreshed.
+- Listing, privacy label (+ Precise Location), age rating (Age Assurance), review notes (guest mode, review account, 18+ invite-only, Declared Age Range, unlisted) in `docs/APPSTORE.md`.

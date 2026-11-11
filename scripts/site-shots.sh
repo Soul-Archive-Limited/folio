@@ -31,6 +31,7 @@ for mode in light dark; do
   shot todo-$mode 4 "${base[@]}" -FolioTab todo
   shot profile-$mode 4 "${base[@]}" -FolioTab profile -FolioAvatar folio:01
   shot search-$mode 5 "${base[@]}" -FolioTab journal -FolioSearch river
+  shot places-$mode 7 "${base[@]}" -FolioTab journal -FolioJournalMode places
   shot onthisday-$mode 4 "${base[@]}" -FolioNow "$(date +%F)T09:30" -FolioSelectDay "$(date +%F)"
   shot dictation-$mode 6 "${base[@]}" -FolioOpen composer -FolioDemo dictation -FolioOpenTool mic
   shot intelligence-$mode 6 "${base[@]}" -FolioSelectDay 2026-10-27 -FolioOpen composerLarge -FolioDemo intelligence -FolioOpenTool titles

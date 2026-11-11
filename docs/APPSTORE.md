@@ -2,11 +2,11 @@
 
 What to type into App Store Connect, field by field. Final for the TestFlight external beta (Batch G, Phase 14); re-check the items marked **before public release** when the final name and icon arrive. Sources and reasoning: DECISIONS 143, 209–211. Apple's rules were checked on 2026-10-29.
 
-## Listing
+## Listing (version 1.0, Batch O)
 
 | Field | Value | Limit |
 |---|---|---|
-| Name | **Folio Diary** (the App Store Connect record; working name — change with the final name) | 30 |
+| Name | **Folio** (owner, Batch O; if App Store Connect says the name is taken, keep **Folio Diary**) | 30 |
 | Subtitle | **Calendar diary, encrypted** | 30 |
 | Primary category | Lifestyle | |
 | Secondary category | Productivity | |
@@ -18,57 +18,66 @@ What to type into App Store Connect, field by field. Final for the TestFlight ex
 | Copyright | © 2026 Soul Archive Ltd | |
 | Seller / developer | Soul Archive Ltd (Organization account) | |
 | Price | Free, no in-app purchases | |
+| Distribution | Public App Store record, then **Unlisted** after Apple approves the request | |
+| Availability | Every country and region **except France** (owner, Batch O) and **China mainland** (needs an ICP Filing Number we don't have) | |
 
 **Promotional text** (170 max, can change any time without a new build):
 
-> Your days on a calendar. Write for today or any day in the past, add photos and tasks, and keep it private — encrypted on your iPhone before anything syncs.
+> Your days on a calendar. Write for any day, add photos, places and tasks, and keep it private — encrypted on your iPhone before anything syncs.
 
-**Keywords** (100 max, commas, no spaces; words already in the name and subtitle — Folio, Diary, Calendar, encrypted — are indexed anyway and left out):
+(145 characters)
+
+**Keywords** (100 max, commas, no spaces; words in the name and subtitle — Folio, Calendar, diary, encrypted — are indexed anyway and left out):
 
 ```
-journal,private,photo,memories,tasks,to-do,daily,writing,notes,offline,dictation,secure,day,planner
+journal,private,photo,memories,tasks,to-do,daily,writing,notes,offline,dictation,places,secure,day
 ```
-(99 characters)
+(98 characters)
 
 **Description** (4,000 max):
 
 > Folio is a private diary built around a calendar.
 >
-> Open the app and you see your month. Days you wrote on show a tiny photo or a coloured dot; days with tasks show a ring. Tap a day and its pages and tasks appear underneath. Writing opens in the bottom half of the screen, so the calendar stays in view.
+> Open the app and you see your month. Days you wrote on show a tiny photo or coloured dots; days with tasks show a ring. Tap a day and its pages and tasks appear underneath. Writing opens in the bottom half of the screen, so the calendar stays in view.
 >
 > WRITE FOR ANY DAY
-> Pick any date — yesterday or 1998 — so you can move your old paper diaries in. Add up to ten photos to a page, format your text, give it a category and a colour.
+> Pick any date — yesterday or 1998 — so you can move your old paper diaries in, or scan a paper page and Folio reads it on your iPhone. Add up to ten photos, a category, a mood and a place. Drafts save themselves.
+>
+> PLACES, ONLY WHEN YOU ADD THEM
+> Search Apple Maps, use where you are once, or type a name. A photo taken somewhere offers its place, and nothing is kept unless you say Add. See every place on a map in the Journal.
 >
 > TASKS THAT STAY ON THEIR DAY
-> A simple to-do list feeds the same calendar. Tick a task and it stays on its day, shown as done. No streaks. No nagging.
+> A simple to-do list feeds the same calendar, with reminders, repeats and subtasks. Tick a task and it stays on its day, shown as done. No streaks. No nagging — just a small glow when a day's first page is kept.
+>
+> READ IT BACK
+> A Journal timeline, a wall of every photo, Year in Pixels, On this day and search across everything you've written — all on your iPhone.
 >
 > PRIVATE BY DESIGN
 > • Use everything without an account. Your diary stays on your iPhone.
-> • Turn on sync with Apple, Google or email to use Folio on another iPhone and on the web. Everything is encrypted on your device before it leaves; we can't read it.
+> • Turn on sync with Apple, Google or email to use Folio on another iPhone, iPad and on the web. Everything is encrypted on your device before it leaves; we can't read it. Accounts are for adults and by invitation.
 > • A recovery key lets you open your diary on a new device. We never see it.
+> • Lock Folio with Face ID.
 > • No ads. No tracking. No analytics.
 >
 > ON-DEVICE HELP
 > Dictate entries with on-device speech recognition, and — on iPhones with Apple Intelligence — get title ideas, a light grammar polish and tasks found in your writing. It all runs on your iPhone.
 >
 > ALSO
-> • Journal timeline and a photo wall of everything you've written
+> • Widgets, Control Center buttons and Siri
 > • Recently Deleted keeps deleted items for 30 days
-> • Export your diary any time (JSON + photos)
+> • Export your diary any time as JSON and photos, or as a PDF book
 > • iPad: calendar and day side by side
 > • Light and dark, Dynamic Type, VoiceOver labels, Reduce Motion
-> • Open source
 >
 > Made by Soul Archive Ltd, London.
 
-**Screenshots** (`docs/appstore/`, JPEG, no alpha, sample data):
-- iPhone 6.3" (required size 1206 × 2622): `iphone-01-calendar.jpg` … `iphone-07-calendar-dark.jpg` (calendar, composer, entry, Journal, To-do, "Private by design", calendar in dark).
-- iPad 13" (2752 × 2064 landscape, Batch L): `ipad-01-calendar.jpg` … `ipad-05-todo.jpg` (calendar, entry, journal, Year in Pixels, to-do).
-- Apple accepts these for the other sizes; the 6.9" (1320 × 2868) slot is optional.
+**Screenshots** (`docs/appstore/`, JPEG, no alpha, sample data; retaken in Batch O with `scripts/appstore-shots.sh`). Apple's screenshot page (read 11 Nov 2026) requires only **iPhone with Dynamic Island (medium display)** and **iPad 13-inch**:
+- iPhone, 1206 × 2622: `iphone-01-calendar` · `02-composer` · `03-entry-place` · `04-journal` · `05-places` · `06-todo` · `07-profile` · `08-calendar-dark`.
+- iPad 13", 2752 × 2064 landscape: `ipad-01-calendar` · `02-entry` · `03-journal` · `04-places` · `05-year` · `06-todo`.
 
 ## App Privacy (the "nutrition label")
 
-Privacy Policy URL: https://folio.devilsense.com/privacy. Answer **Yes, we collect data**, then exactly these six types. For each: used for **App Functionality** only; **linked to the user: Yes**; **used for tracking: No**.
+Privacy Policy URL: https://folio.devilsense.com/privacy. Answer **Yes, we collect data**, then exactly these six types (Precise Location added in Batch O). For each: used for **App Functionality** only; **linked to the user: Yes**; **used for tracking: No**.
 
 | Category → type | Why |
 |---|---|
@@ -77,13 +86,13 @@ Privacy Policy URL: https://folio.devilsense.com/privacy. Answer **Yes, we colle
 | User Content → **Other User Content** | Entries, tasks and categories, synced end-to-end encrypted. |
 | Identifiers → **User ID** | The account id and the Apple/Google account ids that let you sign in. |
 | Other Data → **Other Data Types** | Each signed-in device's model and system version, shown in Profile → Devices. |
-| Location → **Precise Location** (Batch N — **owner adds it in the final ship pass**) | A place the person adds to an entry (name, short address, coordinates), synced end-to-end encrypted. Only when they add one; never automatic, never in the background. Not Coarse Location: a searched place is exact. |
+| Location → **Precise Location** (Batch N; published in Batch O) | A place the person adds to an entry (name, short address, coordinates), synced end-to-end encrypted. Only when they add one; never automatic, never in the background. Not Coarse Location: a searched place is exact. |
 
 The diary content is declared even though it reaches the server only end-to-end encrypted and Soul Archive Ltd can't read it: Apple's App Privacy page has no exemption for encrypted data, so we declare it, as Day One and Ente do (owner decision, DECISIONS 212). The privacy policy explains that the label lists it while we still can't read it.
 
-**Not collected:** location, contacts, health, financial info, browsing/search history, usage data, diagnostics, purchases, sensitive info. Network addresses are only counted, as keyed hashes, for up to two days to stop abuse.
+**Not collected:** coarse location, contacts, health, financial info, browsing/search history, usage data, diagnostics, purchases, sensitive info. Network addresses are only counted, as keyed hashes, for up to two days to stop abuse.
 
-`PrivacyInfo.xcprivacy` matches: no tracking, no tracking domains, the same five types, UserDefaults reason `CA92.1`.
+`PrivacyInfo.xcprivacy` matches: no tracking, no tracking domains, the same six types, UserDefaults reasons `CA92.1` (the app's own defaults) and `1C8F.1` (the App Group shared with the widgets and share extension, which declare `1C8F.1` too). No other required-reason APIs are used (searched in Batch O).
 
 ## Export compliance
 
@@ -92,7 +101,7 @@ The diary content is declared even though it reaches the server only end-to-end 
 ## Age rating (iOS 26 questionnaire)
 
 Answer **None / No** to everything:
-- In-app controls: Parental Controls — No; Age Assurance — **Yes from the first build with Batch M's age check** (Declared Age Range on sign-up where the law requires it; accounts are 18+), No for older builds.
+- In-app controls: Parental Controls — No; Age Assurance — **Yes** (1.0 carries Batch M's age check: Declared Age Range on sign-up where the law requires it; accounts are 18+).
 - Capabilities: Unrestricted Web Access — No (links open Safari; the Google sign-in sheet is only for signing in); User-Generated Content — **No** (entries are seen only by the person who wrote them, never shared or published); Social Media — No; Messaging and Chat — No; Advertising — No.
 - Mature themes, Medical or Wellness, Sexuality or Nudity, Violence, Chance-Based Activities (gambling, simulated gambling, contests, loot boxes) — None.
 
@@ -109,13 +118,19 @@ Expected result: **4+**.
 - **Contact:** your name, phone, support@devilsense.com.
 - **Notes** (paste, then put your 6 digits where it says so):
 
-> Folio works fully without an account: on the first screens tap "Not now — keep it on this iPhone" and every feature is available.
+> Folio works fully without an account: on the first screens tap "Not now — keep it on this iPhone" and every feature is available. An account is optional and only adds encrypted sync.
 >
-> To test sync (optional): Profile → tick "I'm 18 or older and agree to the Terms and Privacy Policy" (accounts are for adults; the app without an account is open to everyone) → Continue with email → enter review@devilsense.com → enter the code ______ (no email is sent for this address). On a new account Folio shows a recovery key: tap Copy or Save, type its last 4 characters, Continue.
+> To test sync (optional): Profile → Account & Sync → tick "I'm 18 or older and agree to the Terms and Privacy Policy" → Continue with email → enter review@devilsense.com → enter the code ______ (no email is sent for this address). On a new account Folio shows a recovery key: tap Copy or Save, type its last 4 characters, Continue.
 >
-> Account deletion: Profile → Delete account → confirm with the same email code → type DELETE. This deletes the account and everything stored on our servers, and revokes Sign in with Apple when used.
+> Accounts are for adults (18+) and new accounts are by invitation from an existing user. The review address above needs no invitation. Where the law requires an age check (Apple reports this through requiredRegulatoryFeatures, e.g. Texas), ticking the 18+ box asks Apple's Declared Age Range API for the age range; an under-18 answer stops the account from being created and the app stays usable without an account. In other regions no age request is shown. The answer is used on the device only.
 >
-> Diary content is end-to-end encrypted on the device (Apple CryptoKit); our server stores only ciphertext. Linking a web browser uses a QR code scanned from a signed-in iPhone (Profile → Link a browser or device) and needs a second device. Dictation uses on-device speech recognition; the ✦ writing tools appear only on devices with Apple Intelligence turned on.
+> Account deletion: Profile → Account & Sync → Delete account → confirm with the same email code → type DELETE. This deletes the account and everything stored on our servers, and revokes Sign in with Apple when used.
+>
+> Places: location is asked only when the person taps "Current location" in the Place sheet (when-in-use, one fix); places are never added automatically.
+>
+> Diary content is end-to-end encrypted on the device (Apple CryptoKit); our server stores only ciphertext. Linking a web browser uses a QR code scanned from a signed-in iPhone (Profile → Account & Sync → Link a browser or device) and needs a second device. Dictation uses on-device speech recognition; the ✦ writing tools appear only on devices with Apple Intelligence turned on.
+>
+> This app is intended for UNLISTED distribution: a private diary for the developer and invited friends. We will request unlisted distribution after submitting.
 
 **After approval:** set `REVIEW_ENABLED` to `"false"` in `api/wrangler.jsonc` and deploy, or keep it on until the app is approved for the App Store as well (it's needed again for that review).
 

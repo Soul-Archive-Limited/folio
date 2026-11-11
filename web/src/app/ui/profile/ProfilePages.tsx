@@ -167,7 +167,7 @@ function Data() {
 
 function Help() {
   const { me, showHelp } = useDiary();
-  const version = '0.1.0 · web';
+  const version = '1.0.0 · web';
   return (
     <>
       <div className="group glass">
