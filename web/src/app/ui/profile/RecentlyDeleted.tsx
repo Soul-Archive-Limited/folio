@@ -53,7 +53,7 @@ export default function RecentlyDeleted() {
 
   return (
     <>
-      <Back title="Recently Deleted" />
+      <Back title="Recently Deleted" to="/app/profile/data" />
       <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginBottom: 14 }}>
         <div className="segmented glass" role="group" aria-label="Kind">
           {(['entry', 'task', 'category'] as const).map((k) => (

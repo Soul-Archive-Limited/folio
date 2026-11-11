@@ -290,22 +290,24 @@ Title (required) · Notes · Date toggle → graphical DatePicker · Time toggle
 - **Subtasks:** tick in place, add with Return, swipe to remove. They show under their parent ("1/3" on the row), not as tasks of their own, and go to Recently Deleted and come back with it. Rows also show a bell (reminder) and repeat arrows. The web app keeps all three and repeats on tick; editing them is on the iPhone for now.
 
 ### 6.9 Profile tab
-Inset-grouped glass sections:
-- **Header card [G]:** profile picture, name (tap to edit), "Writing since March 2019 · 412 pages". No streaks anywhere. Tap the picture → **Choose photo** (PhotosPicker, then a circular crop: drag to move, pinch to zoom; saved as a 256 px JPEG) or **Folio avatars** (24 original "page spirits" — a little page with a folded corner, a face and a coloured dot, each with its own palette and personality; vector art generated with the web's copies by `scripts/avatars/generate.py`) · Remove picture. Without one, the monogram. The picture syncs encrypted with the settings and shows in Profile, the greeting, Devices ("This device") and the web app (sidebar, Profile — where a Folio avatar can also be chosen —, Devices) (Batch I).
-- **Your archive** 2×2 tiles: Entries · Photos · Days written on · Tasks done (tap → filtered tab).
-- **Account:**
-  - Guest: "Sync & web access" card with the three sign-in buttons (same as onboarding step 5).
-  - Signed in: email / provider icon · Sync status (Up to date · Syncing… · Offline — will sync later · Error, tap for detail) · last synced · "Sync now" · **Devices** (model + OS such as "iPhone 15 Pro · iOS 27.1" or "Chrome on macOS", date added, last seen, "This device"; rename any device — the name is encrypted with the Data Key; "Sign out" each, "Sign out other devices"; DECISIONS 189) · **Recovery key** (Face ID/passcode gated "Show recovery key") · **Link a browser or device** (shows QR, §10.4) · **Sign out** (asks: keep diary on this iPhone or remove it) · **Delete account** (§10.6, `danger`).
-- **Categories** → manager (§6.10).
-- **Appearance:** Theme, Writing font, First day of week.
-- **Writing:** Default category · Show photo tiles on calendar.
-- **Dictation & Intelligence** (§8–9) with availability explanation.
-- **Privacy & Security:** **Lock Folio** + "Lock" delay (§4.4) · Hide content in app switcher.
-- **Widgets:** Show details on Home Screen · Show details on Lock Screen (§6.18).
-- **Memories:** On this day notification + Time (§6.19). **Apple Calendar:** Show Apple Calendar events (§6.2).
-- **Your data:** **Recently Deleted · N** (§5.2) · Export as JSON + photos zip (decrypted, local; "Include Recently Deleted" toggle, off by default) · **Export PDF** (§6.21) · Erase data on this iPhone (also empties Recently Deleted).
-- **Help:** "Show the tour again" · "What do the marks mean?" · Support & FAQ · Contact support (mailto).
-- **About:** Website · Privacy Policy · Terms · Open Source (GitHub) · Acknowledgements · Rate Folio (`requestReview` only here) · Version · "Made by Soul Archive Ltd".
+**Batch N redesign (DECISIONS 307–308).** The root fits one iPhone 15 Pro screen at the default text size, without scrolling (the empty navigation bar is hidden on the root; pages show their own):
+- **Search settings** (a small glass field at the top): every setting is in `ProfileSetting.all` with keywords; typed words prefix-match title or keywords (same word rules as diary search); results show the setting and its page and open it (Name and Profile picture open Edit profile). "Invite a friend" is found only by someone who may invite.
+- **Profile card [G]:** picture (56 pt), name, "Writing since March 2019" and **Edit profile** (also a tap on the picture). No streaks anywhere.
+- **One row of four stats:** Pages · Days written on · Photos · Tasks done (tap → the filtered tab). Counts only.
+- **Grouped rows, each opening its own page (iPhone-Settings style):** [Account & Sync · Categories (count)] [Appearance · Writing & Dictation · Reminders & Notifications · Widgets] [Privacy & Security · Your data (N deleted) · Help & About].
+  - **Account & Sync** — guest: "Sync & web access" with the three sign-in buttons and the 18+ box. Signed in: email / provider · sync status · Sync now · Devices · **Invite a friend** (owner only) · Recovery key · Link a browser or device · Sign out · Delete account (details as before: Devices list, keep/remove on sign out, §10.6).
+  - **Categories** → manager (§6.10).
+  - **Appearance:** Theme, Writing font, First day of week, Season effect, **Celebrations** (Batch N, default on, device-only; §6.22). App icon choice comes later.
+  - **Writing & Dictation:** Default category · Photo tiles on calendar · Dictation language and the ✦ availability notes (§8–9).
+  - **Reminders & Notifications:** On this day notification + time (§6.19) · Task reminders status (On / Off in Settings / asks at first use, with Open Settings) · Apple Calendar events (§6.2).
+  - **Widgets:** Show details on Home Screen · on Lock Screen (§6.18).
+  - **Privacy & Security:** Lock Folio + delay (§4.4) · Hide content in app switcher.
+  - **Your data:** Recently Deleted · N (pushed) · Export as JSON + photos · Include Recently Deleted · Export PDF (§6.21) · Erase data on this iPhone.
+  - **Help & About:** Show the tour again · What do the marks mean? · Support & FAQ · Contact support · Legal (Privacy Policy, Terms, Acceptable use, Accessibility, Company details, Open source licences, Source code) · Website · Rate Folio (`requestReview` only here) · Version · "Made by Soul Archive Ltd · registered in England and Wales, no. 16186654".
+- **Edit profile (Batch N Part 3):** one sheet — the large picture (120 pt) with **Choose photo** (PhotosPicker → circular crop, 256 px JPEG) · **Folio avatars** (the 24 page spirits) · **Remove photo**, the name field (≤ 40) under it, **Save / Cancel**. Changes are staged in the sheet; Save writes the encrypted settings record at once (only if something changed) and it syncs; Cancel leaves everything as it was. The picture shows in Profile, the greeting, Devices and the web app.
+- **iPad (regular width):** `NavigationSplitView` — the root is the sidebar (the open page highlighted), the page is the detail.
+- **Web (§11.3):** the same root, pages at `/app/profile/<page>`, rows beside the open page from 900 px, the same search and an Edit profile sheet (a chosen photo is centre-cropped to a 256 px JPEG in the browser).
+- DEBUG: `-FolioProfilePage <page>`, `-FolioOpen editProfile|avatars|avatarCrop`, `-FolioProfileSearch "…"`.
 
 ### 6.10 Categories manager
 Rows: colour dot, symbol, name, count. Drag reorder, swipe delete (to Recently Deleted, §5.2; Undo or Restore re-links its items), tap edit. Edit sheet: name, 12-swatch grid, optional symbol from 40 curated SF Symbols, live chip preview. Max 30.
@@ -509,6 +511,7 @@ Every page: title, meta description, OG image, favicons, sitemap.xml, robots.txt
 - **Welcome (Batch L):** the first time an account opens in a browser, a glass card in the onboarding's voice: "Your days, kept." with a month assembling → (accounts with no name yet) "What should we call you?" + the 24 Folio avatars → Your look (Light / Dark / Match device) → Find your way (calendar, New entry / N / drop photos, Search / and ?, dictation on iPhone). Skippable; remembered per account in this browser (`folio.welcomed.<userId>`); Profile → Help → Show the welcome again.
 - **Keyboard (Batch L):** N new entry (selected day) · T new task · / or ⌘K search · 1–4 tabs · arrows move days in the grid · [ ] month · G today · ⌘/Ctrl-Enter saves in the composer · Esc closes · ? shows the list. Off while typing, with a modifier, or with a sheet, menu or the welcome open.
 - **Drag and drop (Batch L):** photos dropped on a calendar day open a new entry for that day with them attached; while the composer is open, photos dropped anywhere join it (same 10-photo limit and JPEG preparation as the picker).
+- **Profile (Batch N):** the iPhone's structure — search settings, profile card with Edit profile, four stats, grouped rows (Account & Sync · Categories · Appearance · Writing & Dictation · Reminders & Notifications · Widgets · Privacy & Security · Your data · Help & About) each at `/app/profile/<page>`; from 900 px the rows stay beside the page. iPhone-only settings (reminders, widgets, Lock Folio, dictation) say so on their page. Edit profile: Choose photo (centre-cropped 256 px JPEG made in the browser), Folio avatars, Remove photo, name; Save / Cancel.
 - **Your data (Batch L):** Export as JSON + photos — `Folio Export.json` (the iPhone's shape) and `Folio Photos/` in one zip written in the tab (`lib/zip.ts`, stored, no library), optional Recently Deleted; **Export PDF** — the §6.21 book (cover, a page per month, entries with photos and the day's tasks, page numbers where the browser supports `@page` margin boxes) rendered into a print-only layer at A5 and handed to the browser's print window ("Save as PDF"). Nothing is uploaded. **Help:** What do the marks mean? · Keyboard shortcuts · Show the welcome again · Support & FAQ · Contact support. **About:** Website, Privacy Policy, Terms, Cookies and storage, Acceptable use, Accessibility, Company details, Open source.
 - **Editor:** Tiptap restricted to §5.1 styles, serialising via the shared Markdown fixtures.
 - **Real-time:** WebSocket to `/api/live` while the tab is visible; pull on focus; optimistic updates with rollback.

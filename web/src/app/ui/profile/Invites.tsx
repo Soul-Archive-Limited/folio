@@ -49,7 +49,7 @@ export default function Invites() {
 
   return (
     <>
-      <Back title="Invite a friend" />
+      <Back title="Invite a friend" to="/app/profile/account" />
       <p className="ink2">Folio is invite-only for now. Each code makes one new account and lasts 7 days. People who already have an account don't need one.</p>
       {fresh && (
         <div className="group glass" style={{ padding: 20, textAlign: 'center', display: 'grid', gap: 10 }}>

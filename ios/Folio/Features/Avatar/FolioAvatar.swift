@@ -28,13 +28,25 @@ struct ProfileAvatar: View {
 
     var body: some View {
         let settings = store.settings()
+        AvatarImage(avatar: settings.avatar, photo: settings.avatarPhoto, name: settings.displayName, size: size)
+    }
+}
+
+/// A picture from given values, so Edit profile can show a choice before it's saved.
+struct AvatarImage: View {
+    let avatar: String?
+    let photo: Data?
+    let name: String
+    var size: Double = 64
+
+    var body: some View {
         Group {
-            if let number = FolioAvatar.number(from: settings.avatar) {
+            if let number = FolioAvatar.number(from: avatar) {
                 Image(FolioAvatar.assetName(number))
                     .resizable()
                     .scaledToFit()
                     .accessibilityLabel(Text("Avatar: \(FolioAvatar.name(number))"))
-            } else if settings.avatar == "photo", let data = settings.avatarPhoto, let image = UIImage(data: data) {
+            } else if avatar == "photo", let photo, let image = UIImage(data: photo) {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
@@ -42,7 +54,7 @@ struct ProfileAvatar: View {
                     .overlay { Circle().strokeBorder(.hairline, lineWidth: 1) }
                     .accessibilityLabel("Profile photo")
             } else {
-                Monogram(name: settings.displayName, size: size)
+                Monogram(name: name, size: size)
             }
         }
         .frame(width: size, height: size)

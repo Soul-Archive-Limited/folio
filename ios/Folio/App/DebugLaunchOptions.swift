@@ -36,6 +36,10 @@ import Foundation
 /// - `-FolioToastSeconds 15` keeps toasts up longer (UI tests on slow CI).
 /// - `-FolioTrashSamples YES` puts a few sample items in Recently Deleted.
 /// - `-FolioOpen recentlyDeleted` (with `-FolioTab profile`) opens Recently Deleted.
+/// - `-FolioProfilePage account|categories|appearance|writing|notifications|widgets|privacy|data|help`
+///   (with `-FolioTab profile`) opens that Profile page (Batch N); `-FolioOpen editProfile` the
+///   Edit profile sheet; `-FolioProfileSearch "lock"` types into Profile's search field.
+/// - `-FolioJournalMode places` opens the Journal's Places map (Batch N).
 /// - `-FolioResetAccount YES` signs this Simulator out and forgets every Folio Keychain item
 ///   (session, Data Keys, recovery keys) — a "new device" for the sync tests.
 /// - `-FolioSkipOwnerAuth YES` skips the Face ID / passcode check before showing the recovery

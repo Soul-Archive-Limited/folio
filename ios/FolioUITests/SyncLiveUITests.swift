@@ -246,7 +246,9 @@ final class SyncLiveUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-hasOnboarded", "YES", "-com.apple.TipKit.HideAllTips", "1", "-FolioSkipGreeting", "YES",
                                "-FolioNoTour", "YES", "-FolioToastSeconds", "20", "-AppleLocale", "en_GB",
-                               "-AppleLanguages", "(en-GB)", "-FolioSkipOwnerAuth", "YES"] + extra
+                               "-AppleLanguages", "(en-GB)", "-FolioSkipOwnerAuth", "YES",
+                               // Batch N: Profile's account rows live on the Account & Sync page.
+                               "-FolioProfilePage", "account"] + extra
         // A local `wrangler dev` instead of the deployed API (Batch F), e.g. http://127.0.0.1:8787/api/
         if let base = env["FOLIO_API_BASE"] { app.launchArguments += ["-FolioAPIBase", base] }
         app.launch()

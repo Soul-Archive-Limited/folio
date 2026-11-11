@@ -47,3 +47,13 @@ test('place groups: pages at the same place together, most pages first', () => {
   ]);
   assert.deepEqual(groups.map((g) => [g.place.name, g.entries.map((e) => e.id)]), [['Kew', ['c', 'a']], ['Bath', ['b']]]);
 });
+
+import { searchSettings } from '../src/app/lib/profile-search.ts';
+
+test('Profile search (Batch N): prefix words over titles and keywords; invites only for the owner', () => {
+  assert.deepEqual(searchSettings('DARK', false).map((s) => s.title), ['Theme']);
+  assert.deepEqual(searchSettings('exp pdf', false).map((s) => s.title), ['Export PDF']);
+  assert.deepEqual(searchSettings('invite', false), []);
+  assert.deepEqual(searchSettings('invite', true).map((s) => s.title), ['Invite a friend']);
+  assert.deepEqual(searchSettings('  ', false), []);
+});

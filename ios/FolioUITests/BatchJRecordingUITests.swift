@@ -55,9 +55,9 @@ final class BatchJRecordingUITests: XCTestCase {
 
     @MainActor
     func testRecordPDFPreview() throws {
-        let app = try launch(["-FolioTab", "profile"])
+        let app = try launch(["-FolioTab", "profile", "-FolioProfilePage", "data"])
         let row = app.buttons["profile.exportPDF"]
-        XCTAssertTrue(app.staticTexts["Profile"].firstMatch.waitForExistence(timeout: 10))
+        XCTAssertTrue(row.waitForExistence(timeout: 10))
         for _ in 0..<8 where !row.isHittable { app.swipeUp() }
         sleep(1)
         row.tap()

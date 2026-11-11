@@ -377,7 +377,7 @@ struct ShareSheet: UIViewControllerRepresentable {
 #if DEBUG
 /// DEBUG-only developer tools.
 struct ProfileDeveloperSection: View {
-    @Binding var showsGallery: Bool
+    @State private var showsGallery = false
     @Environment(DiaryStore.self) private var store
     @AppStorage(PreferenceKeys.hasOnboarded) private var hasOnboarded = true
     @AppStorage(PreferenceKeys.fakeIntelligenceUnavailable) private var fakesUnavailable = false
@@ -391,6 +391,14 @@ struct ProfileDeveloperSection: View {
             Toggle("Fake “writing tools unavailable”", systemImage: "sparkles", isOn: $fakesUnavailable)
         }
         .listRowBackground(ProfileRowBackground())
+        .fullScreenCover(isPresented: $showsGallery) {
+            DesignGalleryView()
+                .overlay(alignment: .topTrailing) {
+                    GlassIconButton(title: "Close", systemImage: "xmark") { showsGallery = false }
+                        .padding(Spacing.m)
+                }
+                .privacyCovered()
+        }
     }
 }
 #endif

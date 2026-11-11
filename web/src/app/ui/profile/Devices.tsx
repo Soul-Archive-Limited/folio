@@ -57,7 +57,7 @@ export default function Devices() {
 
   return (
     <>
-      <Back title="Devices" />
+      <Back title="Devices" to="/app/profile/account" />
       {problem && <p className="callout ink2">{problem}</p>}
       {devices && (
         <>

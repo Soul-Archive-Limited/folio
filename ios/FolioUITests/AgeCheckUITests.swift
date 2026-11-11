@@ -9,7 +9,7 @@ final class AgeCheckUITests: XCTestCase {
     private func launch(answer: String) -> (XCUIApplication, XCUIElement) {
         let app = XCUIApplication()
         app.launchArguments = ["-hasOnboarded", "YES", "-FolioResetAccount", "YES", "-FolioSkipGreeting", "YES", "-FolioNoTour", "YES",
-                               "-FolioTab", "profile", "-FolioAgeCheck", answer, "-FolioToastSeconds", "15"]
+                               "-FolioTab", "profile", "-FolioProfilePage", "account", "-FolioAgeCheck", answer, "-FolioToastSeconds", "15"]
         app.launch()
         let consent = app.descendants(matching: .any)[Self.consentLabel].firstMatch
         XCTAssertTrue(consent.waitForExistence(timeout: 20))

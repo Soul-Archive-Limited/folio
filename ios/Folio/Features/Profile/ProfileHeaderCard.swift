@@ -1,61 +1,99 @@
 import SwiftUI
 
-/// Monogram, name (tap to edit) and "Writing since March 2019 · 412 pages" (SPEC §6.9).
+/// The profile card (Batch N): picture, name, "Writing since March 2019" and Edit profile.
 /// No streaks anywhere.
 struct ProfileHeaderCard: View {
+    let onEdit: () -> Void
+
     @Environment(DiaryStore.self) private var store
-    @State private var editsName = false
-    @State private var draftName = ""
 
     var body: some View {
         let name = store.settings().displayName
         let stats = store.profileStatsValue
-        GlassCard {
-            HStack(spacing: Spacing.m) {
-                AvatarMenu { ProfileAvatar(size: 64) }
-                VStack(alignment: .leading, spacing: Spacing.xxs) {
-                    Button {
-                        draftName = name
-                        editsName = true
-                    } label: {
-                        HStack(spacing: Spacing.xs) {
-                            Text(name.isEmpty ? String(localized: "Add your name") : name)
-                                .folioFont(.title2)
-                                .foregroundStyle(name.isEmpty ? .inkSecondary : .ink)
-                            Image(systemName: "pencil")
-                                .font(.footnote.weight(.semibold))
-                                .foregroundStyle(.inkSecondary)
-                                .accessibilityHidden(true)
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityHint("Edits your name")
-                    Text(summary(stats))
-                        .folioFont(.callout)
-                        .foregroundStyle(.inkSecondary)
-                }
-                Spacer(minLength: 0)
+        HStack(spacing: Spacing.s) {
+            Button(action: onEdit) { ProfileAvatar(size: 56) }
+                .buttonStyle(.pressable)
+                .accessibilityLabel("Profile picture")
+                .accessibilityHint("Edits your profile")
+            VStack(alignment: .leading, spacing: 2) {
+                Text(name.isEmpty ? String(localized: "Add your name") : name)
+                    .folioFont(.headline)
+                    .foregroundStyle(name.isEmpty ? .inkSecondary : .ink)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.85)
+                Text(summary(stats))
+                    .folioFont(.callout)
+                    .foregroundStyle(.inkSecondary)
+                    .lineLimit(2)
             }
+            .accessibilityElement(children: .combine)
+            Spacer(minLength: Spacing.xs)
+            Button("Edit profile", action: onEdit)
+                .folioFont(.callout)
+                .fontWeight(.semibold)
+                .buttonStyle(.glass)
+                .accessibilityIdentifier("profile.edit")
         }
-        .alert("Your name", isPresented: $editsName) {
-            TextField("Name", text: $draftName)
-                .textContentType(.givenName)
-            Button("Save") {
-                let clean = draftName.trimmingCharacters(in: .whitespacesAndNewlines)
-                store.updateSettings { $0.displayName = String(clean.prefix(40)) }
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("Used to greet you.")
-        }
+        .padding(Spacing.s)
+        .folioGlass(in: .rect(cornerRadius: Radius.card))
         .task(id: store.revision) { await store.refreshProfileStats() }
     }
 
     private func summary(_ stats: ProfileStats) -> String {
         guard let since = stats.writingSince, stats.entries > 0 else { return String(localized: "Your first page is waiting.") }
         let month = since.startDate(in: store.calendar).formatted(.dateTime.month(.wide).year())
-        let pages = stats.entries == 1 ? String(localized: "1 page") : String(localized: "\(stats.entries) pages")
-        return String(localized: "Writing since \(month) · \(pages)")
+        return String(localized: "Writing since \(month)")
+    }
+}
+
+/// One compact row of four stats (Batch N): Pages · Days written on · Photos · Tasks done.
+/// Each opens its tab, filtered. Counts, never streaks.
+struct ProfileStatsRow: View {
+    @Environment(DiaryStore.self) private var store
+    @Environment(\.tabRouter) private var router
+
+    var body: some View {
+        let stats = store.profileStatsValue
+        HStack(spacing: 0) {
+            stat("Pages", value: stats.entries, to: .entries)
+            divider
+            stat("Days written on", value: stats.daysWrittenOn, to: .daysWrittenOn)
+            divider
+            stat("Photos", value: stats.photos, to: .photos)
+            divider
+            stat("Tasks done", value: stats.tasksDone, to: .tasksDone)
+        }
+        .padding(.vertical, Spacing.xs)
+        .folioGlass(in: .rect(cornerRadius: Radius.card))
+    }
+
+    private var divider: some View {
+        Rectangle().fill(.hairline).frame(width: 1, height: 32).accessibilityHidden(true)
+    }
+
+    private func stat(_ title: LocalizedStringKey, value: Int, to destination: TabRouter.Destination) -> some View {
+        Button { router?.open(destination) } label: {
+            VStack(spacing: 1) {
+                Text(value, format: .number)
+                    .font(.system(.title3, design: .rounded, weight: .semibold))
+                    .monospacedDigit()
+                    .foregroundStyle(.ink)
+                    .contentTransition(.numericText())
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                Text(title)
+                    .folioFont(.micro)
+                    .foregroundStyle(.inkSecondary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.85)
+            }
+            .frame(maxWidth: .infinity, minHeight: Spacing.minHitTarget)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.pressable)
+        .accessibilityElement(children: .combine)
+        .accessibilityHint("Opens it")
     }
 }
 

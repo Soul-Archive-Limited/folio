@@ -497,6 +497,39 @@ svg.i.sm { width: 18px; height: 18px; }
 .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgb(0 0 0 / 0.2); transition: transform 0.3s var(--spring); }
 .toggle:checked { background: var(--done); }
 .toggle:checked::after { transform: translateX(20px); }
+/* Profile (Batch N): search, card, one row of stats, grouped rows; rows beside the page when wide. */
+.profile-layout { max-width: 720px; }
+.profile-root, .profile-detail { min-width: 0; }
+.profile-layout.has-detail .profile-root { display: none; }
+@media (min-width: 900px) {
+  .profile-layout.has-detail { max-width: 1120px; display: grid; grid-template-columns: minmax(300px, 360px) minmax(0, 1fr); gap: 28px; align-items: start; }
+  .profile-layout.has-detail .profile-root { display: block; position: sticky; top: 0; }
+  .profile-layout.has-detail .profile-detail .back-btn { display: none; }
+}
+.settings-search { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px; border-radius: 999px; margin-bottom: 12px; color: var(--ink-secondary); }
+.settings-search input { flex: 1; min-width: 0; border: 0; background: none; font-size: 16px; color: var(--ink); outline: none; min-height: 40px; }
+.settings-search:focus-within { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+.profile-card { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: var(--r-card); margin-bottom: 12px; }
+.profile-card .profile-name { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.profile-card p { margin: 0; }
+.profile-card .avatar.big { width: 56px; height: 56px; }
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); border-radius: var(--r-card); padding: 6px 0; margin-bottom: 12px; }
+.stats-row button { display: grid; gap: 1px; justify-items: center; align-content: center; min-height: 52px; border: 0; background: none; padding: 4px 2px; border-left: 1px solid var(--hairline); color: inherit; }
+.stats-row button:first-child { border-left: 0; }
+.stats-row b { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.stats-row span { font-size: 11px; color: var(--ink-secondary); text-align: center; line-height: 1.2; }
+@media (hover: hover) and (pointer: fine) { .stats-row button:hover { background: color-mix(in srgb, var(--ink) 4%, transparent); } }
+.profile-rows { margin-bottom: 12px; }
+.profile-rows .row { min-height: 44px; padding: 8px 14px; }
+.profile-rows .row > svg:first-child { color: var(--accent); }
+.profile-rows .row[aria-current='page'] { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.edit-profile { display: grid; gap: 14px; justify-items: center; }
+.edit-profile .edit-avatar .avatar.big { width: 120px; height: 120px; font-size: 46px; animation: avatar-in 0.3s var(--spring) both; }
+@keyframes avatar-in { from { transform: scale(0.92); opacity: 0; } }
+.edit-profile .edit-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.edit-profile .edit-name { display: grid; gap: 6px; width: 100%; }
+.edit-profile .avatar-grid { width: 100%; }
+@media (prefers-reduced-motion: reduce) { .edit-profile .edit-avatar .avatar.big { animation: fade-in 0.2s ease-out both; } }
 .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px; }
 .tile { border-radius: 20px; padding: 16px; text-align: left; border: 1px solid var(--glass-edge); }
 .tile b { display: block; font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -732,3 +765,5 @@ body.dropping .sheet { box-shadow: 0 0 0 2px var(--accent), var(--glass-shadow);
 .quick-wrap { padding-top: 0 !important; padding-bottom: 16px !important; flex: none; }
 @media (min-width: 768px) { .quick-wrap .quick-add { position: relative; bottom: auto; margin-top: 8px; } }
 .search h2.section-label { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-quiet); }
+
+@keyframes fade-in { from { opacity: 0; } }
