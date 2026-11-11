@@ -431,6 +431,32 @@ svg.i.sm { width: 18px; height: 18px; }
 @media (hover: hover) and (pointer: fine) { .menu button:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); } }
 .menu button.danger { color: var(--danger); }
 .same-day { margin-top: 26px; display: grid; gap: 8px; }
+/* Places (Batch N) */
+.place-line { display: inline-flex; align-items: center; gap: 3px; min-width: 0; max-width: 14em; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; font-size: 11px; }
+.place-line span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.place-line .i { width: 13px; height: 13px; flex: none; }
+.place-card { display: flex; align-items: center; gap: 12px; margin-top: 22px; padding: 14px 16px; border-radius: 22px; color: var(--ink); text-decoration: none; transition: transform 0.25s var(--spring); }
+.place-card > .i { color: var(--accent); flex: none; }
+.place-card .place-text { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.place-card .place-open { color: var(--accent-text); font-weight: 600; white-space: nowrap; }
+.place-card:active { transform: scale(0.98); }
+.place-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.place-chip { display: inline-flex; align-items: center; gap: 6px; justify-self: start; max-width: 100%; min-height: 36px; padding: 0 4px 0 12px; border-radius: 999px; color: var(--ink-secondary); }
+.place-chip .place-name { font-size: 15px; color: inherit; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-height: 36px; }
+.place-chip .x { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; }
+.place-edit { display: grid; gap: 8px; }
+.place-recents { display: flex; flex-wrap: wrap; gap: 6px; }
+.place-recents .chip .i { width: 14px; height: 14px; color: var(--accent); }
+.places-list { display: grid; gap: 12px; }
+.place-group { border-radius: 22px; padding: 14px 16px 8px; }
+.place-group header { display: flex; align-items: center; gap: 12px; }
+.place-group header > .i { color: var(--accent); flex: none; }
+.place-group .place-text { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.place-group h2 { margin: 0; font-weight: 600; }
+.place-group .place-open { color: var(--accent-text); font-weight: 600; text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
+.place-group ul { list-style: none; margin: 6px 0 0; padding: 0; }
+.place-group li button { display: flex; gap: 12px; align-items: baseline; width: 100%; min-height: 44px; text-align: left; border-top: 1px solid var(--hairline); padding: 8px 0; }
+
 
 /* MARK: Journal (SPEC §6.6) */
 .month-head { position: sticky; top: 0; z-index: 2; padding: 14px 4px 8px; margin: 0 -4px; background: linear-gradient(var(--bg) 70%, transparent); }
@@ -628,6 +654,7 @@ body:has(.gate) .aura { opacity: 0.5; }
   .pb-month h2 em { color: #3441d5; font-weight: 400; }
   .pb-month header p { font: 600 7.5pt -apple-system, sans-serif; letter-spacing: 0.14em; color: #77736c; margin: 1mm 0 0; }
   .print-book article { break-inside: auto; }
+  .pb-place { font: 8pt -apple-system, sans-serif; color: #6b6872; margin: 0 0 2mm; }
   .pb-date { font: 600 7.5pt -apple-system, sans-serif; letter-spacing: 0.1em; text-transform: uppercase; color: #3441d5; margin: 4mm 0 1mm; }
   .print-book h3 { font-size: 13pt; font-weight: 700; margin: 0 0 1.5mm; break-after: avoid; }
   .print-book .prose p { margin: 0 0 2mm; }

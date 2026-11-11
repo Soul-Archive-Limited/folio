@@ -14,6 +14,16 @@ export interface EntryData {
   trashedAt?: number;
   /** Batch J: 1…5 (Heavy … Bright); anything else is ignored when shown. */
   mood?: number;
+  /** Batch N: where it was written; coordinates only when added on an iPhone. */
+  place?: PlaceData;
+}
+
+/** Batch N, as `Place.swift`. Keys in sorted order so the JSON matches Swift's `.sortedKeys`. */
+export interface PlaceData {
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  name: string;
 }
 
 export interface PhotoData {

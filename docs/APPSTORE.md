@@ -68,7 +68,7 @@ journal,private,photo,memories,tasks,to-do,daily,writing,notes,offline,dictation
 
 ## App Privacy (the "nutrition label")
 
-Privacy Policy URL: https://folio.devilsense.com/privacy. Answer **Yes, we collect data**, then exactly these five types. For each: used for **App Functionality** only; **linked to the user: Yes**; **used for tracking: No**.
+Privacy Policy URL: https://folio.devilsense.com/privacy. Answer **Yes, we collect data**, then exactly these six types. For each: used for **App Functionality** only; **linked to the user: Yes**; **used for tracking: No**.
 
 | Category → type | Why |
 |---|---|
@@ -77,6 +77,7 @@ Privacy Policy URL: https://folio.devilsense.com/privacy. Answer **Yes, we colle
 | User Content → **Other User Content** | Entries, tasks and categories, synced end-to-end encrypted. |
 | Identifiers → **User ID** | The account id and the Apple/Google account ids that let you sign in. |
 | Other Data → **Other Data Types** | Each signed-in device's model and system version, shown in Profile → Devices. |
+| Location → **Precise Location** (Batch N — **owner adds it in the final ship pass**) | A place the person adds to an entry (name, short address, coordinates), synced end-to-end encrypted. Only when they add one; never automatic, never in the background. Not Coarse Location: a searched place is exact. |
 
 The diary content is declared even though it reaches the server only end-to-end encrypted and Soul Archive Ltd can't read it: Apple's App Privacy page has no exemption for encrypted data, so we declare it, as Day One and Ente do (owner decision, DECISIONS 212). The privacy policy explains that the label lists it while we still can't read it.
 

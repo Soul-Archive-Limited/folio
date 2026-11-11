@@ -8,6 +8,9 @@ import { type ComposerRequest, useDiary } from './context.tsx';
 import { EditorBody, editorMarkdown, FormatPopover, useFolioEditor } from './Editor.tsx';
 import { Icon } from './Icons.tsx';
 import { MoodPicker, moodOf } from './Mood.tsx';
+import { cleanPlace } from '../lib/place.ts';
+import type { PlaceData } from '../lib/payloads.ts';
+import { PlaceField } from './Place.tsx';
 
 type PhotoItem = { id: string; existing: true } | { id: string; existing: false; prepared: PreparedPhoto };
 
@@ -41,6 +44,8 @@ function ComposerBody({ request, day, onDayChange, dirty }: { request: ComposerR
   const [title, setTitle] = useState(existing?.data.title ?? '');
   const [categoryId, setCategoryId] = useState<string | null>(existing?.data.categoryID ?? request.categoryId ?? store.settings?.defaultCategoryID ?? null);
   const [mood, setMood] = useState<number | undefined>(moodOf(existing?.data.mood)?.value);
+  const [place, setPlace] = useState<PlaceData | undefined>(cleanPlace(existing?.data.place));
+  const [placeEditing, setPlaceEditing] = useState(false);
   const [photos, setPhotos] = useState<PhotoItem[]>(existing ? store.photosOf(existing.id).map((p) => ({ id: p.id, existing: true })) : []);
   const [bodyEmpty, setBodyEmpty] = useState(!existing?.data.bodyMarkdown);
   const [format, setFormat] = useState(false);
@@ -121,7 +126,7 @@ function ComposerBody({ request, day, onDayChange, dirty }: { request: ComposerR
     setBusy(true);
     const entryId = store.put('entry', {
       title: title.trim().slice(0, 120), bodyMarkdown: editorMarkdown(editor), dayKey, minutesFromMidnight: minutes,
-      categoryID: categoryId ?? undefined, mood, ...(existing ? {} : { createdAt: Date.now() }),
+      categoryID: categoryId ?? undefined, mood, place, ...(existing ? {} : { createdAt: Date.now() }),
     }, existing?.id);
     const kept = new Set(photos.filter((p) => p.existing).map((p) => p.id.toLowerCase()));
     if (existing) {
@@ -198,6 +203,7 @@ function ComposerBody({ request, day, onDayChange, dirty }: { request: ComposerR
                 onChange={(e) => { const [h, m] = e.target.value.split(':').map(Number); if (h !== undefined && m !== undefined) touch(setMinutes)(h * 60 + m); }} />
             )}
           </label>
+          <PlaceField place={place} editing={placeEditing} onEditing={setPlaceEditing} onChange={touch(setPlace)} />
           <MoodPicker value={mood} onChange={touch(setMood)} />
           {newCategory === null ? (
             <CategoryChips selected={categoryId} onSelect={touch(setCategoryId)} allLabel="None" onCreate={() => setNewCategory('')} />
@@ -217,6 +223,8 @@ function ComposerBody({ request, day, onDayChange, dirty }: { request: ComposerR
           <Icon name="photo" />
           <input type="file" accept="image/*" multiple className="sr-only" onChange={(e) => { void addFiles(e.target.files); e.target.value = ''; }} disabled={photos.length >= MAX_PHOTOS} />
         </label>
+        <button className="icon-btn" aria-label={place ? `Place, ${place.name}` : 'Add place'} aria-pressed={!!place || placeEditing}
+          title="Place" onClick={() => setPlaceEditing(!placeEditing)}><Icon name="place" /></button>
         <span className="sep" />
         <button className="icon-btn" aria-label="Dictate — available in the iPhone app" onClick={() => setNotice(true)}><Icon name="mic" /></button>
         <button className="icon-btn" aria-label="Writing tools — available in the iPhone app" onClick={() => setNotice(true)}><Icon name="sparkle" /></button>

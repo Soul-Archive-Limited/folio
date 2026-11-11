@@ -9,6 +9,7 @@ import { Avatar } from '../Avatar.tsx';
 import { Sheet } from '../common.tsx';
 import { useDiary } from '../context.tsx';
 import { moodOf } from '../Mood.tsx';
+import { cleanPlace, placeLine } from '../../lib/place.ts';
 import { Prose } from '../Prose.tsx';
 
 type Range = { from: string; until: string };
@@ -113,6 +114,7 @@ function Book({ range, photos, tasks, onDone }: { range: Range; photos: boolean;
                 <p className="pb-date">{[fmt({ weekday: 'long', day: 'numeric', month: 'long' }).format(parseDayKey(e.data.dayKey)),
                   e.data.minutesFromMidnight !== undefined ? formatTime(e.data.minutesFromMidnight) : '', mood?.title ?? ''].filter(Boolean).join(' · ')}</p>
                 {e.data.title && <h3>{e.data.title}</h3>}
+                {cleanPlace(e.data.place) && <p className="pb-place">{placeLine(cleanPlace(e.data.place)!)}</p>}
                 <Prose markdown={e.data.bodyMarkdown} />
                 {store.photosOf(e.id).map((p) => urls[p.id] && <img key={p.id} src={urls[p.id]} alt="" />)}
                 {dayTasks.length > 0 && (

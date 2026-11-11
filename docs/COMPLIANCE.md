@@ -63,6 +63,7 @@ Sources: [ICO cookie guidance updates — Lewis Silkin, Nov 2025](https://www.le
 | IP address | Rate limits only — stored as a keyed hash, ≤ 2 days | Hash only |
 | Diary content | Sync | Only end-to-end encrypted |
 | Name, avatar, settings | Encrypted inside the settings record | Server can't read them |
+| Place on an entry (Batch N) | The person's own record of where they wrote; Places map | Only end-to-end encrypted, only when they add one; never automatic. A photo's GPS is read on device only to make an offer and never stored unless accepted; the stored photo keeps none |
 
 Nothing found to remove. The web app's `folio.device` localStorage marker avoids re-sending the browser name; kept.
 
@@ -70,7 +71,7 @@ Nothing found to remove. The web app's `folio.device` localStorage marker avoids
 
 - **Apple 5.1.1** (data collection and storage): privacy policy linked in App Store Connect and in the app (Profile → About); account optional (guest mode); account deletion in app and on web with Sign in with Apple token revocation (5.1.1(v)); purpose strings only at use. **4.8 Login Services:** Sign in with Apple offered first, with equal prominence to Google. The system `SignInWithAppleButton` is used on iPhone; the web uses "Continue with Apple" with Apple's logo per Apple's web button rules (black/white, unmodified logo, same size as other options).
 - **Age rating:** stays **4+** — Apple's rating reflects content (none mature; diary content is private, not user-generated content shared with others). Restricting *accounts* to adults is a service rule, declared truthfully in the questionnaire's "Age Assurance" item only once the Declared Age Range API is adopted.
-- **App Privacy label** (`docs/APPSTORE.md`): Email; Photos or Videos; Other User Content; User ID; Other Data (device model + OS) — all App Functionality, linked, not tracking. Matches the policy and `PrivacyInfo.xcprivacy`. The new age-confirmation timestamp is account metadata, not a new data type.
+- **App Privacy label** (`docs/APPSTORE.md`): Email; Photos or Videos; Other User Content; User ID; Other Data (device model + OS); **Precise Location (Batch N — to publish in the final ship pass)** — all App Functionality, linked, not tracking. Location: `NSLocationWhenInUseUsageDescription` only (no Always, no background mode), asked the first time "Current location" is tapped after Folio's explainer; approximate location accepted (5.1.1(iv), 5.1.5). Matches the policy and `PrivacyInfo.xcprivacy`. The new age-confirmation timestamp is account metadata, not a new data type.
 - **Google OAuth (API Services User Data Policy):** scopes `openid email` only since Batch L (`profile` dropped — name and picture were never used; Apple's web flow likewise asks for email only); homepage, privacy policy and terms URLs on the consent screen; the policy now states Google user data is used only to sign in. Verification of the consent screen (logo/branding) is in the owner checklist.
 - **Trademarks:** "Sign in with Apple" / Apple logo only inside sign-in buttons; Google "G" mark unmodified in the white button per Google's branding guidelines; the site says "for iPhone" and "iPhone and the web" descriptively; no Apple product imagery other than our own simple phone frame around our own screenshots; the 3D phone is our own generic geometry. App Intent texts avoid Apple product names (DECISIONS 274).
 
@@ -105,6 +106,7 @@ No Google Fonts, CDNs, embeds, external images or scripts anywhere except Turnst
 | Sync | Account holders | E2E-encrypted records and photos + sync metadata; device model/OS, last seen | Contract | Cloudflare | Until deletion (tombstone markers until the account is deleted) |
 | Security | Visitors who request codes or sign in | Keyed hashes of IP/email; account-id counters; Turnstile signals (Cloudflare) | Legitimate interests | Cloudflare | ≤ 3 days |
 | Support | People who email us | Email, message | Legitimate interests | Email provider | ≤ 24 months |
+| Place lookups (Batch N) | iPhone users who search for a place, tap Current location or add a photo with a location | Typed search text or a coordinate | Contract (the feature they asked for) | Apple Maps (Apple as independent controller; nothing passes through our servers) | Not kept by us; the chosen place lives E2E-encrypted in the entry |
 
 ## 10. Risk register
 
@@ -125,6 +127,8 @@ No Google Fonts, CDNs, embeds, external images or scripts anywhere except Turnst
 | R13 | Sign in with Apple server-to-server notifications (consent revoked, account deleted) not handled | Low | Low | **Done in Batch M:** `/api/auth/apple/notifications` ends sessions on consent-revoked and unlinks or wipes on account-deleted (SPEC §10.2c). Remaining: register the URL on the App ID | Owner (portal) |
 | R14 | This document is public on GitHub and lists open owner actions | — | Low | Owner decides whether to keep it public | Owner |
 | R15 | Email-code takeover by slow guessing | Low | High | Batch L: 20 checks per address per day, 10 codes per address per day, 5 tries per code | — |
+| R16 | App Privacy label lacks Precise Location until the owner republishes it (Batch N places) | Medium until the final pass | Medium (App Review 5.1.2 mismatch) | Add Location → Precise Location (App Functionality, linked, not tracking) in App Store Connect **before** submitting any build with places; `PrivacyInfo.xcprivacy` already declares it | Owner |
+| R17 | A photo's location is sent to Apple Maps for the "Add place?" offer before the person accepts | Low | Low | Only the coordinate, only to Apple (first party, already the platform), only when they add the photo; disclosed in the policy; nothing stored unless accepted (DECISIONS 305) | — |
 
 ## 11. Owner checklist (only a person can do these)
 
@@ -139,4 +143,5 @@ No Google Fonts, CDNs, embeds, external images or scripts anywhere except Turnst
 9. Tell your one friend (the only other account) that the Terms and Privacy Policy changed on 6 Nov 2026 (18+ accounts, Acceptable Use).
 10. In the **App Store age-rating questionnaire**, answer **Age Assurance — Yes** once a build with the Batch M age check is the one being reviewed (see `docs/APPSTORE.md`).
 11. Decide whether `docs/COMPLIANCE.md` (with this checklist) should stay public in the open-source repository.
+13. **App Store Connect → App Privacy (final ship pass):** add **Location → Precise Location** — App Functionality, linked to the user, not used for tracking — and publish, before the build with places goes to review (Batch N).
 12. Have the lawyer confirm the dated legal facts in §4–§5 (Texas SB 2420 timeline, ICO guidance date, whether the DUAA 2025 PECR preference exception has commenced).

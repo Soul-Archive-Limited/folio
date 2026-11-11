@@ -8,6 +8,7 @@ const FOLIO: Record<string, FolioIconName> = {
   camera: 'camera', tag: 'category', mic: 'dictate', sparkle: 'sparkle', trash: 'trash', share: 'share',
   lock: 'lock', sync: 'sync', devices: 'devices', search: 'search', mood: 'mood', scan: 'scan', invite: 'invite',
   export: 'export', memories: 'memories', appearance: 'appearance', widgets: 'widgets', edit: 'page.new',
+  place: 'place', map: 'map',
 };
 
 /** Line icons in the spirit of SF Symbols for everything else (the web has no SF Symbols). */

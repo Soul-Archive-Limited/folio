@@ -6,6 +6,8 @@ import type { Rec } from '../lib/store.ts';
 import { CategoryChip, PhotoImg } from './common.tsx';
 import { useDiary } from './context.tsx';
 import { MoodGlyph, moodOf } from './Mood.tsx';
+import { cleanPlace } from '../lib/place.ts';
+import { PlaceLine } from './Place.tsx';
 
 /** An entry in the day panel or a list: 64 pt photo, title, two-line preview, category, time. */
 export function EntryCard({ entry, style, showDate }: { entry: Rec<EntryData>; style?: CSSProperties; showDate?: boolean }) {
@@ -13,6 +15,7 @@ export function EntryCard({ entry, style, showDate }: { entry: Rec<EntryData>; s
   const photo = store.photosOf(entry.id)[0];
   const preview = plainText(entry.data.bodyMarkdown).replace(/\n+/g, ' ').trim();
   const title = entry.data.title.trim() || preview.split(/[.!?]/)[0]?.slice(0, 60) || 'Untitled';
+  const place = cleanPlace(entry.data.place);
   const time = entry.data.minutesFromMidnight !== undefined ? formatTime(entry.data.minutesFromMidnight) : '';
   return (
     <button className="card" style={style} onClick={() => openEntry(entry.id)}>
@@ -23,6 +26,7 @@ export function EntryCard({ entry, style, showDate }: { entry: Rec<EntryData>; s
         <span className="meta">
           {moodOf(entry.data.mood) && <span title={moodOf(entry.data.mood)!.title}><MoodGlyph mood={entry.data.mood} size={13} /></span>}
           <CategoryChip id={entry.data.categoryID} />
+          {place && <PlaceLine place={place} />}
           {(showDate || time) && <span className="caption ink3">{[showDate && formatShort(entry.data.dayKey), time].filter(Boolean).join(' · ')}</span>}
         </span>
       </span>

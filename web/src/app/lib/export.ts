@@ -1,3 +1,4 @@
+import { cleanPlace } from './place.ts';
 /**
  * "Export as JSON + photos" on the web (Batch L), the same shape as the iPhone's DataExporter:
  * `Folio Export.json` (settings, categories, entries with Markdown bodies, tasks) and a
@@ -35,7 +36,7 @@ export async function exportDiary(store: DiaryStore, key: DataKey, includeTrash:
     categories: categories.map((c) => ({ id: c.id, name: c.data.name, colorKey: c.data.colorKey, symbol: c.data.symbol, trashedAt: c.data.trashedAt })),
     entries: entries.map((e) => ({
       id: e.id, day: e.data.dayKey, minutesFromMidnight: e.data.minutesFromMidnight, title: e.data.title, bodyMarkdown: e.data.bodyMarkdown,
-      categoryID: e.data.categoryID, mood: e.data.mood, photos: names.get(e.id) ?? [], createdAt: e.data.createdAt, trashedAt: e.data.trashedAt,
+      categoryID: e.data.categoryID, mood: e.data.mood, place: cleanPlace(e.data.place), photos: names.get(e.id) ?? [], createdAt: e.data.createdAt, trashedAt: e.data.trashedAt,
     })),
     tasks: tasks.map((t) => ({
       id: t.id, title: t.data.title, notes: t.data.notes, day: t.data.dayKey, minutesFromMidnight: t.data.minutesFromMidnight, categoryID: t.data.categoryID,

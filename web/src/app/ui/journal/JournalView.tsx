@@ -8,11 +8,12 @@ import { useDiary } from '../context.tsx';
 import { EntryCard } from '../EntryCard.tsx';
 import { Icon } from '../Icons.tsx';
 import { YearPixels } from './YearPixels.tsx';
+import { PlacesList } from './PlacesList.tsx';
 
 /** Journal (SPEC §6.6): Timeline with sticky months and cover cards, or every photo. */
 export default function JournalView() {
   const { store, openComposer, openEntry, navigate } = useDiary();
-  const [mode, setMode] = useState<'timeline' | 'photos' | 'year'>('timeline');
+  const [mode, setMode] = useState<'timeline' | 'photos' | 'year' | 'places'>('timeline');
   const [category, setCategory] = useState<string | null>(null);
   const entries = useMemo(() => store.entries()
     .filter((e) => !category || sameId(e.data.categoryID, category))
@@ -48,6 +49,7 @@ export default function JournalView() {
             <button aria-pressed={mode === 'timeline'} onClick={() => setMode('timeline')} title="Timeline"><Icon name="timeline" /><span className="sr-only">Timeline</span></button>
             <button aria-pressed={mode === 'photos'} onClick={() => setMode('photos')} title="Photos"><Icon name="grid" /><span className="sr-only">Photos</span></button>
             <button aria-pressed={mode === 'year'} onClick={() => setMode('year')} title="Year in Pixels"><Icon name="pixels" /><span className="sr-only">Year in Pixels</span></button>
+            <button aria-pressed={mode === 'places'} onClick={() => setMode('places')} title="Places"><Icon name="map" /><span className="sr-only">Places</span></button>
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' }}>
@@ -58,6 +60,8 @@ export default function JournalView() {
           <YearPixels />
         ) : entries.length === 0 ? (
           <Empty icon="journal" text={category ? 'No pages in this category yet.' : 'Your journal is empty. Tap + to write your first page.'} />
+        ) : mode === 'places' ? (
+          <PlacesList entries={entries} />
         ) : mode === 'timeline' ? (
           months.map((m) => (
             <section key={m.key} aria-label={formatMonthYear(`${m.key}-01`)}>

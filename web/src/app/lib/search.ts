@@ -104,7 +104,8 @@ export function documents(store: DiaryStore) {
       doc = {
         id: e.id, kind: 'entry', dayKey: e.data.dayKey, categoryID: e.data.categoryID, title: e.data.title, text,
         subtasks: [], photoCount: photos.length, firstPhotoID: photos[0]?.id, isCompleted: false,
-        vocabulary: vocabulary([e.data.title, text]),
+        // Batch N: the place's name and address match too.
+        vocabulary: vocabulary([e.data.title, text, e.data.place?.name ?? '', e.data.place?.address ?? '']),
       };
       entryDocs.set(e, doc);
     }

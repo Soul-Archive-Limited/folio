@@ -7,6 +7,8 @@ import { CategoryChip, PhotoImg, Sheet, useCloseSheet } from './common.tsx';
 import { useDiary } from './context.tsx';
 import { EntryCard } from './EntryCard.tsx';
 import { Icon } from './Icons.tsx';
+import { cleanPlace } from '../lib/place.ts';
+import { PlaceCard } from './Place.tsx';
 import { MoodGlyph, moodOf } from './Mood.tsx';
 import { Prose } from './Prose.tsx';
 
@@ -90,6 +92,7 @@ function Detail({ id }: { id: string }) {
         </div>
         {entry.data.title && <h1 className="title2" style={{ fontSize: 28, margin: '6px 0 12px' }}>{entry.data.title}</h1>}
         <Prose markdown={entry.data.bodyMarkdown} />
+        {cleanPlace(entry.data.place) && <PlaceCard place={cleanPlace(entry.data.place)!} />}
         {others.length > 0 && (
           <section className="same-day">
             <h2 className="caption ink3">Same day in other years</h2>

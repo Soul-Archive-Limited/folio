@@ -1,7 +1,7 @@
 ---
 import Page from '../layouts/Page.astro';
 import { site } from '../config/site';
-const updated = '10 November 2026';
+const updated = '11 November 2026';
 ---
 <Page title="Privacy Policy" heading="Privacy" updated={updated}
   description="How Folio handles personal data: nothing leaves your iPhone without an account; with one, your diary is end-to-end encrypted so we can't read it. Plain English, accurate to what the code does."
@@ -24,7 +24,7 @@ const updated = '10 November 2026';
       <tr><td>If you use Sign in with Apple: a refresh token, encrypted with a server key</td><td>Only to revoke Folio’s access at Apple when you delete your account</td><td>Until you delete your account</td></tr>
       <tr><td>When your account was created, and when you confirmed you are 18 or older and accepted the Terms and this policy</td><td>To run the account and to show that sign-up met our age rule</td><td>Until you delete your account</td></tr>
       <tr><td>For each signed-in device: its model and system version (for example “iPhone 17 Pro · iOS 26.5” or “Chrome on macOS”), when it was added and last seen, and a hash of its sign-in token. A name you give a device is end-to-end encrypted.</td><td>So you can see and sign out your devices</td><td>Until you sign that device out (sessions end after 30 days unused) or delete your account</td></tr>
-      <tr><td>Your diary — entries, photos, tasks, categories, mood and settings — <strong>only end-to-end encrypted</strong>, with the minimum metadata needed to sync it: record ID, type, version, size, the time it changed and whether it was deleted</td><td>To keep your devices in sync</td><td>Until you delete your account. When you permanently delete an item, its content and photos are removed at once; a small marker (ID, type, time, “deleted”) stays so your other devices delete it too.</td></tr>
+      <tr><td>Your diary — entries, photos, tasks, categories, mood, the places you add to entries and settings — <strong>only end-to-end encrypted</strong>, with the minimum metadata needed to sync it: record ID, type, version, size, the time it changed and whether it was deleted</td><td>To keep your devices in sync</td><td>Until you delete your account. When you permanently delete an item, its content and photos are removed at once; a small marker (ID, type, time, “deleted”) stays so your other devices delete it too.</td></tr>
       <tr><td>Operational logs: error and event names our server writes (for example “apple_revoke” with a status code) — never request bodies, diary data, tokens, email addresses or IP addresses</td><td>To keep the service running and fix faults</td><td>Kept by Cloudflare for its standard log period (a few days)</td></tr>
       <tr><td>A copy of your diary key, locked with your recovery key (which we never see)</td><td>So you can unlock a new device with your recovery key</td><td>Until you delete your account</td></tr>
       <tr><td>Short-lived sign-in data: the email address a code was sent to with a keyed hash of the code, sign-in “state” values, a one-time hand-off code, a device-link request (with the requesting device’s model)</td><td>To complete a sign-in or link a device safely</td><td>Valid for 10 minutes or less (link requests 5 minutes); deleted when used, or at the nightly clean-up after they expire</td></tr>
@@ -33,16 +33,27 @@ const updated = '10 November 2026';
       <tr><td>After you delete your account: a one-way hash of your former user ID and the time</td><td>To show the deletion happened</td><td>Kept as a record; it can’t be turned back into your ID or email</td></tr>
     </tbody>
   </table>
-  <p><strong>End-to-end encrypted</strong> means your diary is locked on your device, with a key only your devices hold, before it is sent. Our servers can’t read entry titles, text, photos, tasks, categories, moods, which day an entry belongs to, or your settings — and we can’t recover your diary without your devices or your recovery key. Because Apple’s App Store privacy labels have no category for data we can’t read, our label lists diary content as data we collect; it is still only stored in a form we can’t read.</p>
+  <p><strong>End-to-end encrypted</strong> means your diary is locked on your device, with a key only your devices hold, before it is sent. Our servers can’t read entry titles, text, photos, tasks, categories, moods, places, which day an entry belongs to, or your settings — and we can’t recover your diary without your devices or your recovery key. Because Apple’s App Store privacy labels have no category for data we can’t read, our label lists diary content as data we collect; it is still only stored in a form we can’t read.</p>
 
   <h2>What we don’t do</h2>
   <ul>
     <li>No advertising, no analytics, no tracking, no session recording and no third-party code in the iPhone app. We don’t sell or share personal data, and we don’t use it to train AI.</li>
     <li>We never send marketing email. The only emails are sign-in codes and a confirmation when you delete your account.</li>
     <li>Dictation and the ✦ writing tools run on your iPhone with Apple’s on-device models; audio and text don’t reach us, and audio is never stored. Search runs on your device or in your browser tab.</li>
-    <li>No location, contacts or calendar data is sent to us. If you turn on Apple Calendar events, they’re read on your iPhone only and never copied into Folio.</li>
+    <li>No contacts or calendar data is sent to us, and no location except a place you add to an entry, end-to-end encrypted (see “Places on entries”). If you turn on Apple Calendar events, they’re read on your iPhone only and never copied into Folio.</li>
     <li>No automated decisions with legal or similar effects are made about you.</li>
   </ul>
+
+  <h2 id="places">Places on entries</h2>
+  <p>You can add a place to an entry — only when you choose to; Folio never adds one by itself and never tracks where you go.</p>
+  <ul>
+    <li><strong>What’s kept:</strong> the place’s name, a short address and its map position, inside the entry. With an account it syncs <strong>end-to-end encrypted</strong>, like the rest of your diary, so we can’t read it. Remove a place from the entry at any time; deleting the entry deletes it too.</li>
+    <li><strong>Searching for a place</strong> sends what you type to <strong>Apple Maps</strong> (Apple’s MapKit, built into iOS) to suggest places. Apple handles these searches under its own privacy policy.</li>
+    <li><strong>Current location</strong> asks iOS for your location once, only when you tap it, and only after you allow “While Using the App” (approximate location is enough). Folio sends that position to Apple Maps to find the place’s name and keeps only the place you choose. It never runs in the background.</li>
+    <li><strong>Photos with a location:</strong> when you add a photo that has a location in it, Folio reads that location on your iPhone before removing all of the photo’s metadata, asks Apple Maps for the place’s name, and offers “Add <em>place</em>?”. Nothing is stored unless you accept, and the photo itself is always saved without its location.</li>
+    <li><strong>On the web</strong> a place is the name you type — nothing is looked up — and “Open in Apple Maps” opens maps.apple.com in a new tab only when you click it.</li>
+  </ul>
+  <p>Our App Store privacy label lists this as <em>Precise Location</em>, used for app functionality and linked to your account, because a place you add syncs with your diary — still only in a form we can’t read. It is not used for tracking.</p>
 
   <h2>Our lawful bases (UK and EU GDPR)</h2>
   <ul>
@@ -57,6 +68,7 @@ const updated = '10 November 2026';
     <li><strong>Cloudflare, Inc.</strong> hosts this website, the web app, our server, database and encrypted photo storage, and runs the Turnstile check on the web email sign-in. Data may be processed anywhere in Cloudflare’s global network, including the United States. Cloudflare acts as our processor under its Data Processing Addendum, which includes the EU Standard Contractual Clauses and the UK International Data Transfer Addendum, and Cloudflare participates in the EU–US Data Privacy Framework and its UK extension.</li>
     <li><strong>Resend</strong> (Plus Five Five, Inc., United States) delivers sign-in codes and the deletion confirmation. It receives your email address and the message and keeps delivery logs for a limited period under its own retention settings. Resend acts as our processor under its Data Processing Addendum, which includes the Standard Contractual Clauses for transfers outside the UK and EU.</li>
     <li><strong>Apple iCloud Keychain</strong>, if you use it: your diary key is kept in your iPhone’s Keychain and syncs, end-to-end encrypted by Apple, to your other Apple devices, so they can unlock without the recovery key. It never passes through us.</li>
+    <li><strong>Apple Maps</strong> (Apple Inc.), only when you search for a place, use Current location or add a photo that has a location in the iPhone app — see “Places on entries”. Apple acts as an independent controller for Maps under its own privacy policy.</li>
     <li><strong>Apple</strong> and <strong>Google</strong>, only if you choose Sign in with Apple or Google. They act as independent controllers for their own sign-in, under their own privacy policies. From Google we ask for and receive only your account ID, email address and whether it is verified (scopes: openid and email); from Apple only your account ID and email (or a private relay address). We use this data only to sign you in, link your sign-in methods and email you about your account — never for anything else. If you stop using Sign in with Apple for Folio, Apple tells our server and we sign out your devices. If you delete your Apple Account, Apple tells us too: we remove the Apple sign-in, and if it was your only way into Folio, we delete your Folio account and its encrypted diary, since no one could open it again (copies on your devices stay). We don’t store these messages.</li>
     <li><strong>Apple</strong> distributes the iPhone app through the App Store and TestFlight under its own terms and privacy policy.</li>
   </ul>
