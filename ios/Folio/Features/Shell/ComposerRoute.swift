@@ -21,6 +21,11 @@ struct ComposerRoute: View {
                 ComposerSheet(model: ComposerModel(entry: entry, writingFont: writingFont),
                               calendar: calendar, startsLarge: true, onSaved: saved)
             }
+        case .openEntry(let id):
+            if let entry = store.entry(id: id) {
+                ComposerSheet(model: ComposerModel(entry: entry, writingFont: writingFont),
+                              calendar: calendar, growsWhenTyping: true, onSaved: saved)
+            }
         case .pastEntry:
             ComposerSheet(model: ComposerModel(day: store.today.adding(days: -1), categoryID: store.settings().defaultCategoryID,
                                                writingFont: writingFont),

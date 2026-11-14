@@ -10,6 +10,7 @@ struct DayPanel: View {
     @Environment(DiaryStore.self) private var store
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(CalendarEvents.self) private var calendarEvents: CalendarEvents?
+    @Environment(\.newItemRequest) private var request
 
     var body: some View {
         let day = model.selectedDay
@@ -46,10 +47,13 @@ struct DayPanel: View {
                     if !entries.isEmpty {
                         PanelSectionTitle(title: "Pages")
                         ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
-                            NavigationLink(value: entry.id) {
+                            // Batch O (owner): a page opens in the half sheet over the calendar, like
+                            // writing one, instead of a full-screen push; typing takes it full screen.
+                            Button { request?.send(.openEntry(entry.id)) } label: {
                                 EntryCard(entry: entry, category: entry.categoryID.flatMap { categories[$0] }, calendar: store.calendar)
                                     .zoomSource(id: entry.id, in: zoomNamespace)
                             }
+                            .accessibilityHint("Opens the page")
                             .buttonStyle(.pressable)
                             .entryActions(entry)
                             .staggeredAppear(index: index)

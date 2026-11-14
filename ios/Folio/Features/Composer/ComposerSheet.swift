@@ -6,6 +6,8 @@ struct ComposerSheet: View {
     @State private var model: ComposerModel
     let calendar: CalendarModel?
     var startsLarge = false
+    /// Batch O: opened from the day panel at half height; the keyboard takes it to full screen.
+    var growsWhenTyping = false
     var opensDatePicker = false
     /// "Dictate an entry" (long-press "+"): opens listening (SPEC §8).
     var startsDictation = false
@@ -32,8 +34,9 @@ struct ComposerSheet: View {
 
     enum Field { case title, body }
 
-    init(model: ComposerModel, calendar: CalendarModel?, startsLarge: Bool = false, opensDatePicker: Bool = false,
-         startsDictation: Bool = false, onSaved: @escaping (Entry, Bool) -> Void) {
+    init(model: ComposerModel, calendar: CalendarModel?, startsLarge: Bool = false, growsWhenTyping: Bool = false,
+         opensDatePicker: Bool = false, startsDictation: Bool = false, onSaved: @escaping (Entry, Bool) -> Void) {
+        self.growsWhenTyping = growsWhenTyping
         self.startsDictation = startsDictation
         _model = State(initialValue: model)
         self.calendar = calendar
@@ -117,6 +120,12 @@ struct ComposerSheet: View {
         }
         .task { await dictation.checkSupport() }
         .onChange(of: focus) { _, field in if field == .body { model.hasPlacedCursor = true } }
+        // The body is a UIKit text view, so the keyboard itself is the signal that typing began.
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+            growForTyping()
+        }
+        // A hardware keyboard shows no keyboard: the first change counts as typing too.
+        .onChange(of: model.hasChanges) { _, changed in if changed { growForTyping() } }
         .dictationPermissions(dictation)
         .sheet(item: $writingTool) { tool in
             WritingToolsSheet(tool: tool, model: model, assistant: assistant)
@@ -185,6 +194,11 @@ struct ComposerSheet: View {
 
     private var hasError: Binding<Bool> {
         Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })
+    }
+
+    private func growForTyping() {
+        guard growsWhenTyping, detent != .large else { return }
+        withAnimation(reduceMotion ? FolioMotion.reduced : .smooth(duration: 0.35)) { detent = .large }
     }
 
     private func appear() {

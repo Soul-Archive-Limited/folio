@@ -12,20 +12,22 @@ struct MonthTitle: View {
         // Batch O: "September" with the Today pill showing didn't fit a 402-pt iPhone even at
         // 70 % and was cut to "Septe…"; the short name ("Sept") is the fallback. VoiceOver reads the
         // full name from the button's label.
+        // Full name at full size, then the full name a size smaller, then the short name.
         ViewThatFits(in: .horizontal) {
-            title(.wide)
-            title(.abbreviated)
+            title(.wide, compact: false)
+            title(.wide, compact: true)
+            title(.abbreviated, compact: false)
         }
     }
 
-    private func title(_ width: Date.FormatStyle.Symbol.Month) -> some View {
+    private func title(_ width: Date.FormatStyle.Symbol.Month, compact: Bool) -> some View {
         // At accessibility sizes the month and year stack instead of truncating.
         let layout = dynamicTypeSize.isAccessibilitySize
             ? AnyLayout(VStackLayout(alignment: .leading, spacing: 0))
             : AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: Spacing.xs))
         return layout {
             Text(month.firstDay.utcDate.formatted(Date.FormatStyle(timeZone: .gmt).month(width)))
-                .folioFont(.title1)
+                .folioFont(compact ? .title2 : .title1)
                 .foregroundStyle(.ink)
                 .id(month.id)
                 .transition(reduceMotion ? AnyTransition.opacity : AnyTransition(.blurReplace))
