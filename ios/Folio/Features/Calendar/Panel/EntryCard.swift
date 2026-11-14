@@ -22,7 +22,7 @@ struct EntryCard: View {
                 // Batch O (independent review): a page with no title showed a bold "Untitled"
                 // over its words, while the page itself shows none; its words lead instead.
                 if !entry.title.isEmpty || preview.isEmpty {
-                    Text(entry.title.isEmpty ? String(localized: "Untitled") : entry.title)
+                    Text(entry.displayTitle)
                         .folioFont(.headline)
                         .foregroundStyle(.ink)
                         .lineLimit(1)

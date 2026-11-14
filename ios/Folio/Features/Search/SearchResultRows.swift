@@ -16,7 +16,7 @@ struct SearchEntryRow: View {
                 Text(SearchDateLine.text(document.dayKey))
                     .folioFont(.caption)
                     .foregroundStyle(.inkSecondary)
-                Text(SearchHighlight.attributed(document.title.isEmpty ? String(localized: "Untitled") : document.title, terms: terms))
+                Text(SearchHighlight.attributed(document.displayTitle, terms: terms))
                     .folioFont(.headline)
                     .foregroundStyle(.ink)
                     .lineLimit(1)

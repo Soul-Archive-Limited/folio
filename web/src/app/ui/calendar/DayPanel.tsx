@@ -1,4 +1,5 @@
 import { formatLong } from '../../lib/days.ts';
+import { pageTitle } from '../../lib/markdown.ts';
 import type { DayIndex } from '../../lib/markers.ts';
 import { useDiary } from '../context.tsx';
 import { EntryCard } from '../EntryCard.tsx';
@@ -49,7 +50,7 @@ function OnThisDay({ day }: { day: string }) {
       <h3 className="caption" style={{ color: 'var(--accent-text)' }}>On this day</h3>
       {earlier.slice(0, 3).map((e) => (
         <button key={e.id} onClick={() => openEntry(e.id)}>
-          <b>{e.data.dayKey.slice(0, 4)}</b><span>{e.data.title || 'Untitled'}</span>{e.data.mood ? <MoodGlyph mood={e.data.mood} size={12} /> : null}
+          <b>{e.data.dayKey.slice(0, 4)}</b><span>{pageTitle(e.data.title, e.data.bodyMarkdown)}</span>{e.data.mood ? <MoodGlyph mood={e.data.mood} size={12} /> : null}
         </button>
       ))}
       {earlier.length > 3 && <p className="caption ink3">and {earlier.length - 3} more</p>}

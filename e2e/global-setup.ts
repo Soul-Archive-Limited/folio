@@ -39,7 +39,7 @@ async function seed(page: Page) {
   await addTask(page, 'Post the letter to Ana');
   await addTask(page, 'Book dentist');
   await selectDay(page, 3);
-  await writeEntry(page, { title: 'Lisbon', body: 'Pastéis de nata for breakfast.', mood: 'Bright', place: 'Belém' });
+  await writeEntry(page, { title: 'Lisbon', body: 'Pastéis de nata for breakfast.', mood: 'Great', place: 'Belém' });
   await selectDay(page, 2);
   await writeEntry(page, { title: 'To be deleted', body: 'This one goes to Recently Deleted.' });
   await page.locator('.day-panel').getByRole('button', { name: /To be deleted/ }).click();

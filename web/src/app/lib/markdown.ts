@@ -192,3 +192,15 @@ export function normalized(runs: Run[]): Run[] {
 
 /** Plain text, one block per line — previews and the "has content" check. */
 export const plainText = (markdown: string) => fromMarkdown(markdown).blocks.map((b) => b.runs.map((r) => r.text).join('')).join('\n');
+
+/**
+ * What a page is called wherever it's listed (Batch O, owner: never "Untitled"): the title,
+ * else the first line of its words, else "A photo" / "3 photos", else "Empty page".
+ */
+export function pageTitle(title: string, bodyMarkdown: string, photoCount = 0): string {
+  const trimmed = title.trim();
+  if (trimmed) return trimmed;
+  const line = plainText(bodyMarkdown).split('\n').map((s) => s.trim()).find(Boolean);
+  if (line) return line.slice(0, 80);
+  return photoCount === 0 ? 'Empty page' : photoCount === 1 ? 'A photo' : `${photoCount} photos`;
+}

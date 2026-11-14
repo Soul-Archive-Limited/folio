@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import { formatShort, formatTime } from '../lib/days.ts';
-import { plainText } from '../lib/markdown.ts';
+import { pageTitle, plainText } from '../lib/markdown.ts';
 import type { EntryData } from '../lib/payloads.ts';
 import type { Rec } from '../lib/store.ts';
 import { CategoryChip, PhotoImg } from './common.tsx';
@@ -14,7 +14,7 @@ export function EntryCard({ entry, style, showDate }: { entry: Rec<EntryData>; s
   const { store, openEntry } = useDiary();
   const photo = store.photosOf(entry.id)[0];
   const preview = plainText(entry.data.bodyMarkdown).replace(/\n+/g, ' ').trim();
-  const title = entry.data.title.trim() || preview.split(/[.!?]/)[0]?.slice(0, 60) || 'Untitled';
+  const title = pageTitle(entry.data.title, entry.data.bodyMarkdown, store.photosOf(entry.id).length);
   const place = cleanPlace(entry.data.place);
   const time = entry.data.minutesFromMidnight !== undefined ? formatTime(entry.data.minutesFromMidnight) : '';
   return (

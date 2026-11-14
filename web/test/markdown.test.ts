@@ -3,7 +3,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { fromMarkdown, plainText, toMarkdown } from '../src/app/lib/markdown.ts';
+import { fromMarkdown, pageTitle, plainText, toMarkdown } from '../src/app/lib/markdown.ts';
 import { fromEditorJSON, toEditorJSON } from '../src/app/lib/editorDoc.ts';
 
 const f = JSON.parse(readFileSync(new URL('../../shared/markdown-fixtures.json', import.meta.url), 'utf8'));
@@ -35,4 +35,12 @@ test('nested list items flatten to lines', () => {
 test('an empty editor is an empty body, and plain text drops markers', () => {
   assert.equal(toMarkdown(fromEditorJSON(toEditorJSON(fromMarkdown('')))), '');
   assert.equal(plainText('# Trip\nWe walked for **hours**.'), 'Trip\nWe walked for hours.');
+});
+
+test('a page is never called "Untitled" (Batch O)', () => {
+  assert.equal(pageTitle('Long walk', 'Along the river.'), 'Long walk');
+  assert.equal(pageTitle('  ', '\n**Saw a heron** standing still.\nSecond line'), 'Saw a heron standing still.');
+  assert.equal(pageTitle('', '', 1), 'A photo');
+  assert.equal(pageTitle('', '', 3), '3 photos');
+  assert.equal(pageTitle('', ''), 'Empty page');
 });

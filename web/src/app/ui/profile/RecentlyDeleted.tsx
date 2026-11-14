@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { formatShort } from '../../lib/days.ts';
-import { plainText } from '../../lib/markdown.ts';
+import { pageTitle, plainText } from '../../lib/markdown.ts';
 import { deletePhotoBlobs } from '../../lib/photos.ts';
 import { daysLeft } from '../../lib/store.ts';
 import { Empty, Modal } from '../common.tsx';
@@ -23,7 +23,7 @@ export default function RecentlyDeleted() {
   const items = (kind === 'entry' ? trash.entries : kind === 'task' ? trash.tasks : trash.categories).sort((a, b) => (b.data.trashedAt ?? 0) - (a.data.trashedAt ?? 0));
 
   const title = (id: string): string => {
-    if (kind === 'entry') { const e = store.get('entry', id)!.data; return e.title || plainText(e.bodyMarkdown).split('\n')[0] || 'Untitled'; }
+    if (kind === 'entry') { const e = store.get('entry', id)!.data; return pageTitle(e.title, e.bodyMarkdown); }
     if (kind === 'task') return store.get('task', id)!.data.title;
     return store.get('category', id)!.data.name;
   };

@@ -53,11 +53,25 @@ extension DiaryStore {
 }
 
 extension Entry {
-    /// The title, else the first line of the body, else "Untitled".
+    /// What a page is called wherever it's listed (Batch O, owner: never "Untitled"): the title,
+    /// else the first line of its words, else "A photo" / "3 photos", else "Empty page".
     var displayTitle: String {
-        if !title.isEmpty { return title }
+        let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmed.isEmpty { return trimmed }
         let firstLine = MarkdownCodec.document(from: bodyMarkdown).plainText
-            .split(whereSeparator: \.isNewline).first.map(String.init) ?? ""
-        return firstLine.isEmpty ? String(localized: "Untitled") : String(firstLine.prefix(80))
+            .split(whereSeparator: \.isNewline)
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .first { !$0.isEmpty } ?? ""
+        if !firstLine.isEmpty { return String(firstLine.prefix(80)) }
+        return Self.untitledName(photoCount: orderedPhotos.count)
+    }
+
+    /// The name for a page with no words at all.
+    static func untitledName(photoCount: Int) -> String {
+        switch photoCount {
+        case 0: String(localized: "Empty page")
+        case 1: String(localized: "A photo")
+        default: String(localized: "\(photoCount) photos")
+        }
     }
 }

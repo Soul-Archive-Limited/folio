@@ -9,11 +9,13 @@ nonisolated enum Mood: Int, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .heavy: String(localized: "Heavy")
+        // Batch O (owner): plain words everyone reads the same way (were Heavy · Low · Steady ·
+        // Good · Bright). The stored values 1…5 don't change.
+        case .heavy: String(localized: "Rough")
         case .low: String(localized: "Low")
-        case .steady: String(localized: "Steady")
+        case .steady: String(localized: "Okay")
         case .good: String(localized: "Good")
-        case .bright: String(localized: "Bright")
+        case .bright: String(localized: "Great")
         }
     }
 

@@ -1,10 +1,10 @@
 /** Mood (Batch J): five steps, Folio's own ring that fills from the bottom — never a face. */
 export const MOODS = [
-  { value: 1, title: 'Heavy', color: 'var(--cat-indigo)', opacity: 1 },
+  { value: 1, title: 'Rough', color: 'var(--cat-indigo)', opacity: 1 },
   { value: 2, title: 'Low', color: 'var(--cat-indigo)', opacity: 0.5 },
-  { value: 3, title: 'Steady', color: 'var(--cat-sand)', opacity: 0.75 },
+  { value: 3, title: 'Okay', color: 'var(--cat-sand)', opacity: 0.75 },
   { value: 4, title: 'Good', color: 'var(--accent)', opacity: 0.55 },
-  { value: 5, title: 'Bright', color: 'var(--accent)', opacity: 1 },
+  { value: 5, title: 'Great', color: 'var(--accent)', opacity: 1 },
 ] as const;
 
 /** A synced mood, or undefined when missing or off the scale (a crafted record). */
@@ -31,7 +31,7 @@ export function MoodGlyph({ mood, size = 18 }: { mood?: number; size?: number })
 
 export function MoodPicker({ value, onChange }: { value?: number; onChange: (mood: number | undefined) => void }) {
   return (
-    <div className="mood-picker" role="radiogroup" aria-label="How did it feel?">
+    <div className="mood-picker" role="radiogroup" aria-label="Mood — how did the day feel?">
       {MOODS.map((m) => (
         <button key={m.value} role="radio" aria-checked={value === m.value} title={m.title}
           onClick={() => onChange(value === m.value ? undefined : m.value)}>

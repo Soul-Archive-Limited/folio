@@ -26,7 +26,7 @@ test.describe('Flows', () => {
     const problems = watchConsole(page);
     await openDiary(page);
     await page.locator('.cell:not(.out)').nth(6).click();
-    await writeEntry(page, { title: 'Flow page', body: 'First draft.', mood: 'Steady' });
+    await writeEntry(page, { title: 'Flow page', body: 'First draft.', mood: 'Okay' });
     const card = page.locator('.day-panel').getByRole('button', { name: /Flow page/ });
     await card.click();
     await page.getByRole('button', { name: 'Edit' }).click();

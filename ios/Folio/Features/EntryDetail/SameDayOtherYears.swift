@@ -62,7 +62,7 @@ struct OtherYearCard: View {
             Text(entry.day?.year ?? 0, format: .number.grouping(.never))
                 .folioFont(.title2)
                 .foregroundStyle(.accentText)
-            Text(entry.title.isEmpty ? String(localized: "Untitled") : entry.title)
+            Text(entry.displayTitle)
                 .folioFont(.callout)
                 .foregroundStyle(.ink)
                 .lineLimit(2)

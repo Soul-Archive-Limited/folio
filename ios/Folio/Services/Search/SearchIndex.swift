@@ -24,6 +24,15 @@ nonisolated struct SearchIndex: Sendable {
         let isCompleted: Bool
         let mood: Int?
         let vocabulary: [String]
+
+        /// The title, else the first line of the text (Batch O: never "Untitled").
+        var displayTitle: String {
+            let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !trimmed.isEmpty { return trimmed }
+            let firstLine = text.split(whereSeparator: \.isNewline)
+                .map { $0.trimmingCharacters(in: .whitespaces) }.first { !$0.isEmpty } ?? ""
+            return firstLine.isEmpty ? Entry.untitledName(photoCount: photoCount) : String(firstLine.prefix(80))
+        }
     }
 
     var documents: [Document] = []

@@ -31,10 +31,21 @@ struct ComposerMoodButton: View {
 
     var body: some View {
         Button { showsPicker = true } label: {
-            MoodGlyph(mood: mood, size: 21)
-                .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
-                .contentShape(.rect)
+            Group {
+                if mood == nil {
+                    // Batch O (owner): an empty ring didn't say "mood". The day's weather does,
+                    // without a face; once chosen, the mood's own mark shows.
+                    Image(systemName: "cloud.sun")
+                        .font(.title3)
+                        .foregroundStyle(.ink)
+                } else {
+                    MoodGlyph(mood: mood, size: 21)
+                }
+            }
+            .frame(width: Spacing.minHitTarget, height: Spacing.minHitTarget)
+            .contentShape(.rect)
         }
+        .help("Mood")
         .accessibilityLabel(mood.map { String(localized: "Mood, \($0.title)") } ?? String(localized: "Mood"))
         .accessibilityIdentifier("composer.mood")
         .popover(isPresented: $showsPicker) {
@@ -50,7 +61,7 @@ struct MoodPicker: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.s) {
-            Text("How did it feel?").folioFont(.caption).foregroundStyle(.inkSecondary)
+            Text("Mood — how did the day feel?").folioFont(.caption).foregroundStyle(.inkSecondary)
             HStack(spacing: Spacing.s) {
                 ForEach(Mood.allCases) { option in
                     Button {

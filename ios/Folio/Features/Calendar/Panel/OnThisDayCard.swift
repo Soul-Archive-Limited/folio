@@ -19,7 +19,7 @@ struct OnThisDayCard: View {
                             Text(String(entry.day?.year ?? 0))
                                 .font(.subheadline.weight(.bold).monospacedDigit())
                                 .foregroundStyle(.ink)
-                            Text(entry.title.isEmpty ? String(localized: "Untitled") : entry.title)
+                            Text(entry.displayTitle)
                                 .folioFont(.callout)
                                 .foregroundStyle(.inkSecondary)
                                 .lineLimit(1)

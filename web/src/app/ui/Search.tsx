@@ -1,4 +1,5 @@
 import { useDeferredValue, useMemo, useState } from 'react';
+import { pageTitle } from '../lib/markdown.ts';
 import { addDays, formatShort, todayKey } from '../lib/days.ts';
 import { highlight, search, type SearchDoc, type SearchFilters, snippet, words } from '../lib/search.ts';
 import { CategoryChip, Empty, PhotoImg, Sheet, useCloseSheet } from './common.tsx';
@@ -89,7 +90,7 @@ function SearchBody({ tasksOnly: initialTasksOnly }: { tasksOnly: boolean }) {
               {d.firstPhotoID && <span className="thumb"><PhotoImg id={d.firstPhotoID} rendition="thumb" /></span>}
               <span className="grow" style={{ minWidth: 0, textAlign: 'start' }}>
                 <span className="ink2" style={{ display: 'block', fontSize: 12 }}>{d.dayKey ? formatShort(d.dayKey) + ' ' + d.dayKey.slice(0, 4) : ''}</span>
-                <span className="t"><Marked text={d.title || 'Untitled'} terms={terms} /></span>
+                <span className="t"><Marked text={pageTitle(d.title, d.text, d.photoCount)} terms={terms} /></span>
                 {d.text && <span className="p"><Marked text={snippet(d.text, terms)} terms={terms} /></span>}
                 {d.categoryID && <span className="meta"><CategoryChip id={d.categoryID} /></span>}
               </span>

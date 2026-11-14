@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { sameId } from '../../lib/bytes.ts';
 import { addMonths, formatMonthYear, formatShort, monthKey, monthOf, todayKey } from '../../lib/days.ts';
 import { byTimeInDay } from '../../lib/markers.ts';
-import { plainText } from '../../lib/markdown.ts';
+import { pageTitle, plainText } from '../../lib/markdown.ts';
 import { CategoryChips, Empty, PhotoImg } from '../common.tsx';
 import { useDiary } from '../context.tsx';
 import { EntryCard } from '../EntryCard.tsx';
@@ -79,7 +79,7 @@ export default function JournalView() {
                     <PhotoImg id={cover.id} rendition="display" />
                     <span className="over">
                       <span className="caption" style={{ opacity: 0.85 }}>{formatShort(e.data.dayKey)}</span>
-                      <span className="title2" style={{ display: 'block' }}>{e.data.title || plainText(e.data.bodyMarkdown).split('\n')[0] || 'Untitled'}</span>
+                      <span className="title2" style={{ display: 'block' }}>{pageTitle(e.data.title, e.data.bodyMarkdown)}</span>
                     </span>
                   </button>
                 );

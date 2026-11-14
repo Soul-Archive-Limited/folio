@@ -12,7 +12,7 @@ export interface EntryData {
   categoryID?: string;
   createdAt: number;
   trashedAt?: number;
-  /** Batch J: 1…5 (Heavy … Bright); anything else is ignored when shown. */
+  /** Batch J: 1…5 (Rough … Great); anything else is ignored when shown. */
   mood?: number;
   /** Batch N: where it was written; coordinates only when added on an iPhone. */
   place?: PlaceData;

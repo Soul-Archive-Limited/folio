@@ -28,7 +28,7 @@ enum TourStep: Int, CaseIterable, Identifiable, Sendable {
         case .month: "Your month"
         case .tapDay: "Tap a day"
         case .add: "Write your first page"
-        case .composerTools: "Photos, categories, your voice"
+        case .composerTools: "Photos, mood, places, your voice"
         case .todo: "To-do"
         case .profile: "Make it yours"
         }
@@ -39,7 +39,7 @@ enum TourStep: Int, CaseIterable, Identifiable, Sendable {
         case .month: "Days you write on get a photo or a dot."
         case .tapDay: "Tap a day to see its pages and tasks."
         case .add: "Tap + to write. The calendar stays above while you type."
-        case .composerTools: "Add photos, pick a category, or dictate instead of typing."
+        case .composerTools: "Add photos, a category, how the day felt (the cloud and sun) or a place — or dictate instead of typing."
         case .todo: "Tasks you finish stay on their day, ticked."
         case .profile: "Make categories with your own colours. Turn on sync any time."
         }

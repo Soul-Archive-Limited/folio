@@ -1,4 +1,5 @@
 import { formatShort } from '../../lib/days.ts';
+import { pageTitle } from '../../lib/markdown.ts';
 import { appleMapsURL, placeGroups } from '../../lib/place.ts';
 import type { EntryData } from '../../lib/payloads.ts';
 import type { Rec } from '../../lib/store.ts';
@@ -32,7 +33,7 @@ export function PlacesList({ entries }: { entries: Rec<EntryData>[] }) {
               <li key={e.id}>
                 <button onClick={() => openEntry(e.id)}>
                   <span className="caption place-date">{formatShort(e.data.dayKey)}</span>
-                  <span>{e.data.title || 'Untitled'}</span>
+                  <span>{pageTitle(e.data.title, e.data.bodyMarkdown)}</span>
                 </button>
               </li>
             ))}

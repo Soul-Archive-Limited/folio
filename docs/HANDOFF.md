@@ -2,12 +2,15 @@
 
 The next session starts here. Read this, then `CLAUDE.md`, `docs/SPEC.md`, `docs/PHASES.md` and the last entries of `docs/DECISIONS.md`. Updated at the end of every batch.
 
-_Last updated: 2026-11-12, Batch O (version 1.0, full audit, App Store submission) — in progress._
+_Last updated: 2026-11-14, Batch O (version 1.0 on TestFlight; privacy check; App Store submission still to do)._
 
 ## Batch O status (resume here)
 Version **1.0.0**. Done and pushed: App Store screenshots retaken at Apple's required sizes (`scripts/appstore-shots.sh`), 1.0 listing/privacy/age-rating/review notes in `docs/APPSTORE.md`, website changelog 1.0 + Features (Places, celebrations) + fresh app shots, and the owner-requested **full hands-on audit** (`docs/reports/full-audit.md`: findings, design review, costs and limits; DECISIONS 313–316).
 - Owner's answers: build 139 all good; **no real-iPhone Instruments pass now** (still open); App Store name **Folio**; availability **every country except France** (and China mainland, which needs an ICP filing) → EU trader declaration first.
-- Part 4 (App Store Connect) needs the owner's 2FA sign-in in the browser pane.
+- **TestFlight 1.0.0 (145)** uploaded 14 Nov (0 warnings): in **Owner** (installable now) and submitted to **Friends** (Beta App Review: Waiting for Review). App Privacy now has **Precise Location** (published 14 Nov). Builds 137–139 never reached App Store Connect; the friend was on 0.1.0 (107).
+- **Privacy check (owner, 14 Nov):** production has one account (owner, Sign in with Apple) and one signed-in device (owner's iPhone 15 Pro); the friend has never signed in (guest). Fixed the one way diaries could mix: pages left on an iPhone after a sign-out never upload into a *different* account without asking (`LocalDiaryOrigin`, DECISIONS 317).
+- **Day-panel pages open in the half sheet** and grow full screen when typing (DECISIONS 318) — not yet in a TestFlight build.
+- **Still to do (Part 4):** Hono 4.13.16 update + API deploy (DECISIONS 319, owner's go-ahead), EU trader declaration, listing/age rating/review notes/screenshots in App Store Connect, availability (all but France and China mainland), live production sync test (review code in Keychain), submit 1.0 for App Review, unlisted request.
 
 ### Batch O tools
 - `scripts/appstore-shots.sh <udid> iphone|ipad [out]` — App Store JPEGs (iPhone 17 Pro = 1206 × 2622; iPad Pro 13" landscape = 2752 × 2064; rotate the iPad with the Simulator tool first).
