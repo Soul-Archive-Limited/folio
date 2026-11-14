@@ -10,6 +10,7 @@ struct AccountFlowView: View {
 
     @Environment(AccountModel.self) private var account
     @Environment(SyncEngine.self) private var sync
+    @Environment(DiaryStore.self) private var store
     @State private var toasts = ToastCenter()
 
     var body: some View {
@@ -40,6 +41,14 @@ struct AccountFlowView: View {
             }
         case .locked:
             UnlockView(onCancel: onFinish)
+        case .choosingDiary:
+            // Cancel signs this account out again; the pages stay on the iPhone as they were.
+            LocalDiaryChoiceView(onCancel: {
+                Task {
+                    await account.signOut(keepLocalData: true, store: store)
+                    onFinish()
+                }
+            })
         case .ready:
             SyncProgressStep(onDone: onFinish)
         }

@@ -13,6 +13,7 @@ import Foundation
 /// - `-FolioSeedLongEntry YES` adds today's "Very long entry" (~50,000 characters).
 /// - `-FolioResetData YES` erases the local store first.
 /// - `-FolioSampleData YES` loads sample data into an empty store.
+/// - `-FolioForeignDiary YES` marks this iPhone's pages as another account's (Batch O).
 /// - `-FolioStressData YES` loads 10,000 entries for performance checks.
 /// - `-FolioSeedPixels YES` adds short pages with moods across this year (Year in Pixels shots).
 /// - `-FolioHitchLog YES` counts late frames into `Documents/hitches.log` (Phase 13 audit).
@@ -77,8 +78,10 @@ enum DebugLaunchOptions {
             Keychain.deleteEverything()
             for key in defaults.dictionaryRepresentation().keys where key.hasPrefix("sync.") { defaults.removeObject(forKey: key) }
         }
-        if defaults.bool(forKey: "FolioResetData") { store.eraseAll() }
+        if defaults.bool(forKey: "FolioResetData") { store.eraseAll(); LocalDiaryOrigin.accountID = nil }
         if defaults.bool(forKey: "FolioSampleData") { PreviewData.loadIfEmpty(into: store) }
+        // Batch O: pretend the pages on this iPhone came from another account (UI test).
+        if defaults.bool(forKey: "FolioForeignDiary") { LocalDiaryOrigin.accountID = UUID() }
         if defaults.bool(forKey: "FolioStressData"), store.isEmpty { PreviewData.loadStressData(into: store) }
         if defaults.bool(forKey: "FolioSeedPixels") { PreviewData.loadPixelYear(into: store) }
         if defaults.bool(forKey: "FolioTrashSamples") { PreviewData.trashSamples(in: store) }

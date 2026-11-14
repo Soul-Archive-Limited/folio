@@ -146,6 +146,9 @@ extension AccountModel {
 
     private func finishSignOut(keepLocalData: Bool, store: DiaryStore) {
         let userID = userID
+        // Only a diary that synced with this account becomes "this account's pages"; signing out
+        // while still choosing (or before the key arrived) leaves the earlier origin as it was.
+        let wasSyncing = status == .ready
         sync?.stop()
         StoredSession.remove()
         api.setToken(nil)
@@ -153,8 +156,10 @@ extension AccountModel {
         if let userID { SyncState.clear(for: userID) }
         if keepLocalData {
             store.detachFromAccount()
+            if wasSyncing, let userID { LocalDiaryOrigin.accountID = userID }
         } else {
             store.eraseAll()
+            LocalDiaryOrigin.accountID = nil
         }
     }
 }

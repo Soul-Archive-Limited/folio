@@ -42,6 +42,36 @@ final class SyncLiveUITests: XCTestCase {
         shot("p10-08-profile-signed-in")
     }
 
+    /// Batch O: pages another account left on this iPhone don't upload into a different account.
+    /// Sign up with them on the iPhone → the choice appears before any sync → Remove → the new
+    /// account's Journal is empty. Needs an empty local D1 (the review account must be new).
+    @MainActor func testO1PagesFromAnotherAccountAreNotMerged() throws {
+        let app = try launch(["-FolioResetAccount", "YES", "-FolioResetData", "YES", "-FolioSampleData", "YES",
+                              "-FolioForeignDiary", "YES", "-FolioTab", "profile"])
+        try signIn(app)
+        let key = app.staticTexts["recoveryKey"]
+        XCTAssertTrue(key.waitForExistence(timeout: 30))
+        let characters = key.label.replacingOccurrences(of: " ", with: "").replacingOccurrences(of: "-", with: "")
+        let confirm = app.textFields["recoveryConfirm"]
+        confirm.tap()
+        confirm.typeText(String(characters.suffix(4)))
+        app.buttons["Continue"].firstMatch.tap()
+        XCTAssertTrue(app.staticTexts["Pages from another account"].waitForExistence(timeout: 20),
+                      "Signing in with another account's pages on the iPhone must ask first")
+        shot("o-01-pages-from-another-account")
+        app.buttons["localDiary.remove"].tap()
+        let removeButton = app.buttons["Remove from this iPhone"]
+        XCTAssertTrue(removeButton.waitForExistence(timeout: 5))
+        removeButton.tap()
+        try waitForAllSet(app, timeout: 120)
+        app.buttons["Done"].tap()
+        app.terminate()
+        let after = try launch(["-FolioTab", "journal"])
+        XCTAssertFalse(after.descendants(matching: .any).matching(identifier: "entry-card").firstMatch.waitForExistence(timeout: 8),
+                       "The new account must not contain the other account's pages")
+        shot("o-02-new-account-journal-empty")
+    }
+
     /// B: a fresh device signs in to the same account and shows the link QR; its text goes to
     /// the pasteboard (no camera in the Simulator). Waits until A approves, then syncs.
     @MainActor func testB1SignInAndWaitForQR() throws {

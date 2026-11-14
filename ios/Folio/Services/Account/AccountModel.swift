@@ -9,11 +9,14 @@ import os
 ///   shows until the person confirms they saved it.
 /// - `locked`: signed in, but this device doesn't have the Data Key (no iCloud Keychain copy);
 ///   the unlock screen offers a QR from another device or the recovery key.
+/// - `choosingDiary`: signed in with the key, but this iPhone still holds pages from a
+///   different account (signed out here earlier); nothing syncs until the person chooses to add
+///   them to this account or remove them from the iPhone (`LocalDiaryOrigin`, Batch O).
 /// - `ready`: signed in with the key; sync runs.
 @Observable
 final class AccountModel {
     enum Status: Equatable {
-        case guest, settingUp, locked, ready
+        case guest, settingUp, locked, choosingDiary, ready
     }
 
     private(set) var status: Status = .guest
@@ -41,7 +44,9 @@ final class AccountModel {
         api.setToken(stored.token)
         if let key = Self.storedDataKey(for: stored.userID) {
             dataKey = key
-            status = .ready
+            // Closed while choosing what to do with another account's pages: ask again.
+            let pending = LocalDiaryOrigin.accountID.map { $0 != stored.userID } ?? false
+            status = pending ? .choosingDiary : .ready
         } else {
             status = .locked
         }
@@ -181,8 +186,31 @@ final class AccountModel {
     }
 
     private func becomeReady() {
+        // Batch O: pages another account left on this iPhone never upload into this one unasked.
+        if let userID, let store = sync?.store,
+           LocalDiaryOrigin.needsChoice(signingIn: userID, origin: LocalDiaryOrigin.accountID, hasLocalPages: !store.isEmpty) {
+            status = .choosingDiary
+            return
+        }
+        LocalDiaryOrigin.accountID = nil   // whatever is here now belongs to this account
         status = .ready
         sync?.accountBecameReady(joinedExisting: joinedExistingAccount)
+    }
+
+    // MARK: Another account's pages on this iPhone (Batch O)
+
+    /// "Add them to this account": they upload with the first sync.
+    func addLocalDiaryToAccount() {
+        LocalDiaryOrigin.accountID = nil
+        becomeReady()
+    }
+
+    /// "Remove them from this iPhone": they stay in the other account online; this account
+    /// starts from what it has on the server.
+    func removeLocalDiary(store: DiaryStore) {
+        store.eraseAll()
+        LocalDiaryOrigin.accountID = nil
+        becomeReady()
     }
 
     static func storedDataKey(for userID: UUID) -> DataKey? {
