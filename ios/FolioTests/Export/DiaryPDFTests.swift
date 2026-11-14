@@ -35,7 +35,7 @@ struct DiaryPDFTests {
         #expect(result.pageCount >= 1 + months.count)
         let text = document.string ?? ""
         #expect(text.contains("Formatting check"))
-        #expect(text.contains("BRIGHT"))
+        #expect(text.contains("GREAT"))
         #expect(text.contains("packed"))
         #expect(text.contains("Morning swim"))
         #expect(elapsed < .seconds(60))

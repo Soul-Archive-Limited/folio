@@ -166,7 +166,7 @@ final class ScreenshotUITests: XCTestCase {
         let next = app.buttons["Next"]
         XCTAssertTrue(next.waitForExistence(timeout: 10))
         next.press(forDuration: 0.15)
-        XCTAssertTrue(app.staticTexts["Photos, categories, your voice"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Photos, mood, places, your voice"].waitForExistence(timeout: 5))
         shot("04-after-tour-step4-composer")
     }
 }

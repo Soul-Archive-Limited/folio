@@ -12,7 +12,7 @@ final class TourComposerStepUITests: XCTestCase {
         app.launch()
         XCTAssertTrue(app.staticTexts["Write your first page"].waitForExistence(timeout: 20))
         app.buttons["Next"].press(forDuration: 0.15)
-        let title = app.staticTexts["Photos, categories, your voice"]
+        let title = app.staticTexts["Photos, mood, places, your voice"]
         XCTAssertTrue(title.waitForExistence(timeout: 6), "step 4's card shows in the composer")
         Thread.sleep(forTimeInterval: 0.6)
         if let folder = ProcessInfo.processInfo.environment["FOLIO_SHOTS"] {
