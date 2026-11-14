@@ -11,7 +11,8 @@ Version **1.0.0**. Done and pushed: App Store screenshots retaken at Apple's req
 - **Privacy check (owner, 14 Nov):** production has one account (owner, Sign in with Apple) and one signed-in device (owner's iPhone 15 Pro); the friend has never signed in (guest). Fixed the one way diaries could mix: pages left on an iPhone after a sign-out never upload into a *different* account without asking (`LocalDiaryOrigin`, DECISIONS 317).
 - **Day-panel pages open in the half sheet** and grow full screen when typing (DECISIONS 318); **moods** are Rough · Low · Okay · Good · Great with a cloud-and-sun button (DECISIONS 320); **no page is called "Untitled"** (DECISIONS 321).
 - **TestFlight 1.0.0 (149)** (14 Nov, 0 warnings) has all of the above plus the privacy fix: in **Owner** now. Apple allows one 1.0.0 build in Beta App Review at a time — **add 149 to Friends once 145 is approved** (TestFlight → Friends → Builds → +).
-- **Still to do (Part 4):** Hono 4.13.16 update + API deploy (DECISIONS 319, owner's go-ahead), EU trader declaration, listing/age rating/review notes/screenshots in App Store Connect, availability (all but France and China mainland), live production sync test (review code in Keychain), submit 1.0 for App Review, unlisted request.
+- **API deployed 61c26b91** (14 Nov): Hono 4.13.16 security update (DECISIONS 319). Astro 7.4.7 for the website can follow after 19 Nov (two-week rule).
+- **Still to do (Part 4):** EU trader declaration, listing/age rating/review notes/screenshots in App Store Connect, availability (all but France and China mainland), live production sync test (review code in Keychain), submit 1.0 for App Review, unlisted request.
 
 ### Batch O tools
 - `scripts/appstore-shots.sh <udid> iphone|ipad [out]` — App Store JPEGs (iPhone 17 Pro = 1206 × 2622; iPad Pro 13" landscape = 2752 × 2064; rotate the iPad with the Simulator tool first).
