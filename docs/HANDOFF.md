@@ -9,7 +9,8 @@ Version **1.0.0**. Done and pushed: App Store screenshots retaken at Apple's req
 - Owner's answers: build 139 all good; **no real-iPhone Instruments pass now** (still open); App Store name **Folio**; availability **every country except France** (and China mainland, which needs an ICP filing) → EU trader declaration first.
 - **TestFlight 1.0.0 (145)** uploaded 14 Nov (0 warnings): in **Owner** (installable now) and submitted to **Friends** (Beta App Review: Waiting for Review). App Privacy now has **Precise Location** (published 14 Nov). Builds 137–139 never reached App Store Connect; the friend was on 0.1.0 (107).
 - **Privacy check (owner, 14 Nov):** production has one account (owner, Sign in with Apple) and one signed-in device (owner's iPhone 15 Pro); the friend has never signed in (guest). Fixed the one way diaries could mix: pages left on an iPhone after a sign-out never upload into a *different* account without asking (`LocalDiaryOrigin`, DECISIONS 317).
-- **Day-panel pages open in the half sheet** and grow full screen when typing (DECISIONS 318) — not yet in a TestFlight build.
+- **Day-panel pages open in the half sheet** and grow full screen when typing (DECISIONS 318); **moods** are Rough · Low · Okay · Good · Great with a cloud-and-sun button (DECISIONS 320); **no page is called "Untitled"** (DECISIONS 321).
+- **TestFlight 1.0.0 (149)** (14 Nov, 0 warnings) has all of the above plus the privacy fix: in **Owner** now. Apple allows one 1.0.0 build in Beta App Review at a time — **add 149 to Friends once 145 is approved** (TestFlight → Friends → Builds → +).
 - **Still to do (Part 4):** Hono 4.13.16 update + API deploy (DECISIONS 319, owner's go-ahead), EU trader declaration, listing/age rating/review notes/screenshots in App Store Connect, availability (all but France and China mainland), live production sync test (review code in Keychain), submit 1.0 for App Review, unlisted request.
 
 ### Batch O tools
